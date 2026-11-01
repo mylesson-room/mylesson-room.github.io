@@ -94,6 +94,6 @@ function renderTraining(){const t=training,entry=t.queue[t.index];if(!entry){con
 
 
 
-window.addEventListener('pagehide',stop);if(!Number.isInteger(state.page)||state.page<0||state.page>=pages.length)state.page=0;if(location.hash==='#homework')state.page=0;render();if(location.hash==='#vocabulary')openDict();if(location.hash==='#training')openTraining();if(!storage){$('#storageNote').hidden=false;$('#storageNote').textContent='Saving unavailable. Export your work before closing.';}
+window.addEventListener('pagehide',stop);if(!Number.isInteger(state.page)||state.page<0||state.page>=pages.length)state.page=0;if(location.hash==='#homework')state.page=7;render();if(location.hash==='#vocabulary')openDict();if(location.hash==='#training')openTraining();if(!storage){$('#storageNote').hidden=false;$('#storageNote').textContent='Saving unavailable. Export your work before closing.';}
 </script></body></html>
 
