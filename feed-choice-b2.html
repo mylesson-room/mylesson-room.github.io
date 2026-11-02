@@ -22,6 +22,15 @@
 #translationPop .translation-add:hover{background:#ffe1e7;color:#db6e80}
 #translationPop #selectedWord{max-height:100px;overflow:auto;font-size:18px;line-height:1.45}
 #translationPop #selectedMeaning{max-height:220px;overflow:auto}
+
+.audio-box{background:linear-gradient(135deg,#f5faff,#eaf4ff);border:1px solid #d6e7f7;border-radius:22px;padding:24px;margin:24px 0;box-shadow:0 8px 24px #224d7810}
+.audio-top{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-bottom:20px}.audio-top strong{font-size:18px}.audio-top span{font-size:12px;color:var(--muted)}
+.audio-player{display:flex;align-items:center;gap:16px;padding:16px;background:var(--card);border:1px solid var(--line);border-radius:16px}
+.audio-play{flex:0 0 48px;width:48px;height:48px;border:0;border-radius:50%;background:#287fd2;color:white;font-size:20px;box-shadow:0 4px 12px #287fd230}
+.audio-track{flex:1;min-width:0}.audio-track input{display:block;width:100%;accent-color:#287fd2;cursor:pointer;height:18px;margin:0;padding:0}.audio-times{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;margin-top:5px}
+.audio-box .transcript{border:0;margin-top:16px;padding-top:0}.audio-box .transcript summary{display:inline-flex;align-items:center;gap:8px;background:transparent;border:0;padding:8px 0;color:var(--accent);font-size:14px;cursor:pointer;list-style:none}.audio-box .transcript summary::-webkit-details-marker{display:none}.audio-box .transcript summary:before{content:'＋';font-size:18px}.audio-box .transcript[open] summary:before{content:'−'}.audio-box .transcript p{font-size:15px}
+@media(max-width:600px){.audio-box{padding:16px}.audio-top{align-items:flex-start;flex-direction:column}.audio-player{gap:12px;padding:12px}}
+body.dark .audio-box{background:var(--soft)}
 </style></head><body><header><div class="brand">Gostudy</div><div class="header-actions"><a class="small-button cabinet-link" href="student-feed-b2.html">← Кабинет</a><button class="small-button" id="dictBtn">My words <span id="wordCount">0</span></button><button class="small-button" id="themeBtn" aria-label="Switch colour theme">◐</button></div></header>
 <div class="shell"><main><div class="lesson-bar"><button class="small-button" id="menuBtn" aria-haspopup="dialog" aria-expanded="false">☰ Задания</button></div><div id="pageLabel" hidden></div><h1 id="title" tabindex="-1"></h1><p class="subtitle" id="goal"></p><div id="content"></div><details class="teacher" hidden><summary>Teacher notes · pacing</summary><p id="teacherTips"></p></details><div class="page-controls"><button id="prev" class="small-button">← Назад</button><span id="counter"></span><button id="next" class="primary">Next →</button></div><footer class="footer">Gostudy · Media & Choice · B2. Ответы и слова сохраняются в этом браузере.</footer><p class="storage-note" id="storageNote" hidden role="status"></p></main></div>
 <dialog id="lessonMenu" class="menu-dialog"><button class="small-button" id="exportBtn" hidden style="margin-bottom:20px">↓ Download my answers</button><div class="menu-top"><b>Урок</b><button class="small-button" id="closeMenu">Закрыть ✕</button></div><span class="eyebrow">MEDIA & CHOICE · B2</span><h2>Your feed,<br>your choice?</h2><nav id="nav"></nav></dialog>
@@ -108,5 +117,17 @@ function renderTraining(){const t=training,entry=t.queue[t.index];if(!entry){con
 
 
 window.addEventListener('pagehide',stop);if(!Number.isInteger(state.page)||state.page<0||state.page>=pages.length)state.page=0;if(location.hash==='#homework')state.page=7;render();if(location.hash==='#vocabulary')openDict();if(location.hash==='#training')openTraining();if(!storage){$('#storageNote').hidden=false;$('#storageNote').textContent='Saving unavailable. Export your work before closing.';}
+</script><script>
+(()=>{
+const fmt=n=>Number.isFinite(n)?Math.floor(n/60)+':'+String(Math.floor(n%60)).padStart(2,'0'):'0:00';
+function enhance(){const audio=document.getElementById('lessonAudio');if(!audio||audio.dataset.styled)return;audio.dataset.styled='1';audio.controls=false;audio.hidden=true;
+const player=document.createElement('div');player.className='audio-player';player.innerHTML='<button type="button" class="audio-play" aria-label="Воспроизвести аудио">▶</button><div class="audio-track"><input type="range" min="0" max="100" step="0.1" value="0" aria-label="Позиция воспроизведения"><div class="audio-times"><span class="elapsed">0:00</span><span class="duration">1:38</span></div></div>';audio.after(player);
+const button=player.querySelector('button'),range=player.querySelector('input');
+const sync=()=>{button.textContent=audio.paused?'▶':'Ⅱ';button.setAttribute('aria-label',audio.paused?'Воспроизвести аудио':'Пауза');range.value=audio.duration?audio.currentTime/audio.duration*100:0;player.querySelector('.elapsed').textContent=fmt(audio.currentTime);if(Number.isFinite(audio.duration))player.querySelector('.duration').textContent=fmt(audio.duration);};
+button.onclick=()=>{if(audio.paused)audio.play().catch(()=>{audio.hidden=false;audio.controls=true;player.hidden=true;});else audio.pause();};
+range.oninput=()=>{if(Number.isFinite(audio.duration))audio.currentTime=Number(range.value)*audio.duration/100;sync();};
+['play','pause','ended','timeupdate','loadedmetadata','durationchange'].forEach(e=>audio.addEventListener(e,sync));sync();}
+new MutationObserver(enhance).observe(document.getElementById('content'),{childList:true});enhance();
+})();
 </script></body></html>
 
