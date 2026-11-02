@@ -13,10 +13,10 @@
 #translationPop .translation-entry{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:start}#translationPop .translation-add{display:grid;place-items:center;min-height:44px;width:44px;height:44px;margin-top:7px;padding:0;border:1px solid var(--accent);border-radius:12px;background:var(--accent);color:white;font-size:30px;line-height:1;cursor:pointer}#translationPop #selectedMeaning{box-sizing:border-box;display:block;width:100%;min-height:60px;max-height:none;resize:none;overflow:hidden;white-space:pre-wrap;overflow-wrap:anywhere;font-size:17px;line-height:1.65;padding:12px 14px}#translationPop #selectedWord{white-space:normal;overflow-wrap:anywhere;line-height:1.4}#translationPop .dict-actions{margin-top:12px}
 /* Translation occupies its own space and never covers lesson text. */
 .shell{display:block;max-width:1400px;padding-right:390px}
-.translation-pop{position:fixed!important;left:auto!important;right:24px!important;top:100px!important;bottom:auto!important;width:340px!important;max-height:calc(100dvh - 124px)!important;overflow:auto;box-sizing:border-box;user-select:none}
-.translation-pop h3{max-height:100px;overflow:auto;font-size:18px;line-height:1.45}
-.translation-pop textarea{max-height:220px!important;overflow:auto!important;user-select:text}
-@media(max-width:1000px){.shell{max-width:850px;padding-right:28px}.translation-pop{position:relative!important;top:auto!important;right:auto!important;left:auto!important;width:100%!important;max-height:none!important;margin:20px 0;box-shadow:0 4px 18px #203f6310}.translation-pop h3{max-height:90px}}
+#translationPop#translationPop{position:fixed!important;left:auto!important;right:24px!important;top:100px!important;bottom:auto!important;width:340px!important;max-height:calc(100dvh - 124px)!important;overflow:auto;box-sizing:border-box;user-select:none}
+#translationPop#translationPop h3{max-height:100px;overflow:auto;font-size:18px;line-height:1.45}
+#translationPop#translationPop textarea{max-height:220px!important;overflow:auto!important;user-select:text}
+@media(max-width:1000px){.shell{max-width:850px;padding-right:28px}#translationPop#translationPop{position:relative!important;top:auto!important;right:auto!important;left:auto!important;width:100%!important;max-height:none!important;margin:20px 0;box-shadow:0 4px 18px #203f6310}#translationPop#translationPop h3{max-height:90px}}
 
 #translationPop .translation-add{color:#e88996;background:#fff0f2;border:1px solid #f6cbd2;border-radius:50%;box-shadow:0 3px 10px #e889961a}
 #translationPop .translation-add:hover{background:#ffe1e7;color:#db6e80}
