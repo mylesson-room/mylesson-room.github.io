@@ -31,11 +31,78 @@
 .audio-box .transcript{border:0;margin-top:16px;padding-top:0}.audio-box .transcript summary{display:inline-flex;align-items:center;gap:8px;background:transparent;border:0;padding:8px 0;color:var(--accent);font-size:14px;cursor:pointer;list-style:none}.audio-box .transcript summary::-webkit-details-marker{display:none}.audio-box .transcript summary:before{content:'＋';font-size:18px}.audio-box .transcript[open] summary:before{content:'−'}.audio-box .transcript p{font-size:15px}
 @media(max-width:600px){.audio-box{padding:16px}.audio-top{align-items:flex-start;flex-direction:column}.audio-player{gap:12px;padding:12px}}
 body.dark .audio-box{background:var(--soft)}
-.travel-cover{display:block;width:100%;height:300px;object-fit:cover;border-radius:18px;margin-bottom:22px}.homework-story{font-size:17px;line-height:2.6}.homework-story select{display:inline-block;width:auto;max-width:100%;padding:5px 9px;font-size:15px;margin:0 4px;vertical-align:baseline}.homework-story .feedback{display:inline;font-size:12px;margin-right:6px}@media(max-width:600px){.travel-cover{height:210px}}#menuBtn,.page-controls{display:none!important}#content select{width:auto;max-width:100%;margin:4px;padding:6px}#content .feedback{display:inline;font-size:12px}</style></head><body><header><div class="brand">Gostudy</div><div class="header-actions"><a class="small-button cabinet-link" href="student-travel-a2.html">← Кабинет</a><button class="small-button" id="dictBtn">My words <span id="wordCount">0</span></button><button class="small-button" id="themeBtn" aria-label="Switch colour theme">◐</button></div></header>
+.travel-cover{display:block;width:100%;height:300px;object-fit:cover;border-radius:18px;margin-bottom:22px}.homework-story{font-size:17px;line-height:2.6}.homework-story select{display:inline-block;width:auto;max-width:100%;padding:5px 9px;font-size:15px;margin:0 4px;vertical-align:baseline}.homework-story .feedback{display:inline;font-size:12px;margin-right:6px}@media(max-width:600px){.travel-cover{height:210px}}#menuBtn,.page-controls{display:none!important}#content select{width:auto;max-width:100%;margin:4px;padding:6px}#content .feedback{display:inline;font-size:12px}/* Rounded surfaces and translucent navigation inspired by iPhone. */
+body {
+  --ios-glass: rgba(250, 253, 255, .88);
+  --ios-shadow: 0 10px 28px rgba(23, 73, 127, .09);
+  background: radial-gradient(ellipse at top right, #dbeeff, transparent 65%) var(--bg);
+  min-height: 100vh;
+}
+body.dark {
+  --ios-glass: rgba(26, 45, 66, .92);
+  --ios-shadow: 0 10px 28px rgba(0, 0, 0, .23);
+  background: radial-gradient(ellipse at top right, #223f60, transparent 65%) var(--bg);
+}
+header, .page-controls, #dictionary {
+  background: var(--ios-glass);
+  -webkit-backdrop-filter: blur(22px) saturate(145%);
+  backdrop-filter: blur(22px) saturate(145%);
+}
+header { height: auto; min-height: 66px; }
+.card { border-radius: 26px; box-shadow: var(--ios-shadow); }
+.word, .role, .option, .audio-box { border-radius: 18px; }
+button.primary, button.small-button, a.small-button, .primary.cabinet-link {
+  min-height: 44px;
+  border-radius: 999px;
+}
+a.small-button { display: inline-flex; align-items: center; }
+#content :is(select, input[type="text"], textarea), #wordForm input {
+  min-height: 44px;
+  border-radius: 15px;
+  font-size: 16px;
+}
+.page-controls {
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  box-shadow: var(--ios-shadow);
+}
+#dictionary {
+  border-radius: 28px;
+  box-shadow: 0 25px 75px rgba(15, 40, 76, .24);
+  max-height: min(85dvh, 760px);
+}
+#dictionary .menu-top { align-items: center; margin-bottom: 16px; }
+#dictionary .menu-top h2 { margin: 0; }
+#dictionary #dictStatus { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+#dictionary #dictStatus:empty { margin: 0; }
+#dictionary .dict-actions { align-items: center; }
+@media (max-width: 600px) {
+  header { padding-inline: 14px; }
+  .card { padding: 18px; }
+  #dictionary { padding: 18px; }
+  #dictionary .dict-actions > button { flex: 1 1 auto; }
+}
+
+.sea-art{margin:0 0 18px;border-radius:22px;overflow:hidden}.sea-art svg{display:block;width:100%;height:auto}#dictionary .dictrow{flex-wrap:wrap}</style></head><body><header><div class="brand">Gostudy</div><div class="header-actions"><a class="small-button cabinet-link" href="student-travel-a2.html">← Кабинет</a><button class="small-button" id="dictBtn">My words <span id="wordCount">0</span></button><button class="small-button" id="themeBtn" aria-label="Switch colour theme">◐</button></div></header>
 <div class="shell"><main><div class="lesson-bar"><button class="small-button" id="menuBtn" aria-haspopup="dialog" aria-expanded="false">☰ Задания</button></div><div id="pageLabel" hidden></div><h1 id="title" tabindex="-1"></h1><p class="subtitle" id="goal"></p><div id="content"></div><details class="teacher" hidden><summary>Teacher notes · pacing</summary><p id="teacherTips"></p></details><div class="page-controls"><button id="prev" class="small-button">← Назад</button><span id="counter"></span><button id="next" class="primary">Next →</button></div><footer class="footer">Gostudy · Travel · A2+. Ответы и слова сохраняются в этом браузере.</footer><p class="storage-note" id="storageNote" hidden role="status"></p></main></div>
-<dialog id="lessonMenu" class="menu-dialog"><button class="small-button" id="exportBtn" hidden style="margin-bottom:20px">↓ Download my answers</button><div class="menu-top"><b>Урок</b><button class="small-button" id="closeMenu">Закрыть ✕</button></div><span class="eyebrow">TRAVEL · B2</span><h2>Your feed,<br>your choice?</h2><nav id="nav"></nav></dialog>
-<dialog id="dictionary" class="dictionary"><div class="menu-top"><h2>My vocabulary</h2><button class="small-button" id="closeDict">Close ✕</button></div><p class="muted">Введите слово на русском или английском — направление перевода определится автоматически. Перевод можно исправить.</p><form id="wordForm"><label class="field-label" for="newWord">Слово или фраза · RU / EN</label><input id="newWord" type="text" maxlength="200" required placeholder="boarding pass"><label class="field-label" for="newMeaning">Перевод · EN / RU</label><input id="newMeaning" type="text" maxlength="500" required placeholder="посадочный талон"><div class="dict-actions"><button class="primary" type="submit">＋ Save word</button><button class="small-button" type="button" id="manualTranslate">Перевести онлайн</button></div></form><p class="audio-note">Онлайн-перевод отправляет только введённый или выделенный текст сервису MyMemory. Не добавляйте личные данные. Перевод слов урока работает без интернета.</p><div class="dict-actions"><button class="primary" id="trainWords">▶ Тренировать мои слова</button><button class="small-button" id="exportWords">↓ Export words (.txt)</button></div><p id="dictStatus" role="status"></p><div id="wordList"></div></dialog>
-<dialog id="trainingDialog" class="dictionary"><div class="menu-top"><h2>Тренировка слов</h2><button class="small-button" id="closeTraining">Закрыть ✕</button></div><div id="trainingBody"></div></dialog><div id="translationPop" class="translation-pop" hidden role="region" aria-label="Перевод выделенного текста"><button class="small-button x" id="closePop" aria-label="Закрыть перевод">✕</button><h3 id="selectedWord"></h3><label class="field-label" for="selectedMeaning">Перевод</label><p id="selectedContext" class="selected-context" hidden></p><div class="translation-entry"><button class="translation-add" id="saveSelected" type="button" aria-label="Добавить в словарь" title="Добавить в словарь">♥</button><textarea id="selectedMeaning" rows="2" maxlength="2000" aria-label="Перевод — можно исправить"></textarea></div><p id="translateStatus" class="audio-note" role="status" hidden></p><div class="dict-actions" hidden><button class="small-button" id="translateOnline" hidden>Другой перевод</button></div></div><div id="toast" role="status"></div>
+<dialog id="lessonMenu" class="menu-dialog"><button class="small-button" id="exportBtn" hidden style="margin-bottom:20px">↓ Download my answers</button><div class="menu-top"><b>Урок</b><button class="small-button" id="closeMenu">Закрыть ✕</button></div><span class="eyebrow">TRAVEL · A2+</span><h2>A weekend<br>away</h2><nav id="nav"></nav></dialog>
+<dialog id="dictionary" class="dictionary" aria-labelledby="dictionaryTitle">
+  <div class="menu-top"><h2 id="dictionaryTitle">My vocabulary</h2><button class="small-button" id="closeDict" type="button">Close ✕</button></div>
+  <form id="wordForm">
+    <label class="field-label" for="newWord">Слово или фраза · RU / EN</label>
+    <input id="newWord" type="text" maxlength="200" autocomplete="off" required>
+    <label class="field-label" for="newMeaning">Перевод · EN / RU</label>
+    <input id="newMeaning" type="text" maxlength="500" autocomplete="off" required>
+    <p id="dictStatus" role="status"></p>
+    <div class="dict-actions">
+      <button class="primary" type="submit">＋ Save word</button>
+      <button class="small-button" id="trainWords" type="button">▷ Тренировать мои слова</button>
+    </div>
+  </form>
+  <div id="wordList"></div>
+</dialog>
+<dialog id="trainingDialog" class="dictionary"><div class="menu-top"><h2>Тренировка слов</h2><button class="small-button" id="closeTraining">Закрыть ✕</button></div><div id="trainingBody"></div></dialog><div id="translationPop" class="translation-pop" hidden role="region" aria-label="Перевод выделенного текста"><button class="small-button x" id="closePop" aria-label="Закрыть перевод">✕</button><h3 id="selectedWord"></h3><button type="button" class="small-button" id="speakSelected" aria-label="Озвучить выделенный текст">🔊 Озвучить</button><label class="field-label" for="selectedMeaning">Перевод</label><p id="selectedContext" class="selected-context" hidden></p><div class="translation-entry"><button class="translation-add" id="saveSelected" type="button" aria-label="Добавить в словарь" title="Добавить в словарь">♥</button><textarea id="selectedMeaning" rows="2" maxlength="2000" aria-label="Перевод — можно исправить"></textarea></div><p id="translateStatus" class="audio-note" role="status" hidden></p><div class="dict-actions" hidden><button class="small-button" id="translateOnline" hidden>Другой перевод</button></div></div><div id="toast" role="status"></div>
 <script>
 'use strict';
 const CLIPS=[{"title":"At the hotel","lines":[["Receptionist","Hello! How can I help you?"],["Lena","Hi. I have a booking for two nights. My name is Lena Park."],["Receptionist","Yes, a single room. Can I see your passport, please?"],["Lena","Of course. What time is breakfast?"],["Receptionist","From seven to ten. Your room is on the second floor."],["Lena","Thank you. Is there a bus stop nearby?"],["Receptionist","Yes. Turn left outside the hotel. It is next to the café."]],"qs":[["How many nights is Lena staying?",["One","Two","Three"],1],["Where is her room?",["On the first floor","On the second floor","Next to the café"],1],["Where is the bus stop?",["Next to the café","In the hotel","At the station"],0]]},{"qs":[["How did Lena travel?",["By bus","By train","By plane"],1],["Why did she call the hotel?",["The train was late","She lost her suitcase","She wanted breakfast"],0],["What are her plans for Sunday?",["A museum","A long walk by the river","A market"],1]]}];
@@ -43,7 +110,26 @@ const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const key='gostudy-travel-a2plus-homework-v1';let state={page:0,answers:{},words:[],dark:false};let storage=true;
 try{const s=JSON.parse(localStorage.getItem(key)||'null');if(s&&typeof s==='object'){state={...state,...s};state.answers=s.answers&&typeof s.answers==='object'?s.answers:{};state.words=Array.isArray(s.words)?s.words.filter(w=>w&&typeof w.en==='string'&&typeof w.ru==='string'):[];}}catch(e){storage=false;}
-function save(){try{localStorage.setItem(key,JSON.stringify(state));}catch(e){storage=false;$('#storageNote').hidden=false;$('#storageNote').textContent='Saving unavailable. Export your answers and vocabulary before closing.';}$('#wordCount').textContent=state.words.length;}
+const sharedWordKey="gostudy-travel-a2plus-v1";
+let lastWords = '';
+function readSharedWords(){
+  try {
+    const shared = JSON.parse(localStorage.getItem(sharedWordKey) || '{}');
+    if(Array.isArray(shared.words)) state.words = shared.words.filter(w=>w&&typeof w.en==='string'&&typeof w.ru==='string');
+  } catch {}
+  lastWords = JSON.stringify(state.words);
+}
+readSharedWords();
+window.addEventListener('pageshow',()=>{readSharedWords();$('#wordCount').textContent=state.words.length;if($('#dictionary').open)renderWords();});
+function save(){try{
+  const currentWords = JSON.stringify(state.words);
+  if(currentWords!==lastWords){
+    const shared = JSON.parse(localStorage.getItem(sharedWordKey)||'{}');
+    shared.words=state.words;
+    localStorage.setItem(sharedWordKey,JSON.stringify(shared));
+    lastWords=currentWords;
+  }
+  localStorage.setItem(key,JSON.stringify(state));}catch(e){storage=false;$('#storageNote').hidden=false;$('#storageNote').textContent='Saving unavailable. Export your answers and vocabulary before closing.';}$('#wordCount').textContent=state.words.length;}
 let toastTimer;function notify(s){$('#toast').textContent=s;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3200);}
 const words=[["a ticket","билет","I bought a ticket online."],["a return ticket","билет туда и обратно","A return ticket, please."],["a platform","платформа","The train leaves from platform four."],["a suitcase","чемодан","My suitcase is small."],["a booking","бронирование","I have a booking for two nights."],["check in","заселиться; зарегистрироваться","Can we check in now?"],["a single room","одноместный номер","I booked a single room."],["a map","карта","Can I have a map, please?"],["late","поздно; с опозданием","The train was twenty minutes late."],["nearby","поблизости","Is there a café nearby?"]];
 const glossary={"ticket":"билет","return ticket":"билет туда и обратно","platform":"платформа","suitcase":"чемодан","booking":"бронирование","check in":"заселиться; зарегистрироваться","single room":"одноместный номер","map":"карта","late":"поздно; с опозданием","nearby":"поблизости"};
@@ -56,7 +142,7 @@ function promptBox(title,text){return '<div class="prompt"><h3>'+title+'</h3><p>
 function b2mc(group,qs){return qs.map((q,i)=>{const id='q'+group+'-'+i;return '<div class="question"><p>'+(i+1)+'. '+esc(q[0])+'</p><div class="options">'+q[1].map((v,j)=>'<label class="option"><input type="radio" name="'+id+'" data-q="'+group+':'+i+'" value="'+j+'" '+(Number(state.answers[id])===j&&state.answers[id]!==undefined?'checked':'')+'><span>'+esc(v)+'</span></label>').join('')+'</div><div class="feedback" id="fb-'+id+'" role="status"></div></div>';}).join('');}
 function feedWelcome(){return card("Pack your bag","<img class=\"travel-cover\" src=\"https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=85\" alt=\"Крыло самолёта над облаками\"><div class=\"hero\"><span class=\"eyebrow\">TRAVEL · A2+</span><h2>A weekend away</h2><p>Buy a ticket, find your train and check in at a hotel.</p></div>")+card("Let’s talk","<ul><li>Do you like travelling by train or by plane?</li><li>What do you always put in your bag?</li><li>Where would you like to go for two days?</li></ul><p>I prefer… · I always take… · I’d like to visit…</p>");}
 const VOCAB_GAPS=[["coll0","The train leaves from ___ four.","platform"],["coll1","I have a ___ for two nights.","booking"],["coll2","Can we check ___ now?","in"],["coll3","Is there a café ___?","nearby"]];
-function feedWords(){return card('Language for a better argument','<div class="word-grid">'+words.map((w,i)=>'<article class="word"><strong>'+esc(w[0])+'</strong><p>'+esc(w[2])+'</p><details><summary>Meaning · перевод</summary><p>'+esc(w[1])+'</p></details><button class="small-button" data-add="'+i+'">＋ В словарь</button></article>').join('')+'</div>')+card('Complete the collocations',VOCAB_GAPS.map(g=>'<div class="gap"><label for="'+g[0]+'">'+esc(g[1])+'</label><input type="text" id="'+g[0]+'" data-answer="'+g[0]+'" data-gap="'+g[2]+'" enterkeyhint="done" autocapitalize="none" autocomplete="off" value="'+esc(state.answers[g[0]]||'')+'"><div class="feedback" id="fb-'+g[0]+'" role="status"></div></div>').join('')+'<p class="muted">Use Enter or leave a field to check it.</p>');}
+function feedWords(){return card('Language for a better argument','<div class="word-grid">'+words.map((w,i)=>'<article class="word"><strong>'+esc(w[0])+'</strong><p>'+esc(w[2])+'</p><details><summary>Meaning · перевод</summary><p>'+esc(w[1])+'</p></details><button type="button" class="small-button" data-speak-word>🔊 Прослушать</button><button class="small-button" data-add="'+i+'">♥ В словарь</button></article>').join('')+'</div>')+card('Complete the collocations',VOCAB_GAPS.map(g=>'<div class="gap"><label for="'+g[0]+'">'+esc(g[1])+'</label><input type="text" id="'+g[0]+'" data-answer="'+g[0]+'" data-gap="'+g[2]+'" enterkeyhint="done" autocapitalize="none" autocomplete="off" value="'+esc(state.answers[g[0]]||'')+'"><div class="feedback" id="fb-'+g[0]+'" role="status"></div></div>').join('')+'<p class="muted">Use Enter or leave a field to check it.</p>');}
 function feedReading(){return card("Lena’s first weekend in York","<p>Last Saturday, Lena went to York for the weekend. She bought a return ticket online and packed a small suitcase. At the station, she checked the screen. Her train was leaving from platform four.</p><p>The train was twenty minutes late. Lena called her hotel and said, “I have a booking for two nights. I’m going to arrive after six.” The receptionist said, “No problem. You can check in until ten.”</p><p>At the hotel, Lena left her suitcase in her room and walked to a café nearby. On Sunday, she is going to walk by the river and take some photos. She has a map, but she doesn’t want to plan every minute.</p>")+card('Choose the answer',b2mc(1,CLIPS[1].qs));}
 function feedListening(){const c=CLIPS[0];return card(c.title,"<p>First listen: how many nights is Lena staying? Then choose the answers.</p><div class=\"audio-box\"><div class=\"audio-top\"><strong>At the hotel</strong><span>English · browser voice</span></div><div class=\"audio-player\"><button type=\"button\" class=\"audio-play\" id=\"travelSpeak\" aria-label=\"Воспроизвести диалог\">▶</button><span id=\"travelVoiceStatus\">Послушать диалог</span><button type=\"button\" class=\"small-button\" id=\"travelStop\">Стоп</button></div><details class=\"transcript\"><summary>Показать текст аудио</summary>"+c.lines.map(l=>'<p><b>'+esc(l[0])+': </b>'+esc(l[1])+'</p>').join('')+'</details></div>'+b2mc(0,c.qs));}
 const FEED_ITEMS=[['🛹','Skateboard tricks in slow motion','sport'],['🔭','Why stars have different colours','science'],['🎧','An artist you have never heard of','music'],['🥘','A recipe using three ingredients','food'],['📷','Street photography without expensive equipment','art'],['⚽','How a team practises a difficult move','sport'],['🌱','A tiny garden on a balcony','science'],['🎸','The same song, five different versions','music'],['🎬','Making a film with paper characters','art']];
@@ -67,22 +153,71 @@ function feedWriting(){return card("Plan a weekend with your partner","<ol><li>C
 function hwChoice(id,answer,options){return '<select id="'+id+'" data-gap="'+answer+'" data-answer="'+id+'" aria-label="Пропуск '+id.replace('hw','')+'"><option value="">Выберите…</option>'+options.map(v=>'<option value="'+esc(v)+'" '+(state.answers[id]===v?'selected':'')+'>'+esc(v)+'</option>').join('')+'</select><span class="feedback" id="fb-'+id+'" role="status"></span>';}
 function feedFinish(){return card('1 · A day in a new town',"<p><b>guidebook</b> — путеводитель · <b>raincoat</b> — дождевик · <b>souvenir</b> — сувенир.</p><p>Tom used a "+hwChoice("h1","guidebook",["guidebook","souvenir","raincoat"])+" to find a small museum. It started raining, so he put on his "+hwChoice("h2","raincoat",["souvenir","raincoat","guidebook"])+". Before he went home, he bought a "+hwChoice("h3","souvenir",["raincoat","guidebook","souvenir"])+" for his sister.</p>")+card('2 · Last weekend and next weekend',"<p>Выберите Past Simple или <i>going to</i> по смыслу текста.</p><p>Last weekend, Amy "+hwChoice("h4","went",["go","went","going"])+" to Brighton. She "+hwChoice("h5","didn’t buy",["didn’t buy","didn’t bought","doesn’t buy"])+" a map because she had one on her phone. Next Saturday, she "+hwChoice("h6","is going to visit",["visited","is going to visit","visit"])+" another town. Amy and her brother "+hwChoice("h7","are going to take",["took","is going to take","are going to take"])+" the train together.</p>");}
 function installGapChecks(){function check(el){const v=el.value.trim(),ok=norm(v)===norm(el.dataset.gap);el.classList.toggle('correct',!!v&&ok);el.classList.toggle('incorrect',!!v&&!ok);$('#fb-'+el.id).textContent=!v?'':ok?'✓ Верно!':'Попробуйте ещё раз.';}$$('[data-gap]').forEach(el=>{el.addEventListener('blur',()=>check(el));el.addEventListener('change',()=>{state.answers[el.dataset.answer]=el.value;save();check(el);});el.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();check(el);}});el.addEventListener('input',()=>{el.classList.remove('correct','incorrect');$('#fb-'+el.id).textContent='';});if(el.value.trim())check(el);});}
-function installLesson(){setTimeout(()=>{if(typeof installTravelVoice==='function')installTravelVoice();},0);installGapChecks();$$('[data-position]').forEach(b=>b.onclick=()=>{state.answers.position=Number(b.dataset.position);save();render();});$$('[data-feed-pick]').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.feedPick),p=labPicks(),at=p.indexOf(i);if(at>=0)p.splice(at,1);else if(p.length<3)p.push(i);else{notify('Выберите не больше трёх видео. Можно снять выделение с другого.');return;}state.answers.feedPicks=p;save();const y=scrollY;render();scrollTo(0,y);});if($('#toggleExplore'))$('#toggleExplore').onclick=()=>{state.answers.explore=!state.answers.explore;save();const y=scrollY;render();scrollTo(0,y);};if($('#resetFeed'))$('#resetFeed').onclick=()=>{state.answers.feedPicks=[];state.answers.explore=false;save();render();};$('#exportBtn').hidden=true;}
+function installLesson(){installGapChecks();$$('[data-position]').forEach(b=>b.onclick=()=>{state.answers.position=Number(b.dataset.position);save();render();});$$('[data-feed-pick]').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.feedPick),p=labPicks(),at=p.indexOf(i);if(at>=0)p.splice(at,1);else if(p.length<3)p.push(i);else{notify('Выберите не больше трёх видео. Можно снять выделение с другого.');return;}state.answers.feedPicks=p;save();const y=scrollY;render();scrollTo(0,y);});if($('#toggleExplore'))$('#toggleExplore').onclick=()=>{state.answers.explore=!state.answers.explore;save();const y=scrollY;render();scrollTo(0,y);};if($('#resetFeed'))$('#resetFeed').onclick=()=>{state.answers.feedPicks=[];state.answers.explore=false;save();render();};$('#exportBtn').hidden=true;}
 
 function feedback(ci,qi){const id=`q${ci}-${qi}`,v=state.answers[id];if(v===undefined)return;const ok=Number(v)===CLIPS[ci].qs[qi][2];$('#fb-'+id).textContent=ok?'✓ Верно!':'Попробуйте ещё раз. Вернитесь к тексту или аудио.';$$(`[name="${id}"]`).forEach(el=>{el.closest('label').classList.toggle('correct',el.checked&&ok);el.closest('label').classList.toggle('incorrect',el.checked&&!ok);});}
 function stop(){clearPractice();const a=$('#lessonAudio');if(a)a.pause();}
-function render(){const p=pages[state.page];$('#pageLabel').textContent=`TRAVEL / ${String(state.page+1).padStart(2,'0')} · ≈ ${p[2]} MIN`;$('#title').textContent=p[0];$('#goal').textContent=p[1];$('#teacherTips').textContent=p[3];$('#counter').textContent=`${state.page+1} / ${pages.length}`;$('#prev').disabled=state.page===0;$('#next').textContent=state.page===7?'Итог ✓':'Далее →';$('#content').innerHTML=[feedWelcome,feedWords,feedReading,feedListening,feedLab,feedDebate,feedWriting,feedFinish][state.page]();$('#nav').innerHTML=pages.map((p,i)=>`<button data-page="${i}" class="${i===state.page?'active':''}"><span>${String(i+1).padStart(2,'0')}</span>${esc(p[0])}</button>`).join('');$$('[data-page]').forEach(b=>b.onclick=()=>go(Number(b.dataset.page)));$$('[data-answer]').forEach(el=>el.oninput=()=>{state.answers[el.dataset.answer]=el.value;save();});$$('[data-can]').forEach(el=>el.onchange=()=>{state.answers[el.dataset.can]=el.checked;save();});$$('[data-add]').forEach(b=>b.onclick=()=>{const w=words[Number(b.dataset.add)];addWord(w[0],w[1]);});$$('[data-q]').forEach(el=>{const [ci,qi]=el.dataset.q.split(':').map(Number);el.onchange=()=>{state.answers[`q${ci}-${qi}`]=Number(el.value);save();feedback(ci,qi);};feedback(ci,qi);});if($('#checkGaps'))$('#checkGaps').onclick=()=>$$('[data-gap]').forEach(el=>{const ok=norm(el.value)===norm(el.dataset.gap);el.classList.toggle('correct',ok);el.classList.toggle('incorrect',!ok);$('#fb-'+el.id).textContent=ok?'✓ Correct.':'Попробуйте ещё раз. Можно открыть таблицу-подсказку.';});if($('#speed'))$('#speed').onchange=e=>$('#lessonAudio').playbackRate=Number(e.target.value);if($('#lessonAudio'))$('#lessonAudio').onerror=()=>notify('Audio unavailable. Open the script to practise together.');installLesson();document.body.classList.toggle('dark',!!state.dark);save();}
+function render(){const p=pages[state.page];$('#pageLabel').textContent=`TRAVEL / ${String(state.page+1).padStart(2,'0')} · ≈ ${p[2]} MIN`;$('#title').textContent=p[0];$('#goal').textContent=p[1];$('#teacherTips').textContent=p[3];$('#counter').textContent=`${state.page+1} / ${pages.length}`;$('#prev').disabled=state.page===0;$('#next').textContent=state.page===7?'Итог ✓':'Далее →';$('#content').innerHTML="<figure class=\"sea-art\"><svg viewBox=\"0 0 700 126\" role=\"img\" aria-label=\"Weekend homework · READ, CHOOSE, CHECK\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"700\" height=\"126\" rx=\"20\" fill=\"#173350\"/><path d=\"M0 110q170-52 350-4t350-10v30H0z\" fill=\"#245471\"/><text x=\"24\" y=\"28\" fill=\"#d1eafb\" font-family=\"system-ui\" font-size=\"18\" font-weight=\"700\">Weekend homework</text><path d=\"M104 78H608\" stroke=\"#8ac9e3\" stroke-width=\"3\" stroke-dasharray=\"8 8\"/><g transform=\"translate(22 48)\"><rect width=\"192\" height=\"55\" rx=\"15\" fill=\"#b4e3f5\"/><text x=\"96\" y=\"34\" text-anchor=\"middle\" fill=\"#173853\" font-family=\"system-ui\" font-weight=\"700\" font-size=\"16\">READ</text></g><g transform=\"translate(254 48)\"><rect width=\"192\" height=\"55\" rx=\"15\" fill=\"#ffe0a2\"/><text x=\"96\" y=\"34\" text-anchor=\"middle\" fill=\"#173853\" font-family=\"system-ui\" font-weight=\"700\" font-size=\"16\">CHOOSE</text></g><g transform=\"translate(486 48)\"><rect width=\"192\" height=\"55\" rx=\"15\" fill=\"#b7e6ce\"/><text x=\"96\" y=\"34\" text-anchor=\"middle\" fill=\"#173853\" font-family=\"system-ui\" font-weight=\"700\" font-size=\"16\">CHECK</text></g></svg></figure>"+feedFinish();$('#nav').innerHTML=pages.map((p,i)=>`<button data-page="${i}" class="${i===state.page?'active':''}"><span>${String(i+1).padStart(2,'0')}</span>${esc(p[0])}</button>`).join('');$$('[data-page]').forEach(b=>b.onclick=()=>go(Number(b.dataset.page)));$$('[data-answer]').forEach(el=>el.oninput=()=>{state.answers[el.dataset.answer]=el.value;save();});$$('[data-can]').forEach(el=>el.onchange=()=>{state.answers[el.dataset.can]=el.checked;save();});$$('[data-add]').forEach(b=>b.onclick=()=>{const w=words[Number(b.dataset.add)];addWord(w[0],w[1]);});$$('[data-q]').forEach(el=>{const [ci,qi]=el.dataset.q.split(':').map(Number);el.onchange=()=>{state.answers[`q${ci}-${qi}`]=Number(el.value);save();feedback(ci,qi);};feedback(ci,qi);});if($('#checkGaps'))$('#checkGaps').onclick=()=>$$('[data-gap]').forEach(el=>{const ok=norm(el.value)===norm(el.dataset.gap);el.classList.toggle('correct',ok);el.classList.toggle('incorrect',!ok);$('#fb-'+el.id).textContent=ok?'✓ Correct.':'Попробуйте ещё раз. Можно открыть таблицу-подсказку.';});if($('#speed'))$('#speed').onchange=e=>$('#lessonAudio').playbackRate=Number(e.target.value);if($('#lessonAudio'))$('#lessonAudio').onerror=()=>notify('Audio unavailable. Open the script to practise together.');installLesson();document.body.classList.toggle('dark',!!state.dark);save();}
 function go(i){stop();$('#translationPop').hidden=true;if($('#lessonMenu').open)$('#lessonMenu').close();state.page=i;render();$('#title').focus({preventScroll:true});window.scrollTo({top:0,behavior:'smooth'});}
 $('#prev').onclick=()=>go(Math.max(0,state.page-1));$('#next').onclick=()=>state.page<pages.length-1?go(state.page+1):notify('Урок завершён. Можно вернуться к любому разделу.');$('#themeBtn').onclick=()=>{state.dark=!state.dark;document.body.classList.toggle('dark',state.dark);save();};$('#menuBtn').onclick=()=>{$('#lessonMenu').showModal();$('#menuBtn').setAttribute('aria-expanded','true');};$('#closeMenu').onclick=()=>$('#lessonMenu').close();$('#lessonMenu').onclose=()=>$('#menuBtn').setAttribute('aria-expanded','false');
 function addWord(en,ru){en=en.trim();ru=ru.trim();if(/[а-яё]/i.test(en)&&/[a-z]/i.test(ru)&&!/[а-яё]/i.test(ru)){[en,ru]=[ru,en];}if(!en||!ru){notify('Add a word and its translation.');return false;}const old=state.words.find(w=>norm(w.en)===norm(en));if(old)old.ru=ru;else state.words.push({en,ru});save();notify(old?'Translation updated.':'Word saved ✓');return true;}
-function renderWords(){const list=$('#wordList');list.innerHTML=state.words.length?state.words.map((w,i)=>`<div class="dictrow"><div><strong>${esc(w.en)}</strong><p>${esc(w.ru)}</p></div><div><button class="small-button" data-edit="${i}" aria-label="Edit ${esc(w.en)}">Edit</button> <button class="small-button" data-delete="${i}" aria-label="Delete ${esc(w.en)}">✕</button></div></div>`).join(''):'<p class="muted dict-empty">Пока пусто. Выделите слово в уроке или добавьте его выше.</p>';$$('[data-edit]').forEach(b=>b.onclick=()=>{const w=state.words[Number(b.dataset.edit)];$('#newWord').value=w.en;$('#newMeaning').value=w.ru;$('#newMeaning').focus();});$$('[data-delete]').forEach(b=>b.onclick=()=>{state.words.splice(Number(b.dataset.delete),1);save();renderWords();});}
+function renderWords(){const list=$('#wordList');list.innerHTML=state.words.length?state.words.map((w,i)=>`<div class="dictrow"><div><strong>${esc(w.en)}</strong><p>${esc(w.ru)}</p></div><div><button type="button" class="small-button" data-speak-word>🔊 Прослушать</button> <button class="small-button" data-edit="${i}" aria-label="Edit ${esc(w.en)}">Edit</button> <button class="small-button" data-delete="${i}" aria-label="Delete ${esc(w.en)}">✕</button></div></div>`).join(''):'<p class="muted dict-empty">Пока пусто. Выделите слово в уроке или добавьте его выше.</p>';$$('[data-edit]').forEach(b=>b.onclick=()=>{const w=state.words[Number(b.dataset.edit)];manualVersion++;clearTimeout(manualTimer);manualStatus.textContent='';$('#newWord').value=w.en;$('#newMeaning').value=w.ru;$('#newMeaning').focus();});$$('[data-delete]').forEach(b=>b.onclick=()=>{state.words.splice(Number(b.dataset.delete),1);save();renderWords();});}
 function openDict(){window.getSelection()?.removeAllRanges();$('#translationPop').hidden=true;renderWords();$('#dictionary').showModal();}$('#dictBtn').onclick=openDict;$('#closeDict').onclick=()=>$('#dictionary').close();$('#wordForm').onsubmit=e=>{e.preventDefault();if(addWord($('#newWord').value,$('#newMeaning').value)){e.target.reset();renderWords();}};
 $('#trainWords').onclick=openTraining;$('#closeTraining').onclick=()=>$('#trainingDialog').close();
 let lookupVersion=0;
 function localTranslation(text){const n=norm(text);if(!/[а-яё]/i.test(n))return glossary[n]||'';const aliases={'загран паспорт':'passport','загранпаспорт':'passport','заграничный паспорт':'passport','посадочный талон':'boarding pass','ручная кладь':'hand luggage','место у окна':'window seat','место у прохода':'aisle seat'};if(aliases[n])return aliases[n];const found=Object.entries(glossary).find(([en,ru])=>ru.split(';').some(part=>norm(part)===n));return found?found[0]:'';}
 async function online(text){if(new TextEncoder().encode(text).length>450)throw Error('Выделите более короткую фразу (до 450 байт).');const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);try{const response=await fetch('https://api.mymemory.translated.net/get?'+new URLSearchParams({q:text,langpair:/[а-яё]/i.test(text)?'ru|en':'en|ru'}),{signal:controller.signal,credentials:'omit',referrerPolicy:'no-referrer'});if(!response.ok)throw Error('Сервис временно недоступен. Введите перевод вручную.');const d=await response.json();if(Number(d.responseStatus)!==200||!d.responseData?.translatedText)throw Error('Перевод недоступен. Возможно, исчерпан лимит. Введите перевод вручную.');const doc=new DOMParser().parseFromString(d.responseData.translatedText,'text/html');return doc.documentElement.textContent;}finally{clearTimeout(timeout);}}
-$('#manualTranslate').onclick=async()=>{const text=$('#newWord').value.trim();if(!text)return;$('#dictStatus').textContent='Переводим…';$('#manualTranslate').disabled=true;try{const ru=localTranslation(text)||await online(text);if($('#newWord').value.trim()===text)$('#newMeaning').value=ru;$('#dictStatus').textContent='Проверьте перевод перед сохранением.';}catch(e){$('#dictStatus').textContent=e.name==='AbortError'?'Сервис не ответил. Можно ввести перевод вручную.':e.message;}finally{$('#manualTranslate').disabled=false;}};
-const CONTEXT_PHRASES=[["a ticket","билет"],["a return ticket","билет туда и обратно"],["a platform","платформа"],["a suitcase","чемодан"],["a booking","бронирование"],["check in","заселиться; зарегистрироваться"],["a single room","одноместный номер"],["a map","карта"],["late","поздно; с опозданием"],["nearby","поблизости"]];
+
+const manualWord = $('#newWord');
+const manualMeaning = $('#newMeaning');
+const manualStatus = $('#dictStatus');
+const manualCache = new Map();
+let manualVersion = 0;
+let manualTimer;
+manualMeaning.addEventListener('input', () => {
+  manualVersion++;
+  clearTimeout(manualTimer);
+  manualStatus.textContent = '';
+});
+function translateWhileTyping(event) {
+  clearTimeout(manualTimer);
+  const version = ++manualVersion;
+  const query = manualWord.value.trim();
+  manualMeaning.value = '';
+  manualStatus.textContent = '';
+  if (!query || event?.isComposing) return;
+  const russian = /[а-яё]/i.test(query);
+  const pair = state.words.find(word => norm(russian ? word.ru : word.en) === norm(query));
+  const saved = russian ? pair?.en : pair?.ru;
+  const immediate = saved || localTranslation(query) || manualCache.get(norm(query));
+  if (immediate) {
+    manualMeaning.value = immediate;
+    return;
+  }
+  manualStatus.textContent = 'Переводим…';
+  manualTimer = setTimeout(async () => {
+    try {
+      const result = await online(query);
+      if (version !== manualVersion || manualWord.value.trim() !== query) return;
+      manualCache.set(norm(query), result);
+      manualMeaning.value = result;
+      manualStatus.textContent = 'Перевод готов. Можно исправить перед сохранением.';
+    } catch {
+      if (version === manualVersion && manualWord.value.trim() === query) {
+        manualStatus.textContent = 'Перевод недоступен. Можно ввести его вручную.';
+      }
+    }
+  }, 300);
+}
+manualWord.addEventListener('input', translateWhileTyping);
+manualWord.addEventListener('compositionend', translateWhileTyping);
+$('#wordForm').addEventListener('reset', () => {
+  manualVersion++;
+  clearTimeout(manualTimer);
+  manualStatus.textContent = '';
+});
+
+const CONTEXT_PHRASES = Object.entries(glossary);
 const CONTEXT_WORDS={};
 const SENTENCE_TRANSLATIONS={};
 function lessonMeaning(text,context){const n=norm(text).replace(/[.!?,;:]+$/,'');const phrase=CONTEXT_PHRASES.find(([en])=>en===n);if(phrase)return phrase[1];if(SENTENCE_TRANSLATIONS[norm(text)+'.']||SENTENCE_TRANSLATIONS[norm(text)])return SENTENCE_TRANSLATIONS[norm(text)+'.']||SENTENCE_TRANSLATIONS[norm(text)];if(CONTEXT_WORDS[n]){if(n==='water'&&!/flower|garden|plant/i.test(context))return '';if(n==='pick'&&!/apple|fruit/i.test(context))return '';if((n==='have'||n==='had')&&!/lunch/i.test(context))return '';return CONTEXT_WORDS[n];}return localTranslation(text);}
@@ -95,7 +230,7 @@ async function fillSelected(text,context,version){const field=$('#selectedMeanin
 function selectionPopup(){if(selectingText)return;if($('#dictionary').open||$('#lessonMenu').open||$('#trainingDialog').open)return;const sel=window.getSelection();if(!sel||sel.isCollapsed||!sel.rangeCount)return;const el=sel.anchorNode?.parentElement,focus=sel.focusNode?.parentElement;if(!el||!focus||!el.closest('#content')||!focus.closest('#content')||el.closest('input,textarea,button,select'))return;const text=sel.toString().trim();if(!text||text.length>200||!/[a-zA-Zа-яА-ЯёЁ]/.test(text))return;selectedRange=sel.getRangeAt(0).cloneRange();const context=sentenceNearSelection(el,text);if(!$('#translationPop').hidden&&$('#selectedWord').textContent===text&&popupContext===context){anchorPopup();return;}popupContext=context;const version=++lookupVersion;$('#selectedWord').textContent=text;$('#translationPop').hidden=false;fillSelected(text,context,version);}
 let selectionTimer;document.addEventListener('selectionchange',()=>{clearTimeout(selectionTimer);selectionTimer=setTimeout(selectionPopup,180);});document.addEventListener('pointerup',e=>{selectingText=false;if(!e.target.closest('#translationPop'))setTimeout(selectionPopup,0);});document.addEventListener('pointercancel',()=>{selectingText=false;});window.addEventListener('scroll',anchorPopup,{passive:true});window.addEventListener('resize',anchorPopup);window.visualViewport?.addEventListener('resize',anchorPopup);document.addEventListener('pointerdown',e=>{if(!e.target.closest('#translationPop')){selectingText=true;clearTimeout(selectionTimer);$('#translationPop').hidden=true;lookupVersion++;window.getSelection()?.removeAllRanges();}});document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('#translationPop').hidden=true;lookupVersion++;}});$('#closePop').onclick=()=>{$('#translationPop').hidden=true;lookupVersion++;window.getSelection()?.removeAllRanges();};$('#translateOnline').onclick=async()=>{const text=$('#selectedWord').textContent,version=++lookupVersion;$('#translateStatus').textContent='Переводим…';try{const ru=await online(text);if(version===lookupVersion){$('#selectedMeaning').value=ru;$('#translateStatus').textContent='MyMemory · альтернативный перевод';anchorPopup();}}catch(e){if(version===lookupVersion)$('#translateStatus').textContent='Не удалось получить перевод. Можно ввести свой вариант.';}};$('#saveSelected').onclick=()=>{const en=$('#selectedWord').textContent;if(addWord(en,$('#selectedMeaning').value)){const entry=state.words.find(w=>norm(w.en)===norm(en));if(entry){entry.example=popupContext;save();}$('#translationPop').hidden=true;window.getSelection()?.removeAllRanges();}};
 function download(text,name){const u=URL.createObjectURL(new Blob(['\uFEFF'+text],{type:'text/plain;charset=utf-8'})),a=document.createElement('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),10000);}
-$('#exportWords').onclick=()=>download('GOSTUDY · MY VOCABULARY\n\n'+state.words.map(w=>w.en+' — '+w.ru).join('\n'),'GoStudy_My_Words.txt');$('#exportBtn').onclick=()=>{const lines=['GOSTUDY · YOUR FEED YOUR CHOICE · B2',''];for(const [k,v]of Object.entries(state.answers)){let label=k;if(/^q\d-\d$/.test(k)){const [ci,qi]=k.slice(1).split('-').map(Number);label=CLIPS[ci].qs[qi][0];lines.push(label,CLIPS[ci].qs[qi][1][v]||'','');}else lines.push(label,String(v),'');}lines.push('MY WORDS',...state.words.map(w=>w.en+' — '+w.ru));download(lines.join('\n'),'Gostudy_Feed_B2_Answers.txt');};
+$('#exportBtn').onclick=()=>{const lines=['GOSTUDY · YOUR FEED YOUR CHOICE · B2',''];for(const [k,v]of Object.entries(state.answers)){let label=k;if(/^q\d-\d$/.test(k)){const [ci,qi]=k.slice(1).split('-').map(Number);label=CLIPS[ci].qs[qi][0];lines.push(label,CLIPS[ci].qs[qi][1][v]||'','');}else lines.push(label,String(v),'');}lines.push('MY WORDS',...state.words.map(w=>w.en+' — '+w.ru));download(lines.join('\n'),'Gostudy_Feed_B2_Answers.txt');};
 const TURN_TIMES=[[[0,5.165],[5.815,11.761],[12.411,18.268],[18.918,22.908],[23.558,27.691],[28.341,33.729],[34.379,39.876]]];
 function hintBox(hint,example){return '<details class="hint-box"><summary>💡 Нужна подсказка</summary><p>'+esc(hint)+'</p>'+(example?'<details><summary>Показать пример ответа</summary><p>'+esc(example)+'</p></details>':'')+'</details>';}
 const PAGE_HINTS=[["Начните со слов. Можно делать задания по одному и возвращаться позже.",""],["water — поливать, pick — собирать, make — готовить. Выберите выражение и нажмите на его перевод.","water the flowers — поливать цветы"],["В рассказе услышите знакомые слова: country house, sunny, apples, film. Можно открыть текст.",""],["У обычных глаголов добавьте -ed. Три особые формы: go → went, have → had, make → made.","Yesterday I watered the flowers."],["Чаще всего порядок такой: кто → что сделал → где. Last Sunday и In the evening можно поставить в начале.","My grandchildren played outside."],["Можно написать всего три предложения по образцу. Не обязательно о настоящей даче — можно придумать.","Last Sunday, I went to the country house. We had lunch together. It was a lovely day."],["Можно вернуться к заданиям или отметить работу готовой.",""]];
@@ -129,15 +264,29 @@ range.oninput=()=>{if(Number.isFinite(audio.duration))audio.currentTime=Number(r
 ['play','pause','ended','timeupdate','loadedmetadata','durationchange'].forEach(e=>audio.addEventListener(e,sync));sync();}
 new MutationObserver(enhance).observe(document.getElementById('content'),{childList:true});enhance();
 })();
+</script><script>document.getElementById('title').textContent='Homework · Travel A2+';document.getElementById('goal').textContent='Выберите ответы в двух коротких текстах.';</script><script>
+const speakSelected = $('#speakSelected');
+speakSelected.disabled = !('speechSynthesis' in window);
+speakSelected.addEventListener('click', () => {
+  const phrase = $('#selectedWord').textContent.trim();
+  if (!phrase || !('speechSynthesis' in window)) return;
+  const utterance = new SpeechSynthesisUtterance(phrase);
+  utterance.lang = /[а-яё]/i.test(phrase) ? 'ru-RU' : 'en-GB';
+  utterance.rate = 0.88;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utterance);
+});
 </script><script>
-function installTravelVoice(){
-const b=document.getElementById('travelSpeak');if(!b)return;
-const status=document.getElementById('travelVoiceStatus');
-if(!('speechSynthesis' in window)){b.disabled=true;status.textContent='Озвучивание недоступно: используйте текст диалога.';return;}
-b.onclick=()=>{if(speechSynthesis.speaking){if(speechSynthesis.paused){speechSynthesis.resume();b.textContent='Ⅱ';}else{speechSynthesis.pause();b.textContent='▶';}return;}
-const u=new SpeechSynthesisUtterance(CLIPS[0].lines.map(l=>l[1]).join(' '));u.lang='en-GB';u.rate=0.9;const voice=speechSynthesis.getVoices().find(v=>v.lang==='en-GB')||speechSynthesis.getVoices().find(v=>v.lang.startsWith('en'));if(voice)u.voice=voice;
-u.onend=()=>{b.textContent='▶';status.textContent='Послушать ещё раз';};u.onerror=()=>{b.textContent='▶';status.textContent='Используйте текст диалога, если голос недоступен.';};speechSynthesis.speak(u);b.textContent='Ⅱ';status.textContent='At the hotel';};
-document.getElementById('travelStop').onclick=()=>{speechSynthesis.cancel();b.textContent='▶';status.textContent='Послушать диалог';};}
-document.addEventListener('click',e=>{if(e.target.closest('#next,#prev,[data-page]')&&'speechSynthesis' in window)speechSynthesis.cancel();},true);
-</script><script>document.getElementById('title').textContent='Homework · Travel A2+';document.getElementById('goal').textContent='Выберите ответы в двух коротких текстах.';</script></body></html>
+document.addEventListener('click', event => {
+  const button = event.target.closest('[data-speak-word]');
+  if (!button || !('speechSynthesis' in window)) return;
+  const term = button.closest('.word, .dictrow')?.querySelector('strong')?.textContent.trim();
+  if (!term) return;
+  const utterance = new SpeechSynthesisUtterance(term);
+  utterance.lang = /[а-яё]/i.test(term) ? 'ru-RU' : 'en-GB';
+  utterance.rate = .88;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utterance);
+});
+</script></body></html>
 
