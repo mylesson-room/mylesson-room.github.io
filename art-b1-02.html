@@ -31,10 +31,46 @@
 .audio-box .transcript{border:0;margin-top:16px;padding-top:0}.audio-box .transcript summary{display:inline-flex;align-items:center;gap:8px;background:transparent;border:0;padding:8px 0;color:var(--accent);font-size:14px;cursor:pointer;list-style:none}.audio-box .transcript summary::-webkit-details-marker{display:none}.audio-box .transcript summary:before{content:'＋';font-size:18px}.audio-box .transcript[open] summary:before{content:'−'}.audio-box .transcript p{font-size:15px}
 @media(max-width:600px){.audio-box{padding:16px}.audio-top{align-items:flex-start;flex-direction:column}.audio-player{gap:12px;padding:12px}}
 body.dark .audio-box{background:var(--soft)}
-.travel-cover{display:block;width:100%;height:300px;object-fit:cover;border-radius:18px;margin-bottom:22px}.homework-story{font-size:17px;line-height:2.6}.homework-story select{display:inline-block;width:auto;max-width:100%;padding:5px 9px;font-size:15px;margin:0 4px;vertical-align:baseline}.homework-story .feedback{display:inline;font-size:12px;margin-right:6px}@media(max-width:600px){.travel-cover{height:210px}}</style></head><body><header><div class="brand">Gostudy</div><div class="header-actions"><a class="small-button cabinet-link" href="student-art-b1.html">← Кабинет</a><button class="small-button" id="dictBtn">My words <span id="wordCount">0</span></button><button class="small-button" id="themeBtn" aria-label="Switch colour theme">◐</button></div></header>
+.travel-cover{display:block;width:100%;height:300px;object-fit:cover;border-radius:18px;margin-bottom:22px}.homework-story{font-size:17px;line-height:2.6}.homework-story select{display:inline-block;width:auto;max-width:100%;padding:5px 9px;font-size:15px;margin:0 4px;vertical-align:baseline}.homework-story .feedback{display:inline;font-size:12px;margin-right:6px}@media(max-width:600px){.travel-cover{height:210px}}
+#dictionary {
+  background: rgba(250, 253, 255, .88);
+  -webkit-backdrop-filter: blur(22px) saturate(145%);
+  backdrop-filter: blur(22px) saturate(145%);
+  border-radius: 28px;
+  box-shadow: 0 25px 75px rgba(15, 40, 76, .24);
+  max-height: min(85dvh, 760px);
+}
+body.dark #dictionary { background: rgba(26, 45, 66, .92); }
+#dictionary button { min-height: 44px; border-radius: 999px; }
+#dictionary #wordForm input { min-height: 44px; border-radius: 15px; font-size: 16px; }
+#dictionary .menu-top { align-items: center; margin-bottom: 16px; }
+#dictionary .menu-top h2 { margin: 0; }
+#dictionary #dictStatus { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+#dictionary #dictStatus:empty { margin: 0; }
+#dictionary .dict-actions { align-items: center; }
+#dictionary .dictrow { flex-wrap: wrap; }
+@media (max-width: 600px) {
+  #dictionary { padding: 18px; }
+  #dictionary .dict-actions > button { flex: 1 1 auto; }
+}
+</style></head><body><header><div class="brand">Gostudy</div><div class="header-actions"><a class="small-button cabinet-link" href="student-art-b1.html">← Кабинет</a><button class="small-button" id="dictBtn">My words <span id="wordCount">0</span></button><button class="small-button" id="themeBtn" aria-label="Switch colour theme">◐</button></div></header>
 <div class="shell"><main><div class="lesson-bar"><button class="small-button" id="menuBtn" aria-haspopup="dialog" aria-expanded="false">☰ Задания</button></div><div id="pageLabel" hidden></div><h1 id="title" tabindex="-1"></h1><p class="subtitle" id="goal"></p><div id="content"></div><details class="teacher" hidden><summary>Teacher notes · pacing</summary><p id="teacherTips"></p></details><div class="page-controls"><button id="prev" class="small-button">← Назад</button><span id="counter"></span><button id="next" class="primary">Next →</button></div><footer class="footer">Gostudy · Art · B1 · Lesson 02. Ответы и слова сохраняются в этом браузере.</footer><p class="storage-note" id="storageNote" hidden role="status"></p></main></div>
 <dialog id="lessonMenu" class="menu-dialog"><button class="small-button" id="exportBtn" hidden style="margin-bottom:20px">↓ Download my answers</button><div class="menu-top"><b>Урок</b><button class="small-button" id="closeMenu">Закрыть ✕</button></div><span class="eyebrow">TRAVEL · B2</span><h2>Your feed,<br>your choice?</h2><nav id="nav"></nav></dialog>
-<dialog id="dictionary" class="dictionary"><div class="menu-top"><h2>My vocabulary</h2><button class="small-button" id="closeDict">Close ✕</button></div><p class="muted">Введите слово на русском или английском — направление перевода определится автоматически. Перевод можно исправить.</p><form id="wordForm"><label class="field-label" for="newWord">Слово или фраза · RU / EN</label><input id="newWord" type="text" maxlength="200" required placeholder="boarding pass"><label class="field-label" for="newMeaning">Перевод · EN / RU</label><input id="newMeaning" type="text" maxlength="500" required placeholder="посадочный талон"><div class="dict-actions"><button class="primary" type="submit">＋ Save word</button></div></form><p class="audio-note">Онлайн-перевод отправляет только введённый или выделенный текст сервису MyMemory. Не добавляйте личные данные. Перевод слов урока работает без интернета.</p><div class="dict-actions"><button class="primary" id="trainWords">▶ Тренировать мои слова</button><button class="small-button" id="exportWords">↓ Export words (.txt)</button></div><p id="dictStatus" role="status"></p><div id="wordList"></div></dialog>
+<dialog id="dictionary" class="dictionary" aria-labelledby="dictionaryTitle">
+  <div class="menu-top"><h2 id="dictionaryTitle">My vocabulary</h2><button class="small-button" id="closeDict" type="button">Close ✕</button></div>
+  <form id="wordForm">
+    <label class="field-label" for="newWord">Слово или фраза · RU / EN</label>
+    <input id="newWord" type="text" maxlength="200" autocomplete="off" required>
+    <label class="field-label" for="newMeaning">Перевод · EN / RU</label>
+    <input id="newMeaning" type="text" maxlength="500" autocomplete="off" required>
+    <p id="dictStatus" role="status"></p>
+    <div class="dict-actions">
+      <button class="primary" type="submit">＋ Save word</button>
+      <button class="small-button" id="trainWords" type="button">▷ Тренировать мои слова</button>
+    </div>
+  </form>
+  <div id="wordList"></div>
+</dialog>
 <dialog id="trainingDialog" class="dictionary"><div class="menu-top"><h2>Тренировка слов</h2><button class="small-button" id="closeTraining">Закрыть ✕</button></div><div id="trainingBody"></div></dialog><div id="translationPop" class="translation-pop" hidden role="region" aria-label="Перевод выделенного текста"><button class="small-button x" id="closePop" aria-label="Закрыть перевод">✕</button><h3 id="selectedWord"></h3><button type="button" class="small-button" id="speakSelected" aria-label="Озвучить выделенный текст">🔊 Озвучить</button><label class="field-label" for="selectedMeaning">Перевод</label><p id="selectedContext" class="selected-context" hidden></p><div class="translation-entry"><button class="translation-add" id="saveSelected" type="button" aria-label="Добавить в словарь" title="Добавить в словарь">♥</button><textarea id="selectedMeaning" rows="2" maxlength="2000" aria-label="Перевод — можно исправить"></textarea></div><p id="translateStatus" class="audio-note" role="status" hidden></p><div class="dict-actions" hidden><button class="small-button" id="translateOnline" hidden>Другой перевод</button></div></div><div id="toast" role="status"></div>
 <script>
 'use strict';
@@ -94,7 +130,7 @@ function render(){const p=pages[state.page];$('#pageLabel').textContent=`TRAVEL 
 function go(i){stop();$('#translationPop').hidden=true;if($('#lessonMenu').open)$('#lessonMenu').close();state.page=i;render();$('#title').focus({preventScroll:true});window.scrollTo({top:0,behavior:'smooth'});}
 $('#prev').onclick=()=>go(Math.max(0,state.page-1));$('#next').onclick=()=>state.page<pages.length-1?go(state.page+1):notify('Урок завершён. Можно вернуться к любому разделу.');$('#themeBtn').onclick=()=>{state.dark=!state.dark;document.body.classList.toggle('dark',state.dark);save();};$('#menuBtn').onclick=()=>{$('#lessonMenu').showModal();$('#menuBtn').setAttribute('aria-expanded','true');};$('#closeMenu').onclick=()=>$('#lessonMenu').close();$('#lessonMenu').onclose=()=>$('#menuBtn').setAttribute('aria-expanded','false');
 function addWord(en,ru){en=en.trim();ru=ru.trim();if(/[а-яё]/i.test(en)&&/[a-z]/i.test(ru)&&!/[а-яё]/i.test(ru)){[en,ru]=[ru,en];}if(!en||!ru){notify('Add a word and its translation.');return false;}const old=state.words.find(w=>norm(w.en)===norm(en));if(old)old.ru=ru;else state.words.push({en,ru});save();notify(old?'Translation updated.':'Word saved ✓');return true;}
-function renderWords(){const list=$('#wordList');list.innerHTML=state.words.length?state.words.map((w,i)=>`<div class="dictrow"><div><strong>${esc(w.en)}</strong><p>${esc(w.ru)}</p></div><div><button class="small-button" data-edit="${i}" aria-label="Edit ${esc(w.en)}">Edit</button> <button class="small-button" data-delete="${i}" aria-label="Delete ${esc(w.en)}">✕</button></div></div>`).join(''):'<p class="muted dict-empty">Пока пусто. Выделите слово в уроке или добавьте его выше.</p>';$$('[data-edit]').forEach(b=>b.onclick=()=>{const w=state.words[Number(b.dataset.edit)];$('#newWord').value=w.en;$('#newMeaning').value=w.ru;$('#newMeaning').focus();});$$('[data-delete]').forEach(b=>b.onclick=()=>{state.words.splice(Number(b.dataset.delete),1);save();renderWords();});}
+function renderWords(){const list=$('#wordList');list.innerHTML=state.words.length?state.words.map((w,i)=>`<div class="dictrow"><div><strong>${esc(w.en)}</strong><p>${esc(w.ru)}</p></div><div><button type="button" class="small-button" data-speak-word>🔊 Прослушать слово</button> <button class="small-button" data-edit="${i}" aria-label="Edit ${esc(w.en)}">Edit</button> <button class="small-button" data-delete="${i}" aria-label="Delete ${esc(w.en)}">✕</button></div></div>`).join(''):'<p class="muted dict-empty">Пока пусто. Выделите слово в уроке или добавьте его выше.</p>';$$('[data-edit]').forEach(b=>b.onclick=()=>{const w=state.words[Number(b.dataset.edit)];manualVersion++;clearTimeout(manualTimer);manualStatus.textContent='';$('#newWord').value=w.en;$('#newMeaning').value=w.ru;$('#newMeaning').focus();});$$('[data-delete]').forEach(b=>b.onclick=()=>{state.words.splice(Number(b.dataset.delete),1);save();renderWords();});}
 function openDict(){window.getSelection()?.removeAllRanges();$('#translationPop').hidden=true;renderWords();$('#dictionary').showModal();}$('#dictBtn').onclick=openDict;$('#closeDict').onclick=()=>$('#dictionary').close();$('#wordForm').onsubmit=e=>{e.preventDefault();if(addWord($('#newWord').value,$('#newMeaning').value)){e.target.reset();renderWords();}};
 $('#trainWords').onclick=openTraining;$('#closeTraining').onclick=()=>$('#trainingDialog').close();
 let lookupVersion=0;
@@ -161,7 +197,6 @@ async function fillSelected(text,context,version){const field=$('#selectedMeanin
 function selectionPopup(){if(selectingText)return;if($('#dictionary').open||$('#lessonMenu').open||$('#trainingDialog').open)return;const sel=window.getSelection();if(!sel||sel.isCollapsed||!sel.rangeCount)return;const el=sel.anchorNode?.parentElement,focus=sel.focusNode?.parentElement;if(!el||!focus||!el.closest('#content')||!focus.closest('#content')||el.closest('input,textarea,button,select'))return;const text=sel.toString().trim();if(!text||text.length>200||!/[a-zA-Zа-яА-ЯёЁ]/.test(text))return;selectedRange=sel.getRangeAt(0).cloneRange();const context=sentenceNearSelection(el,text);if(!$('#translationPop').hidden&&$('#selectedWord').textContent===text&&popupContext===context){anchorPopup();return;}popupContext=context;const version=++lookupVersion;$('#selectedWord').textContent=text;$('#translationPop').hidden=false;fillSelected(text,context,version);}
 let selectionTimer;document.addEventListener('selectionchange',()=>{clearTimeout(selectionTimer);selectionTimer=setTimeout(selectionPopup,180);});document.addEventListener('pointerup',e=>{selectingText=false;if(!e.target.closest('#translationPop'))setTimeout(selectionPopup,0);});document.addEventListener('pointercancel',()=>{selectingText=false;});window.addEventListener('scroll',anchorPopup,{passive:true});window.addEventListener('resize',anchorPopup);window.visualViewport?.addEventListener('resize',anchorPopup);document.addEventListener('pointerdown',e=>{if(!e.target.closest('#translationPop')){selectingText=true;clearTimeout(selectionTimer);$('#translationPop').hidden=true;lookupVersion++;window.getSelection()?.removeAllRanges();}});document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('#translationPop').hidden=true;lookupVersion++;}});$('#closePop').onclick=()=>{$('#translationPop').hidden=true;lookupVersion++;window.getSelection()?.removeAllRanges();};$('#translateOnline').onclick=async()=>{const text=$('#selectedWord').textContent,version=++lookupVersion;$('#translateStatus').textContent='Переводим…';try{const ru=await online(text);if(version===lookupVersion){$('#selectedMeaning').value=ru;$('#translateStatus').textContent='MyMemory · альтернативный перевод';anchorPopup();}}catch(e){if(version===lookupVersion)$('#translateStatus').textContent='Не удалось получить перевод. Можно ввести свой вариант.';}};$('#saveSelected').onclick=()=>{const en=$('#selectedWord').textContent;if(addWord(en,$('#selectedMeaning').value)){const entry=state.words.find(w=>norm(w.en)===norm(en));if(entry){entry.example=popupContext;save();}$('#translationPop').hidden=true;window.getSelection()?.removeAllRanges();}};
 function download(text,name){const u=URL.createObjectURL(new Blob(['\uFEFF'+text],{type:'text/plain;charset=utf-8'})),a=document.createElement('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),10000);}
-$('#exportWords').onclick=()=>download('GOSTUDY · MY VOCABULARY\n\n'+state.words.map(w=>w.en+' — '+w.ru).join('\n'),'GoStudy_My_Words.txt');$('#exportBtn').onclick=()=>{const lines=['GOSTUDY · YOUR FEED YOUR CHOICE · B2',''];for(const [k,v]of Object.entries(state.answers)){let label=k;if(/^q\d-\d$/.test(k)){const [ci,qi]=k.slice(1).split('-').map(Number);label=CLIPS[ci].qs[qi][0];lines.push(label,CLIPS[ci].qs[qi][1][v]||'','');}else lines.push(label,String(v),'');}lines.push('MY WORDS',...state.words.map(w=>w.en+' — '+w.ru));download(lines.join('\n'),'Gostudy_Feed_B2_Answers.txt');};
 const TURN_TIMES=[[[0,5.165],[5.815,11.761],[12.411,18.268],[18.918,22.908],[23.558,27.691],[28.341,33.729],[34.379,39.876]]];
 function hintBox(hint,example){return '<details class="hint-box"><summary>💡 Нужна подсказка</summary><p>'+esc(hint)+'</p>'+(example?'<details><summary>Показать пример ответа</summary><p>'+esc(example)+'</p></details>':'')+'</details>';}
 const PAGE_HINTS=[["Начните со слов. Можно делать задания по одному и возвращаться позже.",""],["water — поливать, pick — собирать, make — готовить. Выберите выражение и нажмите на его перевод.","water the flowers — поливать цветы"],["В рассказе услышите знакомые слова: country house, sunny, apples, film. Можно открыть текст.",""],["У обычных глаголов добавьте -ed. Три особые формы: go → went, have → had, make → made.","Yesterday I watered the flowers."],["Чаще всего порядок такой: кто → что сделал → где. Last Sunday и In the evening можно поставить в начале.","My grandchildren played outside."],["Можно написать всего три предложения по образцу. Не обязательно о настоящей даче — можно придумать.","Last Sunday, I went to the country house. We had lunch together. It was a lovely day."],["Можно вернуться к заданиям или отметить работу готовой.",""]];
@@ -204,6 +239,18 @@ speakSelected.addEventListener('click', () => {
   const utterance = new SpeechSynthesisUtterance(phrase);
   utterance.lang = /[а-яё]/i.test(phrase) ? 'ru-RU' : 'en-GB';
   utterance.rate = 0.88;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utterance);
+});
+</script><script>
+document.addEventListener('click', event => {
+  const button = event.target.closest('[data-speak-word]');
+  if (!button || !('speechSynthesis' in window)) return;
+  const term = button.closest('.word, .dictrow')?.querySelector('strong')?.textContent.trim();
+  if (!term) return;
+  const utterance = new SpeechSynthesisUtterance(term);
+  utterance.lang = /[а-яё]/i.test(term) ? 'ru-RU' : 'en-GB';
+  utterance.rate = .88;
   speechSynthesis.cancel();
   speechSynthesis.speak(utterance);
 });
