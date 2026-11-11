@@ -4,16 +4,40 @@
   const project = 'https://kawfqlohguwvmmplvrny.supabase.co';
   const publicKey = 'sb_publishable_aAZxKwYpLcIXAjCiN5lBSg_qdFxvYwL';
   const authKey = 'gostudy-cloud-session-v1';
-  const lessonKeys = [
+  const travelB2Keys = [
     'gostudy-travel-disruptions-b2-v1',
     'gostudy-travel-disruptions-b2-homework-v1',
     'gostudy-travel-b2-02-v1',
     'gostudy-travel-b2-02-homework-v1',
     'gostudy-travel-b2-profile-v1',
   ];
-  const keys = new Set(lessonKeys);
-  const accountPage = 'gostudy-account.html';
-  const cabinetPage = 'student-travel-b2.html';
+  const travelA2Keys = [
+    "gostudy-travel-a2plus-v1",
+    "gostudy-travel-a2plus-profile-v1",
+    "gostudy-travel-a2plus-homework-v1",
+    "gostudy-travel-a2plus-02-v1",
+    "gostudy-travel-a2plus-02-homework-v1",
+    "gostudy-travel-a2plus-03-v1",
+    "gostudy-travel-a2plus-03-homework-v1",
+    "gostudy-travel-a2plus-04-v1",
+    "gostudy-travel-a2plus-04-homework-v1"
+  ];
+  const travelA2Pages = new Set([
+    "student-travel-a2.html",
+    "travel-weekend-a2.html",
+    "travel-a2-homework.html",
+    "travel-a2-02.html",
+    "travel-a2-02-homework.html",
+    "travel-a2-03.html",
+    "travel-a2-03-homework.html",
+    "travel-a2-04.html",
+    "travel-a2-04-homework.html"
+  ]);
+  const travelA2 = travelA2Pages.has(location.pathname.split('/').pop()) ||
+    new URLSearchParams(location.search).get('course') === 'travel-a2';
+  const keys = new Set(travelA2 ? travelA2Keys : travelB2Keys);
+  const accountPage = 'gostudy-account.html' + (travelA2 ? '?course=travel-a2' : '');
+  const cabinetPage = travelA2 ? 'student-travel-a2.html' : 'student-travel-b2.html';
   const table = '/rest/v1/gostudy_progress';
   const json = (value, fallback = null) => {
     try { return JSON.parse(value) ?? fallback; } catch { return fallback; }
@@ -180,6 +204,15 @@
 
   function mountAccount() {
     const form = document.getElementById('cloud-login');
+    const courseName = travelA2 ? 'Travel A2+' : 'Travel B2';
+    const cabinetLink = document.getElementById('cloud-cabinet');
+    if (cabinetLink) {
+      cabinetLink.href = cabinetPage;
+      cabinetLink.textContent = '← Кабинет ' + courseName;
+    }
+    const intro = document.getElementById('cloud-intro');
+    if (intro) intro.textContent = 'Войдите, чтобы сохранять ответы, открытые разделы и слова ' + courseName + ' между устройствами.';
+    document.title = 'Аккаунт GoStudy · ' + courseName;
     const settings = document.getElementById('cloud-settings');
     const status = document.getElementById('cloud-message');
     const render = () => {
