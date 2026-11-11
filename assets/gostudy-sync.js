@@ -280,7 +280,8 @@
   }
 
   function mountTeacherWords() {
-    if ((!travelA2 && !financeB1) || !session) return;
+    if ((!travelA2 && !financeB1 && !feedB2) || !session) return;
+    const course = feedB2 ? 'feed_b2' : financeB1 ? 'finance_b1' : 'travel_a2';
     const dictionary = document.getElementById('dictionary');
     const dictionaryButton = document.getElementById('dictBtn');
     const targets = [dictionary, document.getElementById('words')].filter(Boolean);
@@ -318,7 +319,7 @@
     const refresh = async () => {
       try {
         if (document.hidden) return;
-        const result = await request('/rest/v1/rpc/' + (financeB1 ? 'gostudy_finance_b1_my_words' : 'gostudy_travel_a2_my_words'), {method:'POST',body:{}}, await token());
+        const result = await request('/rest/v1/rpc/' + 'gostudy_' + course + '_my_words', {method:'POST',body:{}}, await token());
         if (!result.ok || !Array.isArray(result.data)) return;
         const signature = JSON.stringify(result.data);
         if (signature === last) return;
@@ -376,6 +377,13 @@
       ['gostudy-finance-b1-homework-v1','Домашка 1 · Finance B1'],
       ['gostudy-finance-b1-02-v1','Урок 2 · Where did my money go?'],
       ['gostudy-finance-b1-02-homework-v1','Домашка 2 · Finance B1'],
+      ['gostudy-feed-b2-v1','Урок 1 · Feed B2'],
+      ['gostudy-feed-b2-02-v1','Урок 2 · Feed B2'],
+      ['gostudy-feed-b2-02-homework-v1','Домашка 2 · Feed B2'],
+      ['gostudy-feed-b2-03-v1','Урок 3 · Feed B2'],
+      ['gostudy-feed-b2-03-homework-v1','Домашка 3 · Feed B2'],
+      ['gostudy-feed-b2-04-v1','Урок 4 · A real photo, a false story'],
+      ['gostudy-feed-b2-04-homework-v1','Домашка 4 · Feed B2'],
     ]);
     const lesson4Labels = {
       hwRead1:'Что делала Элла?', hwRead2:'Проблема с поездом в 10:45', hwRead3:'Почему решили подождать?',
@@ -383,7 +391,7 @@
       hwG1:'I … on the platform', hwG2:'The assistant … us', hwG3:'They … for the platform',
     };
     const finance2Labels = {hwRead1:'Какой платёж проверила Миа?',hwRead2:'Где она нашла название приложения?',hwRead3:'Зачем Миа связалась с поддержкой?',hwListen1:'Сумма списания',hwListen2:'Когда закончился пробный период?',hwListen3:'Что Сэм уже сделал?',hwG1:'I … the statement yesterday',hwG2:'They … yet',hwG3:'She … it last Friday',hwG4:'We … support'};
-    const courses = new Map([['travel_a2','Travel A2+'],['finance_b1','Finance B1']]);
+    const courses = new Map([['travel_a2','Travel A2+'],['finance_b1','Finance B1'],['feed_b2','Feed B2']]);
     const rosterByCourse = new Map();
     let students = [];
     let signature = '';
