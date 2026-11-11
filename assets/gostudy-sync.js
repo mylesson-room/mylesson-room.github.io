@@ -277,7 +277,9 @@
 
   function mountTeacherWords() {
     if ((!travelA2 && !financeB1) || !session) return;
-    const targets = [document.getElementById('dictionary'), document.getElementById('words')].filter(Boolean);
+    const dictionary = document.getElementById('dictionary');
+    const dictionaryButton = document.getElementById('dictBtn');
+    const targets = [dictionary, document.getElementById('words')].filter(Boolean);
     const panels = targets.map(target => {
       const section = document.createElement('section');
       section.className = 'gostudy-teacher-words';
@@ -286,10 +288,28 @@
       const list = document.createElement('ul');
       section.append(title, list);
       section.hidden = true;
-      target.append(section);
+      if (target === dictionary) {
+        const form = target.querySelector('#wordForm');
+        if (form) form.before(section);
+        else target.prepend(section);
+      } else {
+        target.prepend(section);
+      }
       return {section, list};
     });
     if (!panels.length) return;
+    const shortcut = document.createElement('button');
+    shortcut.type = 'button';
+    shortcut.className = 'gostudy-cloud-link';
+    shortcut.hidden = true;
+    shortcut.onclick = () => {
+      if (dictionary && !dictionary.open) {
+        if (dictionaryButton) dictionaryButton.click();
+        else dictionary.showModal();
+      }
+      panels[0].section.scrollIntoView({block:'nearest'});
+    };
+    document.querySelector('.gostudy-cloud-bar')?.append(shortcut);
     let last = '';
     const refresh = async () => {
       try {
@@ -299,6 +319,8 @@
         const signature = JSON.stringify(result.data);
         if (signature === last) return;
         last = signature;
+        shortcut.hidden = !result.data.length;
+        shortcut.textContent = 'Слова от преподавателя · ' + result.data.length;
         for (const {section,list} of panels) {
           section.hidden = result.data.length === 0;
           list.replaceChildren(...result.data.map(word => {
