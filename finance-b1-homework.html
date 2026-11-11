@@ -31,19 +31,145 @@
 .audio-box .transcript{border:0;margin-top:16px;padding-top:0}.audio-box .transcript summary{display:inline-flex;align-items:center;gap:8px;background:transparent;border:0;padding:8px 0;color:var(--accent);font-size:14px;cursor:pointer;list-style:none}.audio-box .transcript summary::-webkit-details-marker{display:none}.audio-box .transcript summary:before{content:'＋';font-size:18px}.audio-box .transcript[open] summary:before{content:'−'}.audio-box .transcript p{font-size:15px}
 @media(max-width:600px){.audio-box{padding:16px}.audio-top{align-items:flex-start;flex-direction:column}.audio-player{gap:12px;padding:12px}}
 body.dark .audio-box{background:var(--soft)}
-.travel-cover{display:block;width:100%;height:300px;object-fit:cover;border-radius:18px;margin-bottom:22px}.homework-story{font-size:17px;line-height:2.6}.homework-story select{display:inline-block;width:auto;max-width:100%;padding:5px 9px;font-size:15px;margin:0 4px;vertical-align:baseline}.homework-story .feedback{display:inline;font-size:12px;margin-right:6px}@media(max-width:600px){.travel-cover{height:210px}}#menuBtn,.page-controls{display:none!important}#content select{max-width:100%;width:auto;margin:4px;padding:6px}#content .feedback{font-size:13px}</style></head><body><header><div class="brand">Gostudy</div><div class="header-actions"><a class="small-button cabinet-link" href="student-finance-b1.html">← Кабинет</a><button class="small-button" id="dictBtn">My words <span id="wordCount">0</span></button><button class="small-button" id="themeBtn" aria-label="Switch colour theme">◐</button></div></header>
+.travel-cover{display:block;width:100%;height:300px;object-fit:cover;border-radius:18px;margin-bottom:22px}.homework-story{font-size:17px;line-height:2.6}.homework-story select{display:inline-block;width:auto;max-width:100%;padding:5px 9px;font-size:15px;margin:0 4px;vertical-align:baseline}.homework-story .feedback{display:inline;font-size:12px;margin-right:6px}@media(max-width:600px){.travel-cover{height:210px}}#menuBtn,.page-controls{display:none!important}#content select{max-width:100%;width:auto;margin:4px;padding:6px}#content .feedback{font-size:13px}/* Rounded surfaces and translucent navigation inspired by iPhone. */
+body {
+  --ios-glass: rgba(250, 253, 255, .88);
+  --ios-shadow: 0 10px 28px rgba(23, 73, 127, .09);
+  background: radial-gradient(ellipse at top right, #dbeeff, transparent 65%) var(--bg);
+  min-height: 100vh;
+}
+body.dark {
+  --ios-glass: rgba(26, 45, 66, .92);
+  --ios-shadow: 0 10px 28px rgba(0, 0, 0, .23);
+  background: radial-gradient(ellipse at top right, #223f60, transparent 65%) var(--bg);
+}
+header, .page-controls, #dictionary {
+  background: var(--ios-glass);
+  -webkit-backdrop-filter: blur(22px) saturate(145%);
+  backdrop-filter: blur(22px) saturate(145%);
+}
+header { height: auto; min-height: 66px; }
+.card { border-radius: 26px; box-shadow: var(--ios-shadow); }
+.word, .role, .option, .audio-box { border-radius: 18px; }
+button.primary, button.small-button, a.small-button, .primary.cabinet-link {
+  min-height: 44px;
+  border-radius: 999px;
+}
+a.small-button { display: inline-flex; align-items: center; }
+#content :is(select, input[type="text"], textarea), #wordForm input {
+  min-height: 44px;
+  border-radius: 15px;
+  font-size: 16px;
+}
+.page-controls {
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  box-shadow: var(--ios-shadow);
+}
+#dictionary {
+  border-radius: 28px;
+  box-shadow: 0 25px 75px rgba(15, 40, 76, .24);
+  max-height: min(85dvh, 760px);
+}
+#dictionary .menu-top { align-items: center; margin-bottom: 16px; }
+#dictionary .menu-top h2 { margin: 0; }
+#dictionary #dictStatus { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+#dictionary #dictStatus:empty { margin: 0; }
+#dictionary .dict-actions { align-items: center; }
+@media (max-width: 600px) {
+  header { padding-inline: 14px; }
+  .card { padding: 18px; }
+  #dictionary { padding: 18px; }
+  #dictionary .dict-actions > button { flex: 1 1 auto; }
+}
+/* Rounded surfaces and translucent navigation inspired by iPhone. */
+body {
+  --ios-glass: rgba(250, 253, 255, .88);
+  --ios-shadow: 0 10px 28px rgba(23, 73, 127, .09);
+  background: radial-gradient(ellipse at top right, #dbeeff, transparent 65%) var(--bg);
+  min-height: 100vh;
+}
+body.dark {
+  --ios-glass: rgba(26, 45, 66, .92);
+  --ios-shadow: 0 10px 28px rgba(0, 0, 0, .23);
+  background: radial-gradient(ellipse at top right, #223f60, transparent 65%) var(--bg);
+}
+header, .page-controls, #dictionary {
+  background: var(--ios-glass);
+  -webkit-backdrop-filter: blur(22px) saturate(145%);
+  backdrop-filter: blur(22px) saturate(145%);
+}
+header { height: auto; min-height: 66px; }
+.card { border-radius: 26px; box-shadow: var(--ios-shadow); }
+.word, .role, .option, .audio-box { border-radius: 18px; }
+button.primary, button.small-button, a.small-button, .primary.cabinet-link {
+  min-height: 44px;
+  border-radius: 999px;
+}
+a.small-button { display: inline-flex; align-items: center; }
+#content :is(select, input[type="text"], textarea), #wordForm input {
+  min-height: 44px;
+  border-radius: 15px;
+  font-size: 16px;
+}
+.page-controls {
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  box-shadow: var(--ios-shadow);
+}
+#dictionary {
+  border-radius: 28px;
+  box-shadow: 0 25px 75px rgba(15, 40, 76, .24);
+  max-height: min(85dvh, 760px);
+}
+#dictionary .menu-top { align-items: center; margin-bottom: 16px; }
+#dictionary .menu-top h2 { margin: 0; }
+#dictionary #dictStatus { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+#dictionary #dictStatus:empty { margin: 0; }
+#dictionary .dict-actions { align-items: center; }
+@media (max-width: 600px) {
+  header { padding-inline: 14px; }
+  .card { padding: 18px; }
+  #dictionary { padding: 18px; }
+  #dictionary .dict-actions > button { flex: 1 1 auto; }
+}
+
+
+
+
+#dictionary .dictrow{flex-wrap:wrap}</style>
+<link rel="stylesheet" href="assets/gostudy-sync.css?v=3">
+<script src="assets/gostudy-sync.js?v=4"></script>
+<script>window.GoStudyStorage ??= {getItem: key => localStorage.getItem(key), setItem: (key, value) => localStorage.setItem(key, value)};</script>
+</head><body><header><div class="brand">Gostudy</div><div class="header-actions"><a class="small-button cabinet-link" href="student-finance-b1.html">← Кабинет</a><button class="small-button" id="dictBtn">My words <span id="wordCount">0</span></button><button class="small-button" id="themeBtn" aria-label="Switch colour theme">◐</button></div></header>
 <div class="shell"><main><div class="lesson-bar"><button class="small-button" id="menuBtn" aria-haspopup="dialog" aria-expanded="false">☰ Задания</button></div><div id="pageLabel" hidden></div><h1 id="title" tabindex="-1"></h1><p class="subtitle" id="goal"></p><div id="content"></div><details class="teacher" hidden><summary>Teacher notes · pacing</summary><p id="teacherTips"></p></details><div class="page-controls"><button id="prev" class="small-button">← Назад</button><span id="counter"></span><button id="next" class="primary">Next →</button></div><footer class="footer">Gostudy · Finance B1. Ответы и слова сохраняются в этом браузере.</footer><p class="storage-note" id="storageNote" hidden role="status"></p></main></div>
 <dialog id="lessonMenu" class="menu-dialog"><button class="small-button" id="exportBtn" hidden style="margin-bottom:20px">↓ Download my answers</button><div class="menu-top"><b>Урок</b><button class="small-button" id="closeMenu">Закрыть ✕</button></div><span class="eyebrow">TRAVEL · B2</span><h2>Your feed,<br>your choice?</h2><nav id="nav"></nav></dialog>
-<dialog id="dictionary" class="dictionary"><div class="menu-top"><h2>My vocabulary</h2><button class="small-button" id="closeDict">Close ✕</button></div><p class="muted">Введите слово на русском или английском — направление перевода определится автоматически. Перевод можно исправить.</p><form id="wordForm"><label class="field-label" for="newWord">Слово или фраза · RU / EN</label><input id="newWord" type="text" maxlength="200" required placeholder="boarding pass"><label class="field-label" for="newMeaning">Перевод · EN / RU</label><input id="newMeaning" type="text" maxlength="500" required placeholder="посадочный талон"><div class="dict-actions"><button class="primary" type="submit">＋ Save word</button><button class="small-button" type="button" id="manualTranslate">Перевести онлайн</button></div></form><p class="audio-note">Онлайн-перевод отправляет только введённый или выделенный текст сервису MyMemory. Не добавляйте личные данные. Перевод слов урока работает без интернета.</p><div class="dict-actions"><button class="primary" id="trainWords">▶ Тренировать мои слова</button><button class="small-button" id="exportWords">↓ Export words (.txt)</button></div><p id="dictStatus" role="status"></p><div id="wordList"></div></dialog>
-<dialog id="trainingDialog" class="dictionary"><div class="menu-top"><h2>Тренировка слов</h2><button class="small-button" id="closeTraining">Закрыть ✕</button></div><div id="trainingBody"></div></dialog><div id="translationPop" class="translation-pop" hidden role="region" aria-label="Перевод выделенного текста"><button class="small-button x" id="closePop" aria-label="Закрыть перевод">✕</button><h3 id="selectedWord"></h3><label class="field-label" for="selectedMeaning">Перевод</label><p id="selectedContext" class="selected-context" hidden></p><div class="translation-entry"><button class="translation-add" id="saveSelected" type="button" aria-label="Добавить в словарь" title="Добавить в словарь">♥</button><textarea id="selectedMeaning" rows="2" maxlength="2000" aria-label="Перевод — можно исправить"></textarea></div><p id="translateStatus" class="audio-note" role="status" hidden></p><div class="dict-actions" hidden><button class="small-button" id="translateOnline" hidden>Другой перевод</button></div></div><div id="toast" role="status"></div>
+<dialog id="dictionary" class="dictionary" aria-labelledby="dictionaryTitle">
+  <div class="menu-top"><h2 id="dictionaryTitle">My vocabulary</h2><button class="small-button" id="closeDict" type="button">Close ✕</button></div>
+  <form id="wordForm">
+    <label class="field-label" for="newWord">Слово или фраза · RU / EN</label>
+    <input id="newWord" type="text" maxlength="200" autocomplete="off" required>
+    <label class="field-label" for="newMeaning">Перевод · EN / RU</label>
+    <input id="newMeaning" type="text" maxlength="500" autocomplete="off" required>
+    <p id="dictStatus" role="status"></p>
+    <div class="dict-actions">
+      <button class="primary" type="submit">＋ Save word</button>
+      <button class="small-button" id="trainWords" type="button">▷ Тренировать мои слова</button>
+    </div>
+  </form>
+  <div id="wordList"></div>
+</dialog>
+<dialog id="trainingDialog" class="dictionary"><div class="menu-top"><h2>Тренировка слов</h2><button class="small-button" id="closeTraining">Закрыть ✕</button></div><div id="trainingBody"></div></dialog><div id="translationPop" class="translation-pop" hidden role="region" aria-label="Перевод выделенного текста"><button class="small-button x" id="closePop" aria-label="Закрыть перевод">✕</button><h3 id="selectedWord"></h3><button type="button" class="small-button" id="speakSelected" aria-label="Озвучить выделенный текст">🔊 Озвучить</button><label class="field-label" for="selectedMeaning">Перевод</label><p id="selectedContext" class="selected-context" hidden></p><div class="translation-entry"><button class="translation-add" id="saveSelected" type="button" aria-label="Добавить в словарь" title="Добавить в словарь">♥</button><textarea id="selectedMeaning" rows="2" maxlength="2000" aria-label="Перевод — можно исправить"></textarea></div><p id="translateStatus" class="audio-note" role="status" hidden></p><div class="dict-actions" hidden><button class="small-button" id="translateOnline" hidden>Другой перевод</button></div></div><div id="toast" role="status"></div>
 <script>
 'use strict';
 const CLIPS=[{"title":"At the hotel","lines":[["Receptionist","Hello! How can I help you?"],["Lena","Hi. I have a booking for two nights. My name is Lena Park."],["Receptionist","Yes, a single room. Can I see your passport, please?"],["Lena","Of course. What time is breakfast?"],["Receptionist","From seven to ten. Your room is on the second floor."],["Lena","Thank you. Is there a bus stop nearby?"],["Receptionist","Yes. Turn left outside the hotel. It is next to the café."]],"qs":[["How many nights is Lena staying?",["One","Two","Three"],1],["Where is her room?",["On the first floor","On the second floor","Next to the café"],1],["Where is the bus stop?",["Next to the café","In the hotel","At the station"],0]]},{"qs":[["How did Lena travel?",["By bus","By train","By plane"],1],["Why did she call the hotel?",["The train was late","She lost her suitcase","She wanted breakfast"],0],["What are her plans for Sunday?",["A museum","A long walk by the river","A market"],1]]}];
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const key='gostudy-finance-b1-homework-v1';let state={page:0,answers:{},words:[],dark:false};let storage=true;
-try{const s=JSON.parse(localStorage.getItem(key)||'null');if(s&&typeof s==='object'){state={...state,...s};state.answers=s.answers&&typeof s.answers==='object'?s.answers:{};state.words=Array.isArray(s.words)?s.words.filter(w=>w&&typeof w.en==='string'&&typeof w.ru==='string'):[];}}catch(e){storage=false;}
-function save(){try{localStorage.setItem(key,JSON.stringify(state));}catch(e){storage=false;$('#storageNote').hidden=false;$('#storageNote').textContent='Saving unavailable. Export your answers and vocabulary before closing.';}$('#wordCount').textContent=state.words.length;}
+try{const s=JSON.parse(GoStudyStorage.getItem(key)||'null');if(s&&typeof s==='object'){state={...state,...s};state.answers=s.answers&&typeof s.answers==='object'?s.answers:{};state.words=Array.isArray(s.words)?s.words.filter(w=>w&&typeof w.en==='string'&&typeof w.ru==='string'):[];}}catch(e){storage=false;}
+function save(){try{GoStudyStorage.setItem(key,JSON.stringify(state));}catch(e){storage=false;$('#storageNote').hidden=false;$('#storageNote').textContent='Saving unavailable. Export your answers and vocabulary before closing.';}$('#wordCount').textContent=state.words.length;}
 let toastTimer;function notify(s){$('#toast').textContent=s;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3200);}
 const words=[["bank account","банковский счёт","I opened a bank account."],["bank transfer","банковский перевод","I sent the money by bank transfer."],["cash","наличные","Do you accept cash?"],["fee","комиссия; сбор","Is there a fee for this service?"],["borrow","брать взаймы","Can I borrow some money?"],["lend","давать взаймы","A bank can lend money."],["loan","заём; кредит","She applied for a loan."],["interest","проценты по займу","How much interest will I pay?"],["monthly payment","ежемесячный платёж","The monthly payment is 50 units."],["repay","погашать; возвращать","He repaid the loan in six months."],["total cost","полная стоимость","What is the total cost?"],["savings","сбережения","They used some of their savings."]];
 const glossary={"bank account":"банковский счёт","bank transfer":"банковский перевод","cash":"наличные","fee":"комиссия; сбор","borrow":"брать взаймы","lend":"давать взаймы","loan":"заём; кредит","interest":"проценты по займу","monthly payment":"ежемесячный платёж","repay":"погашать; возвращать","total cost":"полная стоимость","savings":"сбережения"};
@@ -56,7 +182,7 @@ function promptBox(title,text){return '<div class="prompt"><h3>'+title+'</h3><p>
 function b2mc(group,qs){return qs.map((q,i)=>{const id='q'+group+'-'+i;return '<div class="question"><p>'+(i+1)+'. '+esc(q[0])+'</p><div class="options">'+q[1].map((v,j)=>'<label class="option"><input type="radio" name="'+id+'" data-q="'+group+':'+i+'" value="'+j+'" '+(Number(state.answers[id])===j&&state.answers[id]!==undefined?'checked':'')+'><span>'+esc(v)+'</span></label>').join('')+'</div><div class="feedback" id="fb-'+id+'" role="status"></div></div>';}).join('');}
 function feedWelcome(){return card("1 · The repair bill","<p>New words: <b>receipt</b> — чек · <b>balance</b> — остаток на счёте · <b>due date</b> — срок оплаты · <b>instalment</b> — часть оплаты по графику.</p><p>After a bicycle repair, Aisha paid the first part of the bill and kept the paper the shop gave her. Before the next payment, she opened her banking app to see how much money was left in her account. She set a reminder for Friday, the day the next payment had to arrive.</p>")+card("Choose the word from context","<p>The paper proves she paid. It is a "+hwChoice("h1","receipt",["receipt","balance","due date"])+"</p>"+"<p>The amount left in her account is the "+hwChoice("h2","balance",["instalment","balance","receipt"])+"</p>"+"<p>Friday is the "+hwChoice("h3","due date",["balance","receipt","due date"])+"</p>"+"<p>One scheduled part of the bill is an "+hwChoice("h4","instalment",["instalment","receipt","balance"])+"</p>")+card("2 · A payment across time","<p>В этом тексте выбери Past Simple, Present Perfect или форму будущего по контексту.</p>")+card("Complete the story","<p>Last Monday, Ben ___ his friend 20 units. "+hwChoice("h5","lent",["has lent","lent","will lend"])+"</p>"+"<p>Since Monday, his friend ___ half of it. "+hwChoice("h6","has repaid",["repaid yesterday","has repaid","will repay"])+"</p>"+"<p>He has a clear plan. Next Friday, he ___ the rest. "+hwChoice("h7","is going to repay",["repaid","has repaid","is going to repay"])+"</p>")+card("3 · The shop’s offer","<p>Two fictional plans for the same bicycle repair. Plan X costs 4 × 30 units, plus a separate 5-unit fee. Plan Y costs 5 × 24 units, with zero fee.</p>")+card("Check the numbers","<p>What is the full cost of Plan X? "+hwChoice("h8","125 units",["120 units","125 units","145 units"])+"</p>"+"<p>Which plan costs less in total? "+hwChoice("h9","Plan Y",["Plan X","Plan Y","They cost the same"])+"</p>");}
 const VOCAB_GAPS=[["coll0","The train leaves from ___ four.","platform"],["coll1","I have a ___ for two nights.","booking"],["coll2","Can we check ___ now?","in"],["coll3","Is there a café ___?","nearby"]];
-function feedWords(){return card("Useful words at the bank","<div class=\"word-grid\"><article class=\"word\"><strong>bank account</strong><p>I opened a bank account.</p><details><summary>Перевод</summary><p>банковский счёт</p></details><button class=\"small-button\" data-add=\"0\">＋ В словарь</button></article><article class=\"word\"><strong>bank transfer</strong><p>I sent the money by bank transfer.</p><details><summary>Перевод</summary><p>банковский перевод</p></details><button class=\"small-button\" data-add=\"1\">＋ В словарь</button></article><article class=\"word\"><strong>cash</strong><p>Do you accept cash?</p><details><summary>Перевод</summary><p>наличные</p></details><button class=\"small-button\" data-add=\"2\">＋ В словарь</button></article><article class=\"word\"><strong>fee</strong><p>Is there a fee for this service?</p><details><summary>Перевод</summary><p>комиссия; сбор</p></details><button class=\"small-button\" data-add=\"3\">＋ В словарь</button></article><article class=\"word\"><strong>borrow</strong><p>Can I borrow some money?</p><details><summary>Перевод</summary><p>брать взаймы</p></details><button class=\"small-button\" data-add=\"4\">＋ В словарь</button></article><article class=\"word\"><strong>lend</strong><p>A bank can lend money.</p><details><summary>Перевод</summary><p>давать взаймы</p></details><button class=\"small-button\" data-add=\"5\">＋ В словарь</button></article><article class=\"word\"><strong>loan</strong><p>She applied for a loan.</p><details><summary>Перевод</summary><p>заём; кредит</p></details><button class=\"small-button\" data-add=\"6\">＋ В словарь</button></article><article class=\"word\"><strong>interest</strong><p>How much interest will I pay?</p><details><summary>Перевод</summary><p>проценты по займу</p></details><button class=\"small-button\" data-add=\"7\">＋ В словарь</button></article><article class=\"word\"><strong>monthly payment</strong><p>The monthly payment is 50 units.</p><details><summary>Перевод</summary><p>ежемесячный платёж</p></details><button class=\"small-button\" data-add=\"8\">＋ В словарь</button></article><article class=\"word\"><strong>repay</strong><p>He repaid the loan in six months.</p><details><summary>Перевод</summary><p>погашать; возвращать</p></details><button class=\"small-button\" data-add=\"9\">＋ В словарь</button></article><article class=\"word\"><strong>total cost</strong><p>What is the total cost?</p><details><summary>Перевод</summary><p>полная стоимость</p></details><button class=\"small-button\" data-add=\"10\">＋ В словарь</button></article><article class=\"word\"><strong>savings</strong><p>They used some of their savings.</p><details><summary>Перевод</summary><p>сбережения</p></details><button class=\"small-button\" data-add=\"11\">＋ В словарь</button></article></div>")+card("Borrow or lend?","<p>I need money. Can I ___ 50 units from you? "+hwChoice("v1","borrow",["lend","repay","borrow"])+"</p>"+"<p>I have spare money. I can ___ you 50 units. "+hwChoice("v2","lend",["borrow","lend","charge"])+"</p>"+"<p>The bank charges a small ___ for this service. "+hwChoice("v3","fee",["loan","fee","account"])+"</p>");}
+function feedWords(){return card("Useful words at the bank","<div class=\"word-grid\"><article class=\"word\"><strong>bank account</strong><p>I opened a bank account.</p><details><summary>Перевод</summary><p>банковский счёт</p></details><button type=\"button\" class=\"small-button\" data-speak-word>🔊 Прослушать слово</button> <button class=\"small-button\" data-add=\"0\">♥ В словарь</button></article><article class=\"word\"><strong>bank transfer</strong><p>I sent the money by bank transfer.</p><details><summary>Перевод</summary><p>банковский перевод</p></details><button type=\"button\" class=\"small-button\" data-speak-word>🔊 Прослушать слово</button> <button class=\"small-button\" data-add=\"1\">♥ В словарь</button></article><article class=\"word\"><strong>cash</strong><p>Do you accept cash?</p><details><summary>Перевод</summary><p>наличные</p></details><button type=\"button\" class=\"small-button\" data-speak-word>🔊 Прослушать слово</button> <button class=\"small-button\" data-add=\"2\">♥ В словарь</button></article><article class=\"word\"><strong>fee</strong><p>Is there a fee for this service?</p><details><summary>Перевод</summary><p>комиссия; сбор</p></details><button type=\"button\" class=\"small-button\" data-speak-word>🔊 Прослушать слово</button> <button class=\"small-button\" data-add=\"3\">♥ В словарь</button></article><article class=\"word\"><strong>borrow</strong><p>Can I borrow some money?</p><details><summary>Перевод</summary><p>брать взаймы</p></details><button type=\"button\" class=\"small-button\" data-speak-word>🔊 Прослушать слово</button> <button class=\"small-button\" data-add=\"4\">♥ В словарь</button></article><article class=\"word\"><strong>lend</strong><p>A bank can lend money.</p><details><summary>Перевод</summary><p>давать взаймы</p></details><button type=\"button\" class=\"small-button\" data-speak-word>🔊 Прослушать слово</button> <button class=\"small-button\" data-add=\"5\">♥ В словарь</button></article><article class=\"word\"><strong>loan</strong><p>She applied for a loan.</p><details><summary>Перевод</summary><p>заём; кредит</p></details><button type=\"button\" class=\"small-button\" data-speak-word>🔊 Прослушать слово</button> <button class=\"small-button\" data-add=\"6\">♥ В словарь</button></article><article class=\"word\"><strong>interest</strong><p>How much interest will I pay?</p><details><summary>Перевод</summary><p>проценты по займу</p></details><button type=\"button\" class=\"small-button\" data-speak-word>🔊 Прослушать слово</button> <button class=\"small-button\" data-add=\"7\">♥ В словарь</button></article><article class=\"word\"><strong>monthly payment</strong><p>The monthly payment is 50 units.</p><details><summary>Перевод</summary><p>ежемесячный платёж</p></details><button type=\"button\" class=\"small-button\" data-speak-word>🔊 Прослушать слово</button> <button class=\"small-button\" data-add=\"8\">♥ В словарь</button></article><article class=\"word\"><strong>repay</strong><p>He repaid the loan in six months.</p><details><summary>Перевод</summary><p>погашать; возвращать</p></details><button type=\"button\" class=\"small-button\" data-speak-word>🔊 Прослушать слово</button> <button class=\"small-button\" data-add=\"9\">♥ В словарь</button></article><article class=\"word\"><strong>total cost</strong><p>What is the total cost?</p><details><summary>Перевод</summary><p>полная стоимость</p></details><button type=\"button\" class=\"small-button\" data-speak-word>🔊 Прослушать слово</button> <button class=\"small-button\" data-add=\"10\">♥ В словарь</button></article><article class=\"word\"><strong>savings</strong><p>They used some of their savings.</p><details><summary>Перевод</summary><p>сбережения</p></details><button type=\"button\" class=\"small-button\" data-speak-word>🔊 Прослушать слово</button> <button class=\"small-button\" data-add=\"11\">♥ В словарь</button></article></div>")+card("Borrow or lend?","<p>I need money. Can I ___ 50 units from you? "+hwChoice("v1","borrow",["lend","repay","borrow"])+"</p>"+"<p>I have spare money. I can ___ you 50 units. "+hwChoice("v2","lend",["borrow","lend","charge"])+"</p>"+"<p>The bank charges a small ___ for this service. "+hwChoice("v3","fee",["loan","fee","account"])+"</p>");}
 function feedReading(){return card("A quick payment in São Paulo and Mumbai","<p>In Brazil, <b>Pix</b> lets people send money between accounts in seconds, day or night. Imagine Ana buys lunch in São Paulo. She scans a QR code and checks the name and amount in her app before she confirms the payment.</p><p>In India, <b>UPI</b> also lets people transfer money between bank accounts almost immediately. Imagine Ravi is in Mumbai. His friend paid for lunch, so Ravi sends his part through an app. His friend can see the money arrive without waiting for the next working day.</p><p>Both examples show how quickly people can pay. The situations are different: Ana pays a business, and Ravi pays a friend. A person’s choice may depend on their phone, internet access and what the other person accepts. At a street market, one seller might accept digital payments and another might ask for cash.</p><p><a href=\"https://www.bcb.gov.br/estabilidadefinanceira/pix-sobre\">Pix · Banco Central do Brasil</a> · <a href=\"https://www.npci.org.in/what-we-do/upi/faqs\">UPI · NPCI</a></p>")+card("Check the details","<p>Who pays a business? "+hwChoice("r1","Ana",["Ravi","Ana","Both"])+"</p>"+"<p>What do both systems make possible? "+hwChoice("r2","Quick transfers",["A bank loan","Cash withdrawals only","Quick transfers"])+"</p>"+"<p>Why might a shopper use cash? "+hwChoice("r3","The seller asks for it",["The app always takes days","The seller asks for it","The shopper is in Brazil"])+"</p>");}
 function feedListening(){return '';} 
 const FEED_ITEMS=[['🛹','Skateboard tricks in slow motion','sport'],['🔭','Why stars have different colours','science'],['🎧','An artist you have never heard of','music'],['🥘','A recipe using three ingredients','food'],['📷','Street photography without expensive equipment','art'],['⚽','How a team practises a difficult move','sport'],['🌱','A tiny garden on a balcony','science'],['🎸','The same song, five different versions','music'],['🎬','Making a film with paper characters','art']];
@@ -75,13 +201,59 @@ function render(){const p=pages[state.page];$('#pageLabel').textContent=`TRAVEL 
 function go(i){stop();$('#translationPop').hidden=true;if($('#lessonMenu').open)$('#lessonMenu').close();state.page=i;render();$('#title').focus({preventScroll:true});window.scrollTo({top:0,behavior:'smooth'});}
 $('#prev').onclick=()=>go(Math.max(0,state.page-1));$('#next').onclick=()=>state.page<pages.length-1?go(state.page+1):notify('Урок завершён. Можно вернуться к любому разделу.');$('#themeBtn').onclick=()=>{state.dark=!state.dark;document.body.classList.toggle('dark',state.dark);save();};$('#menuBtn').onclick=()=>{$('#lessonMenu').showModal();$('#menuBtn').setAttribute('aria-expanded','true');};$('#closeMenu').onclick=()=>$('#lessonMenu').close();$('#lessonMenu').onclose=()=>$('#menuBtn').setAttribute('aria-expanded','false');
 function addWord(en,ru){en=en.trim();ru=ru.trim();if(/[а-яё]/i.test(en)&&/[a-z]/i.test(ru)&&!/[а-яё]/i.test(ru)){[en,ru]=[ru,en];}if(!en||!ru){notify('Add a word and its translation.');return false;}const old=state.words.find(w=>norm(w.en)===norm(en));if(old)old.ru=ru;else state.words.push({en,ru});save();notify(old?'Translation updated.':'Word saved ✓');return true;}
-function renderWords(){const list=$('#wordList');list.innerHTML=state.words.length?state.words.map((w,i)=>`<div class="dictrow"><div><strong>${esc(w.en)}</strong><p>${esc(w.ru)}</p></div><div><button class="small-button" data-edit="${i}" aria-label="Edit ${esc(w.en)}">Edit</button> <button class="small-button" data-delete="${i}" aria-label="Delete ${esc(w.en)}">✕</button></div></div>`).join(''):'<p class="muted dict-empty">Пока пусто. Выделите слово в уроке или добавьте его выше.</p>';$$('[data-edit]').forEach(b=>b.onclick=()=>{const w=state.words[Number(b.dataset.edit)];$('#newWord').value=w.en;$('#newMeaning').value=w.ru;$('#newMeaning').focus();});$$('[data-delete]').forEach(b=>b.onclick=()=>{state.words.splice(Number(b.dataset.delete),1);save();renderWords();});}
+function renderWords(){const list=$('#wordList');list.innerHTML=state.words.length?state.words.map((w,i)=>`<div class="dictrow"><div><strong>${esc(w.en)}</strong><p>${esc(w.ru)}</p></div><div><button type="button" class="small-button" data-speak-word>🔊 Прослушать слово</button> <button class="small-button" data-edit="${i}" aria-label="Edit ${esc(w.en)}">Edit</button> <button class="small-button" data-delete="${i}" aria-label="Delete ${esc(w.en)}">✕</button></div></div>`).join(''):'<p class="muted dict-empty">Пока пусто. Выделите слово в уроке или добавьте его выше.</p>';$$('[data-edit]').forEach(b=>b.onclick=()=>{const w=state.words[Number(b.dataset.edit)];cancelWordTranslation();$('#newWord').value=w.en;$('#newMeaning').value=w.ru;$('#newMeaning').focus();});$$('[data-delete]').forEach(b=>b.onclick=()=>{state.words.splice(Number(b.dataset.delete),1);save();renderWords();});}
 function openDict(){window.getSelection()?.removeAllRanges();$('#translationPop').hidden=true;renderWords();$('#dictionary').showModal();}$('#dictBtn').onclick=openDict;$('#closeDict').onclick=()=>$('#dictionary').close();$('#wordForm').onsubmit=e=>{e.preventDefault();if(addWord($('#newWord').value,$('#newMeaning').value)){e.target.reset();renderWords();}};
 $('#trainWords').onclick=openTraining;$('#closeTraining').onclick=()=>$('#trainingDialog').close();
 let lookupVersion=0;
 function localTranslation(text){const n=norm(text);if(!/[а-яё]/i.test(n))return glossary[n]||'';const aliases={'загран паспорт':'passport','загранпаспорт':'passport','заграничный паспорт':'passport','посадочный талон':'boarding pass','ручная кладь':'hand luggage','место у окна':'window seat','место у прохода':'aisle seat'};if(aliases[n])return aliases[n];const found=Object.entries(glossary).find(([en,ru])=>ru.split(';').some(part=>norm(part)===n));return found?found[0]:'';}
 async function online(text){if(new TextEncoder().encode(text).length>450)throw Error('Выделите более короткую фразу (до 450 байт).');const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);try{const response=await fetch('https://api.mymemory.translated.net/get?'+new URLSearchParams({q:text,langpair:/[а-яё]/i.test(text)?'ru|en':'en|ru'}),{signal:controller.signal,credentials:'omit',referrerPolicy:'no-referrer'});if(!response.ok)throw Error('Сервис временно недоступен. Введите перевод вручную.');const d=await response.json();if(Number(d.responseStatus)!==200||!d.responseData?.translatedText)throw Error('Перевод недоступен. Возможно, исчерпан лимит. Введите перевод вручную.');const doc=new DOMParser().parseFromString(d.responseData.translatedText,'text/html');return doc.documentElement.textContent;}finally{clearTimeout(timeout);}}
-$('#manualTranslate').onclick=async()=>{const text=$('#newWord').value.trim();if(!text)return;$('#dictStatus').textContent='Переводим…';$('#manualTranslate').disabled=true;try{const ru=localTranslation(text)||await online(text);if($('#newWord').value.trim()===text)$('#newMeaning').value=ru;$('#dictStatus').textContent='Проверьте перевод перед сохранением.';}catch(e){$('#dictStatus').textContent=e.name==='AbortError'?'Сервис не ответил. Можно ввести перевод вручную.':e.message;}finally{$('#manualTranslate').disabled=false;}};
+const wordInput = $('#newWord');
+const meaningInput = $('#newMeaning');
+const wordStatus = $('#dictStatus');
+const translationCache = new Map();
+let translationTimer;
+let translationVersion = 0;
+
+function cancelWordTranslation() {
+  clearTimeout(translationTimer);
+  translationVersion++;
+  wordStatus.textContent = '';
+}
+
+function translateWordInput(event) {
+  cancelWordTranslation();
+  const version = translationVersion;
+  const query = wordInput.value.trim();
+  meaningInput.value = '';
+  if (event.isComposing || !/[a-zа-яё]/i.test(query)) return;
+
+  const normalized = norm(query);
+  const russian = /[а-яё]/i.test(query);
+  const saved = state.words.find(word => norm(russian ? word.ru : word.en) === normalized);
+  const translation = (russian ? saved?.en : saved?.ru) || localTranslation(query) || translationCache.get(normalized);
+  if (translation) {
+    meaningInput.value = translation;
+    return;
+  }
+
+  wordStatus.textContent = 'Переводим…';
+  translationTimer = setTimeout(async () => {
+    try {
+      const result = await online(query);
+      if (version !== translationVersion || wordInput.value.trim() !== query) return;
+      translationCache.set(normalized, result);
+      meaningInput.value = result;
+      wordStatus.textContent = '';
+    } catch {
+      if (version === translationVersion) wordStatus.textContent = 'Перевод недоступен. Можно ввести его вручную.';
+    }
+  }, 300);
+}
+
+wordInput.addEventListener('input', translateWordInput);
+wordInput.addEventListener('compositionend', translateWordInput);
+meaningInput.addEventListener('input', cancelWordTranslation);
+$('#wordForm').addEventListener('reset', cancelWordTranslation);
 const CONTEXT_PHRASES=[["bank account","банковский счёт"],["bank transfer","банковский перевод"],["cash","наличные"],["fee","комиссия; сбор"],["borrow","брать взаймы"],["lend","давать взаймы"],["loan","заём; кредит"],["interest","проценты по займу"],["monthly payment","ежемесячный платёж"],["repay","погашать; возвращать"],["total cost","полная стоимость"],["savings","сбережения"]];
 const CONTEXT_WORDS={};
 const SENTENCE_TRANSLATIONS={};
@@ -95,7 +267,7 @@ async function fillSelected(text,context,version){const field=$('#selectedMeanin
 function selectionPopup(){if(selectingText)return;if($('#dictionary').open||$('#lessonMenu').open||$('#trainingDialog').open)return;const sel=window.getSelection();if(!sel||sel.isCollapsed||!sel.rangeCount)return;const el=sel.anchorNode?.parentElement,focus=sel.focusNode?.parentElement;if(!el||!focus||!el.closest('#content')||!focus.closest('#content')||el.closest('input,textarea,button,select'))return;const text=sel.toString().trim();if(!text||text.length>200||!/[a-zA-Zа-яА-ЯёЁ]/.test(text))return;selectedRange=sel.getRangeAt(0).cloneRange();const context=sentenceNearSelection(el,text);if(!$('#translationPop').hidden&&$('#selectedWord').textContent===text&&popupContext===context){anchorPopup();return;}popupContext=context;const version=++lookupVersion;$('#selectedWord').textContent=text;$('#translationPop').hidden=false;fillSelected(text,context,version);}
 let selectionTimer;document.addEventListener('selectionchange',()=>{clearTimeout(selectionTimer);selectionTimer=setTimeout(selectionPopup,180);});document.addEventListener('pointerup',e=>{selectingText=false;if(!e.target.closest('#translationPop'))setTimeout(selectionPopup,0);});document.addEventListener('pointercancel',()=>{selectingText=false;});window.addEventListener('scroll',anchorPopup,{passive:true});window.addEventListener('resize',anchorPopup);window.visualViewport?.addEventListener('resize',anchorPopup);document.addEventListener('pointerdown',e=>{if(!e.target.closest('#translationPop')){selectingText=true;clearTimeout(selectionTimer);$('#translationPop').hidden=true;lookupVersion++;window.getSelection()?.removeAllRanges();}});document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('#translationPop').hidden=true;lookupVersion++;}});$('#closePop').onclick=()=>{$('#translationPop').hidden=true;lookupVersion++;window.getSelection()?.removeAllRanges();};$('#translateOnline').onclick=async()=>{const text=$('#selectedWord').textContent,version=++lookupVersion;$('#translateStatus').textContent='Переводим…';try{const ru=await online(text);if(version===lookupVersion){$('#selectedMeaning').value=ru;$('#translateStatus').textContent='MyMemory · альтернативный перевод';anchorPopup();}}catch(e){if(version===lookupVersion)$('#translateStatus').textContent='Не удалось получить перевод. Можно ввести свой вариант.';}};$('#saveSelected').onclick=()=>{const en=$('#selectedWord').textContent;if(addWord(en,$('#selectedMeaning').value)){const entry=state.words.find(w=>norm(w.en)===norm(en));if(entry){entry.example=popupContext;save();}$('#translationPop').hidden=true;window.getSelection()?.removeAllRanges();}};
 function download(text,name){const u=URL.createObjectURL(new Blob(['\uFEFF'+text],{type:'text/plain;charset=utf-8'})),a=document.createElement('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),10000);}
-$('#exportWords').onclick=()=>download('GOSTUDY · MY VOCABULARY\n\n'+state.words.map(w=>w.en+' — '+w.ru).join('\n'),'GoStudy_My_Words.txt');$('#exportBtn').onclick=()=>{const lines=['GOSTUDY · YOUR FEED YOUR CHOICE · B2',''];for(const [k,v]of Object.entries(state.answers)){let label=k;if(/^q\d-\d$/.test(k)){const [ci,qi]=k.slice(1).split('-').map(Number);label=CLIPS[ci].qs[qi][0];lines.push(label,CLIPS[ci].qs[qi][1][v]||'','');}else lines.push(label,String(v),'');}lines.push('MY WORDS',...state.words.map(w=>w.en+' — '+w.ru));download(lines.join('\n'),'Gostudy_Feed_B2_Answers.txt');};
+$('#exportBtn').onclick=()=>{const lines=['GOSTUDY · YOUR FEED YOUR CHOICE · B2',''];for(const [k,v]of Object.entries(state.answers)){let label=k;if(/^q\d-\d$/.test(k)){const [ci,qi]=k.slice(1).split('-').map(Number);label=CLIPS[ci].qs[qi][0];lines.push(label,CLIPS[ci].qs[qi][1][v]||'','');}else lines.push(label,String(v),'');}lines.push('MY WORDS',...state.words.map(w=>w.en+' — '+w.ru));download(lines.join('\n'),'Gostudy_Feed_B2_Answers.txt');};
 const TURN_TIMES=[[[0,5.165],[5.815,11.761],[12.411,18.268],[18.918,22.908],[23.558,27.691],[28.341,33.729],[34.379,39.876]]];
 function hintBox(hint,example){return '<details class="hint-box"><summary>💡 Нужна подсказка</summary><p>'+esc(hint)+'</p>'+(example?'<details><summary>Показать пример ответа</summary><p>'+esc(example)+'</p></details>':'')+'</details>';}
 const PAGE_HINTS=[["Начните со слов. Можно делать задания по одному и возвращаться позже.",""],["water — поливать, pick — собирать, make — готовить. Выберите выражение и нажмите на его перевод.","water the flowers — поливать цветы"],["В рассказе услышите знакомые слова: country house, sunny, apples, film. Можно открыть текст.",""],["У обычных глаголов добавьте -ed. Три особые формы: go → went, have → had, make → made.","Yesterday I watered the flowers."],["Чаще всего порядок такой: кто → что сделал → где. Last Sunday и In the evening можно поставить в начале.","My grandchildren played outside."],["Можно написать всего три предложения по образцу. Не обязательно о настоящей даче — можно придумать.","Last Sunday, I went to the country house. We had lunch together. It was a lovely day."],["Можно вернуться к заданиям или отметить работу готовой.",""]];
@@ -129,5 +301,20 @@ range.oninput=()=>{if(Number.isFinite(audio.duration))audio.currentTime=Number(r
 ['play','pause','ended','timeupdate','loadedmetadata','durationchange'].forEach(e=>audio.addEventListener(e,sync));sync();}
 new MutationObserver(enhance).observe(document.getElementById('content'),{childList:true});enhance();
 })();
+</script><script>
+function speakTravelTerm(term) {
+  if (!term || !('speechSynthesis' in window)) return;
+  const utterance = new SpeechSynthesisUtterance(term);
+  utterance.lang = /[а-яё]/i.test(term) ? 'ru-RU' : 'en-GB';
+  utterance.rate = 0.88;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utterance);
+}
+$('#speakSelected').disabled = !('speechSynthesis' in window);
+$('#speakSelected').onclick = () => speakTravelTerm($('#selectedWord').textContent.trim());
+document.addEventListener('click', event => {
+  const word = event.target.closest('[data-speak-word]')?.closest('.word, .dictrow')?.querySelector('strong');
+  if (word) speakTravelTerm(word.textContent.trim());
+});
 </script></body></html>
 

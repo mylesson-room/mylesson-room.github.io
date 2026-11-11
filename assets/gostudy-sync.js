@@ -35,9 +35,14 @@
   ]);
   const travelA2 = travelA2Pages.has(location.pathname.split('/').pop()) ||
     new URLSearchParams(location.search).get('course') === 'travel-a2';
-  const keys = new Set(travelA2 ? travelA2Keys : travelB2Keys);
-  const accountPage = 'gostudy-account.html' + (travelA2 ? '?course=travel-a2' : '');
-  const cabinetPage = travelA2 ? 'student-travel-a2.html' : 'student-travel-b2.html';
+  const financePages = new Set(['student-finance-b1.html','finance-b1.html','finance-b1-homework.html','finance-b1-02.html','finance-b1-02-homework.html']);
+  const financeB1 = financePages.has(location.pathname.split('/').pop()) ||
+    new URLSearchParams(location.search).get('course') === 'finance-b1';
+  const financeKeys = ['gostudy-finance-b1-v1','gostudy-finance-b1-profile-v1','gostudy-finance-b1-homework-v1','gostudy-finance-b1-02-v1','gostudy-finance-b1-02-homework-v1'];
+  const keys = new Set(financeB1 ? financeKeys : travelA2 ? travelA2Keys : travelB2Keys);
+  const courseName = financeB1 ? 'Finance B1' : travelA2 ? 'Travel A2+' : 'Travel B2';
+  const accountPage = 'gostudy-account.html' + (financeB1 ? '?course=finance-b1' : travelA2 ? '?course=travel-a2' : '');
+  const cabinetPage = financeB1 ? 'student-finance-b1.html' : travelA2 ? 'student-travel-a2.html' : 'student-travel-b2.html';
   const table = '/rest/v1/gostudy_progress';
   const json = (value, fallback = null) => {
     try { return JSON.parse(value) ?? fallback; } catch { return fallback; }
@@ -208,7 +213,6 @@
 
   function mountAccount() {
     const form = document.getElementById('cloud-login');
-    const courseName = travelA2 ? 'Travel A2+' : 'Travel B2';
     const cabinetLink = document.getElementById('cloud-cabinet');
     if (cabinetLink) {
       cabinetLink.href = cabinetPage;
@@ -272,7 +276,7 @@
   }
 
   function mountTeacherWords() {
-    if (!travelA2 || !session) return;
+    if ((!travelA2 && !financeB1) || !session) return;
     const targets = [document.getElementById('dictionary'), document.getElementById('words')].filter(Boolean);
     const panels = targets.map(target => {
       const section = document.createElement('section');
@@ -290,7 +294,7 @@
     const refresh = async () => {
       try {
         if (document.hidden) return;
-        const result = await request('/rest/v1/rpc/gostudy_travel_a2_my_words', {method:'POST',body:{}}, await token());
+        const result = await request('/rest/v1/rpc/' + (financeB1 ? 'gostudy_finance_b1_my_words' : 'gostudy_travel_a2_my_words'), {method:'POST',body:{}}, await token());
         if (!result.ok || !Array.isArray(result.data)) return;
         const signature = JSON.stringify(result.data);
         if (signature === last) return;
@@ -342,12 +346,19 @@
       ['gostudy-travel-a2plus-03-homework-v1','Домашка 3'],
       ['gostudy-travel-a2plus-04-v1','Урок 4 · The train is late'],
       ['gostudy-travel-a2plus-04-homework-v1','Домашка 4'],
+      ['gostudy-finance-b1-v1','Урок 1 · Money moves'],
+      ['gostudy-finance-b1-homework-v1','Домашка 1 · Finance B1'],
+      ['gostudy-finance-b1-02-v1','Урок 2 · Where did my money go?'],
+      ['gostudy-finance-b1-02-homework-v1','Домашка 2 · Finance B1'],
     ]);
     const lesson4Labels = {
       hwRead1:'Что делала Элла?', hwRead2:'Проблема с поездом в 10:45', hwRead3:'Почему решили подождать?',
       hwListen1:'Новое время отправления', hwListen2:'Номер платформы', hwListen3:'Место встречи',
       hwG1:'I … on the platform', hwG2:'The assistant … us', hwG3:'They … for the platform',
     };
+    const finance2Labels = {hwRead1:'Какой платёж проверила Миа?',hwRead2:'Где она нашла название приложения?',hwRead3:'Зачем Миа связалась с поддержкой?',hwListen1:'Сумма списания',hwListen2:'Когда закончился пробный период?',hwListen3:'Что Сэм уже сделал?',hwG1:'I … the statement yesterday',hwG2:'They … yet',hwG3:'She … it last Friday',hwG4:'We … support'};
+    const courses = new Map([['travel_a2','Travel A2+'],['finance_b1','Finance B1']]);
+    const rosterByCourse = new Map();
     let students = [];
     let signature = '';
     let busy = false;
@@ -366,7 +377,7 @@
       }
     }
     function renderStudent() {
-      const student = students.find(row => row.id === studentPicker.value);
+      const student = students.find(row => row.selection === studentPicker.value);
       wordForm.hidden = !student;
       listWords(studentWords, student?.words);
       listWords(assignedWords, student?.assigned);
@@ -384,7 +395,7 @@
         for (const [id,value] of answers) {
           const question = document.createElement('dt');
           const answer = document.createElement('dd');
-          question.textContent = key==='gostudy-travel-a2plus-04-v1' && lesson4Labels[id] || id;
+          question.textContent = (key==='gostudy-travel-a2plus-04-v1' && lesson4Labels[id]) || (key==='gostudy-finance-b1-02-v1' && finance2Labels[id]) || id;
           answer.textContent = Array.isArray(value) ? value.join(' → ') : typeof value === 'object' ? JSON.stringify(value) : String(value);
           list.append(question,answer);
         }
@@ -401,23 +412,28 @@
       if (!session || busy || document.hidden) return;
       busy = true;
       try {
-        const result = await request('/rest/v1/rpc/gostudy_travel_a2_teacher_view', {method:'POST',body:{}}, await token());
-        if (!result.ok || !Array.isArray(result.data)) throw new Error('Не удалось получить данные ученицы.');
-        const next = JSON.stringify(result.data);
+        const access = await token();
+        const results = await Promise.allSettled(Array.from(courses, async ([course,label]) => {
+          const response = await request('/rest/v1/rpc/gostudy_' + course + '_teacher_view', {method:'POST',body:{}}, access);
+          if (!response.ok || !Array.isArray(response.data)) throw new Error(label);
+          rosterByCourse.set(course, response.data.map(row => ({...row,course,selection:course+':'+row.id})));
+        }));
+        const roster = Array.from(courses.keys()).flatMap(course => rosterByCourse.get(course) || []);
+        const next = JSON.stringify(roster);
         if (signature !== next) {
           const selected = studentPicker.value;
           signature = next;
-          students = result.data;
+          students = roster;
           studentPicker.replaceChildren(...students.map(student => {
             const option = document.createElement('option');
-            option.value = student.id;
+            option.value = student.selection;
             option.textContent = student.label;
             return option;
           }));
-          if (students.some(student => student.id === selected)) studentPicker.value = selected;
+          if (students.some(student => student.selection === selected)) studentPicker.value = selected;
           renderStudent();
         }
-        message.textContent = students.length ? 'Ответы обновляются автоматически.' : 'К этому аккаунту пока не привязаны ученики.';
+        message.textContent = results.some(result => result.status === 'rejected') ? 'Часть данных пока недоступна.' : students.length ? 'Ответы обновляются автоматически.' : 'К этому аккаунту пока не привязаны ученики.';
       } catch(error) { message.textContent = error.message; }
       finally { busy = false; }
     }
@@ -449,8 +465,10 @@
       const status = document.getElementById('teacher-word-status');
       button.disabled = true;
       try {
-        const result = await request('/rest/v1/rpc/gostudy_travel_a2_assign_word',{method:'POST',body:{
-          p_student:studentPicker.value,p_en:wordForm.elements.en.value.trim(),p_ru:wordForm.elements.ru.value.trim(),
+        const student = students.find(row => row.selection === studentPicker.value);
+        if (!student || !courses.has(student.course)) throw new Error('Выберите ученика.');
+        const result = await request('/rest/v1/rpc/gostudy_' + student.course + '_assign_word',{method:'POST',body:{
+          p_student:student.id,p_en:wordForm.elements.en.value.trim(),p_ru:wordForm.elements.ru.value.trim(),
         }},await token());
         if (!result.ok || result.data !== true) throw new Error('Не удалось добавить слово. Проверьте доступ и поля.');
         wordForm.reset();
