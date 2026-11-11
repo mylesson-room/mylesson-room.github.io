@@ -111,15 +111,19 @@
     session = {...data, expires_at: Date.now() + data.expires_in * 1000};
     sessionStorage.setItem(authKey, JSON.stringify(session));
   }
+  let refreshInFlight;
   async function token() {
     if (!session) throw new Error('Войдите в аккаунт GoStudy.');
     if (session.expires_at > Date.now() + 30000) return session.access_token;
-    const response = await request('/auth/v1/token?grant_type=refresh_token', {
-      method: 'POST', body: {refresh_token: session.refresh_token},
-    });
-    if (!response.ok) throw new Error('Срок входа истёк. Откройте аккаунт и войдите снова.');
-    saveSession(response.data);
-    return session.access_token;
+    refreshInFlight ??= (async () => {
+      const response = await request('/auth/v1/token?grant_type=refresh_token', {
+        method: 'POST', body: {refresh_token: session.refresh_token},
+      });
+      if (!response.ok) throw new Error('Срок входа истёк. Войдите снова.');
+      saveSession(response.data);
+      return session.access_token;
+    })().finally(() => { refreshInFlight = null; });
+    return refreshInFlight;
   }
 
   async function push(key, accessToken) {
@@ -266,8 +270,206 @@
       if (!document.hidden) synchronize({reload: true}).catch(report);
     });
   }
+
+  function mountTeacherWords() {
+    if (!travelA2 || !session) return;
+    const targets = [document.getElementById('dictionary'), document.getElementById('words')].filter(Boolean);
+    const panels = targets.map(target => {
+      const section = document.createElement('section');
+      section.className = 'gostudy-teacher-words';
+      const title = document.createElement('h3');
+      title.textContent = 'Слова от преподавателя';
+      const list = document.createElement('ul');
+      section.append(title, list);
+      section.hidden = true;
+      target.append(section);
+      return {section, list};
+    });
+    if (!panels.length) return;
+    let last = '';
+    const refresh = async () => {
+      try {
+        if (document.hidden) return;
+        const result = await request('/rest/v1/rpc/gostudy_travel_a2_my_words', {method:'POST',body:{}}, await token());
+        if (!result.ok || !Array.isArray(result.data)) return;
+        const signature = JSON.stringify(result.data);
+        if (signature === last) return;
+        last = signature;
+        for (const {section,list} of panels) {
+          section.hidden = result.data.length === 0;
+          list.replaceChildren(...result.data.map(word => {
+            const row = document.createElement('li');
+            row.textContent = word.en + ' — ' + word.ru;
+            if ('speechSynthesis' in window) {
+              const play = document.createElement('button');
+              play.type = 'button';
+              play.className = 'gostudy-word-play';
+              play.textContent = '🔊';
+              play.setAttribute('aria-label', 'Прослушать ' + word.en);
+              play.onclick = () => {
+                speechSynthesis.cancel();
+                const voice = new SpeechSynthesisUtterance(word.en);
+                voice.lang = 'en-GB';
+                speechSynthesis.speak(voice);
+              };
+              row.append(' ',play);
+            }
+            return row;
+          }));
+        }
+      } catch {
+        // The existing list stays visible during a network interruption.
+      } finally { setTimeout(refresh, 5000); }
+    };
+    refresh();
+  }
+
+  function mountTeacher() {
+    const login = document.getElementById('teacher-login');
+    const dashboard = document.getElementById('teacher-dashboard');
+    const message = document.getElementById('teacher-status');
+    const studentPicker = document.getElementById('teacher-student');
+    const wordForm = document.getElementById('teacher-word');
+    const answerList = document.getElementById('teacher-answers');
+    const studentWords = document.getElementById('teacher-student-words');
+    const assignedWords = document.getElementById('teacher-assigned-words');
+    const lessonLabels = new Map([
+      ['gostudy-travel-a2plus-v1','Урок 1 · A weekend away'],
+      ['gostudy-travel-a2plus-homework-v1','Домашка 1'],
+      ['gostudy-travel-a2plus-02-v1','Урок 2 · A day out in York'],
+      ['gostudy-travel-a2plus-02-homework-v1','Домашка 2'],
+      ['gostudy-travel-a2plus-03-v1','Урок 3 · A day by the sea'],
+      ['gostudy-travel-a2plus-03-homework-v1','Домашка 3'],
+      ['gostudy-travel-a2plus-04-v1','Урок 4 · The train is late'],
+      ['gostudy-travel-a2plus-04-homework-v1','Домашка 4'],
+    ]);
+    const lesson4Labels = {
+      hwRead1:'Что делала Элла?', hwRead2:'Проблема с поездом в 10:45', hwRead3:'Почему решили подождать?',
+      hwListen1:'Новое время отправления', hwListen2:'Номер платформы', hwListen3:'Место встречи',
+      hwG1:'I … on the platform', hwG2:'The assistant … us', hwG3:'They … for the platform',
+    };
+    let students = [];
+    let signature = '';
+    let busy = false;
+    let pollTimer;
+    function listWords(target, words) {
+      const entries = Array.isArray(words) ? words.filter(word => word && typeof word.en === 'string' && typeof word.ru === 'string') : [];
+      target.replaceChildren(...entries.map(word => {
+        const item = document.createElement('li');
+        item.textContent = word.en + ' — ' + word.ru;
+        return item;
+      }));
+      if (!entries.length) {
+        const item = document.createElement('li');
+        item.textContent = 'Пока пусто.';
+        target.append(item);
+      }
+    }
+    function renderStudent() {
+      const student = students.find(row => row.id === studentPicker.value);
+      wordForm.hidden = !student;
+      listWords(studentWords, student?.words);
+      listWords(assignedWords, student?.assigned);
+      answerList.replaceChildren();
+      for (const [key,label] of lessonLabels) {
+        const progress = student?.progress?.find(row => row.key === key);
+        if (!progress) continue;
+        const answers = Object.entries(progress.answers || {}).filter(([,value]) => value !== '' && value !== null);
+        if (!answers.length) continue;
+        const group = document.createElement('details');
+        group.open = true;
+        const title = document.createElement('summary');
+        title.textContent = label + ' · ' + answers.length;
+        const list = document.createElement('dl');
+        for (const [id,value] of answers) {
+          const question = document.createElement('dt');
+          const answer = document.createElement('dd');
+          question.textContent = key==='gostudy-travel-a2plus-04-v1' && lesson4Labels[id] || id;
+          answer.textContent = Array.isArray(value) ? value.join(' → ') : typeof value === 'object' ? JSON.stringify(value) : String(value);
+          list.append(question,answer);
+        }
+        group.append(title,list);
+        answerList.append(group);
+      }
+      if (!answerList.childElementCount) answerList.textContent = 'Ответы появятся, когда ученица войдёт и синхронизирует урок.';
+    }
+    function setSignedIn() {
+      login.hidden = !!session;
+      dashboard.hidden = !session;
+    }
+    async function refresh() {
+      if (!session || busy || document.hidden) return;
+      busy = true;
+      try {
+        const result = await request('/rest/v1/rpc/gostudy_travel_a2_teacher_view', {method:'POST',body:{}}, await token());
+        if (!result.ok || !Array.isArray(result.data)) throw new Error('Не удалось получить данные ученицы.');
+        const next = JSON.stringify(result.data);
+        if (signature !== next) {
+          const selected = studentPicker.value;
+          signature = next;
+          students = result.data;
+          studentPicker.replaceChildren(...students.map(student => {
+            const option = document.createElement('option');
+            option.value = student.id;
+            option.textContent = student.label;
+            return option;
+          }));
+          if (students.some(student => student.id === selected)) studentPicker.value = selected;
+          renderStudent();
+        }
+        message.textContent = students.length ? 'Ответы обновляются автоматически.' : 'К этому аккаунту пока не привязаны ученики.';
+      } catch(error) { message.textContent = error.message; }
+      finally { busy = false; }
+    }
+    function startPolling() {
+      clearInterval(pollTimer);
+      refresh();
+      pollTimer = setInterval(refresh, 3500);
+    }
+    login.addEventListener('submit', async event => {
+      event.preventDefault();
+      const button = login.querySelector('button');
+      const password = login.elements.password.value;
+      login.elements.password.value = '';
+      button.disabled = true;
+      message.textContent = 'Входим…';
+      try {
+        const result = await request('/auth/v1/token?grant_type=password',{method:'POST',body:{email:login.elements.email.value.trim(),password}});
+        if (!result.ok) throw new Error('Не удалось войти. Проверьте почту и пароль.');
+        saveSession(result.data);
+        setSignedIn();
+        startPolling();
+      } catch(error) { message.textContent = error.message; }
+      finally { button.disabled = false; }
+    });
+    studentPicker.onchange = renderStudent;
+    wordForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      const button = wordForm.querySelector('button');
+      const status = document.getElementById('teacher-word-status');
+      button.disabled = true;
+      try {
+        const result = await request('/rest/v1/rpc/gostudy_travel_a2_assign_word',{method:'POST',body:{
+          p_student:studentPicker.value,p_en:wordForm.elements.en.value.trim(),p_ru:wordForm.elements.ru.value.trim(),
+        }},await token());
+        if (!result.ok || result.data !== true) throw new Error('Не удалось добавить слово. Проверьте доступ и поля.');
+        wordForm.reset();
+        status.textContent = 'Слово добавлено.';
+        refresh();
+      } catch(error) { status.textContent = error.message; }
+      finally { button.disabled = false; }
+    });
+    document.getElementById('teacher-signout').onclick = () => {
+      sessionStorage.removeItem(authKey);
+      location.reload();
+    };
+    setSignedIn();
+    if (session) startPolling();
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('cloud-login')) mountAccount();
-    else mountLesson();
+    if (document.getElementById('teacher-login')) mountTeacher();
+    else if (document.getElementById('cloud-login')) mountAccount();
+    else { mountLesson(); mountTeacherWords(); }
   });
 })();

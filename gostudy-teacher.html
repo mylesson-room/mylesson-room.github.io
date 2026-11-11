@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GoStudy · Кабинет преподавателя</title>
+<link rel="stylesheet" href="assets/gostudy-sync.css?v=3">
+<script src="assets/gostudy-sync.js?v=3"></script>
+</head>
+<body class="cloud-account teacher-page">
+<main>
+  <header class="teacher-top"><strong>GoStudy</strong><a href="student-travel-a2.html">Travel A2+</a></header>
+  <h1>Кабинет преподавателя</h1>
+  <p>Смотрите ответы ученицы во время занятия и добавляйте слова в её словарь.</p>
+  <form id="teacher-login" method="post" hidden>
+    <label for="teacher-email">Электронная почта</label>
+    <input id="teacher-email" type="email" name="email" autocomplete="username" required>
+    <label for="teacher-password">Пароль</label>
+    <input id="teacher-password" type="password" name="password" autocomplete="current-password" required>
+    <button type="submit">Войти</button>
+  </form>
+  <p id="teacher-status" role="status"></p>
+  <section id="teacher-dashboard" hidden>
+    <div class="teacher-controls"><label for="teacher-student">Ученица</label><select id="teacher-student"></select><button type="button" id="teacher-signout">Выйти</button></div>
+    <div class="teacher-grid">
+      <section class="teacher-panel">
+        <h2>Ответы ученицы</h2>
+        <div id="teacher-answers">Загружаем ответы…</div>
+      </section>
+      <section class="teacher-panel">
+        <h2>Словарь</h2>
+        <form id="teacher-word" method="post" hidden>
+          <label for="teacher-en">Слово или фраза</label>
+          <input id="teacher-en" name="en" maxlength="150" required>
+          <label for="teacher-ru">Перевод</label>
+          <input id="teacher-ru" name="ru" maxlength="300" required>
+          <button type="submit">Добавить ученице</button>
+          <p id="teacher-word-status" role="status"></p>
+        </form>
+        <h3>Добавила ученица</h3><ul id="teacher-student-words"></ul>
+        <h3>Задал преподаватель</h3><ul id="teacher-assigned-words"></ul>
+      </section>
+    </div>
+  </section>
+</main>
+</body>
+</html>
