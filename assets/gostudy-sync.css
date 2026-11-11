@@ -1,0 +1,54 @@
+.gostudy-cloud-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 14px;
+  padding: 8px 16px;
+  font: 600 14px/1.4 system-ui, sans-serif;
+}
+.gostudy-cloud-link {
+  color: #195a9b;
+  background: #edf5ff;
+  border: 1px solid #c9dff7;
+  border-radius: 999px;
+  padding: 6px 13px;
+}
+.cloud-account {
+  margin: 0;
+  padding: 24px 14px;
+  font: 16px/1.55 system-ui, sans-serif;
+  color: #203c5d;
+  background: #eff6ff;
+}
+.cloud-account main {
+  width: min(520px, 100%);
+  margin: 24px auto;
+  padding: 22px;
+  border-radius: 24px;
+  background: #fff;
+  border: 1px solid #d5e5f7;
+}
+.cloud-account h1 { margin: .4em 0; line-height: 1.15; }
+.cloud-account a { color: #195a9b; }
+.cloud-account form { display: grid; gap: 9px; }
+.cloud-account input:not([type=checkbox]) {
+  padding: 10px;
+  border: 1px solid #a8c8eb;
+  border-radius: 9px;
+  font: inherit;
+}
+.cloud-account .cloud-check { display: flex; gap: 8px; margin: 7px 0; }
+.cloud-account button {
+  min-height: 42px;
+  padding: 8px 15px;
+  border: 1px solid #185ea6;
+  border-radius: 999px;
+  background: #185ea6;
+  color: white;
+  font: 650 15px system-ui, sans-serif;
+  cursor: pointer;
+}
+.cloud-account details { margin: 14px 0; }
+.cloud-account summary { cursor: pointer; }
+.cloud-account [hidden] { display: none !important; }

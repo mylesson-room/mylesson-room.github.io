@@ -142,7 +142,11 @@ a.small-button { display: inline-flex; align-items: center; }
 .travel-scene { margin: 0 0 18px; border-radius: 22px; overflow: hidden; box-shadow: var(--ios-shadow); }
 .travel-scene svg { display: block; width: 100%; height: auto; }
 #dictionary .dictrow { flex-wrap: wrap; }
-#menuBtn,.page-controls{display:none!important}#content select{display:inline-block;width:auto;max-width:100%;margin:4px}</style></head><body><header><div class="brand">Gostudy</div><div class="header-actions"><a class="small-button cabinet-link" href="student-travel-b2.html">← Кабинет</a><button class="small-button" id="dictBtn">My words <span id="wordCount">0</span></button><button class="small-button" id="themeBtn" aria-label="Switch colour theme">◐</button></div></header>
+#menuBtn,.page-controls{display:none!important}#content select{display:inline-block;width:auto;max-width:100%;margin:4px}</style>
+<link rel="stylesheet" href="assets/gostudy-sync.css">
+<script src="assets/gostudy-sync.js"></script>
+<script>window.GoStudyStorage ??= {getItem: key => localStorage.getItem(key), setItem: (key, value) => localStorage.setItem(key, value)};</script>
+</head><body><header><div class="brand">Gostudy</div><div class="header-actions"><a class="small-button cabinet-link" href="student-travel-b2.html">← Кабинет</a><button class="small-button" id="dictBtn">My words <span id="wordCount">0</span></button><button class="small-button" id="themeBtn" aria-label="Switch colour theme">◐</button></div></header>
 <div class="shell"><main><div class="lesson-bar"><button class="small-button" id="menuBtn" aria-haspopup="dialog" aria-expanded="false">☰ Задания</button></div><div id="pageLabel" hidden></div><h1 id="title" tabindex="-1"></h1><p class="subtitle" id="goal"></p><div id="content"></div><details class="teacher" hidden><summary>Teacher notes · pacing</summary><p id="teacherTips"></p></details><div class="page-controls"><button id="prev" class="small-button">← Назад</button><span id="counter"></span><button id="next" class="primary">Next →</button></div><footer class="footer">Gostudy · Travel · B2. Ответы и слова сохраняются в этом браузере.</footer><p class="storage-note" id="storageNote" hidden role="status"></p></main></div>
 <dialog id="lessonMenu" class="menu-dialog"><button class="small-button" id="exportBtn" hidden style="margin-bottom:20px">↓ Download my answers</button><div class="menu-top"><b>Урок</b><button class="small-button" id="closeMenu">Закрыть ✕</button></div><span class="eyebrow">Travel · B2</span><h2>Homework · Travel B2</h2><nav id="nav"></nav></dialog>
 <dialog id="dictionary" class="dictionary" aria-labelledby="dictionaryTitle">
@@ -165,12 +169,12 @@ a.small-button { display: inline-flex; align-items: center; }
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const key="gostudy-travel-disruptions-b2-homework-v1";let state={page:0,answers:{},words:[],dark:false};let storage=true;
-try{const s=JSON.parse(localStorage.getItem(key)||'null');if(s&&typeof s==='object'){state={...state,...s};state.answers=s.answers&&typeof s.answers==='object'?s.answers:{};state.words=Array.isArray(s.words)?s.words.filter(w=>w&&typeof w.en==='string'&&typeof w.ru==='string'):[];}}catch(e){storage=false;}
+try{const s=JSON.parse(GoStudyStorage.getItem(key)||'null');if(s&&typeof s==='object'){state={...state,...s};state.answers=s.answers&&typeof s.answers==='object'?s.answers:{};state.words=Array.isArray(s.words)?s.words.filter(w=>w&&typeof w.en==='string'&&typeof w.ru==='string'):[];}}catch(e){storage=false;}
 const sharedWordKey="gostudy-travel-disruptions-b2-v1";
 let lastWords = '';
 function readSharedWords(){
   try {
-    const shared = JSON.parse(localStorage.getItem(sharedWordKey) || '{}');
+    const shared = JSON.parse(GoStudyStorage.getItem(sharedWordKey) || '{}');
     if(Array.isArray(shared.words)) state.words = shared.words.filter(w=>w&&typeof w.en==='string'&&typeof w.ru==='string');
   } catch {}
   lastWords = JSON.stringify(state.words);
@@ -180,12 +184,12 @@ window.addEventListener('pageshow',()=>{readSharedWords();$('#wordCount').textCo
 function save(){try{
   const currentWords = JSON.stringify(state.words);
   if(currentWords!==lastWords){
-    const shared = JSON.parse(localStorage.getItem(sharedWordKey)||'{}');
+    const shared = JSON.parse(GoStudyStorage.getItem(sharedWordKey)||'{}');
     shared.words=state.words;
-    localStorage.setItem(sharedWordKey,JSON.stringify(shared));
+    GoStudyStorage.setItem(sharedWordKey,JSON.stringify(shared));
     lastWords=currentWords;
   }
-  localStorage.setItem(key,JSON.stringify(state));}catch(e){storage=false;$('#storageNote').hidden=false;$('#storageNote').textContent='Saving unavailable. Export your answers and vocabulary before closing.';}$('#wordCount').textContent=state.words.length;}
+  GoStudyStorage.setItem(key,JSON.stringify(state));}catch(e){storage=false;$('#storageNote').hidden=false;$('#storageNote').textContent='Saving unavailable. Export your answers and vocabulary before closing.';}$('#wordCount').textContent=state.words.length;}
 let toastTimer;function notify(s){$('#toast').textContent=s;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3200);}
 const words=[["miss a connection","пропустить пересадку","We missed our connection after a two-hour delay."],["be stranded","застрять без возможности продолжить путь","We were stranded at the airport overnight."],["make alternative arrangements","организовать другой вариант","We had to make alternative arrangements."],["rebook","перебронировать","Could you rebook us on a later flight?"],["be entitled to","иметь право на","Ask what assistance you are entitled to."],["unexpected expense","непредвиденный расход","The taxi was an unexpected expense."],["sort something out","уладить проблему","Let us sort this out before we leave."],["a backup plan","запасной план","We needed a realistic backup plan."],["weigh up the options","взвесить варианты","We weighed up the options before paying."],["keep someone informed","держать кого-либо в курсе","Please keep us informed about the delay."]];
 const glossary={"miss a connection":"пропустить пересадку","be stranded":"застрять без возможности продолжить путь","make alternative arrangements":"организовать другой вариант","rebook":"перебронировать","be entitled to":"иметь право на","unexpected expense":"непредвиденный расход","sort something out":"уладить проблему","a backup plan":"запасной план","weigh up the options":"взвесить варианты","keep someone informed":"держать кого-либо в курсе"};
@@ -271,16 +275,16 @@ function renderTraining(){const t=training,entry=t.queue[t.index];if(!entry){con
 function feedFinish(){return card('Homework · A different kind of trip','<p>Три текста. Выберите варианты в пропусках: сочинений и письменных сообщений здесь нет. Ответ проверяется после выбора.</p>')+card('1 · New travel vocabulary','<p><b>luggage allowance</b> — норма багажа · <b>travel adapter</b> — переходник · <b>tourist tax</b> — туристический сбор · <b>off the beaten track</b> — вдали от популярных маршрутов</p><div class="homework-story"><p>Before our weekend away, I checked the airline’s '+hwChoice('hw1','luggage allowance',['luggage allowance','tourist tax','travel adapter'])+' because I wanted to take only one small bag. I also packed a '+hwChoice('hw2','travel adapter',['tourist tax','travel adapter','luggage allowance'])+' so I could charge my phone abroad.</p><p>We chose a village '+hwChoice('hw3','off the beaten track',['off the beaten track','at the departure gate','in the overhead locker'])+' instead of a busy resort. At check-in, the receptionist explained that a small '+hwChoice('hw4','tourist tax',['travel adapter','tourist tax','luggage allowance'])+' was payable locally and was not included in our booking.</p></div>')+card('2 · What happened on the journey?','<p>Выберите время по контексту: <b>Past Simple, Past Continuous, Past Perfect, Present Perfect</b>.</p><div class="homework-story"><p>Last Friday, we '+hwChoice('hw5','arrived',['arrived','have arrived','were arriving'])+' at the station at six. While we '+hwChoice('hw6','were waiting',['waited','were waiting','have waited'])+' for our train, an announcement warned of a delay. I checked my email and realised that the company '+hwChoice('hw7','had sent',['has sent','had sent','was sending'])+' us a warning before we left home, but I had not seen it.</p><p>We '+hwChoice('hw8','took',['have taken','were taking','took'])+' a later train and reached the village that evening. Since that trip, I '+hwChoice('hw9','have checked',['checked','had checked','have checked'])+' my messages before every journey. We '+hwChoice('hw10','have not booked',['did not book','have not booked','had not booked'])+' our next trip yet, but we already know we want to return.</p></div>')+card("3 · Challenge: a journey across three timelines","<p>Сложный текст B2+: различайте фон, более раннее событие, продолжающуюся ситуацию и результат к будущему моменту. Рассказ переключается с понедельника на письмо, написанное в четверг.</p><div class=\"homework-story\">"+"<p><b>The journey that kept changing</b></p><p>By the time Nora reached the border station on Monday evening, she "+hwChoice("hw11","had been travelling",["had travelled","had been travelling","have been travelling"])+" for nearly fourteen hours without a proper break. She then discovered that her onward train "+hwChoice("hw12","had been cancelled",["had been cancelled","has cancelled","was cancelling"])+" earlier that afternoon because of flooding. While she "+hwChoice("hw13","was trying",["had tried","was trying","have tried"])+" to find an alternative route, her travelling companion called: the last bus "+hwChoice("hw14","had already left",["has already left","had already left","was already leaving"])+" ten minutes before.</p><p>It is now Thursday, and Nora is writing to a friend: “We "+hwChoice("hw15","have been staying",["had stayed","have been staying","were staying"])+" in a mountain town since Monday night, and we are still here. So far, we "+hwChoice("hw16","have visited",["have visited","had been visiting","were visiting"])+" three villages nearby, but we have not managed to leave the region. At this time tomorrow, if the forecast is right, we "+hwChoice("hw17","will be crossing",["will have crossed","will be crossing","have crossed"])+" the mountain pass in a shared minibus. By noon tomorrow, we "+hwChoice("hw18","will have been travelling",["will have been travelling","will be travelling","had been travelling"])+" for a full twenty-four hours since our replacement journey began at noon today — including the overnight stops.</p><p>“As soon as we "+hwChoice("hw19","arrive",["will arrive","arrive","have been arriving"])+" at the coast tomorrow afternoon, we will contact the guesthouse. By then, I "+hwChoice("hw20","will have booked",["will have booked","will be booking","had booked"])+" a room online, so we will not need to search for accommodation when we get there.”</p>"+"</div>");}
 
 try {
-  const sharedState = JSON.parse(localStorage.getItem(sharedWordKey) || '{}') || {};
+  const sharedState = JSON.parse(GoStudyStorage.getItem(sharedWordKey) || '{}') || {};
   if (!sharedState.importedFirstHomeworkWords) {
-    const legacy = JSON.parse(localStorage.getItem(key) || '{}') || {};
+    const legacy = JSON.parse(GoStudyStorage.getItem(key) || '{}') || {};
     const oldWords = Array.isArray(legacy.words) ? legacy.words : [];
     for (const word of oldWords) {
       if (word && typeof word.en === 'string' && typeof word.ru === 'string' && !state.words.some(existing => norm(existing.en) === norm(word.en))) state.words.push(word);
     }
     sharedState.words = state.words;
     sharedState.importedFirstHomeworkWords = true;
-    localStorage.setItem(sharedWordKey, JSON.stringify(sharedState));
+    GoStudyStorage.setItem(sharedWordKey, JSON.stringify(sharedState));
   }
 } catch {}
 

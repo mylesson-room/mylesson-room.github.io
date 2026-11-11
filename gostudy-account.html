@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Аккаунт GoStudy · Travel B2</title>
+<link rel="stylesheet" href="assets/gostudy-sync.css">
+<script src="assets/gostudy-sync.js"></script>
+</head>
+<body class="cloud-account">
+<main>
+  <a href="student-travel-b2.html">← Кабинет Travel B2</a>
+  <h1>Аккаунт GoStudy</h1>
+  <p>Войдите, чтобы сохранять ответы, открытые разделы и слова Travel B2 между устройствами.</p>
+  <form id="cloud-login" method="post" hidden>
+    <label for="email">Электронная почта</label>
+    <input id="email" name="email" type="email" autocomplete="username" required>
+    <label for="password">Пароль</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required>
+    <label class="cloud-check"><input type="checkbox" name="importLocal"> Перенести мой прогресс из этого браузера, если облачной копии ещё нет</label>
+    <button type="submit">Войти</button>
+    <p>Данные для входа выдаёт преподаватель.</p>
+  </form>
+  <section id="cloud-settings" hidden>
+    <p id="cloud-email"></p>
+    <button type="button" id="cloud-sync">Синхронизировать</button>
+    <details><summary>Загрузить облачную копию</summary>
+      <p>Облачная версия заменит локальные правки для тех уроков, которые уже сохранены в облаке.</p>
+      <button type="button" id="cloud-restore">Заменить локальные правки облачной копией</button>
+    </details>
+    <button type="button" id="cloud-signout">Выйти</button>
+  </section>
+  <p id="cloud-message" data-cloud-status role="status"></p>
+</main>
+</body>
+</html>
