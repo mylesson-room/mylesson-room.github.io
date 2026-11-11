@@ -39,10 +39,10 @@
   const financeB1 = financePages.has(location.pathname.split('/').pop()) ||
     new URLSearchParams(location.search).get('course') === 'finance-b1';
   const financeKeys = ['gostudy-finance-b1-v1','gostudy-finance-b1-profile-v1','gostudy-finance-b1-homework-v1','gostudy-finance-b1-02-v1','gostudy-finance-b1-02-homework-v1'];
-  const feedPages = new Set(['student-feed-b2.html','feed-choice-b2.html','feed-b2-02.html','feed-b2-02-homework.html','feed-b2-03.html','feed-b2-03-homework.html']);
+  const feedPages = new Set(['student-feed-b2.html','feed-choice-b2.html','feed-b2-02.html','feed-b2-02-homework.html','feed-b2-03.html','feed-b2-03-homework.html','feed-b2-04.html','feed-b2-04-homework.html']);
   const feedB2 = feedPages.has(location.pathname.split('/').pop()) ||
     new URLSearchParams(location.search).get('course') === 'feed-b2';
-  const feedKeys = ['gostudy-feed-b2-v1','gostudy-feed-b2-profile-v1','gostudy-feed-b2-02-v1','gostudy-feed-b2-02-homework-v1','gostudy-feed-b2-03-v1','gostudy-feed-b2-03-homework-v1'];
+  const feedKeys = ['gostudy-feed-b2-v1','gostudy-feed-b2-profile-v1','gostudy-feed-b2-02-v1','gostudy-feed-b2-02-homework-v1','gostudy-feed-b2-03-v1','gostudy-feed-b2-03-homework-v1','gostudy-feed-b2-04-v1','gostudy-feed-b2-04-homework-v1'];
   const keys = new Set(feedB2 ? feedKeys : financeB1 ? financeKeys : travelA2 ? travelA2Keys : travelB2Keys);
   const courseName = feedB2 ? 'Feed B2' : financeB1 ? 'Finance B1' : travelA2 ? 'Travel A2+' : 'Travel B2';
   const accountPage = 'gostudy-account.html' + (feedB2 ? '?course=feed-b2' : financeB1 ? '?course=finance-b1' : travelA2 ? '?course=travel-a2' : '');
