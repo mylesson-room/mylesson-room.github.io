@@ -5,17 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GoStudy · Кабинет преподавателя</title>
 <link rel="stylesheet" href="assets/gostudy-sync.css?v=3">
-<script src="assets/gostudy-sync.js?v=18"></script>
+<script src="assets/gostudy-sync.js?v=19"></script>
 <style>.teacher-course-links{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px}.teacher-course-links .pharma-lesson-shortcut{display:inline-flex;align-items:center;min-height:40px;padding:0 12px;border-radius:10px;background:#2368b0;color:#fff;text-decoration:none;font-weight:650}.teacher-course-links .pharma-lesson-shortcut:hover{background:#164f8d}</style>
 <link rel="stylesheet" href="assets/gostudy-classroom.css?v=4">
 <style>#teacher-add-student{margin-top:16px}#teacher-add-student summary{font-weight:700}#teacher-add-student form{max-width:420px;margin-top:12px}#teacher-add-student select{font:inherit;padding:9px}</style>
-<link rel="stylesheet" href="assets/gostudy-cabinet.css?v=1">
+<link rel="stylesheet" href="assets/gostudy-cabinet.css?v=2">
 </head>
 <body class="cloud-account teacher-page">
 <main>
   <header class="teacher-top"><strong>GoStudy</strong><a href="login.html">Общий вход GoStudy</a></header>
-  <h1>Кабинет преподавателя</h1>
-  <p>Смотрите ответы учеников во время занятия и добавляйте слова в их словари.</p>
+  <h1>Обучение</h1>
   <form id="teacher-login" method="post" hidden>
     <label for="teacher-email">Электронная почта</label>
     <input id="teacher-email" type="email" name="email" autocomplete="username" required>
@@ -25,9 +24,12 @@
   </form>
   <p id="teacher-status" role="status"></p>
   <section id="teacher-dashboard" hidden>
-    <div class="teacher-layout"><aside class="teacher-panel teacher-roster"><h2>Ученики</h2><label for="teacher-student-search">Найти ученика</label><input id="teacher-student-search" type="search" placeholder="Имя, почта или курс"><div id="teacher-student-list"></div><select id="teacher-student" hidden aria-label="Ученик"></select><button type="button" id="teacher-signout">Выйти</button></aside><div class="teacher-workspace">
+    <div class="teacher-roster-flat">
+      <div class="teacher-section-tab">Ученики</div>
+      <input id="teacher-student-search" type="search" placeholder="Поиск учеников" aria-label="Поиск учеников">
+      <p id="teacher-student-count" class="teacher-count"></p>
     <details id="teacher-add-student" class="teacher-panel" hidden>
-      <summary>Добавить ученика</summary>
+      <summary>✚ Добавить нового ученика</summary>
       <form method="post" autocomplete="off">
         <label for="teacher-new-email">Почта ученика</label>
         <input id="teacher-new-email" name="email" type="email" maxlength="254" required>
@@ -40,6 +42,10 @@
       <p id="teacher-add-student-status" role="status"></p>
       <a href="login.html">Общая ссылка на вход</a>
     </details>
+      <div id="teacher-student-list"></div>
+      <select id="teacher-student" hidden aria-label="Ученик"></select>
+    </div>
+    <details id="teacher-profile"><summary>Карточка ученика</summary>
     <section id="teacher-classroom" class="teacher-panel" hidden>
       <h2 id="teacher-classroom-title">Класс</h2>
       <article class="home-current" id="teacher-current-lesson"></article><details><summary>Все уроки</summary><ul id="teacher-classroom-lessons"></ul></details>
@@ -63,7 +69,8 @@
         <h3>Задал преподаватель</h3><ul id="teacher-assigned-words"></ul>
       </section>
     </div>
-    </div></div>
+    </details>
+    <button type="button" id="teacher-signout">Выйти</button>
   </section>
 </main>
 </body>

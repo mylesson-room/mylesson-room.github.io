@@ -419,9 +419,11 @@
     const course = tiktokA2 ? 'tiktok_a2' : pharmaC1 ? 'pharma_c1' : firstSales ? 'first_sales' : feedB2 ? 'feed_b2' : financeB1 ? 'finance_b1' : 'travel_a2';
     const lesson = classroomCatalog[course].lessons.at(-1);
     const started = json(GoStudyStorage.getItem(lesson.lessonKey),{});
-    home.innerHTML = '<article class="home-current"><p>Текущий урок</p><h2></h2><div class="home-actions"><a class="home-primary"></a><a>Домашнее задание</a></div></article><div class="home-tools"><a class="home-tile"><strong>Словарь</strong><small>Мои слова</small></a><button type="button" class="home-tile"><strong>Тренировки</strong><small>Повторить слова</small></button></div><dialog class="home-training"><h2>Тренировка слов</h2><p role="status"></p><strong class="home-prompt"></strong><p class="home-meaning" hidden></p><div class="home-actions"><button type="button" class="home-reveal">Показать перевод</button><button type="button" class="home-next">Следующее слово</button><button type="button" class="home-close">Закрыть</button></div></dialog>';
-    home.querySelector('h2').textContent = lesson.title;
-    const [open, homework, dictionary] = home.querySelectorAll('a');
+    home.innerHTML = '<div class="home-duo"><article class="home-current home-homework"><p>Домашнее задание</p><h2></h2><div class="home-actions"><a class="home-primary home-homework-link">Сделать задание</a></div></article><article class="home-current home-lesson"><p>Текущий урок</p><h2></h2><div class="home-actions"><a class="home-primary home-open-lesson"></a></div></article></div><div class="home-tools"><a class="home-tile"><strong>Словарь</strong><small>Мои слова</small></a><button type="button" class="home-tile"><strong>Тренировки</strong><small>Повторить слова</small></button></div><dialog class="home-training"><h2>Тренировка слов</h2><p role="status"></p><strong class="home-prompt"></strong><p class="home-meaning" hidden></p><div class="home-actions"><button type="button" class="home-reveal">Показать перевод</button><button type="button" class="home-next">Следующее слово</button><button type="button" class="home-close">Закрыть</button></div></dialog>';
+    home.querySelectorAll('.home-current h2').forEach(title => { title.textContent = lesson.title; });
+    const open = home.querySelector('.home-open-lesson');
+    const homework = home.querySelector('.home-homework-link');
+    const dictionary = home.querySelector('a.home-tile');
     open.href = lesson.lesson;
     open.textContent = started.page > 0 || Object.keys(started.answers || {}).length ? 'Продолжить урок' : 'Открыть урок';
     homework.href = lesson.homework;
@@ -467,6 +469,27 @@
     reveal.onclick = () => { meaning.hidden = false; };
     next.onclick = () => { if (words.length) index = (index+1)%words.length; showWord(); };
     dialog.querySelector('.home-close').onclick = () => dialog.close();
+    const nav = document.createElement('nav');
+    nav.className = 'home-top-nav';
+    nav.setAttribute('aria-label','Разделы кабинета');
+    const main = document.createElement('a');
+    main.href = '#student-home';
+    main.textContent = 'Главная';
+    main.setAttribute('aria-current','page');
+    const homeworkNav = document.createElement('a');
+    homeworkNav.href = homework.href;
+    homeworkNav.textContent = 'Домашка';
+    const dictionaryNav = document.createElement('a');
+    dictionaryNav.href = dictionary.href;
+    dictionaryNav.textContent = 'Словарь';
+    if (tiktokA2) dictionaryNav.onclick = event => { event.preventDefault(); dictionary.click(); };
+    const practiceNav = document.createElement('button');
+    practiceNav.type = 'button';
+    practiceNav.textContent = 'Практика';
+    practiceNav.onclick = () => home.querySelector('button.home-tile').click();
+    nav.append(main,homeworkNav,dictionaryNav,practiceNav);
+    const header = document.querySelector('header.topbar');
+    if (header) header.append(nav);
     document.body.classList.add('gostudy-student-home');
   }
 
@@ -959,24 +982,49 @@
       if (!studentList) return;
       const query = studentSearch.value.trim().toLowerCase();
       studentList.replaceChildren();
+      const count = document.getElementById('teacher-student-count');
+      if (count) count.textContent = 'Количество учеников '+new Set(students.map(student=>student.id)).size;
       for (const student of students) {
         const label = student.email || student.label;
         const course = classroomCatalog[student.course]?.name || '';
         if (!(label+' '+(student.label || '')+' '+course).toLowerCase().includes(query)) continue;
+        const row = document.createElement('div');
+        row.className = 'teacher-student-row';
+        const avatar = document.createElement('span');
+        avatar.className = 'teacher-avatar';
+        avatar.setAttribute('aria-hidden','true');
+        avatar.textContent = label.slice(0,1).toUpperCase();
+        const info = document.createElement('div');
+        const name = document.createElement('strong');
+        name.textContent = student.label || label;
+        const subtitle = document.createElement('small');
+        subtitle.textContent = student.email || course;
+        const level = document.createElement('small');
+        level.textContent = student.email ? course : '';
+        info.append(name,subtitle,level);
+        const enter = document.createElement('a');
+        enter.className = 'teacher-enter-class';
+        enter.href = classroomLink(classroomCatalog[student.course].lessons.at(-1).lesson,student.id);
+        enter.textContent = '→ Войти в класс';
         const button = document.createElement('button');
         button.type = 'button';
-        button.setAttribute('aria-pressed',String(studentPicker.value===student.selection));
-        const name = document.createElement('strong');
-        name.textContent = label;
-        const subtitle = document.createElement('small');
-        subtitle.textContent = course;
-        button.append(name,subtitle);
-        button.onclick = () => { studentPicker.value = student.selection; renderStudent(); };
-        studentList.append(button);
+        button.className = 'teacher-student-profile';
+        button.setAttribute('aria-label','Карточка ученика · '+label);
+        button.textContent = '👤';
+        button.onclick = () => {
+          studentPicker.value = student.selection;
+          const panel = document.getElementById('teacher-profile');
+          panel.open = true;
+          renderStudent();
+          panel.scrollIntoView({block:'start'});
+        };
+        row.append(avatar,info,enter,button);
+        studentList.append(row);
       }
       if (!studentList.childElementCount) studentList.textContent = query ? 'Никого не нашли.' : 'Список пока пуст.';
     }
     if (studentSearch) studentSearch.oninput = renderStudentList;
+    if (new URLSearchParams(location.search).has('selected')) document.getElementById('teacher-profile')?.setAttribute('open','');
 
     function renderStudent() {
       renderStudentList();

@@ -1,1 +1,34 @@
 .teacher-layout{display:grid;grid-template-columns:minmax(210px,29%) minmax(0,1fr);gap:18px;align-items:start}.teacher-workspace{min-width:0}.teacher-roster h2{margin:0 0 12px}.teacher-roster input{box-sizing:border-box;width:100%;margin:5px 0 10px}.teacher-roster #teacher-student-list{display:grid;gap:6px;margin-bottom:14px}.teacher-roster #teacher-student-list button{display:grid;text-align:left;border-radius:10px;background:#f2f7fe;color:#203c5d;border:1px solid #d6e4f3;overflow-wrap:anywhere}.teacher-roster #teacher-student-list button[aria-pressed=true]{background:#dcecff;border-color:#9ec2f1}.teacher-roster small{margin-top:3px;font-weight:500}.teacher-workspace #teacher-add-student,.teacher-workspace #teacher-classroom{margin-top:0;margin-bottom:12px}.teacher-workspace .teacher-grid{grid-template-columns:1fr}.home-current{display:grid;gap:7px;background:#e2efff;color:#173956;padding:clamp(16px,4vw,30px);border:1px solid #c2dcfa;border-radius:18px}.home-current h2,.home-current h3,.home-current p{margin:0}.home-current h2{font-size:clamp(25px,4.5vw,38px)}.home-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.home-actions a,.home-actions button,.home-tile{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;padding:10px 14px;min-height:42px;border:1px solid #b9d2ee;border-radius:11px;background:#fff;color:#174b88;text-decoration:none;font:650 14px system-ui;cursor:pointer}.home-actions .home-primary{background:#205fb2;color:#fff;border-color:#205fb2}.home-tools{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.home-tools .home-tile{display:grid;justify-content:start;text-align:left;gap:5px;padding:15px}.home-tile small{font-weight:500}.home-training{width:min(440px,calc(100vw - 24px));box-sizing:border-box;border:1px solid #c2dcfa;border-radius:18px;padding:20px;color:#173956}.home-training::backdrop{background:#142a4866}.home-training .home-prompt{font-size:25px}.gostudy-student-home .content-grid,.gostudy-student-home .dock,.gostudy-student-home .pharma-top-actions>a,.gostudy-student-home #tiktok-cabinet #words,.gostudy-student-home #tiktok-cabinet p:has(>#dictBtn){display:none!important}body.gostudy-student-home[data-lesson-key]>.topbar nav,body.gostudy-student-home[data-lesson-key] #content>.hero{display:none}#student-home{margin:12px 0 24px}@media(max-width:700px){.teacher-layout{grid-template-columns:1fr}.teacher-roster #teacher-student-list{max-height:200px;overflow:auto}}@media(max-width:420px){.home-tools{grid-template-columns:1fr}}
+.teacher-page{background:#f5f6fa;color:#494b61}
+.teacher-page main{width:min(980px,100%);border:0;border-radius:20px;padding:clamp(16px,3vw,30px)}
+.teacher-page h1{font-size:31px;margin:22px 0 8px}
+.teacher-page #teacher-status{font-size:13px;color:#646b83}
+.teacher-section-tab{font-size:18px;font-weight:750;border-bottom:1px solid #e8eaf2;padding:10px 0 12px;position:relative}
+.teacher-section-tab:after{content:"";position:absolute;bottom:-1px;left:0;width:76px;height:3px;background:#18b9e6}
+.teacher-roster-flat>input{width:100%;box-sizing:border-box;margin:15px 0 4px;border-color:#dfe3ee}
+.teacher-count{display:flex;align-items:center;gap:12px;color:#6b7188;font-weight:650;margin:12px 0}
+.teacher-count:after{content:"";flex:1;border-top:2px dotted #e3e5ed}
+.teacher-roster-flat #teacher-add-student{padding:0;border:1px solid #e6e9f1;border-radius:10px;margin:0 0 12px}
+.teacher-roster-flat #teacher-add-student summary{text-align:center;padding:23px 12px;color:#087b9e;list-style:none}
+.teacher-roster-flat #teacher-add-student form,.teacher-roster-flat #teacher-add-student>p,.teacher-roster-flat #teacher-add-student>a{margin:0 16px 12px}
+.teacher-student-row{display:grid;grid-template-columns:52px minmax(0,1fr) auto 42px;gap:14px;align-items:center;min-height:84px;border-top:1px solid #edf0f5}
+.teacher-student-row strong,.teacher-student-row small{display:block;overflow-wrap:anywhere}
+.teacher-student-row small{color:#636b83}
+.teacher-avatar{border-radius:50%;display:grid;place-items:center;width:50px;height:50px;background:#edf2ff;color:#495b96;font-weight:750;font-size:21px}
+.teacher-page .teacher-enter-class{background:#087da4;color:white;text-decoration:none;border-radius:8px;padding:9px 13px;font-weight:750}
+.teacher-page .teacher-student-profile{min-height:40px;width:40px;padding:0;border:0;border-radius:8px;background:#f0f2f8;color:#485676}
+#teacher-profile{margin:12px 0}#teacher-profile>summary{font-weight:700}
+body.gostudy-student-home{background:#fff;color:#102531}
+body.gostudy-student-home .topbar{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;border-bottom:1px solid #e9eef1;max-width:none;padding:14px clamp(16px,4vw,40px)}
+body.gostudy-student-home .topbar .brand{grid-column:1;grid-row:1}
+body.gostudy-student-home .topbar .home-top-nav{display:flex;grid-column:2;grid-row:1;justify-content:center;align-items:center;gap:clamp(10px,3vw,24px)}
+body.gostudy-student-home .topbar .theme-control,body.gostudy-student-home .topbar .pharma-top-actions{grid-column:3;grid-row:1}
+body.gostudy-student-home[data-lesson-key]>.topbar nav.home-top-nav{display:flex}
+.home-top-nav a,.home-top-nav button{font:650 14px system-ui;color:#4e6470;text-decoration:none;border:0;background:transparent;padding:4px 0;cursor:pointer;box-shadow:none;white-space:nowrap}.home-top-nav a[aria-current]{color:#112935}
+.gostudy-student-home .home-duo{display:grid;grid-template-columns:1.42fr 1fr;gap:18px}
+.gostudy-student-home .home-current{background:#e2f8fc;border:0;border-radius:10px;min-height:190px;align-content:start;gap:10px;color:#102531}
+.gostudy-student-home .home-current p{color:#466572}.gostudy-student-home .home-current h2{font-size:clamp(22px,3vw,30px)}.gostudy-student-home .home-current .home-actions{align-self:end;margin-top:15px}
+.gostudy-student-home .home-primary{background:#007eaf;border-color:#007eaf;border-radius:8px}
+.gostudy-student-home .home-tools .home-tile{border:0;background:#f4f7f8;color:#102531}
+body.gostudy-student-home.dark{background:#13232f;color:#eaf6fc}body.gostudy-student-home.dark .home-top-nav a,body.gostudy-student-home.dark .home-top-nav button{color:#eaf6fc}
+@media(max-width:570px){.teacher-student-row{grid-template-columns:36px minmax(0,1fr) auto;gap:8px;padding:8px 0}.teacher-avatar{width:34px;height:34px;font-size:16px}.teacher-enter-class{grid-column:2;grid-row:2;justify-self:start}.teacher-student-profile{grid-column:3;grid-row:1/span 2}.gostudy-student-home .home-duo{grid-template-columns:1fr}.gostudy-student-home .home-current{min-height:0}body.gostudy-student-home .topbar .home-top-nav{grid-row:2;grid-column:1/-1;justify-content:flex-start;flex-wrap:wrap}}
