@@ -141,7 +141,7 @@ a.small-button { display: inline-flex; align-items: center; }
 
 #dictionary .dictrow{flex-wrap:wrap}</style>
 <link rel="stylesheet" href="assets/gostudy-sync.css?v=3">
-<script src="assets/gostudy-sync.js?v=14"></script>
+<script src="assets/gostudy-sync.js?v=15"></script>
 <script>window.GoStudyStorage ??= {getItem: key => localStorage.getItem(key), setItem: (key, value) => localStorage.setItem(key, value)};</script>
 </head><body><header><div class="brand">Gostudy</div><div class="header-actions"><a class="small-button cabinet-link" href="student-finance-b1.html">← Кабинет</a><button class="small-button" id="dictBtn">My words <span id="wordCount">0</span></button><button class="small-button" id="themeBtn" aria-label="Switch colour theme">◐</button></div></header>
 <div class="shell"><main><div class="lesson-bar"><button class="small-button" id="menuBtn" aria-haspopup="dialog" aria-expanded="false">☰ Задания</button></div><div id="pageLabel" hidden></div><h1 id="title" tabindex="-1"></h1><p class="subtitle" id="goal"></p><div id="content"></div><details class="teacher" hidden><summary>Teacher notes · pacing</summary><p id="teacherTips"></p></details><div class="page-controls"><button id="prev" class="small-button">← Назад</button><span id="counter"></span><button id="next" class="primary">Next →</button></div><footer class="footer">Gostudy · Finance B1. Ответы и слова сохраняются в этом браузере.</footer><p class="storage-note" id="storageNote" hidden role="status"></p></main></div>
@@ -169,7 +169,26 @@ const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const key='gostudy-finance-b1-homework-v1';let state={page:0,answers:{},words:[],dark:false};let storage=true;
 try{const s=JSON.parse(GoStudyStorage.getItem(key)||'null');if(s&&typeof s==='object'){state={...state,...s};state.answers=s.answers&&typeof s.answers==='object'?s.answers:{};state.words=Array.isArray(s.words)?s.words.filter(w=>w&&typeof w.en==='string'&&typeof w.ru==='string'):[];}}catch(e){storage=false;}
-function save(){try{GoStudyStorage.setItem(key,JSON.stringify(state));}catch(e){storage=false;$('#storageNote').hidden=false;$('#storageNote').textContent='Saving unavailable. Export your answers and vocabulary before closing.';}$('#wordCount').textContent=state.words.length;}
+const sharedWordKey="gostudy-finance-b1-v1";
+let lastWords = '';
+function readSharedWords(){
+  try {
+    const shared = JSON.parse(GoStudyStorage.getItem(sharedWordKey) || '{}');
+    if(Array.isArray(shared.words)) state.words = shared.words.filter(w=>w&&typeof w.en==='string'&&typeof w.ru==='string');
+  } catch {}
+  lastWords = JSON.stringify(state.words);
+}
+readSharedWords();
+window.addEventListener('pageshow',()=>{readSharedWords();$('#wordCount').textContent=state.words.length;if($('#dictionary').open)renderWords();});
+function save(){try{
+  const currentWords = JSON.stringify(state.words);
+  if(currentWords!==lastWords){
+    const shared = JSON.parse(GoStudyStorage.getItem(sharedWordKey)||'{}');
+    shared.words=state.words;
+    GoStudyStorage.setItem(sharedWordKey,JSON.stringify(shared));
+    lastWords=currentWords;
+  }
+  GoStudyStorage.setItem(key,JSON.stringify(state));}catch(e){storage=false;$('#storageNote').hidden=false;$('#storageNote').textContent='Saving unavailable. Export your answers and vocabulary before closing.';}$('#wordCount').textContent=state.words.length;}
 let toastTimer;function notify(s){$('#toast').textContent=s;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3200);}
 const words=[["bank account","банковский счёт","I opened a bank account."],["bank transfer","банковский перевод","I sent the money by bank transfer."],["cash","наличные","Do you accept cash?"],["fee","комиссия; сбор","Is there a fee for this service?"],["borrow","брать взаймы","Can I borrow some money?"],["lend","давать взаймы","A bank can lend money."],["loan","заём; кредит","She applied for a loan."],["interest","проценты по займу","How much interest will I pay?"],["monthly payment","ежемесячный платёж","The monthly payment is 50 units."],["repay","погашать; возвращать","He repaid the loan in six months."],["total cost","полная стоимость","What is the total cost?"],["savings","сбережения","They used some of their savings."]];
 const glossary={"bank account":"банковский счёт","bank transfer":"банковский перевод","cash":"наличные","fee":"комиссия; сбор","borrow":"брать взаймы","lend":"давать взаймы","loan":"заём; кредит","interest":"проценты по займу","monthly payment":"ежемесячный платёж","repay":"погашать; возвращать","total cost":"полная стоимость","savings":"сбережения"};
