@@ -274,6 +274,8 @@
 
   function mountUnifiedAccount() {
     const destinations = new Map([
+      ['business-ai', {name:'Business AI · B2–C1',path:'student-business-ai.html',keys:businessAIKeys}],
+      ['travel-b2', {name:'Travel B2',path:'student-travel-b2.html',keys:travelB2Keys}],
       ['travel-a2', {name: 'Travel A2+', path: 'student-travel-a2.html', keys: travelA2Keys}],
       ['finance-b1', {name: 'Finance B1', path: 'student-finance-b1.html', keys: financeKeys}],
       ['tiktok-a2', {name: 'TikTok A2', path: 'student-tiktok-a2.html', keys: tiktokKeys}],
@@ -528,7 +530,7 @@
 
   function mountLesson() {
     const link = document.createElement('a');
-    link.href = accountPage;
+    link.href = document.getElementById('lesson-data') ? 'login.html' : accountPage;
     link.textContent = session ? 'Аккаунт GoStudy' : 'Войти для синхронизации';
     link.className = 'gostudy-cloud-link';
     const status = document.createElement('span');
