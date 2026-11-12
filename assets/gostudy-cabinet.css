@@ -32,3 +32,13 @@ body.gostudy-student-home[data-lesson-key]>.topbar nav.home-top-nav{display:flex
 .gostudy-student-home .home-tools .home-tile{border:0;background:#f4f7f8;color:#102531}
 body.gostudy-student-home.dark{background:#13232f;color:#eaf6fc}body.gostudy-student-home.dark .home-top-nav a,body.gostudy-student-home.dark .home-top-nav button{color:#eaf6fc}
 @media(max-width:570px){.teacher-student-row{grid-template-columns:36px minmax(0,1fr) auto;gap:8px;padding:8px 0}.teacher-avatar{width:34px;height:34px;font-size:16px}.teacher-enter-class{grid-column:2;grid-row:2;justify-self:start}.teacher-student-profile{grid-column:3;grid-row:1/span 2}.gostudy-student-home .home-duo{grid-template-columns:1fr}.gostudy-student-home .home-current{min-height:0}body.gostudy-student-home .topbar .home-top-nav{grid-row:2;grid-column:1/-1;justify-content:flex-start;flex-wrap:wrap}}
+
+.gostudy-student-home .intro>:not(h1){display:none}
+.gostudy-student-home .home-duo{gap:clamp(14px,2.5vw,28px)}
+.gostudy-student-home .home-current{position:relative;box-sizing:border-box;grid-template-rows:auto auto 1fr;min-height:clamp(215px,23vw,270px);padding:clamp(20px,2.6vw,30px);border-radius:9px;background:#e2f9fd}
+.gostudy-student-home .home-homework h2,.gostudy-student-home .home-homework p{max-width:calc(100% - clamp(70px,13vw,165px))}
+.gostudy-student-home .home-current h2{font-size:clamp(21px,2.4vw,29px);line-height:1.25;font-weight:650}
+.gostudy-student-home .home-cover{position:absolute;inset:clamp(20px,2.6vw,30px) clamp(20px,2.6vw,30px) auto auto;width:clamp(62px,12vw,145px);aspect-ratio:1;border-radius:50%;object-fit:cover;background:#bdf1fb;display:grid;place-items:center;font-size:clamp(28px,5vw,58px)}
+.gostudy-student-home .home-homework .home-primary{background:#007cae;border-color:#007cae}
+.gostudy-student-home .home-lesson .home-primary{background:transparent;border-color:transparent;padding-inline:0;color:#006e9b;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:570px){.gostudy-student-home .home-current{min-height:190px}}

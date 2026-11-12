@@ -420,6 +420,12 @@
     const lesson = classroomCatalog[course].lessons.at(-1);
     const started = json(GoStudyStorage.getItem(lesson.lessonKey),{});
     home.innerHTML = '<div class="home-duo"><article class="home-current home-homework"><p>Домашнее задание</p><h2></h2><div class="home-actions"><a class="home-primary home-homework-link">Сделать задание</a></div></article><article class="home-current home-lesson"><p>Текущий урок</p><h2></h2><div class="home-actions"><a class="home-primary home-open-lesson"></a></div></article></div><div class="home-tools"><a class="home-tile"><strong>Словарь</strong><small>Мои слова</small></a><button type="button" class="home-tile"><strong>Тренировки</strong><small>Повторить слова</small></button></div><dialog class="home-training"><h2>Тренировка слов</h2><p role="status"></p><strong class="home-prompt"></strong><p class="home-meaning" hidden></p><div class="home-actions"><button type="button" class="home-reveal">Показать перевод</button><button type="button" class="home-next">Следующее слово</button><button type="button" class="home-close">Закрыть</button></div></dialog>';
+    const cover = document.querySelector('.content-grid section img');
+    const visual = document.createElement(cover ? 'img' : 'span');
+    visual.className = 'home-cover';
+    if (cover) { visual.src = cover.src; visual.alt = ''; }
+    else { visual.textContent = tiktokA2 ? '🎬' : '🧳'; visual.setAttribute('aria-hidden','true'); }
+    home.querySelector('.home-homework').append(visual);
     home.querySelectorAll('.home-current h2').forEach(title => { title.textContent = lesson.title; });
     const open = home.querySelector('.home-open-lesson');
     const homework = home.querySelector('.home-homework-link');
