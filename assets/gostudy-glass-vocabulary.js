@@ -11,6 +11,7 @@
   const norm = text => String(text).trim().toLowerCase().replace(/\s+/g,' ').replace(/[.!?,;:]+$/,'');
   const russian = /[а-яё]/i;
   const lesson = document.querySelector('.sheet');
+  const travelTest = document.body.classList.contains('travel-workbook');
   const by = (root,selector) => root.querySelector(selector);
   const button = (label,action,cls='') => Object.assign(document.createElement('button'),{type:'button',textContent:label,onclick:action,className:cls});
   const dictionary = document.createElement('dialog');
@@ -23,6 +24,13 @@
   const form = by(dictionary,'form');
   const term = form.elements.term, meaning = form.elements.meaning;
   const status = by(dictionary,'.glass-status');
+  if (travelTest) {
+    const pronounce=button('Озвучить',()=>speak(term.value.trim()),'glass-pronounce');
+    pronounce.disabled=true;
+    term.addEventListener('input',()=>{pronounce.disabled=!term.value.trim();});
+    form.addEventListener('reset',()=>{pronounce.disabled=true;});
+    form.append(pronounce);
+  }
   const tabs = by(dictionary,'.glass-tabs');
   const cache = new Map();
   const glossary = {
@@ -181,7 +189,14 @@
   const side=document.querySelector('.side');
   if(!side)return;
   const toolbar=document.createElement('div');toolbar.className='glass-lesson-tools';
-  toolbar.append(button('Словарь',()=>open('words'),'glass-primary'),button('Тренировать слова',()=>open('cards')));
+  if (travelTest) {
+    const icon = button('📖',()=>open('words'),'glass-primary glass-icon');
+    icon.setAttribute('aria-label','Открыть словарь');
+    icon.title='Словарь';
+    toolbar.append(icon);
+  } else {
+    toolbar.append(button('Словарь',()=>open('words'),'glass-primary'),button('Тренировать слова',()=>open('cards')));
+  }
   by(side,'.panel').after(toolbar);
   translation=document.createElement('section');translation.className='glass-translation';translation.hidden=true;
   translation.setAttribute('aria-label','Перевод выделенного текста');

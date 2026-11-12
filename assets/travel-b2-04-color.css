@@ -1,0 +1,38 @@
+.travel-workbook{background:radial-gradient(ellipse at 85% 8%,#e6f0ff 0,transparent 38%),#edf3f9}
+.travel-workbook .sheet{border-radius:12px;box-shadow:0 9px 34px #183e6410}
+.travel-workbook progress{height:4px}
+.travel-workbook .lesson-cover{border-radius:10px}
+.travel-workbook .travel-route,.travel-workbook .travel-cards{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(135px,100%),1fr));margin:0 0 18px}
+.travel-route>div,.travel-cards>div{display:grid;align-content:start;gap:4px;min-width:0;padding:13px 14px;border:1px solid #d4e8f8;border-radius:12px;background:#eaf6ff;color:#1b4162}
+.travel-route>div:nth-child(2),.travel-cards>div:nth-child(2){background:#fff1d9;border-color:#f0dfbb;color:#634918}
+.travel-route>div:nth-child(3),.travel-cards>div:nth-child(3){background:#e9f7ef;border-color:#d4e9dc;color:#245840}
+.travel-route span,.travel-cards span,.travel-alert>span{display:grid;place-items:center;width:37px;height:37px;border-radius:11px;background:#ffffffbb;font-size:20px;line-height:1;margin-bottom:3px}
+.travel-route strong,.travel-cards strong,.travel-alert strong{font-size:15px;line-height:1.25}
+.travel-route small,.travel-cards small,.travel-alert small{display:block;font-size:13px;line-height:1.4}
+.travel-cards b{font-size:14px}
+.travel-alert{display:flex;align-items:center;gap:12px;border:1px solid #e1ddf8;border-radius:11px;padding:10px 13px;margin-bottom:15px;background:linear-gradient(108deg,#eee9ff,#e5f5ff);color:#36436d}
+.travel-alert>span{margin:0;flex:none}
+.travel-workbook .activity .options label:hover{background:#ebf9ff}
+.travel-workbook .order li:hover{border-color:#a0d3e6;background:#f3fbff}
+.travel-workbook .word-options button:hover{background:#e1f5ff}
+.travel-workbook .glass-lesson-tools .glass-icon{width:46px;height:46px;min-height:0;padding:0;font-size:22px;line-height:1;display:grid;place-items:center;background:#176fae}
+.travel-workbook .glass-words{background:linear-gradient(145deg,#ffffff58,#e1f3ff38 54%,#f7fbff70);-webkit-backdrop-filter:blur(19px) saturate(175%);backdrop-filter:blur(19px) saturate(175%);border-color:#ffffffbb;box-shadow:0 22px 55px #16395842,inset 0 1px 1px #ffffffd9}
+.travel-workbook .glass-words::backdrop{background:#153b572b;backdrop-filter:none}
+.travel-workbook .glass-words .glass-tabs{background:#eaf5ff80}
+.travel-workbook .glass-words .glass-form input{background:#ffffffa8}
+.travel-workbook .glass-words .glass-form label{color:#213d59}
+.travel-workbook .glass-form:has(.glass-pronounce){grid-template-columns:minmax(0,1fr) auto}
+.travel-workbook .glass-form:has(.glass-pronounce) label{grid-column:1/-1}
+.travel-workbook .glass-form .glass-pronounce{justify-self:end}
+.travel-workbook .glass-pronounce:disabled{opacity:.55;cursor:default}
+@media(prefers-reduced-motion:no-preference){
+ .travel-workbook .travel-route>div,.travel-workbook .travel-cards>div,.travel-workbook .travel-alert{animation:travel-arrive .24s ease-out both}
+ .travel-workbook .travel-route>div:nth-child(2),.travel-workbook .travel-cards>div:nth-child(2){animation-delay:.045s}
+ .travel-workbook .travel-route>div:nth-child(3),.travel-workbook .travel-cards>div:nth-child(3){animation-delay:.09s}
+ .travel-workbook [data-result=correct] .feedback{animation:travel-arrive .2s ease-out}
+ .travel-workbook .glass-words[open]{animation:travel-arrive .2s ease-out}
+ .travel-workbook .glass-icon,.travel-workbook .travel-cards>div{transition:transform .18s ease}
+ .travel-workbook .glass-icon:hover,.travel-workbook .travel-cards>div:hover{transform:translateY(-2px)}
+}
+@keyframes travel-arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:440px){.travel-workbook .travel-route,.travel-workbook .travel-cards{grid-template-columns:1fr}.travel-route>div,.travel-cards>div{grid-template-columns:38px minmax(0,1fr);column-gap:9px}.travel-route span,.travel-cards span{grid-row:1/span 3}}

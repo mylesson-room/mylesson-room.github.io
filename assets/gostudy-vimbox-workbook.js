@@ -36,6 +36,12 @@
     const menu = event.target.closest('.word-menu[open]');
     if (menu) { menu.open = false; menu.querySelector('summary').focus(); }
   });
+  function renderVisual(visual) {
+    if (!visual) return '';
+    if (visual.kind === 'route') return '<div class="travel-route" aria-label="'+escape(visual.label)+'">'+visual.stops.map(([icon,title,detail])=>'<div><span aria-hidden="true">'+escape(icon)+'</span><strong>'+escape(title)+'</strong><small>'+escape(detail)+'</small></div>').join('')+'</div>';
+    if (visual.kind === 'cards') return '<div class="travel-cards">'+visual.cards.map(([icon,title,value,detail])=>'<div><span aria-hidden="true">'+escape(icon)+'</span><strong>'+escape(title)+'</strong><b>'+escape(value)+'</b><small>'+escape(detail)+'</small></div>').join('')+'</div>';
+    return '<div class="travel-alert"><span aria-hidden="true">'+escape(visual.icon)+'</span><div><strong>'+escape(visual.title)+'</strong><small>'+escape(visual.detail)+'</small></div></div>';
+  }
   function render() {
     const step = config.steps[index];
     const answer = state.answers[step.id];
@@ -63,7 +69,7 @@
     const source = metrics + (step.source?.length ? '<div class="source '+sourceStyle+'">'+step.source.map(p => '<p>'+escape(p)+'</p>').join('')+'</div>' : '');
     const writing = step.type === 'write' ? '<label class="writing">Your draft<textarea rows="6">'+escape(typeof answer==='string'?answer:'')+'</textarea></label><p class="draft-status" role="status"></p>' : '';
     const cover = step.id === 'original-0' ? '<img class="lesson-cover" src="'+escape(config.cover)+'" alt="'+escape(config.coverAlt || '')+'">' : '';
-    sheet.innerHTML = '<div class="lesson-meta"><span>'+escape(config.level)+'</span><span>Step '+(index+1)+' of '+config.steps.length+'</span></div><progress max="'+config.steps.length+'" value="'+(index+1)+'" aria-label="Lesson progress"></progress><div class="lesson-content"><p class="label">'+escape(config.title)+'</p><h1 tabindex="-1">'+escape(step.title)+'</h1><p class="instruction">'+escape(step.instruction)+'</p>'+cover+source+(exercise?'<section class="activity">'+exercise+'<button type="button" class="check cta">Check answers</button><p role="status" class="result"></p></section>':'')+writing+'</div><div class="step-nav"><button type="button" class="back" '+(index===0?'disabled':'')+'>← Back</button>'+(index+1===config.steps.length?'<a class="cta home-link" href="'+escape(config.cabinet)+'">Back to my course</a>':'<button type="button" class="cta next">Next →</button>')+'</div>';
+    sheet.innerHTML = '<div class="lesson-meta"><span>'+escape(config.level)+'</span><span>Step '+(index+1)+' of '+config.steps.length+'</span></div><progress max="'+config.steps.length+'" value="'+(index+1)+'" aria-label="Lesson progress"></progress><div class="lesson-content"><p class="label">'+escape(config.title)+'</p><h1 tabindex="-1">'+escape(step.title)+'</h1><p class="instruction">'+escape(step.instruction)+'</p>'+cover+renderVisual(step.visual)+source+(exercise?'<section class="activity">'+exercise+'<button type="button" class="check cta">Check answers</button><p role="status" class="result"></p></section>':'')+writing+'</div><div class="step-nav"><button type="button" class="back" '+(index===0?'disabled':'')+'>← Back</button>'+(index+1===config.steps.length?'<a class="cta home-link" href="'+escape(config.cabinet)+'">Back to my course</a>':'<button type="button" class="cta next">Next →</button>')+'</div>';
     sheet.querySelector('.back').onclick = () => go(index-1);
     const next = sheet.querySelector('.next');
     if (next) next.onclick = () => go(index+1);
