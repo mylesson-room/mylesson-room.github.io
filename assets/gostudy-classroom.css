@@ -86,3 +86,8 @@
 #translationPop#translationPop.gostudy-classroom-translation #selectedMeaning{width:100%!important}
 #translationPop .gostudy-classroom-send{min-height:40px;border-radius:11px}
 #translationPop .gostudy-classroom-send-status:empty{display:none}
+
+#dictionary.gostudy-classroom-dictionary #wordList[hidden],
+#dictionary.gostudy-classroom-dictionary button[hidden]{display:none!important}
+#dictionary .gostudy-classroom-dictionary-lists{display:grid;gap:10px;margin-top:12px}
+#dictionary .gostudy-classroom-dictionary-lists .gostudy-teacher-words{margin:0}

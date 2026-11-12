@@ -228,7 +228,28 @@
     saveSession(response.data);
   }
 
+  function mergeLegacyFinanceWords() {
+    const legacyKey = 'gostudy-finance-b1-homework-v1';
+    const baseKey = 'gostudy-finance-b1-v1';
+    const marker = 'gostudy-finance-homework-words-merged';
+    try {
+      if (localStorage.getItem(marker)) return;
+      const old = json(localStorage.getItem(legacyKey));
+      if (!Array.isArray(old?.words) || !old.words.length) return;
+      const base = json(localStorage.getItem(baseKey),{});
+      if (!base || typeof base !== 'object' || Array.isArray(base)) return;
+      const words = new Map();
+      for (const word of [...old.words,...(Array.isArray(base.words) ? base.words : [])]) {
+        if (typeof word?.en === 'string' && typeof word.ru === 'string') words.set(word.en.trim().toLowerCase(),word);
+      }
+      localStorage.setItem(baseKey,JSON.stringify({...base,words:[...words.values()]}));
+      localStorage.setItem(marker,'1');
+    } catch {}
+  }
+  if (financeB1 && !session && !previewRecords) mergeLegacyFinanceWords();
+
   async function importLocalProgress() {
+    if (keys.has('gostudy-finance-b1-v1')) mergeLegacyFinanceWords();
     for (const key of keys) {
       const local = json(localStorage.getItem(key));
       if (!readRecord(key).value && local && typeof local === 'object' && !Array.isArray(local)) {
@@ -484,11 +505,25 @@
     refresh();
   }
 
-  function wordItems(target, words) {
+  function wordItems(target, words, pronounce = false) {
     const entries = Array.isArray(words) ? words.filter(word => word && typeof word.en === 'string' && typeof word.ru === 'string') : [];
     target.replaceChildren(...entries.map(word => {
       const item = document.createElement('li');
       item.textContent = word.en + ' — ' + word.ru;
+      if (pronounce && 'speechSynthesis' in window) {
+        const play = document.createElement('button');
+        play.className = 'gostudy-word-play';
+        play.type = 'button';
+        play.textContent = '🔊';
+        play.setAttribute('aria-label','Прослушать '+word.en);
+        play.onclick = () => {
+          speechSynthesis.cancel();
+          const voice = new SpeechSynthesisUtterance(word.en);
+          voice.lang = 'en-GB';
+          speechSynthesis.speak(voice);
+        };
+        item.append(' ',play);
+      }
       return item;
     }));
     if (!entries.length) {
@@ -525,6 +560,43 @@
     const panelStatus = root.querySelector('[role="status"]');
     const answers = root.querySelector('dl');
     const [studentWords,assignedWords] = root.querySelectorAll('ul');
+    const dictionary = document.getElementById('dictionary');
+    const wordForm = dictionary?.querySelector('#wordForm');
+    const dictionaryStatus = dictionary?.querySelector('#dictStatus');
+    let dictionaryLists;
+    let dictionaryCount;
+    const originalCount = document.getElementById('wordCount');
+    if (originalCount) {
+      originalCount.hidden = true;
+      dictionaryCount = document.createElement('span');
+      originalCount.after(dictionaryCount);
+    }
+    if (dictionary) {
+      dictionary.classList.add('gostudy-classroom-dictionary');
+      dictionary.querySelector('.menu-top h2').textContent = 'Словарь ученика';
+      const oldList = dictionary.querySelector('#wordList');
+      if (oldList) oldList.hidden = true;
+      const training = dictionary.querySelector('#trainWords');
+      if (training) training.hidden = true;
+      const exportWords = dictionary.querySelector('#exportWords');
+      if (exportWords) exportWords.hidden = true;
+      if (wordForm) {
+        const submit = wordForm.querySelector('button[type="submit"]');
+        if (submit) submit.textContent = 'Добавить ученику';
+      }
+      const sections = document.createElement('div');
+      sections.className = 'gostudy-classroom-dictionary-lists';
+      for (const title of ['Сохранил ученик','Слова от преподавателя']) {
+        const section = document.createElement('section');
+        section.className = 'gostudy-teacher-words';
+        const heading = document.createElement('h3');
+        heading.textContent = title;
+        section.append(heading,document.createElement('ul'));
+        sections.append(section);
+      }
+      dictionary.append(sections);
+      dictionaryLists = sections.querySelectorAll('ul');
+    }
     const sourceButton = document.getElementById('saveSelected');
     const popup = document.getElementById('translationPop');
     const send = document.createElement('button');
@@ -590,7 +662,12 @@
 
     function render() {
       const count = wordItems(studentWords,student?.words);
-      wordItems(assignedWords,student?.assigned);
+      const assigned = wordItems(assignedWords,student?.assigned);
+      if (dictionaryLists) {
+        wordItems(dictionaryLists[0],student?.words,true);
+        wordItems(dictionaryLists[1],student?.assigned,true);
+      }
+      if (dictionaryCount) dictionaryCount.textContent = count+assigned;
       summary.textContent = student ? (student.label || 'Ученик') + ' · Слова: '+count : 'Ученик';
       inlineAnswers();
     }
@@ -618,48 +695,73 @@
       } finally { busy = false; }
     }
 
-    send.addEventListener('click',async () => {
-      if (sending) return;
+    async function sendWord(en,ru,status) {
+      if (sending || !status) return false;
       if (!session) {
         const login = document.createElement('a');
         login.href = root.querySelector('a').href;
         login.textContent = 'Войти в кабинет преподавателя';
-        sendStatus.replaceChildren('Для отправки слова войдите в GoStudy. ',login);
-        return;
+        status.replaceChildren('Для отправки слова войдите в GoStudy. ',login);
+        return false;
       }
       if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(classroomStudent)) {
-        sendStatus.textContent = 'Откройте урок через список уроков выбранного ученика.';
-        return;
+        status.textContent = 'Откройте урок через список уроков выбранного ученика.';
+        return false;
       }
-      let en = document.getElementById('selectedWord')?.textContent.trim() || '';
-      let ru = document.getElementById('selectedMeaning')?.value.trim() || '';
       if (/[а-яё]/i.test(en) && /[a-z]/i.test(ru) && !/[а-яё]/i.test(ru)) [en,ru] = [ru,en];
       if (!en || !ru) {
-        sendStatus.textContent = 'Выделите слово и дождитесь перевода или введите его.';
-        return;
+        status.textContent = 'Введите слово и перевод.';
+        return false;
       }
       sending = true;
       send.disabled = true;
-      sendStatus.textContent = 'Добавляем…';
+      status.textContent = 'Добавляем…';
       try {
         await assignClassroomWord(page.course,classroomStudent,en,ru);
-        sendStatus.textContent = 'Слово добавлено ученику.';
+        status.textContent = 'Слово добавлено ученику.';
         refresh();
-      } catch (error) { sendStatus.textContent = error.message; }
-      finally {
+        return true;
+      } catch (error) {
+        status.textContent = error.message;
+        return false;
+      } finally {
         sending = false;
         send.disabled = false;
       }
+    }
+    send.addEventListener('click',() => {
+      const en = document.getElementById('selectedWord')?.textContent.trim() || '';
+      const ru = document.getElementById('selectedMeaning')?.value.trim() || '';
+      sendWord(en,ru,sendStatus);
     });
-    document.addEventListener('click',event => {
-      const link = event.target.closest('a[href]');
-      if (!link) return;
-      const url = new URL(link.href,location.href);
-      if (url.origin === location.origin && classroomPages.get(url.pathname.split('/').pop())?.course === page.course) {
-        link.href = classroomLink(url.pathname.split('/').pop()+url.hash,classroomStudent);
+    if (wordForm) wordForm.onsubmit = async event => {
+      event.preventDefault();
+      const en = wordForm.querySelector('#newWord')?.value.trim() || '';
+      const ru = wordForm.querySelector('#newMeaning')?.value.trim() || '';
+      if (await sendWord(en,ru,dictionaryStatus)) {
+        wordForm.reset();
+        dictionaryStatus.textContent = 'Слово добавлено ученику.';
       }
-    },true);
-    new MutationObserver(inlineAnswers).observe(content,{childList:true});
+    };
+
+    function retainClassroomLinks(rootElement) {
+      for (const link of rootElement.querySelectorAll('a[href]')) {
+        const url = new URL(link.href,location.href);
+        if (url.origin !== location.origin) continue;
+        const filename = url.pathname.split('/').pop();
+        if (classroomPages.get(filename)?.course === page.course) {
+          link.href = classroomLink(filename+url.hash,classroomStudent);
+        } else if (filename === cabinetPage) {
+          link.href = root.querySelector('a').href;
+          link.textContent = '← К урокам ученика';
+        }
+      }
+    }
+    retainClassroomLinks(document);
+    new MutationObserver(() => {
+      retainClassroomLinks(content);
+      inlineAnswers();
+    }).observe(content,{childList:true});
     render();
     refresh();
     if (session) {
@@ -867,7 +969,7 @@
     if (document.getElementById('dictionary') || document.getElementById('translationPop')) {
       const vocabularyStyles = document.createElement('link');
       vocabularyStyles.rel = 'stylesheet';
-      vocabularyStyles.href = 'assets/gostudy-classroom.css?v=3';
+      vocabularyStyles.href = 'assets/gostudy-classroom.css?v=4';
       document.head.append(vocabularyStyles);
     }
     if (document.getElementById('teacher-login')) mountTeacher();
