@@ -516,10 +516,6 @@
     const page = classroomPages.get(location.pathname.split('/').pop());
     const content = document.getElementById('content');
     if (!page || !content) return;
-    const style = document.createElement('link');
-    style.rel = 'stylesheet';
-    style.href = 'assets/gostudy-classroom.css?v=2';
-    document.head.append(style);
     const root = document.createElement('aside');
     root.className = 'gostudy-classroom';
     root.innerHTML = '<a class="gostudy-classroom-back" href="gostudy-teacher.html">← К ученикам</a><details><summary>Ученик</summary><div class="gostudy-classroom-panel"><p role="status"></p><h3>Ответы в этом разделе</h3><dl></dl><h3>Слова ученика</h3><ul></ul><h3>Назначенные слова</h3><ul></ul></div></details>';
@@ -541,6 +537,13 @@
     if (popup && sourceButton) {
       popup.classList.add('gostudy-classroom-translation');
       sourceButton.style.setProperty('display','none','important');
+      const entry = sourceButton.closest('.translation-entry');
+      if (entry) entry.style.setProperty('display','block','important');
+      const translation = document.getElementById('selectedMeaning');
+      if (translation) {
+        translation.style.setProperty('width','100%','important');
+        translation.style.setProperty('writing-mode','horizontal-tb','important');
+      }
       popup.append(send,sendStatus);
     }
     let student;
@@ -861,6 +864,12 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('dictionary') || document.getElementById('translationPop')) {
+      const vocabularyStyles = document.createElement('link');
+      vocabularyStyles.rel = 'stylesheet';
+      vocabularyStyles.href = 'assets/gostudy-classroom.css?v=3';
+      document.head.append(vocabularyStyles);
+    }
     if (document.getElementById('teacher-login')) mountTeacher();
     else if (document.getElementById('unified-login')) mountUnifiedAccount();
     else if (document.getElementById('cloud-login')) mountAccount();

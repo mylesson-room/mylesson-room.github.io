@@ -19,3 +19,70 @@
 
 #translationPop.gostudy-classroom-translation .translation-entry{grid-template-columns:minmax(0,1fr)}
 #translationPop.gostudy-classroom-translation #selectedMeaning{grid-column:1/-1;width:100%;min-width:0;box-sizing:border-box;writing-mode:horizontal-tb}
+
+#dictionary,#translationPop {
+  --vocab-surface:var(--card,#fff);
+  --vocab-panel:var(--soft,#edf6ff);
+  --vocab-edge:var(--line,#c9dff7);
+  --vocab-text:var(--ink,#203c5d);
+  --vocab-muted:var(--muted,#58728c);
+  --vocab-accent:var(--accent,#1d65ad);
+  color:var(--vocab-text);
+  background:var(--vocab-surface);
+}
+#dictionary {
+  box-sizing:border-box;
+  width:min(550px,calc(100vw - 28px));
+  max-height:min(88dvh,760px);
+  padding:clamp(16px,4vw,26px);
+  border:1px solid var(--vocab-edge);
+  border-radius:24px;
+  box-shadow:0 20px 68px #102b4a36;
+}
+#dictionary .menu-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px}
+#dictionary .menu-top h2{font-size:clamp(23px,5vw,29px);margin:0;line-height:1.15}
+#dictionary .menu-top button,#translationPop #speakSelected{border-radius:12px}
+#dictionary>p.muted{color:var(--vocab-muted);font-size:14px;margin:0 0 16px}
+#dictionary #wordForm {
+  display:grid;
+  gap:7px;
+  padding:14px;
+  border:1px solid var(--vocab-edge);
+  border-radius:16px;
+  background:var(--vocab-panel);
+}
+#dictionary #wordForm .field-label{margin:0;font-size:13px;font-weight:650}
+#dictionary #wordForm input{box-sizing:border-box;width:100%;min-width:0;background:var(--vocab-surface);border:1px solid var(--vocab-edge);border-radius:11px;padding:10px 11px;font-size:16px}
+#dictionary #wordForm .dict-actions{margin:3px 0 0}
+#dictionary #wordList{display:grid;gap:8px;margin-top:12px}
+#dictionary #wordList .dictrow{align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--vocab-edge);border-radius:12px;overflow-wrap:anywhere}
+#dictionary #wordList .dictrow>div:first-child{min-width:0}
+#dictionary #wordList .dictrow p{color:var(--vocab-muted)}
+#dictionary #wordList .dictrow>div:last-child{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px}
+#dictionary .dict-actions button,#dictionary .gostudy-word-play{border-radius:11px}
+#dictionary .gostudy-teacher-words {
+  padding:12px 14px;
+  margin:0 0 12px;
+  border:1px solid var(--vocab-edge);
+  border-radius:14px;
+  background:var(--vocab-panel);
+}
+#dictionary .gostudy-teacher-words h3{font-size:15px;margin:0 0 6px}
+#dictionary .gostudy-teacher-words ul{margin:0;padding-inline-start:20px}
+#translationPop#translationPop{border-radius:20px}
+#translationPop#translationPop #selectedMeaning{
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  min-height:52px;
+  background:var(--vocab-panel);
+  border:1px solid var(--vocab-edge);
+  border-radius:12px;
+  font-size:16px;
+  line-height:1.5;
+  writing-mode:horizontal-tb!important;
+}
+#translationPop#translationPop.gostudy-classroom-translation .translation-entry{display:block!important}
+#translationPop#translationPop.gostudy-classroom-translation #selectedMeaning{width:100%!important}
+#translationPop .gostudy-classroom-send{min-height:40px;border-radius:11px}
+#translationPop .gostudy-classroom-send-status:empty{display:none}
