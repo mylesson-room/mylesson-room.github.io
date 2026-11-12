@@ -205,22 +205,128 @@
     return pending;
   }
 
-  async function signIn(email, password, importLocal) {
+  async function authenticate(email, password) {
     const response = await request('/auth/v1/token?grant_type=password', {
       method: 'POST', body: {email, password},
     });
     if (!response.ok) throw new Error('Не удалось войти. Проверьте почту и пароль.');
     saveSession(response.data);
-    await pull(session.access_token);
-    if (importLocal) {
-      for (const key of keys) {
-        const local = json(localStorage.getItem(key));
-        if (!readRecord(key).value && local && typeof local === 'object' && !Array.isArray(local)) {
-          writeRecord(key, {revision: 0, value: JSON.stringify(local), dirty: true});
-        }
+  }
+
+  async function importLocalProgress() {
+    for (const key of keys) {
+      const local = json(localStorage.getItem(key));
+      if (!readRecord(key).value && local && typeof local === 'object' && !Array.isArray(local)) {
+        writeRecord(key, {revision: 0, value: JSON.stringify(local), dirty: true});
       }
-      await synchronize();
     }
+    await synchronize();
+  }
+
+  async function signIn(email, password, importLocal) {
+    await authenticate(email, password);
+    await pull(session.access_token);
+    if (importLocal) await importLocalProgress();
+  }
+
+  function mountUnifiedAccount() {
+    const destinations = new Map([
+      ['travel-a2', {name: 'Travel A2+', path: 'student-travel-a2.html', keys: travelA2Keys}],
+      ['finance-b1', {name: 'Finance B1', path: 'student-finance-b1.html', keys: financeKeys}],
+      ['feed-b2', {name: 'Feed B2', path: 'student-feed-b2.html', keys: feedKeys}],
+      ['first-sales', {name: 'First Sales C1', path: 'student-first-sales.html', keys: salesKeys}],
+      ['pharma-c1', {name: 'Pharma C1', path: 'student-pharma.html', keys: pharmaKeys}],
+      ['teacher', {name: 'Кабинет преподавателя', path: 'gostudy-teacher.html'}],
+    ]);
+    const form = document.getElementById('unified-login');
+    const dashboard = document.getElementById('unified-dashboard');
+    const email = document.getElementById('unified-email');
+    const list = document.getElementById('unified-destinations');
+    const status = document.getElementById('unified-status');
+    const retry = document.getElementById('unified-retry');
+    const signout = document.getElementById('unified-signout');
+    const submit = form.querySelector('button');
+    let importLocal = false;
+    let busy = false;
+
+    function renderSession() {
+      form.hidden = !!session;
+      dashboard.hidden = !session;
+      email.textContent = session?.user?.email || '';
+    }
+
+    async function open(destination) {
+      if (destination.keys) {
+        keys.clear();
+        for (const key of destination.keys) keys.add(key);
+        await pull(await token());
+        if (importLocal) await importLocalProgress();
+      }
+      location.assign(destination.path);
+    }
+
+    async function run(action) {
+      if (busy) return;
+      busy = true;
+      submit.disabled = retry.disabled = signout.disabled = true;
+      list.querySelectorAll('button').forEach(button => { button.disabled = true; });
+      retry.hidden = true;
+      status.textContent = 'Загружаем кабинет…';
+      try {
+        await action();
+      } catch (error) {
+        if (error.message === 'Срок входа истёк. Войдите снова.') {
+          sessionStorage.removeItem(authKey);
+          session = null;
+        }
+        renderSession();
+        status.textContent = error instanceof TypeError ? 'Не удалось подключиться. Попробуйте ещё раз.' : error.message;
+        retry.hidden = !session;
+      } finally {
+        busy = false;
+        submit.disabled = retry.disabled = signout.disabled = false;
+        list.querySelectorAll('button').forEach(button => { button.disabled = false; });
+      }
+    }
+
+    async function loadDestinations() {
+      const response = await request('/rest/v1/rpc/gostudy_my_destinations', {method: 'POST', body: {}}, await token());
+      if (response.status === 401) throw new Error('Срок входа истёк. Войдите снова.');
+      if (!response.ok || !Array.isArray(response.data)) throw new Error('Не удалось загрузить назначенные курсы. Попробуйте ещё раз.');
+      const options = [...new Set(response.data.map(row => row.course))]
+        .map(course => destinations.get(course)).filter(Boolean);
+      if (options.length === 1) {
+        await open(options[0]);
+        return;
+      }
+      list.replaceChildren(...options.map(destination => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = destination.name;
+        button.addEventListener('click', () => run(() => open(destination)));
+        return button;
+      }));
+      status.textContent = options.length ? 'Выберите кабинет.' : 'К этому аккаунту пока не привязаны уроки. Обратитесь к преподавателю.';
+    }
+
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      const password = form.elements.password.value;
+      form.elements.password.value = '';
+      importLocal = form.elements.importLocal.checked;
+      run(async () => {
+        await authenticate(form.elements.email.value.trim(), password);
+        renderSession();
+        await loadDestinations();
+      });
+    });
+    retry.addEventListener('click', () => run(loadDestinations));
+    signout.addEventListener('click', () => {
+      sessionStorage.removeItem(authKey);
+      location.reload();
+    });
+    renderSession();
+    if (session) run(loadDestinations);
   }
 
   function mountAccount() {
@@ -551,6 +657,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('teacher-login')) mountTeacher();
+    else if (document.getElementById('unified-login')) mountUnifiedAccount();
     else if (document.getElementById('cloud-login')) mountAccount();
     else { mountLesson(); mountTeacherWords(); }
   });

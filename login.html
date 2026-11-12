@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Вход в GoStudy</title>
+<link rel="stylesheet" href="assets/gostudy-sync.css?v=3">
+<style>.cloud-account main{box-sizing:border-box}#unified-destinations{display:grid;gap:10px;margin:16px 0}#unified-destinations:empty{margin:0}#unified-dashboard>p{overflow-wrap:anywhere}#unified-dashboard button+button{margin-left:8px}#unified-destinations button+button{margin-left:0}</style>
+<script src="assets/gostudy-sync.js?v=12" defer></script>
+</head>
+<body class="cloud-account">
+<main>
+  <a href="gostudy.html">← GoStudy</a>
+  <h1>Вход в GoStudy</h1>
+  <p>Войдите по почте и паролю, чтобы открыть свои уроки.</p>
+  <form id="unified-login" method="post" hidden>
+    <label for="unified-login-email">Электронная почта</label>
+    <input id="unified-login-email" name="email" type="email" autocomplete="username" required>
+    <label for="unified-password">Пароль</label>
+    <input id="unified-password" name="password" type="password" autocomplete="current-password" required>
+    <label class="cloud-check"><input type="checkbox" name="importLocal"> Перенести прогресс из этого браузера, если облачной копии ещё нет</label>
+    <button type="submit">Войти</button>
+  </form>
+  <p id="unified-status" role="status"></p>
+  <section id="unified-dashboard" aria-label="Ваши кабинеты" hidden>
+    <p id="unified-email"></p>
+    <div id="unified-destinations"></div>
+    <button id="unified-retry" type="button" hidden>Повторить</button>
+    <button id="unified-signout" type="button">Выйти</button>
+  </section>
+</main>
+</body>
+</html>
