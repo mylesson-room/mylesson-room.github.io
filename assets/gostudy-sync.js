@@ -9,6 +9,7 @@
     'gostudy-travel-disruptions-b2-homework-v1',
     'gostudy-travel-b2-02-v1',
     'gostudy-travel-b2-02-homework-v1',
+    'gostudy-travel-b2-03-v1',
     'gostudy-travel-b2-profile-v1',
   ];
   const travelA2Keys = [
@@ -55,7 +56,9 @@
   const tiktokA2 = tiktokPages.has(location.pathname.split('/').pop()) ||
     new URLSearchParams(location.search).get('course') === 'tiktok-a2';
   const tiktokKeys = ['gostudy-tiktok-a2-v1', 'gostudy-tiktok-a2-homework-v1', 'gostudy-tiktok-a2-words-v1'];
-  const keys = new Set(tiktokA2 ? tiktokKeys : pharmaC1 ? pharmaKeys : firstSales ? salesKeys : feedB2 ? feedKeys : financeB1 ? financeKeys : travelA2 ? travelA2Keys : travelB2Keys);
+  const businessAI = ['business-ai-b2c1-02.html','student-business-ai.html'].includes(location.pathname.split('/').pop());
+  const businessAIKeys = ['gostudy-business-ai-b2c1-02-v1'];
+  const keys = new Set(tiktokA2 ? tiktokKeys : pharmaC1 ? pharmaKeys : firstSales ? salesKeys : feedB2 ? feedKeys : financeB1 ? financeKeys : travelA2 ? travelA2Keys : businessAI ? businessAIKeys : travelB2Keys);
   const courseName = tiktokA2 ? 'TikTok A2' : pharmaC1 ? 'Pharma C1' : firstSales ? 'First Sales C1' : feedB2 ? 'Feed B2' : financeB1 ? 'Finance B1' : travelA2 ? 'Travel A2+' : 'Travel B2';
   const accountPage = 'gostudy-account.html' + (tiktokA2 ? '?course=tiktok-a2' : pharmaC1 ? '?course=pharma-c1' : firstSales ? '?course=first-sales' : feedB2 ? '?course=feed-b2' : financeB1 ? '?course=finance-b1' : travelA2 ? '?course=travel-a2' : '');
   const cabinetPage = tiktokA2 ? 'student-tiktok-a2.html' : pharmaC1 ? 'student-pharma.html' : firstSales ? 'student-first-sales.html' : feedB2 ? 'student-feed-b2.html' : financeB1 ? 'student-finance-b1.html' : travelA2 ? 'student-travel-a2.html' : 'student-travel-b2.html';
@@ -1191,7 +1194,15 @@
       vocabularyStyles.href = 'assets/gostudy-classroom.css?v=4';
       document.head.append(vocabularyStyles);
     }
-    if (document.getElementById('teacher-login')) mountTeacher();
+    if (document.getElementById('lesson-data')) {
+      mountLesson();
+      if (session) token().then(access => request('/rest/v1/rpc/gostudy_my_destinations',{method:'POST',body:{}},access)).then(response => {
+        if (response.ok && Array.isArray(response.data) && response.data.some(row => row.course === 'teacher')) {
+          document.querySelector('.sections').hidden = false;
+        }
+      }).catch(() => {});
+    }
+    else if (document.getElementById('teacher-login')) mountTeacher();
     else if (document.getElementById('unified-login')) mountUnifiedAccount();
     else if (document.getElementById('cloud-login')) mountAccount();
     else if (document.getElementById('tiktok-cabinet')) mountTiktokCabinet(document.getElementById('tiktok-cabinet'));
