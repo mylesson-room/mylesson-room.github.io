@@ -422,25 +422,31 @@
     const home = document.getElementById('student-home');
     if (!home) return;
     const course = tiktokA2 ? 'tiktok_a2' : pharmaC1 ? 'pharma_c1' : firstSales ? 'first_sales' : feedB2 ? 'feed_b2' : financeB1 ? 'finance_b1' : 'travel_a2';
-    const lesson = classroomCatalog[course].lessons.at(-1);
+    const lesson = businessAI ? {
+      title: 'From AI Pilot to Rollout',
+      lesson: 'business-ai-b2c1-02.html?v=vimbox-2',
+      lessonKey: 'gostudy-business-ai-b2c1-02-v1',
+      homework: 'business-ai-b2c1-homework.html'
+    } : classroomCatalog[course].lessons.at(-1);
     const started = json(GoStudyStorage.getItem(lesson.lessonKey),{});
     home.innerHTML = '<div class="home-duo"><article class="home-current home-homework"><p>Домашнее задание</p><h2></h2><div class="home-actions"><a class="home-primary home-homework-link">Сделать задание</a></div></article><article class="home-current home-lesson"><p>Текущий урок</p><h2></h2><div class="home-actions"><a class="home-primary home-open-lesson"></a></div></article></div><div class="home-tools"><a class="home-tile"><strong>Словарь</strong><small>Мои слова</small></a><button type="button" class="home-tile"><strong>Тренировки</strong><small>Повторить слова</small></button></div><dialog class="home-training"><h2>Тренировка слов</h2><p role="status"></p><strong class="home-prompt"></strong><p class="home-meaning" hidden></p><div class="home-actions"><button type="button" class="home-reveal">Показать перевод</button><button type="button" class="home-next">Следующее слово</button><button type="button" class="home-close">Закрыть</button></div></dialog>';
     const cover = document.querySelector('.content-grid section img');
-    const visual = document.createElement(cover ? 'img' : 'span');
+    const visual = document.createElement(cover || businessAI ? 'img' : 'span');
     visual.className = 'home-cover';
-    if (cover) { visual.src = cover.src; visual.alt = ''; }
+    if (cover || businessAI) { visual.src = businessAI ? 'assets/gostudy-ai-pilot.png' : cover.src; visual.alt = ''; }
     else { visual.textContent = tiktokA2 ? '🎬' : '🧳'; visual.setAttribute('aria-hidden','true'); }
     home.querySelector('.home-homework').append(visual);
     home.querySelectorAll('.home-current h2').forEach(title => { title.textContent = lesson.title; });
+    if (businessAI) home.querySelector('.home-homework h2').textContent = 'AI at Work';
     const open = home.querySelector('.home-open-lesson');
     const homework = home.querySelector('.home-homework-link');
     const dictionary = home.querySelector('a.home-tile');
     open.href = lesson.lesson;
     open.textContent = started.page > 0 || Object.keys(started.answers || {}).length ? 'Продолжить урок' : 'Открыть урок';
     homework.href = lesson.homework;
-    dictionary.href = tiktokA2 ? '#words' : lesson.lesson+'#vocabulary';
+    dictionary.href = businessAI ? 'business-ai-b2c1.html#vocabulary' : tiktokA2 ? '#words' : lesson.lesson+'#vocabulary';
     if (tiktokA2) dictionary.onclick = event => { event.preventDefault(); document.getElementById('dictBtn')?.click(); };
-    const wordKey = {tiktok_a2:'gostudy-tiktok-a2-words-v1',first_sales:'gostudy-first-sales-shared-v1'}[course] || classroomCatalog[course].lessons[0].lessonKey;
+    const wordKey = businessAI ? 'gostudy-business-ai-shared-v1' : {tiktok_a2:'gostudy-tiktok-a2-words-v1',first_sales:'gostudy-first-sales-shared-v1'}[course] || classroomCatalog[course].lessons[0].lessonKey;
     const dialog = home.querySelector('dialog');
     const status = dialog.querySelector('[role="status"]');
     const prompt = dialog.querySelector('.home-prompt');
@@ -464,7 +470,7 @@
       index = 0;
       showWord();
       dialog.showModal();
-      if (!session) return;
+      if (!session || businessAI) return;
       try {
         const result = await request('/rest/v1/rpc/gostudy_'+course+'_my_words',{method:'POST',body:{}},await token());
         if (!dialog.open || run !== generation || !result.ok || !Array.isArray(result.data)) return;
@@ -530,7 +536,7 @@
 
   function mountLesson() {
     const link = document.createElement('a');
-    link.href = document.getElementById('lesson-data') ? 'login.html' : accountPage;
+    link.href = businessAI || document.getElementById('lesson-data') ? 'login.html' : accountPage;
     link.textContent = session ? 'Аккаунт GoStudy' : 'Войти для синхронизации';
     link.className = 'gostudy-cloud-link';
     const status = document.createElement('span');
