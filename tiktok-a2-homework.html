@@ -38,23 +38,7 @@
   <label class="task" for="home-feed"><span>My feed in five sentences</span><textarea id="home-feed" data-answer="home-feed" aria-label="My feed in five sentences" rows="4"></textarea></label>
 </section>
   </main>
-  <dialog id="dictionary" aria-labelledby="dictionaryTitle">
-    <div class="menu-top"><h2 id="dictionaryTitle">Мой словарь</h2><button id="closeDict" type="button">Закрыть</button></div>
-    <form id="wordForm">
-      <label class="field-label" for="newWord">Слово или фраза</label>
-      <input id="newWord" required maxlength="150">
-      <label class="field-label" for="newMeaning">Перевод</label>
-      <input id="newMeaning" required maxlength="300">
-      <div class="dict-actions"><button class="primary" type="submit">Добавить</button></div>
-    </form>
-    <p id="dictStatus" role="status"></p>
-    <ul id="wordList"></ul>
-  </dialog>
-  <aside id="translationPop" aria-label="Перевод" hidden>
-    <div class="actions"><strong id="selectedWord"></strong><button type="button" id="closePop" aria-label="Закрыть перевод">×</button></div>
-    <p><textarea id="selectedMeaning" aria-label="Перевод" rows="2"></textarea></p>
-    <div class="translation-entry"><button type="button" id="saveSelected" aria-label="Добавить в словарь">+</button></div>
-    <p id="translateStatus" role="status"></p>
-  </aside>
+  <script src="assets/gostudy-vocabulary.js?v=1" data-component="dictionary-1"></script>
+  <script src="assets/gostudy-vocabulary.js?v=1" data-component="translation-1"></script>
 </body>
 </html>
