@@ -50,3 +50,8 @@ button,.cta{border-radius:5px;min-height:34px;padding:6px 13px;font-size:14px;fo
 
 .sheet h1[tabindex="-1"]:focus{outline:none}
 @media(max-width:780px){.word-options{position:static;max-width:100%;margin-top:4px}}
+
+.word-menu summary{min-height:34px;border-radius:6px;padding-inline:12px;color:#236479}
+.word-options{padding:5px;box-shadow:0 8px 24px #24496324}
+.word-options button{min-height:36px;border-radius:4px}
+.word-options button[aria-pressed=true]{font-weight:650}
