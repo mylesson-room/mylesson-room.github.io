@@ -518,7 +518,7 @@
     if (!page || !content) return;
     const style = document.createElement('link');
     style.rel = 'stylesheet';
-    style.href = 'assets/gostudy-classroom.css?v=1';
+    style.href = 'assets/gostudy-classroom.css?v=2';
     document.head.append(style);
     const root = document.createElement('aside');
     root.className = 'gostudy-classroom';
@@ -535,11 +535,11 @@
     send.className = 'gostudy-classroom-send';
     send.type = 'button';
     send.textContent = 'Добавить ученику';
-    send.disabled = true;
     const sendStatus = document.createElement('p');
     sendStatus.className = 'gostudy-classroom-send-status';
     sendStatus.setAttribute('role','status');
     if (popup && sourceButton) {
+      popup.classList.add('gostudy-classroom-translation');
       sourceButton.style.setProperty('display','none','important');
       popup.append(send,sendStatus);
     }
@@ -590,7 +590,6 @@
       wordItems(assignedWords,student?.assigned);
       summary.textContent = student ? (student.label || 'Ученик') + ' · Слова: '+count : 'Ученик';
       inlineAnswers();
-      send.disabled = !student || sending;
     }
 
     async function refresh() {
@@ -617,7 +616,18 @@
     }
 
     send.addEventListener('click',async () => {
-      if (!student || sending) return;
+      if (sending) return;
+      if (!session) {
+        const login = document.createElement('a');
+        login.href = root.querySelector('a').href;
+        login.textContent = 'Войти в кабинет преподавателя';
+        sendStatus.replaceChildren('Для отправки слова войдите в GoStudy. ',login);
+        return;
+      }
+      if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(classroomStudent)) {
+        sendStatus.textContent = 'Откройте урок через список уроков выбранного ученика.';
+        return;
+      }
       let en = document.getElementById('selectedWord')?.textContent.trim() || '';
       let ru = document.getElementById('selectedMeaning')?.value.trim() || '';
       if (/[а-яё]/i.test(en) && /[a-z]/i.test(ru) && !/[а-яё]/i.test(ru)) [en,ru] = [ru,en];
@@ -629,13 +639,13 @@
       send.disabled = true;
       sendStatus.textContent = 'Добавляем…';
       try {
-        await assignClassroomWord(page.course,student.id,en,ru);
+        await assignClassroomWord(page.course,classroomStudent,en,ru);
         sendStatus.textContent = 'Слово добавлено ученику.';
         refresh();
       } catch (error) { sendStatus.textContent = error.message; }
       finally {
         sending = false;
-        send.disabled = !student;
+        send.disabled = false;
       }
     });
     document.addEventListener('click',event => {

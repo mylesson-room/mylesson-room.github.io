@@ -16,3 +16,6 @@
 .gostudy-classroom-send:disabled{opacity:.55;cursor:default}
 .gostudy-classroom-send-status{margin:5px 0 0;font-size:13px}
 @media(max-width:600px){.gostudy-classroom{top:68px;right:8px}.gostudy-classroom-panel{max-height:53vh}}
+
+#translationPop.gostudy-classroom-translation .translation-entry{grid-template-columns:minmax(0,1fr)}
+#translationPop.gostudy-classroom-translation #selectedMeaning{grid-column:1/-1;width:100%;min-width:0;box-sizing:border-box;writing-mode:horizontal-tb}
