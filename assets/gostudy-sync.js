@@ -56,6 +56,16 @@
   const accountPage = 'gostudy-account.html' + (pharmaC1 ? '?course=pharma-c1' : firstSales ? '?course=first-sales' : feedB2 ? '?course=feed-b2' : financeB1 ? '?course=finance-b1' : travelA2 ? '?course=travel-a2' : '');
   const cabinetPage = pharmaC1 ? 'student-pharma.html' : firstSales ? 'student-first-sales.html' : feedB2 ? 'student-feed-b2.html' : financeB1 ? 'student-finance-b1.html' : travelA2 ? 'student-travel-a2.html' : 'student-travel-b2.html';
   const table = '/rest/v1/gostudy_progress';
+  const classroomCatalog = {"travel_a2":{"name":"Travel A2+","lessons":[{"title":"A weekend away","lesson":"travel-weekend-a2.html","homework":"travel-a2-homework.html","lessonKey":"gostudy-travel-a2plus-v1","homeworkKey":"gostudy-travel-a2plus-homework-v1"},{"title":"A day out in York","lesson":"travel-a2-02.html","homework":"travel-a2-02-homework.html","lessonKey":"gostudy-travel-a2plus-02-v1","homeworkKey":"gostudy-travel-a2plus-02-homework-v1"},{"title":"A day by the sea","lesson":"travel-a2-03.html","homework":"travel-a2-03-homework.html","lessonKey":"gostudy-travel-a2plus-03-v1","homeworkKey":"gostudy-travel-a2plus-03-homework-v1"},{"title":"The train is late","lesson":"travel-a2-04.html","homework":"travel-a2-04-homework.html","lessonKey":"gostudy-travel-a2plus-04-v1","homeworkKey":"gostudy-travel-a2plus-04-homework-v1"}]},"finance_b1":{"name":"Finance B1","lessons":[{"title":"Money moves","lesson":"finance-b1.html","homework":"finance-b1-homework.html","lessonKey":"gostudy-finance-b1-v1","homeworkKey":"gostudy-finance-b1-homework-v1"},{"title":"Where did my money go?","lesson":"finance-b1-02.html","homework":"finance-b1-02-homework.html","lessonKey":"gostudy-finance-b1-02-v1","homeworkKey":"gostudy-finance-b1-02-homework-v1"}]},"feed_b2":{"name":"Feed B2","lessons":[{"title":"Your feed, your choice?","lesson":"feed-choice-b2.html","homework":"feed-choice-b2.html#homework","lessonKey":"gostudy-feed-b2-v1","homeworkKey":"gostudy-feed-b2-v1"},{"title":"Before you share","lesson":"feed-b2-02.html","homework":"feed-b2-02-homework.html","lessonKey":"gostudy-feed-b2-02-v1","homeworkKey":"gostudy-feed-b2-02-homework-v1"},{"title":"Who’s selling what?","lesson":"feed-b2-03.html","homework":"feed-b2-03-homework.html","lessonKey":"gostudy-feed-b2-03-v1","homeworkKey":"gostudy-feed-b2-03-homework-v1"},{"title":"A real photo, a false story","lesson":"feed-b2-04.html","homework":"feed-b2-04-homework.html","lessonKey":"gostudy-feed-b2-04-v1","homeworkKey":"gostudy-feed-b2-04-homework-v1"}]},"first_sales":{"name":"First Sales C1","lessons":[{"title":"Your First Sales Interview","lesson":"first-sales-c1.html","homework":"first-sales-c1-homework.html","lessonKey":"gostudy-first-sales-c1-v1","homeworkKey":"gostudy-first-sales-c1-homework-v1"},{"title":"Your First Discovery Call","lesson":"first-sales-c1-02.html","homework":"first-sales-c1-02-homework.html","lessonKey":"gostudy-first-sales-c1-02-v1","homeworkKey":"gostudy-first-sales-c1-02-homework-v1"}]},"pharma_c1":{"name":"Pharma C1","lessons":[{"title":"Pharma marketing: beyond the launch","lesson":"pharma-c1.html","homework":"pharma-c1.html#homework","lessonKey":"gostudy-pharma-c1-v1","homeworkKey":"gostudy-pharma-c1-v1"},{"title":"From feedback to strategy","lesson":"pharma-c1-02.html","homework":"pharma-c1-02-homework.html","lessonKey":"gostudy-pharma-c1-02-v1","homeworkKey":"gostudy-pharma-c1-02-homework-v1"},{"title":"Can AI Help Doctors Spot Cancer?","lesson":"pharma-c1-03.html","homework":"pharma-c1-03-homework.html","lessonKey":"gostudy-pharma-c1-03-v1","homeworkKey":"gostudy-pharma-c1-03-homework-v1"}]}};
+  const classroomStudent = new URLSearchParams(location.search).get('classStudent');
+  const previewRecords = classroomStudent === null ? null : new Map();
+  const classroomPages = new Map(Object.entries(classroomCatalog).flatMap(([course, spec]) =>
+    spec.lessons.flatMap(lesson => [[lesson.lesson, {course, key:lesson.lessonKey}], [lesson.homework.split('#')[0], {course, key:lesson.homeworkKey}]])));
+  function classroomLink(path, student) {
+    const url = new URL(path, location.href);
+    url.searchParams.set('classStudent', student);
+    return url.pathname.split('/').pop() + url.search + url.hash;
+  }
   const json = (value, fallback = null) => {
     try { return JSON.parse(value) ?? fallback; } catch { return fallback; }
   };
@@ -94,9 +104,14 @@
 
   window.GoStudyStorage = {
     getItem(key) {
+      if (previewRecords && keys.has(key)) return previewRecords.get(key) ?? null;
       return session && keys.has(key) ? readRecord(key).value : localStorage.getItem(key);
     },
     setItem(key, value) {
+      if (previewRecords && keys.has(key)) {
+        previewRecords.set(key, String(value));
+        return;
+      }
       if (!session || !keys.has(key)) {
         localStorage.setItem(key, value);
         return;
@@ -469,6 +484,178 @@
     refresh();
   }
 
+  function wordItems(target, words) {
+    const entries = Array.isArray(words) ? words.filter(word => word && typeof word.en === 'string' && typeof word.ru === 'string') : [];
+    target.replaceChildren(...entries.map(word => {
+      const item = document.createElement('li');
+      item.textContent = word.en + ' — ' + word.ru;
+      return item;
+    }));
+    if (!entries.length) {
+      const item = document.createElement('li');
+      item.textContent = 'Пока пусто.';
+      target.append(item);
+    }
+    return entries.length;
+  }
+
+  function answerText(value) {
+    return Array.isArray(value) ? value.join(' → ') :
+      typeof value === 'object' ? JSON.stringify(value) :
+      typeof value === 'boolean' ? (value ? 'Отмечено' : 'Снято') : String(value);
+  }
+
+  async function assignClassroomWord(course, student, en, ru) {
+    const response = await request('/rest/v1/rpc/gostudy_' + course + '_assign_word', {
+      method:'POST',body:{p_student:student,p_en:en,p_ru:ru},
+    },await token());
+    if (!response.ok || response.data !== true) throw new Error('Не удалось добавить слово. Проверьте доступ и поля.');
+  }
+
+  function mountClassroom() {
+    const page = classroomPages.get(location.pathname.split('/').pop());
+    const content = document.getElementById('content');
+    if (!page || !content) return;
+    const style = document.createElement('link');
+    style.rel = 'stylesheet';
+    style.href = 'assets/gostudy-classroom.css?v=1';
+    document.head.append(style);
+    const root = document.createElement('aside');
+    root.className = 'gostudy-classroom';
+    root.innerHTML = '<a class="gostudy-classroom-back" href="gostudy-teacher.html">← К ученикам</a><details><summary>Ученик</summary><div class="gostudy-classroom-panel"><p role="status"></p><h3>Ответы в этом разделе</h3><dl></dl><h3>Слова ученика</h3><ul></ul><h3>Назначенные слова</h3><ul></ul></div></details>';
+    document.body.append(root);
+    root.querySelector('a').href = 'gostudy-teacher.html?selected='+encodeURIComponent(page.course+':'+classroomStudent);
+    const summary = root.querySelector('summary');
+    const panelStatus = root.querySelector('[role="status"]');
+    const answers = root.querySelector('dl');
+    const [studentWords,assignedWords] = root.querySelectorAll('ul');
+    const sourceButton = document.getElementById('saveSelected');
+    const popup = document.getElementById('translationPop');
+    const send = document.createElement('button');
+    send.className = 'gostudy-classroom-send';
+    send.type = 'button';
+    send.textContent = 'Добавить ученику';
+    send.disabled = true;
+    const sendStatus = document.createElement('p');
+    sendStatus.className = 'gostudy-classroom-send-status';
+    sendStatus.setAttribute('role','status');
+    if (popup && sourceButton) {
+      sourceButton.style.setProperty('display','none','important');
+      popup.append(send,sendStatus);
+    }
+    let student;
+    let signature = '';
+    let busy = false;
+    let sending = false;
+
+    function inlineAnswers() {
+      content.querySelectorAll('.gostudy-student-answer').forEach(node => node.remove());
+      const progress = student?.progress?.find(row => row.key === page.key);
+      const values = progress?.answers || {};
+      const groups = new Map();
+      const controls = content.querySelectorAll('[data-q],[data-answer],[data-can],.gap-options input[type="radio"]');
+      for (const control of controls) {
+        const group = control.closest('.question,.gap-options');
+        const key = control.dataset.q ? 'q'+control.dataset.q.replace(':','-') : control.dataset.answer || control.dataset.can || (group?.classList.contains('gap-options') ? group.id : '');
+        if (!key || !Object.hasOwn(values,key)) continue;
+        const value = values[key];
+        if (value === '' || value === null || value === undefined) continue;
+        const saved = groups.get(key);
+        const chosen = control.type === 'radio' && (String(value)===control.value || String(value)===control.closest('.option')?.querySelector('.option-text,span')?.textContent?.trim());
+        if (saved && !chosen) continue;
+        const optionText = chosen ? control.closest('.option')?.querySelector('.option-text,span')?.textContent?.trim() : '';
+        groups.set(key,{anchor:group || control,label:group?.querySelector('p')?.textContent?.trim() || control.getAttribute('aria-label') || control.placeholder || 'Задание '+(groups.size+1), value:optionText || answerText(value)});
+      }
+      answers.replaceChildren();
+      if (!groups.size) {
+        const empty = document.createElement('dd');
+        empty.textContent = 'В этом разделе пока нет ответов.';
+        answers.append(empty);
+      }
+      for (const {anchor,label,value} of groups.values()) {
+        const note = document.createElement('span');
+        note.className = 'gostudy-student-answer';
+        note.textContent = 'Ответ ученика: '+value;
+        anchor.after(note);
+        const name = document.createElement('dt');
+        const result = document.createElement('dd');
+        name.textContent = label;
+        result.textContent = value;
+        answers.append(name,result);
+      }
+    }
+
+    function render() {
+      const count = wordItems(studentWords,student?.words);
+      wordItems(assignedWords,student?.assigned);
+      summary.textContent = student ? (student.label || 'Ученик') + ' · Слова: '+count : 'Ученик';
+      inlineAnswers();
+      send.disabled = !student || sending;
+    }
+
+    async function refresh() {
+      if (busy || document.hidden) return;
+      if (!session) {
+        panelStatus.textContent = 'Войдите в кабинет преподавателя, чтобы открыть данные ученика.';
+        return;
+      }
+      busy = true;
+      try {
+        const response = await request('/rest/v1/rpc/gostudy_' + page.course + '_teacher_view',{method:'POST',body:{}},await token());
+        if (!response.ok || !Array.isArray(response.data)) throw new Error('Данные ученика временно недоступны.');
+        const selected = response.data.find(row => row.id===classroomStudent);
+        const next = JSON.stringify(selected ?? null);
+        student = selected;
+        if (signature !== next) {
+          signature = next;
+          render();
+        }
+        panelStatus.textContent = student ? 'Ответы и слова обновляются автоматически.' : 'Этот ученик не привязан к вашему аккаунту для этого курса.';
+      } catch (error) {
+        panelStatus.textContent = error.message;
+      } finally { busy = false; }
+    }
+
+    send.addEventListener('click',async () => {
+      if (!student || sending) return;
+      let en = document.getElementById('selectedWord')?.textContent.trim() || '';
+      let ru = document.getElementById('selectedMeaning')?.value.trim() || '';
+      if (/[а-яё]/i.test(en) && /[a-z]/i.test(ru) && !/[а-яё]/i.test(ru)) [en,ru] = [ru,en];
+      if (!en || !ru) {
+        sendStatus.textContent = 'Выделите слово и дождитесь перевода или введите его.';
+        return;
+      }
+      sending = true;
+      send.disabled = true;
+      sendStatus.textContent = 'Добавляем…';
+      try {
+        await assignClassroomWord(page.course,student.id,en,ru);
+        sendStatus.textContent = 'Слово добавлено ученику.';
+        refresh();
+      } catch (error) { sendStatus.textContent = error.message; }
+      finally {
+        sending = false;
+        send.disabled = !student;
+      }
+    });
+    document.addEventListener('click',event => {
+      const link = event.target.closest('a[href]');
+      if (!link) return;
+      const url = new URL(link.href,location.href);
+      if (url.origin === location.origin && classroomPages.get(url.pathname.split('/').pop())?.course === page.course) {
+        link.href = classroomLink(url.pathname.split('/').pop()+url.hash,classroomStudent);
+      }
+    },true);
+    new MutationObserver(inlineAnswers).observe(content,{childList:true});
+    render();
+    refresh();
+    if (session) {
+      const poll = setInterval(refresh,3500);
+      window.addEventListener('pagehide',event => { if (!event.persisted) clearInterval(poll); });
+      document.addEventListener('visibilitychange',refresh);
+    }
+  }
+
   function mountTeacher() {
     const login = document.getElementById('teacher-login');
     const dashboard = document.getElementById('teacher-dashboard');
@@ -527,30 +714,35 @@
     };
     const pharmaThreeLabels = {"q0-0":"What does the speaker suggest before a wider launch?","q0-1":"Why might the Swedish results differ at this hospital?","q0-2":"Which outcomes does the speaker want to track?","q1-0":"What changed in the AI-supported group?","q1-1":"What does the 44% figure describe?","q1-2":"What could a hospital reasonably ask next?","q2-0":"What does 6.4 versus 5.0 per 1,000 show?","q2-1":"Which headline best fits the evidence?","pharmaPilot":"Решение о пробном запуске","pharmaHeadline":"Заголовок о результатах"};
     const pharmaThreeHomeworkLabels = {"q0-0":"What is the role of AI in the Swedish trial?","q0-1":"What can we say about 44%?","q0-2":"What would a sensible local pilot track?","q1-0":"Which line is suitable for a report?","q1-1":"A patient asks who reviews the scan. Which reply is clearest?"};
-    const courses = new Map([['travel_a2','Travel A2+'],['finance_b1','Finance B1'],['feed_b2','Feed B2'],['first_sales','First Sales C1'],['pharma_c1','Pharma C1']]);
+    const courses = new Map(Object.entries(classroomCatalog).map(([id,course]) => [id,course.name]));
     const rosterByCourse = new Map();
     let students = [];
+    let studentEmails = new Map();
     let signature = '';
     let busy = false;
     let pollTimer;
-    function listWords(target, words) {
-      const entries = Array.isArray(words) ? words.filter(word => word && typeof word.en === 'string' && typeof word.ru === 'string') : [];
-      target.replaceChildren(...entries.map(word => {
-        const item = document.createElement('li');
-        item.textContent = word.en + ' — ' + word.ru;
-        return item;
-      }));
-      if (!entries.length) {
-        const item = document.createElement('li');
-        item.textContent = 'Пока пусто.';
-        target.append(item);
-      }
-    }
     function renderStudent() {
       const student = students.find(row => row.selection === studentPicker.value);
       wordForm.hidden = !student;
-      listWords(studentWords, student?.words);
-      listWords(assignedWords, student?.assigned);
+      wordItems(studentWords, student?.words);
+      wordItems(assignedWords, student?.assigned);
+      const classroom = document.getElementById('teacher-classroom');
+      const catalog = student && classroomCatalog[student.course];
+      classroom.hidden = !catalog;
+      const heading = document.getElementById('teacher-classroom-title');
+      const lessonList = document.getElementById('teacher-classroom-lessons');
+      heading.textContent = catalog ? 'Класс · '+catalog.name : '';
+      lessonList.replaceChildren(...(catalog?.lessons || []).map((lesson,index) => {
+        const row = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = classroomLink(lesson.lesson,student.id);
+        link.textContent = 'Урок '+(index+1)+' · '+lesson.title;
+        const homework = document.createElement('a');
+        homework.href = classroomLink(lesson.homework,student.id);
+        homework.textContent = 'Домашнее задание';
+        row.append(link,homework);
+        return row;
+      }));
       answerList.replaceChildren();
       for (const [key,label] of lessonLabels) {
         const progress = student?.progress?.find(row => row.key === key);
@@ -566,7 +758,7 @@
           const question = document.createElement('dt');
           const answer = document.createElement('dd');
           question.textContent = (key==='gostudy-travel-a2plus-04-v1' && lesson4Labels[id]) || (key==='gostudy-finance-b1-02-v1' && finance2Labels[id]) || (key==='gostudy-first-sales-c1-02-v1' && discoveryLabels[id]) || (key==='gostudy-first-sales-c1-02-homework-v1' && discoveryHomeworkLabels[id]) || (key==='gostudy-pharma-c1-03-v1' && pharmaThreeLabels[id]) || (key==='gostudy-pharma-c1-03-homework-v1' && pharmaThreeHomeworkLabels[id]) || id;
-          answer.textContent = Array.isArray(value) ? value.join(' → ') : typeof value === 'object' ? JSON.stringify(value) : String(value);
+          answer.textContent = answerText(value);
           list.append(question,answer);
         }
         group.append(title,list);
@@ -583,21 +775,27 @@
       busy = true;
       try {
         const access = await token();
-        const results = await Promise.allSettled(Array.from(courses, async ([course,label]) => {
+        const lookup = async () => {
+          if (studentEmails.size && students.every(student => studentEmails.has(student.id))) return;
+          const response = await request('/rest/v1/rpc/gostudy_teacher_student_emails',{method:'POST',body:{}},access);
+          if (!response.ok || !Array.isArray(response.data)) throw new Error('Не удалось загрузить почту учеников.');
+          studentEmails = new Map(response.data.map(row => [row.id,row.email]));
+        };
+        const results = await Promise.allSettled([lookup(),...Array.from(courses, async ([course,label]) => {
           const response = await request('/rest/v1/rpc/gostudy_' + course + '_teacher_view', {method:'POST',body:{}}, access);
           if (!response.ok || !Array.isArray(response.data)) throw new Error(label);
           rosterByCourse.set(course, response.data.map(row => ({...row,course,selection:course+':'+row.id})));
-        }));
-        const roster = Array.from(courses.keys()).flatMap(course => rosterByCourse.get(course) || []);
+        })]);
+        const roster = Array.from(courses.keys()).flatMap(course => (rosterByCourse.get(course) || []).map(row => ({...row,email:studentEmails.get(row.id)})));
         const next = JSON.stringify(roster);
         if (signature !== next) {
-          const selected = studentPicker.value;
+          const selected = studentPicker.value || new URLSearchParams(location.search).get('selected');
           signature = next;
           students = roster;
           studentPicker.replaceChildren(...students.map(student => {
             const option = document.createElement('option');
             option.value = student.selection;
-            option.textContent = student.label;
+            option.textContent = student.email ? student.email+' · '+courses.get(student.course) : student.label;
             return option;
           }));
           if (students.some(student => student.selection === selected)) studentPicker.value = selected;
@@ -637,10 +835,7 @@
       try {
         const student = students.find(row => row.selection === studentPicker.value);
         if (!student || !courses.has(student.course)) throw new Error('Выберите ученика.');
-        const result = await request('/rest/v1/rpc/gostudy_' + student.course + '_assign_word',{method:'POST',body:{
-          p_student:student.id,p_en:wordForm.elements.en.value.trim(),p_ru:wordForm.elements.ru.value.trim(),
-        }},await token());
-        if (!result.ok || result.data !== true) throw new Error('Не удалось добавить слово. Проверьте доступ и поля.');
+        await assignClassroomWord(student.course,student.id,wordForm.elements.en.value.trim(),wordForm.elements.ru.value.trim());
         wordForm.reset();
         status.textContent = 'Слово добавлено.';
         refresh();
@@ -659,6 +854,7 @@
     if (document.getElementById('teacher-login')) mountTeacher();
     else if (document.getElementById('unified-login')) mountUnifiedAccount();
     else if (document.getElementById('cloud-login')) mountAccount();
+    else if (classroomStudent !== null) mountClassroom();
     else { mountLesson(); mountTeacherWords(); }
   });
 })();
