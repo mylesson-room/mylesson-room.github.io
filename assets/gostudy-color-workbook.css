@@ -1,0 +1,42 @@
+.color-workbook{background:radial-gradient(ellipse at 85% 8%,#e6f0ff 0,transparent 38%),#edf3f9}
+.color-workbook .sheet{border-radius:12px;box-shadow:0 9px 34px #183e6410}
+.color-workbook progress{height:4px}
+.color-workbook .lesson-cover{border-radius:10px}
+.color-workbook .travel-route,.color-workbook .travel-cards{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(135px,100%),1fr));margin:0 0 18px}
+.travel-route>div,.travel-cards>div{display:grid;align-content:start;gap:4px;min-width:0;padding:13px 14px;border:1px solid #d4e8f8;border-radius:12px;background:#eaf6ff;color:#1b4162}
+.travel-route>div:nth-child(2),.travel-cards>div:nth-child(2){background:#fff1d9;border-color:#f0dfbb;color:#634918}
+.travel-route>div:nth-child(3),.travel-cards>div:nth-child(3){background:#e9f7ef;border-color:#d4e9dc;color:#245840}
+.travel-route span,.travel-cards span,.travel-alert>span{display:grid;place-items:center;width:37px;height:37px;border-radius:11px;background:#ffffffbb;font-size:20px;line-height:1;margin-bottom:3px}
+.travel-route strong,.travel-cards strong,.travel-alert strong{font-size:15px;line-height:1.25}
+.travel-route small,.travel-cards small,.travel-alert small{display:block;font-size:13px;line-height:1.4}
+.travel-cards b{font-size:14px}
+.travel-alert{display:flex;align-items:center;gap:12px;border:1px solid #e1ddf8;border-radius:11px;padding:10px 13px;margin-bottom:15px;background:linear-gradient(108deg,#eee9ff,#e5f5ff);color:#36436d}
+.travel-alert>span{margin:0;flex:none}
+.color-workbook .activity .options label:hover{background:#ebf9ff}
+.color-workbook .order li:hover{border-color:#a0d3e6;background:#f3fbff}
+.color-workbook .word-options button:hover{background:#e1f5ff}
+.color-workbook .glass-lesson-tools .glass-icon{width:46px;height:46px;min-height:0;padding:0;font-size:22px;line-height:1;display:grid;place-items:center;background:#176fae}
+.color-workbook .glass-words{background:linear-gradient(145deg,#ffffff58,#e1f3ff38 54%,#f7fbff70);-webkit-backdrop-filter:blur(19px) saturate(175%);backdrop-filter:blur(19px) saturate(175%);border-color:#ffffffbb;box-shadow:0 22px 55px #16395842,inset 0 1px 1px #ffffffd9}
+.color-workbook .glass-words::backdrop{background:#153b572b;backdrop-filter:none}
+.color-workbook .glass-words .glass-tabs{background:#eaf5ff80}
+.color-workbook .glass-words .glass-form input{background:#ffffffa8}
+.color-workbook .glass-words .glass-form label{color:#213d59}
+.color-workbook .glass-form:has(.glass-pronounce){grid-template-columns:minmax(0,1fr) auto}
+.color-workbook .glass-form:has(.glass-pronounce) label{grid-column:1/-1}
+.color-workbook .glass-form .glass-pronounce{justify-self:end}
+.color-workbook .glass-pronounce:disabled{opacity:.55;cursor:default}
+@media(prefers-reduced-motion:no-preference){
+ .color-workbook .travel-route>div,.color-workbook .travel-cards>div,.color-workbook .travel-alert{animation:travel-arrive .24s ease-out both}
+ .color-workbook .travel-route>div:nth-child(2),.color-workbook .travel-cards>div:nth-child(2){animation-delay:.045s}
+ .color-workbook .travel-route>div:nth-child(3),.color-workbook .travel-cards>div:nth-child(3){animation-delay:.09s}
+ .color-workbook [data-result=correct] .feedback{animation:travel-arrive .2s ease-out}
+ .color-workbook .glass-words[open]{animation:travel-arrive .2s ease-out}
+ .color-workbook .glass-icon,.color-workbook .travel-cards>div{transition:transform .18s ease}
+ .color-workbook .glass-icon:hover,.color-workbook .travel-cards>div:hover{transform:translateY(-2px)}
+}
+@keyframes travel-arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:440px){.color-workbook .travel-route,.color-workbook .travel-cards{grid-template-columns:1fr}.travel-route>div,.travel-cards>div{grid-template-columns:38px minmax(0,1fr);column-gap:9px}.travel-route span,.travel-cards span{grid-row:1/span 3}}
+
+.country-workbook{background:radial-gradient(ellipse at 85% 8%,#e7f3e9,transparent 40%),#f2f6ee}
+.country-workbook .travel-alert{background:linear-gradient(110deg,#edf8db,#fff1d8);border-color:#dce8ca;color:#345239}
+.business-workbook .travel-alert{background:linear-gradient(110deg,#e9f2ff,#e9faf8);border-color:#d6e6f0;color:#254a63}
