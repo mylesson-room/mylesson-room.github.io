@@ -1,0 +1,218 @@
+(() => {
+  const course = document.body.dataset.vocabCourse;
+  const legacy = {
+    'business-ai':['gostudy-business-ai-shared-v1','gostudy-business-ai-b2c1-v1'],
+    'country-house':['gostudy-country-house-homework-a2-v1','gostudy-country-house-lesson-a2-v1','gostudy-country-house-lesson-02-a2-v1'],
+    'travel-b2':['gostudy-travel-disruptions-b2-v1','gostudy-travel-b2-02-v1']
+  }[course];
+  if (!legacy) return;
+  const key = 'gostudy-vocabulary-'+course+'-v1';
+  const storage = window.GoStudyStorage || localStorage;
+  const norm = text => String(text).trim().toLowerCase().replace(/\s+/g,' ').replace(/[.!?,;:]+$/,'');
+  const russian = /[а-яё]/i;
+  const lesson = document.querySelector('.sheet');
+  const by = (root,selector) => root.querySelector(selector);
+  const button = (label,action,cls='') => Object.assign(document.createElement('button'),{type:'button',textContent:label,onclick:action,className:cls});
+  const dictionary = document.createElement('dialog');
+  dictionary.className = 'glass-words';
+  dictionary.setAttribute('aria-labelledby','glass-vocab-title');
+  dictionary.innerHTML = '<div class="glass-title"><h2 id="glass-vocab-title">Мой словарь</h2><button type="button" class="glass-close" aria-label="Закрыть">×</button></div><nav class="glass-tabs" aria-label="Словарь и тренировка"></nav><section class="glass-library"><form class="glass-form"><label>Слово или фраза<input required maxlength="200" autocomplete="off" name="term"></label><label>Перевод<input required maxlength="300" autocomplete="off" name="meaning"></label><button type="submit" class="glass-primary">Добавить в словарь</button></form><p class="glass-status" role="status"></p><ul class="glass-list"></ul></section><section class="glass-practice" hidden></section>';
+  document.body.append(dictionary);
+  const library = by(dictionary,'.glass-library');
+  const practice = by(dictionary,'.glass-practice');
+  const form = by(dictionary,'form');
+  const term = form.elements.term, meaning = form.elements.meaning;
+  const status = by(dictionary,'.glass-status');
+  const tabs = by(dictionary,'.glass-tabs');
+  const cache = new Map();
+  const glossary = {
+    'roll out':'внедрять', 'rollout':'внедрение', 'pilot':'пилотный проект', 'outweigh':'перевешивать', 'sign off on':'официально одобрить', 'attributed to':'объясняется', 'case mix':'состав обращений', 'routine billing':'стандартные вопросы по оплате', 'caveat':'оговорка', 'trade-off':'компромисс', 'draft':'черновик', 'reviewer':'проверяющий',
+    'shed':'сарай', 'porch':'крыльцо', 'kettle':'чайник', 'washing line':'бельевая верёвка', 'set the table':'накрыть на стол', 'bring in':'занести внутрь', 'watering can':'лейка', 'washing':'бельё', 'guests':'гости', 'at the moment':'в данный момент',
+    'reroute':'направить другим маршрутом', 'reimburse':'возмещать', 'reimbursed':'возмещён', 'step-free access':'доступ без ступеней', 'out-of-pocket expense':'расход из собственного кармана', 'advance approval':'предварительное согласование', 'miss a connection':'пропустить пересадку', 'replacement coach':'автобус на замену', 'receipt':'чек', 'lift':'лифт', 'fare':'стоимость проезда', 'reimbursement cap':'лимит возмещения'
+  };
+  function read(store,name) {
+    try { const value = JSON.parse(store.getItem(name)); return Array.isArray(value) ? value : Array.isArray(value?.words) ? value.words : []; }
+    catch { return []; }
+  }
+  function words() {
+    const all = new Map();
+    for (const name of legacy) {
+      for (const store of [localStorage,storage]) for (const word of read(store,name)) {
+        if (word?.en && word?.ru) all.set(norm(word.en),word);
+      }
+    }
+    for (const store of [localStorage,storage]) for (const word of read(store,key)) {
+      if (word?.en && word?.ru) all.set(norm(word.en),word);
+    }
+    return [...all.values()];
+  }
+  function add(a,b) {
+    a=a.trim(); b=b.trim();
+    if (!a || !b) return false;
+    const [en,ru] = russian.test(a) && !russian.test(b) ? [b,a] : [a,b];
+    const list = words().filter(word => norm(word.en)!==norm(en));
+    const record = JSON.stringify({words:[...list,{en,ru}]});
+    try { storage.setItem(key,record); } catch { return false; }
+    return true;
+  }
+  async function translate(text) {
+    const normalized=norm(text);
+    const own=words().find(word=>norm(word.en)===normalized || norm(word.ru)===normalized);
+    if (own) return norm(own.en)===normalized ? own.ru : own.en;
+    if (glossary[normalized]) return glossary[normalized];
+    const reverse=Object.keys(glossary).find(en=>norm(glossary[en])===normalized);
+    if (reverse) return reverse;
+    if (cache.has(normalized)) return cache.get(normalized);
+    if (new TextEncoder().encode(text).length>450) throw Error('Выделите более короткую фразу.');
+    const url='https://api.mymemory.translated.net/get?'+new URLSearchParams({q:text,langpair:russian.test(text)?'ru|en':'en|ru'});
+    const response=await fetch(url,{signal:AbortSignal.timeout(9000),credentials:'omit',referrerPolicy:'no-referrer'});
+    if (!response.ok) throw Error('Перевод недоступен. Его можно ввести вручную.');
+    const data=await response.json();
+    if (Number(data.responseStatus)!==200 || !data.responseData?.translatedText) throw Error('Перевод недоступен. Его можно ввести вручную.');
+    const result=new DOMParser().parseFromString(data.responseData.translatedText,'text/html').body.textContent;
+    cache.set(normalized,result);
+    return result;
+  }
+  function speak(text) {
+    if (!window.speechSynthesis) return;
+    const utterance=new SpeechSynthesisUtterance(text);
+    utterance.lang=russian.test(text)?'ru-RU':'en-GB';
+    speechSynthesis.cancel(); speechSynthesis.speak(utterance);
+  }
+  function renderWords() {
+    const list=by(dictionary,'.glass-list');
+    list.replaceChildren();
+    const saved=words();
+    if (!saved.length) { const empty=document.createElement('li'); empty.textContent='Пока пусто. Добавьте слово или выделите его в уроке.'; list.append(empty); }
+    for(const word of saved) {
+      const row=document.createElement('li');
+      const content=document.createElement('div');
+      const strong=document.createElement('strong');
+      const translation=document.createElement('span');
+      strong.textContent=word.en; translation.textContent=word.ru;
+      content.append(strong,translation);
+      row.append(content,button('Озвучить',()=>speak(word.en)));
+      list.append(row);
+    }
+  }
+  let generation=0, timer;
+  term.addEventListener('input',()=>{
+    clearTimeout(timer);
+    const run=++generation;
+    const text=term.value.trim();
+    meaning.value=''; status.textContent='';
+    if (!text) return;
+    timer=setTimeout(async()=>{
+      status.textContent='Переводим…';
+      try { const result=await translate(text); if(run===generation){meaning.value=result;status.textContent='';} }
+      catch(error){if(run===generation)status.textContent=error.message;}
+    },320);
+  });
+  meaning.addEventListener('input',()=>{++generation;clearTimeout(timer);status.textContent='';});
+  form.onsubmit=event=>{
+    event.preventDefault();
+    if (!add(term.value,meaning.value)) { status.textContent='Не удалось сохранить слово.'; return; }
+    ++generation; clearTimeout(timer); form.reset(); renderWords(); status.textContent='Слово добавлено.';
+  };
+  const modes={'cards':'Карточки','choice':'Выбрать перевод','type':'Ввести слово'};
+  let tab='words', index=0;
+  function show(mode,reset=true) {
+    if (reset || tab!==mode) index=0;
+    tab=mode;
+    library.hidden=tab!=='words';
+    practice.hidden=tab==='words';
+    tabs.replaceChildren(...Object.entries({words:'Словарь',...modes}).map(([id,title])=>{
+      const control=button(title,()=>show(id));
+      control.setAttribute('aria-pressed',id===tab);
+      return control;
+    }));
+    if(tab==='words'){renderWords();return;}
+    const saved=words();
+    practice.replaceChildren();
+    if(!saved.length){practice.textContent='Сначала добавьте слова в словарь.';return;}
+    const word=saved[index%saved.length];
+    const counter=document.createElement('p');counter.className='glass-status';counter.textContent=(index%saved.length+1)+' / '+saved.length;
+    const prompt=document.createElement('h3');prompt.textContent=tab==='type'?word.ru:word.en;
+    const feedback=document.createElement('p');feedback.setAttribute('role','status');
+    const next=button('Следующее слово',()=>{index++;show(tab,false);},'glass-primary');
+    practice.append(counter,prompt);
+    if(tab==='cards') practice.append(button('Показать перевод',()=>{feedback.textContent=word.ru;}),button('Озвучить',()=>speak(word.en)));
+    if(tab==='choice'){
+      const distractors=[...new Set(saved.map(item=>item.ru))].filter(ru=>norm(ru)!==norm(word.ru)).slice(0,3);
+      if(!distractors.length) practice.append(document.createTextNode('Для выбора перевода нужны хотя бы два разных перевода.'));
+      else{
+        const options=[...distractors]; options.splice(index%(options.length+1),0,word.ru);
+        const choices=document.createElement('div');choices.className='glass-choices';
+        for(const value of options)choices.append(button(value,()=>{feedback.textContent=value===word.ru?'Верно!':'Попробуйте ещё раз.';}));
+        practice.append(choices);
+      }
+    }
+    if(tab==='type'){
+      const checkForm=document.createElement('form');checkForm.className='glass-form';
+      const field=document.createElement('input');field.required=true;field.autocomplete='off';field.setAttribute('aria-label','Ответ на английском');
+      const check=button('Проверить',null);check.type='submit';
+      checkForm.append(field,check);
+      checkForm.onsubmit=event=>{event.preventDefault();feedback.textContent=norm(field.value)===norm(word.en)?'Верно!':'Попробуйте ещё раз.';};
+      practice.append(checkForm,button('Показать ответ',()=>{feedback.textContent=word.en;}));
+    }
+    practice.append(feedback,next);
+  }
+  function open(mode) {
+    closeTranslation();
+    show(mode);
+    if(!dictionary.open)dictionary.showModal();
+  }
+  by(dictionary,'.glass-close').onclick=()=>dictionary.close();
+  dictionary.addEventListener('click',event=>{
+    if(event.target!==dictionary)return;
+    const r=dictionary.getBoundingClientRect();
+    if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dictionary.close();
+  });
+  document.addEventListener('click',event=>{
+    const target=event.target.closest('.home-top-nav a,.home-top-nav button,.home-tools .home-tile');
+    if(!target)return;
+    const name=target.textContent.trim();
+    if(!name.startsWith('Словарь')&&!/^(Практика|Тренировки)/.test(name))return;
+    event.preventDefault();event.stopImmediatePropagation();open(name.startsWith('Словарь')?'words':'cards');
+  },true);
+  let translation, selected='', translationRun=0;
+  function closeTranslation(){if(translation)translation.hidden=true;selected='';++translationRun;}
+  if(!lesson)return;
+  const side=document.querySelector('.side');
+  if(!side)return;
+  const toolbar=document.createElement('div');toolbar.className='glass-lesson-tools';
+  toolbar.append(button('Словарь',()=>open('words'),'glass-primary'),button('Тренировать слова',()=>open('cards')));
+  by(side,'.panel').after(toolbar);
+  translation=document.createElement('section');translation.className='glass-translation';translation.hidden=true;
+  translation.setAttribute('aria-label','Перевод выделенного текста');
+  translation.innerHTML='<div class="glass-title"><strong></strong><button type="button" aria-label="Закрыть перевод">×</button></div><label>Перевод<textarea rows="2"></textarea></label><p role="status"></p><div class="glass-actions"></div>';
+  toolbar.after(translation);
+  const translated=by(translation,'textarea'), translationStatus=by(translation,'p');
+  by(translation,'.glass-title button').onclick=closeTranslation;
+  by(translation,'.glass-actions').append(button('Озвучить',()=>speak(selected)),button('В словарь',()=>{
+    if(!add(selected,translated.value)){translationStatus.textContent='Добавьте перевод, чтобы сохранить слово.';return;}
+    translationStatus.textContent='Добавлено в словарь.';
+  },'glass-primary'));
+  translated.oninput=()=>{++translationRun;translationStatus.textContent='';};
+  let selecting=false, selectionTimer;
+  function readSelection(){
+    if(selecting||dictionary.open)return;
+    const selection=window.getSelection();
+    if(!selection||selection.isCollapsed||!lesson.contains(selection.anchorNode)||!lesson.contains(selection.focusNode))return;
+    const text=selection.toString().trim().replace(/\s+/g,' ');
+    if(!/[a-zа-яё]/i.test(text)||text===selected)return;
+    selected=text;translation.hidden=false;by(translation,'strong').textContent=text;
+    translated.value='';translationStatus.textContent='Переводим…';
+    const run=++translationRun;
+    translate(text).then(result=>{if(run===translationRun){translated.value=result;translationStatus.textContent='';}}).catch(error=>{if(run===translationRun)translationStatus.textContent=error.message;});
+  }
+  document.addEventListener('pointerdown',event=>{
+    if(translation.contains(event.target))return;
+    selecting=lesson.contains(event.target);
+    if(!translation.hidden)closeTranslation();
+  });
+  document.addEventListener('pointerup',()=>{selecting=false;setTimeout(readSelection,0);});
+  document.addEventListener('pointercancel',()=>{selecting=false;});
+  document.addEventListener('selectionchange',()=>{clearTimeout(selectionTimer);selectionTimer=setTimeout(readSelection,220);});
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!dictionary.open)closeTranslation();});
+})();

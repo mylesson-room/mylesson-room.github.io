@@ -5,6 +5,7 @@
   const publicKey = 'sb_publishable_aAZxKwYpLcIXAjCiN5lBSg_qdFxvYwL';
   const authKey = 'gostudy-cloud-session-v1';
   const travelB2Keys = [
+    'gostudy-vocabulary-travel-b2-v1',
     'gostudy-travel-disruptions-b2-v1',
     'gostudy-travel-disruptions-b2-homework-v1',
     'gostudy-travel-b2-02-v1',
@@ -59,10 +60,10 @@
   const tiktokKeys = ['gostudy-tiktok-a2-v1', 'gostudy-tiktok-a2-homework-v1', 'gostudy-tiktok-a2-words-v1'];
   const currentPage = location.pathname.split('/').pop();
   const countryHouse = ['student-country-house.html','country-house-a2-03.html'].includes(currentPage);
-  const countryHouseKeys = ['gostudy-country-house-a2-03-v1'];
+  const countryHouseKeys = ['gostudy-vocabulary-country-house-v1','gostudy-country-house-a2-03-v1'];
   const travelB2Cabinet = currentPage === 'student-travel-b2.html';
   const businessAI = ['business-ai-b2c1-02.html','student-business-ai.html'].includes(location.pathname.split('/').pop());
-  const businessAIKeys = ['gostudy-business-ai-b2c1-02-v1'];
+  const businessAIKeys = ['gostudy-vocabulary-business-ai-v1','gostudy-business-ai-b2c1-02-v1'];
   const keys = new Set(tiktokA2 ? tiktokKeys : pharmaC1 ? pharmaKeys : firstSales ? salesKeys : feedB2 ? feedKeys : financeB1 ? financeKeys : travelA2 ? travelA2Keys : businessAI ? businessAIKeys : countryHouse ? countryHouseKeys : travelB2Keys);
   const courseName = tiktokA2 ? 'TikTok A2' : pharmaC1 ? 'Pharma C1' : firstSales ? 'First Sales C1' : feedB2 ? 'Feed B2' : financeB1 ? 'Finance B1' : travelA2 ? 'Travel A2+' : 'Travel B2';
   const accountPage = 'gostudy-account.html' + (tiktokA2 ? '?course=tiktok-a2' : pharmaC1 ? '?course=pharma-c1' : firstSales ? '?course=first-sales' : feedB2 ? '?course=feed-b2' : financeB1 ? '?course=finance-b1' : travelA2 ? '?course=travel-a2' : '');
@@ -458,10 +459,10 @@
     const open = home.querySelector('.home-open-lesson');
     const homework = home.querySelector('.home-homework-link');
     const dictionary = home.querySelector('a.home-tile');
-    open.href = lesson.lesson;
+    open.href = document.body.dataset.vocabCourse ? lesson.lesson + '&view=glass' : lesson.lesson;
     open.textContent = started.page > 0 || Object.keys(started.answers || {}).length ? 'Продолжить урок' : 'Открыть урок';
     homework.href = lesson.homework;
-    dictionary.href = courseHome ? courseHome.vocabulary : businessAI ? 'business-ai-b2c1.html#vocabulary' : tiktokA2 ? '#words' : lesson.lesson+'#vocabulary';
+    dictionary.href = document.body.dataset.vocabCourse ? '#student-home' : courseHome ? courseHome.vocabulary : businessAI ? 'business-ai-b2c1.html#vocabulary' : tiktokA2 ? '#words' : lesson.lesson+'#vocabulary';
     if (tiktokA2) dictionary.onclick = event => { event.preventDefault(); document.getElementById('dictBtn')?.click(); };
     const wordKey = courseHome ? courseHome.words : businessAI ? 'gostudy-business-ai-shared-v1' : {tiktok_a2:'gostudy-tiktok-a2-words-v1',first_sales:'gostudy-first-sales-shared-v1'}[course] || classroomCatalog[course].lessons[0].lessonKey;
     const dialog = home.querySelector('dialog');
