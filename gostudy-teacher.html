@@ -5,14 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GoStudy · Кабинет преподавателя</title>
 <link rel="stylesheet" href="assets/gostudy-sync.css?v=3">
-<script src="assets/gostudy-sync.js?v=17"></script>
+<script src="assets/gostudy-sync.js?v=18"></script>
 <style>.teacher-course-links{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px}.teacher-course-links .pharma-lesson-shortcut{display:inline-flex;align-items:center;min-height:40px;padding:0 12px;border-radius:10px;background:#2368b0;color:#fff;text-decoration:none;font-weight:650}.teacher-course-links .pharma-lesson-shortcut:hover{background:#164f8d}</style>
 <link rel="stylesheet" href="assets/gostudy-classroom.css?v=4">
 <style>#teacher-add-student{margin-top:16px}#teacher-add-student summary{font-weight:700}#teacher-add-student form{max-width:420px;margin-top:12px}#teacher-add-student select{font:inherit;padding:9px}</style>
+<link rel="stylesheet" href="assets/gostudy-cabinet.css?v=1">
 </head>
 <body class="cloud-account teacher-page">
 <main>
-  <header class="teacher-top"><strong>GoStudy</strong><nav class="teacher-course-links" aria-label="Уроки"><a href="student-travel-a2.html">Travel A2+</a><a class="pharma-lesson-shortcut" href="pharma-c1-03.html">Pharma C1 · Урок 3 →</a></nav></header>
+  <header class="teacher-top"><strong>GoStudy</strong><a href="login.html">Общий вход GoStudy</a></header>
   <h1>Кабинет преподавателя</h1>
   <p>Смотрите ответы учеников во время занятия и добавляйте слова в их словари.</p>
   <form id="teacher-login" method="post" hidden>
@@ -24,7 +25,7 @@
   </form>
   <p id="teacher-status" role="status"></p>
   <section id="teacher-dashboard" hidden>
-    <div class="teacher-controls"><label for="teacher-student">Ученик</label><select id="teacher-student"></select><button type="button" id="teacher-signout">Выйти</button></div>
+    <div class="teacher-layout"><aside class="teacher-panel teacher-roster"><h2>Ученики</h2><label for="teacher-student-search">Найти ученика</label><input id="teacher-student-search" type="search" placeholder="Имя, почта или курс"><div id="teacher-student-list"></div><select id="teacher-student" hidden aria-label="Ученик"></select><button type="button" id="teacher-signout">Выйти</button></aside><div class="teacher-workspace">
     <details id="teacher-add-student" class="teacher-panel" hidden>
       <summary>Добавить ученика</summary>
       <form method="post" autocomplete="off">
@@ -41,7 +42,7 @@
     </details>
     <section id="teacher-classroom" class="teacher-panel" hidden>
       <h2 id="teacher-classroom-title">Класс</h2>
-      <ul id="teacher-classroom-lessons"></ul>
+      <article class="home-current" id="teacher-current-lesson"></article><details><summary>Все уроки</summary><ul id="teacher-classroom-lessons"></ul></details>
     </section>
     <div class="teacher-grid">
       <section class="teacher-panel">
@@ -62,6 +63,7 @@
         <h3>Задал преподаватель</h3><ul id="teacher-assigned-words"></ul>
       </section>
     </div>
+    </div></div>
   </section>
 </main>
 </body>

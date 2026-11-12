@@ -413,6 +413,63 @@
     if (session) synchronize().catch(report);
   }
 
+  function mountStudentHome() {
+    const home = document.getElementById('student-home');
+    if (!home) return;
+    const course = tiktokA2 ? 'tiktok_a2' : pharmaC1 ? 'pharma_c1' : firstSales ? 'first_sales' : feedB2 ? 'feed_b2' : financeB1 ? 'finance_b1' : 'travel_a2';
+    const lesson = classroomCatalog[course].lessons.at(-1);
+    const started = json(GoStudyStorage.getItem(lesson.lessonKey),{});
+    home.innerHTML = '<article class="home-current"><p>Текущий урок</p><h2></h2><div class="home-actions"><a class="home-primary"></a><a>Домашнее задание</a></div></article><div class="home-tools"><a class="home-tile"><strong>Словарь</strong><small>Мои слова</small></a><button type="button" class="home-tile"><strong>Тренировки</strong><small>Повторить слова</small></button></div><dialog class="home-training"><h2>Тренировка слов</h2><p role="status"></p><strong class="home-prompt"></strong><p class="home-meaning" hidden></p><div class="home-actions"><button type="button" class="home-reveal">Показать перевод</button><button type="button" class="home-next">Следующее слово</button><button type="button" class="home-close">Закрыть</button></div></dialog>';
+    home.querySelector('h2').textContent = lesson.title;
+    const [open, homework, dictionary] = home.querySelectorAll('a');
+    open.href = lesson.lesson;
+    open.textContent = started.page > 0 || Object.keys(started.answers || {}).length ? 'Продолжить урок' : 'Открыть урок';
+    homework.href = lesson.homework;
+    dictionary.href = tiktokA2 ? '#words' : lesson.lesson+'#vocabulary';
+    if (tiktokA2) dictionary.onclick = event => { event.preventDefault(); document.getElementById('dictBtn')?.click(); };
+    const wordKey = {tiktok_a2:'gostudy-tiktok-a2-words-v1',first_sales:'gostudy-first-sales-shared-v1'}[course] || classroomCatalog[course].lessons[0].lessonKey;
+    const dialog = home.querySelector('dialog');
+    const status = dialog.querySelector('[role="status"]');
+    const prompt = dialog.querySelector('.home-prompt');
+    const meaning = dialog.querySelector('.home-meaning');
+    const reveal = dialog.querySelector('.home-reveal');
+    const next = dialog.querySelector('.home-next');
+    let words = [], index = 0, generation = 0;
+    function showWord() {
+      const word = words[index];
+      status.textContent = word ? (index+1)+' / '+words.length : 'В словаре пока нет слов.';
+      prompt.textContent = word?.en || '';
+      meaning.textContent = word?.ru || '';
+      meaning.hidden = true;
+      reveal.hidden = next.hidden = !word;
+    }
+    home.querySelector('button.home-tile').onclick = async () => {
+      const run = ++generation;
+      const saved = json(GoStudyStorage.getItem(wordKey),{});
+      const own = Array.isArray(saved) ? saved : Array.isArray(saved.words) ? saved.words : [];
+      words = own.filter(w => typeof w?.en === 'string' && typeof w.ru === 'string');
+      index = 0;
+      showWord();
+      dialog.showModal();
+      if (!session) return;
+      try {
+        const result = await request('/rest/v1/rpc/gostudy_'+course+'_my_words',{method:'POST',body:{}},await token());
+        if (!dialog.open || run !== generation || !result.ok || !Array.isArray(result.data)) return;
+        const combined = new Map(words.map(w => [w.en.trim().toLowerCase(),w]));
+        for (const w of result.data) if (typeof w?.en === 'string' && typeof w.ru === 'string') {
+          const key = w.en.trim().toLowerCase();
+          if (!combined.has(key)) combined.set(key,w);
+        }
+        words = [...combined.values()];
+        showWord();
+      } catch {}
+    };
+    reveal.onclick = () => { meaning.hidden = false; };
+    next.onclick = () => { if (words.length) index = (index+1)%words.length; showWord(); };
+    dialog.querySelector('.home-close').onclick = () => dialog.close();
+    document.body.classList.add('gostudy-student-home');
+  }
+
   async function mountTiktokCabinet(content) {
     const status = document.getElementById('cabinet-status');
     if (!session) {
@@ -428,6 +485,7 @@
       }
       status.hidden = true;
       content.hidden = false;
+      mountStudentHome();
       mountLesson();
       mountTeacherWords();
     } catch (error) {
@@ -895,7 +953,33 @@
     let signature = '';
     let busy = false;
     let pollTimer;
+    const studentSearch = document.getElementById('teacher-student-search');
+    const studentList = document.getElementById('teacher-student-list');
+    function renderStudentList() {
+      if (!studentList) return;
+      const query = studentSearch.value.trim().toLowerCase();
+      studentList.replaceChildren();
+      for (const student of students) {
+        const label = student.email || student.label;
+        const course = classroomCatalog[student.course]?.name || '';
+        if (!(label+' '+(student.label || '')+' '+course).toLowerCase().includes(query)) continue;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.setAttribute('aria-pressed',String(studentPicker.value===student.selection));
+        const name = document.createElement('strong');
+        name.textContent = label;
+        const subtitle = document.createElement('small');
+        subtitle.textContent = course;
+        button.append(name,subtitle);
+        button.onclick = () => { studentPicker.value = student.selection; renderStudent(); };
+        studentList.append(button);
+      }
+      if (!studentList.childElementCount) studentList.textContent = query ? 'Никого не нашли.' : 'Список пока пуст.';
+    }
+    if (studentSearch) studentSearch.oninput = renderStudentList;
+
     function renderStudent() {
+      renderStudentList();
       const student = students.find(row => row.selection === studentPicker.value);
       wordForm.hidden = !student;
       wordItems(studentWords, student?.words);
@@ -917,6 +1001,27 @@
         row.append(link,homework);
         return row;
       }));
+      const current = document.getElementById('teacher-current-lesson');
+      if (current) {
+        current.replaceChildren();
+        const active = catalog?.lessons.at(-1);
+        if (active) {
+          const label = document.createElement('p');
+          label.textContent = 'Текущий урок';
+          const title = document.createElement('h3');
+          title.textContent = active.title;
+          const actions = document.createElement('div');
+          actions.className = 'home-actions';
+          for (const [path,name] of [[active.lesson,'Войти в урок'],[active.homework,'Домашнее задание']]) {
+            const link = document.createElement('a');
+            link.href = classroomLink(path,student.id);
+            link.textContent = name;
+            if (path === active.lesson) link.className = 'home-primary';
+            actions.append(link);
+          }
+          current.append(label,title,actions);
+        }
+      }
       answerList.replaceChildren();
       for (const [key,label] of lessonLabels) {
         const progress = student?.progress?.find(row => row.key === key);
@@ -1037,6 +1142,6 @@
     else if (document.getElementById('cloud-login')) mountAccount();
     else if (document.getElementById('tiktok-cabinet')) mountTiktokCabinet(document.getElementById('tiktok-cabinet'));
     else if (classroomStudent !== null) mountClassroom();
-    else { mountLesson(); mountTeacherWords(); }
+    else { mountStudentHome(); mountLesson(); mountTeacherWords(); }
   });
 })();
