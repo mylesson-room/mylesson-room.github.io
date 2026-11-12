@@ -47,10 +47,14 @@
   const firstSales = salesPages.has(location.pathname.split('/').pop()) ||
     new URLSearchParams(location.search).get('course') === 'first-sales';
   const salesKeys = ['gostudy-first-sales-shared-v1','gostudy-first-sales-profile-v1','gostudy-first-sales-c1-v1','gostudy-first-sales-c1-homework-v1','gostudy-first-sales-c1-02-v1','gostudy-first-sales-c1-02-homework-v1'];
-  const keys = new Set(firstSales ? salesKeys : feedB2 ? feedKeys : financeB1 ? financeKeys : travelA2 ? travelA2Keys : travelB2Keys);
-  const courseName = firstSales ? 'First Sales C1' : feedB2 ? 'Feed B2' : financeB1 ? 'Finance B1' : travelA2 ? 'Travel A2+' : 'Travel B2';
-  const accountPage = 'gostudy-account.html' + (firstSales ? '?course=first-sales' : feedB2 ? '?course=feed-b2' : financeB1 ? '?course=finance-b1' : travelA2 ? '?course=travel-a2' : '');
-  const cabinetPage = firstSales ? 'student-first-sales.html' : feedB2 ? 'student-feed-b2.html' : financeB1 ? 'student-finance-b1.html' : travelA2 ? 'student-travel-a2.html' : 'student-travel-b2.html';
+  const pharmaPages = new Set(['student-pharma.html','pharma-c1.html','pharma-c1-02.html','pharma-c1-02-homework.html']);
+  const pharmaC1 = pharmaPages.has(location.pathname.split('/').pop()) ||
+    new URLSearchParams(location.search).get('course') === 'pharma-c1';
+  const pharmaKeys = ['gostudy-pharma-c1-v1','gostudy-pharma-profile-v1','gostudy-pharma-c1-02-v1','gostudy-pharma-c1-02-homework-v1'];
+  const keys = new Set(pharmaC1 ? pharmaKeys : firstSales ? salesKeys : feedB2 ? feedKeys : financeB1 ? financeKeys : travelA2 ? travelA2Keys : travelB2Keys);
+  const courseName = pharmaC1 ? 'Pharma C1' : firstSales ? 'First Sales C1' : feedB2 ? 'Feed B2' : financeB1 ? 'Finance B1' : travelA2 ? 'Travel A2+' : 'Travel B2';
+  const accountPage = 'gostudy-account.html' + (pharmaC1 ? '?course=pharma-c1' : firstSales ? '?course=first-sales' : feedB2 ? '?course=feed-b2' : financeB1 ? '?course=finance-b1' : travelA2 ? '?course=travel-a2' : '');
+  const cabinetPage = pharmaC1 ? 'student-pharma.html' : firstSales ? 'student-first-sales.html' : feedB2 ? 'student-feed-b2.html' : financeB1 ? 'student-finance-b1.html' : travelA2 ? 'student-travel-a2.html' : 'student-travel-b2.html';
   const table = '/rest/v1/gostudy_progress';
   const json = (value, fallback = null) => {
     try { return JSON.parse(value) ?? fallback; } catch { return fallback; }
@@ -284,8 +288,8 @@
   }
 
   function mountTeacherWords() {
-    if ((!travelA2 && !financeB1 && !feedB2 && !firstSales) || !session) return;
-    const course = firstSales ? 'first_sales' : feedB2 ? 'feed_b2' : financeB1 ? 'finance_b1' : 'travel_a2';
+    if ((!travelA2 && !financeB1 && !feedB2 && !firstSales && !pharmaC1) || !session) return;
+    const course = pharmaC1 ? 'pharma_c1' : firstSales ? 'first_sales' : feedB2 ? 'feed_b2' : financeB1 ? 'finance_b1' : 'travel_a2';
     const dictionary = document.getElementById('dictionary');
     const dictionaryButton = document.getElementById('dictBtn');
     const targets = [dictionary, document.getElementById('words')].filter(Boolean);
@@ -392,6 +396,9 @@
       ['gostudy-first-sales-c1-homework-v1','Домашка 1 · First Sales C1'],
       ['gostudy-first-sales-c1-02-v1','Урок 2 · Your First Discovery Call'],
       ['gostudy-first-sales-c1-02-homework-v1','Домашка 2 · First Sales C1'],
+      ['gostudy-pharma-c1-v1','Урок 1 · Beyond the launch'],
+      ['gostudy-pharma-c1-02-v1','Урок 2 · From feedback to strategy'],
+      ['gostudy-pharma-c1-02-homework-v1','Домашка 2 · Pharma C1'],
     ]);
     const lesson4Labels = {
       hwRead1:'Что делала Элла?', hwRead2:'Проблема с поездом в 10:45', hwRead3:'Почему решили подождать?',
@@ -410,7 +417,7 @@
       'q0-0':'Масштаб проблемы','q0-1':'Возражение о календаре','q0-2':'Следующий шаг',
       'q1-0':'Итог разговора','q1-1':'Конкретная договорённость',salesFollowUp:'Письмо после звонка',salesIntegration:'Что проверить перед интеграцией',
     };
-    const courses = new Map([['travel_a2','Travel A2+'],['finance_b1','Finance B1'],['feed_b2','Feed B2'],['first_sales','First Sales C1']]);
+    const courses = new Map([['travel_a2','Travel A2+'],['finance_b1','Finance B1'],['feed_b2','Feed B2'],['first_sales','First Sales C1'],['pharma_c1','Pharma C1']]);
     const rosterByCourse = new Map();
     let students = [];
     let signature = '';
