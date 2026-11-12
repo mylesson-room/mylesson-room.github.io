@@ -43,10 +43,14 @@
   const feedB2 = feedPages.has(location.pathname.split('/').pop()) ||
     new URLSearchParams(location.search).get('course') === 'feed-b2';
   const feedKeys = ['gostudy-feed-b2-v1','gostudy-feed-b2-profile-v1','gostudy-feed-b2-02-v1','gostudy-feed-b2-02-homework-v1','gostudy-feed-b2-03-v1','gostudy-feed-b2-03-homework-v1','gostudy-feed-b2-04-v1','gostudy-feed-b2-04-homework-v1'];
-  const keys = new Set(feedB2 ? feedKeys : financeB1 ? financeKeys : travelA2 ? travelA2Keys : travelB2Keys);
-  const courseName = feedB2 ? 'Feed B2' : financeB1 ? 'Finance B1' : travelA2 ? 'Travel A2+' : 'Travel B2';
-  const accountPage = 'gostudy-account.html' + (feedB2 ? '?course=feed-b2' : financeB1 ? '?course=finance-b1' : travelA2 ? '?course=travel-a2' : '');
-  const cabinetPage = feedB2 ? 'student-feed-b2.html' : financeB1 ? 'student-finance-b1.html' : travelA2 ? 'student-travel-a2.html' : 'student-travel-b2.html';
+  const salesPages = new Set(['student-first-sales.html','first-sales-c1.html','first-sales-c1-homework.html','first-sales-c1-02.html','first-sales-c1-02-homework.html']);
+  const firstSales = salesPages.has(location.pathname.split('/').pop()) ||
+    new URLSearchParams(location.search).get('course') === 'first-sales';
+  const salesKeys = ['gostudy-first-sales-shared-v1','gostudy-first-sales-profile-v1','gostudy-first-sales-c1-v1','gostudy-first-sales-c1-homework-v1','gostudy-first-sales-c1-02-v1','gostudy-first-sales-c1-02-homework-v1'];
+  const keys = new Set(firstSales ? salesKeys : feedB2 ? feedKeys : financeB1 ? financeKeys : travelA2 ? travelA2Keys : travelB2Keys);
+  const courseName = firstSales ? 'First Sales C1' : feedB2 ? 'Feed B2' : financeB1 ? 'Finance B1' : travelA2 ? 'Travel A2+' : 'Travel B2';
+  const accountPage = 'gostudy-account.html' + (firstSales ? '?course=first-sales' : feedB2 ? '?course=feed-b2' : financeB1 ? '?course=finance-b1' : travelA2 ? '?course=travel-a2' : '');
+  const cabinetPage = firstSales ? 'student-first-sales.html' : feedB2 ? 'student-feed-b2.html' : financeB1 ? 'student-finance-b1.html' : travelA2 ? 'student-travel-a2.html' : 'student-travel-b2.html';
   const table = '/rest/v1/gostudy_progress';
   const json = (value, fallback = null) => {
     try { return JSON.parse(value) ?? fallback; } catch { return fallback; }
@@ -280,8 +284,8 @@
   }
 
   function mountTeacherWords() {
-    if ((!travelA2 && !financeB1 && !feedB2) || !session) return;
-    const course = feedB2 ? 'feed_b2' : financeB1 ? 'finance_b1' : 'travel_a2';
+    if ((!travelA2 && !financeB1 && !feedB2 && !firstSales) || !session) return;
+    const course = firstSales ? 'first_sales' : feedB2 ? 'feed_b2' : financeB1 ? 'finance_b1' : 'travel_a2';
     const dictionary = document.getElementById('dictionary');
     const dictionaryButton = document.getElementById('dictBtn');
     const targets = [dictionary, document.getElementById('words')].filter(Boolean);
@@ -384,6 +388,10 @@
       ['gostudy-feed-b2-03-homework-v1','Домашка 3 · Feed B2'],
       ['gostudy-feed-b2-04-v1','Урок 4 · A real photo, a false story'],
       ['gostudy-feed-b2-04-homework-v1','Домашка 4 · Feed B2'],
+      ['gostudy-first-sales-c1-v1','Урок 1 · Your First Sales Interview'],
+      ['gostudy-first-sales-c1-homework-v1','Домашка 1 · First Sales C1'],
+      ['gostudy-first-sales-c1-02-v1','Урок 2 · Your First Discovery Call'],
+      ['gostudy-first-sales-c1-02-homework-v1','Домашка 2 · First Sales C1'],
     ]);
     const lesson4Labels = {
       hwRead1:'Что делала Элла?', hwRead2:'Проблема с поездом в 10:45', hwRead3:'Почему решили подождать?',
@@ -391,7 +399,18 @@
       hwG1:'I … on the platform', hwG2:'The assistant … us', hwG3:'They … for the platform',
     };
     const finance2Labels = {hwRead1:'Какой платёж проверила Миа?',hwRead2:'Где она нашла название приложения?',hwRead3:'Зачем Миа связалась с поддержкой?',hwListen1:'Сумма списания',hwListen2:'Когда закончился пробный период?',hwListen3:'Что Сэм уже сделал?',hwG1:'I … the statement yesterday',hwG2:'They … yet',hwG3:'She … it last Friday',hwG4:'We … support'};
-    const courses = new Map([['travel_a2','Travel A2+'],['finance_b1','Finance B1'],['feed_b2','Feed B2']]);
+    const discoveryLabels = {
+      'q1-0':'Вопрос о процессе напоминаний','q1-1':'Вопрос о масштабе проблемы','q1-2':'Кто принимает решение',
+      'q2-0':'Что уже известно','q2-1':'Что уточнить про интеграцию','q0-0':'Аудио · первоначальная гипотеза',
+      'q0-1':'Аудио · ежедневная проблема','q0-2':'Аудио · почему без прогноза','q0-3':'Аудио · следующий шаг',
+      'q3-0':'Возражение · у нас уже есть календарь','q3-1':'Возражение · нет времени на демо',
+      salesQuestion:'Вопрос для Джордана',salesObjection:'Ответ на возражение',salesCallNotes:'Заметки со звонка',salesDebrief:'Ответ на собеседовании',
+    };
+    const discoveryHomeworkLabels = {
+      'q0-0':'Масштаб проблемы','q0-1':'Возражение о календаре','q0-2':'Следующий шаг',
+      'q1-0':'Итог разговора','q1-1':'Конкретная договорённость',salesFollowUp:'Письмо после звонка',salesIntegration:'Что проверить перед интеграцией',
+    };
+    const courses = new Map([['travel_a2','Travel A2+'],['finance_b1','Finance B1'],['feed_b2','Feed B2'],['first_sales','First Sales C1']]);
     const rosterByCourse = new Map();
     let students = [];
     let signature = '';
@@ -429,7 +448,7 @@
         for (const [id,value] of answers) {
           const question = document.createElement('dt');
           const answer = document.createElement('dd');
-          question.textContent = (key==='gostudy-travel-a2plus-04-v1' && lesson4Labels[id]) || (key==='gostudy-finance-b1-02-v1' && finance2Labels[id]) || id;
+          question.textContent = (key==='gostudy-travel-a2plus-04-v1' && lesson4Labels[id]) || (key==='gostudy-finance-b1-02-v1' && finance2Labels[id]) || (key==='gostudy-first-sales-c1-02-v1' && discoveryLabels[id]) || (key==='gostudy-first-sales-c1-02-homework-v1' && discoveryHomeworkLabels[id]) || id;
           answer.textContent = Array.isArray(value) ? value.join(' → ') : typeof value === 'object' ? JSON.stringify(value) : String(value);
           list.append(question,answer);
         }
