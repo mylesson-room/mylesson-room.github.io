@@ -1,0 +1,8 @@
+header.gostudy-lesson-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:64px;padding:10px max(16px,calc((100vw - 1240px)/2));flex-wrap:nowrap;background:#fff;border-bottom:1px solid #dce5ef}
+.gostudy-lesson-logo{display:inline-flex;align-items:center;gap:9px;color:#152943;font:850 1.34rem/1.25 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.04em;white-space:nowrap}
+.gostudy-lesson-mark{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:#155ec5;color:white;font-size:1rem}
+.gostudy-lesson-topbar .gostudy-cabinet-back{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:7px 14px;border:1px solid #d8e5f5;border-radius:999px;color:#155ec5;background:#fff;text-decoration:none;font:700 14px/1.25 system-ui,sans-serif;text-align:center}
+.gostudy-cabinet-back:hover{background:#edf5ff}
+.gostudy-lesson-topbar+.gostudy-cloud-bar .gostudy-cloud-link{display:none}
+.gostudy-lesson-topbar+.gostudy-cloud-bar:not(:has([data-cloud-status]:not(:empty))){display:none}
+@media(max-width:380px){.gostudy-lesson-topbar .gostudy-cabinet-back{padding-inline:9px;font-size:13px}.gostudy-lesson-logo{gap:6px;font-size:1.17rem}}
