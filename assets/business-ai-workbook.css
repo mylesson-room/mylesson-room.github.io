@@ -1,0 +1,52 @@
+:root{font:16px/1.55 "Inter",system-ui,sans-serif;background:#edf2f8;color:#232c33;--accent:#087fa7}
+header{min-height:56px;padding:10px max(22px,calc((100vw - 1240px)/2));box-shadow:0 1px 3px #25475e0c}
+header>a{font-size:21px;letter-spacing:-.04em;color:#13313e}
+header nav a{font-size:14px;font-weight:600}
+.gostudy-cloud-bar{max-width:1240px;margin:0 auto;padding-inline:16px}
+.room{max-width:1280px;grid-template-columns:minmax(0,1fr) 276px;gap:20px;padding:18px 20px 40px}
+.sheet{border-radius:7px;overflow:visible;border-color:#dfe6ee;box-shadow:0 1px 3px #28445b0b}
+.lesson-meta{background:#fff;border-radius:7px 7px 0 0;padding:11px 30px;color:#546977;font-size:13px}
+progress{height:3px}
+.lesson-content{padding:28px 30px 34px}
+.label{font-size:13px;color:#556b79;margin:0 0 5px}
+.sheet h1{font-size:clamp(24px,3vw,34px);font-weight:700;line-height:1.2;letter-spacing:-.025em}
+.instruction{margin:0 0 20px;font-size:17px;font-weight:600;color:#216d85}
+.lesson-cover{aspect-ratio:auto;object-fit:contain;height:auto;border-radius:4px;background:none}
+.source{border:0;border-left:3px solid #81ccdf;background:#f1f9fb;padding:14px 17px}
+.memo,.writing-brief{background:#f8fafc;border:1px solid #dce6ed;border-radius:5px;padding:16px 19px}
+.memo p:first-child{font-size:13px;font-weight:700;border-bottom:1px solid #dce6ed;padding-bottom:11px;color:#405b6d}
+.conversation,.role-brief{display:grid;gap:8px;padding:0;border:0;background:transparent}
+.conversation p,.role-brief p{background:#eaf7fb;margin:0!important;border-radius:5px;padding:12px 15px}
+.conversation p:nth-child(even),.role-brief p:nth-child(even){background:#f0f3f9}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 16px}
+.metrics div{display:flex;flex-direction:column-reverse;border:1px solid #cde9f0;background:#eaf8fb;border-radius:6px;padding:12px 14px}
+.metrics dt{font-size:13px;color:#426276}.metrics dd{margin:0;color:#183b4e;font-size:25px;font-weight:720}
+.activity fieldset{margin:0 0 12px;padding-bottom:12px}.activity legend{line-height:1.5}
+.item-number{background:none;color:#5c7081;font-weight:500;width:21px;margin-right:7px}
+.options{padding-left:28px;gap:7px}
+.activity .options label{padding:6px 11px;border-radius:4px;box-shadow:0 1px 2px #1b3f5610}
+.activity .options label:hover{background:#effaff;border-color:#a5d5e6}
+fieldset .feedback{margin-left:28px}
+button,.cta{border-radius:5px;min-height:34px;padding:6px 13px;font-size:14px;font-weight:650;border-color:#d2dde6;box-shadow:0 1px 2px #153b5414}
+.cta,.check.cta{background:#0084b4;border-color:#0084b4;color:#fff}
+.cta:hover,.check.cta:hover{background:#006e98}
+.step-nav{padding:11px 30px;border-radius:0 0 7px 7px;background:#f0f4f8}
+.word-menu{position:relative;display:inline-block;vertical-align:baseline;margin:1px 5px 1px 3px;max-width:100%;white-space:normal}
+.word-menu summary{display:inline-flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;min-width:96px;max-width:100%;padding:4px 10px;border:1px solid #cedbe4;border-radius:5px;background:#fff;box-shadow:0 2px 0 #e8eff4;color:#223847;list-style:none}
+.word-menu summary::-webkit-details-marker{display:none}
+.word-menu summary::after{content:"";width:6px;height:6px;border:solid #608292;border-width:0 2px 2px 0;transform:rotate(45deg);margin-top:-3px;flex:none}
+.word-menu[open] summary::after{transform:rotate(225deg);margin-top:3px}
+.word-menu[open] summary,.word-menu summary:hover{border-color:#56b7d3;background:#f2fbfd}
+.word-options{position:absolute;z-index:10;top:calc(100% + 5px);left:0;width:max-content;min-width:100%;max-width:min(330px,calc(100vw - 86px));background:white;border:1px solid #d1e1e9;border-radius:6px;padding:4px;box-shadow:0 7px 20px #193b5926}
+.word-options button{display:block;width:100%;text-align:left;border:0;box-shadow:none;padding:6px 9px;font-size:15px;font-weight:500}
+.word-options button:hover,.word-options button[aria-pressed=true]{background:#e7f7fc;color:#146b87}
+[data-result=correct] .word-menu summary{background:#e6f5dd;border-color:#98c489}
+[data-result=retry] .word-menu summary{background:#fff0eb;border-color:#e5a48c}
+.gap-row>div{width:100%}.gap-row .word-menu{vertical-align:baseline}
+.order{padding-left:0}.order li{border-radius:4px;background:#fbfdfe}
+.side .panel{border-radius:7px}.call{background:#edf3f8}
+@media(max-width:780px){.room,.room.wide{grid-template-columns:1fr;padding:12px}.lesson-content,.lesson-meta,.step-nav{padding-inline:16px}.side{position:static}.metrics div{padding:8px}.metrics dd{font-size:21px}.options{padding-left:0}.word-options{max-width:min(275px,calc(100vw - 75px))}}
+@media(max-width:430px){.word-options{position:static;max-width:100%;margin-top:4px}.word-menu{max-width:100%}}
+
+.sheet h1[tabindex="-1"]:focus{outline:none}
+@media(max-width:780px){.word-options{position:static;max-width:100%;margin-top:4px}}
