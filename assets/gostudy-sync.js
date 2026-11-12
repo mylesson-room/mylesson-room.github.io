@@ -47,10 +47,10 @@
   const firstSales = salesPages.has(location.pathname.split('/').pop()) ||
     new URLSearchParams(location.search).get('course') === 'first-sales';
   const salesKeys = ['gostudy-first-sales-shared-v1','gostudy-first-sales-profile-v1','gostudy-first-sales-c1-v1','gostudy-first-sales-c1-homework-v1','gostudy-first-sales-c1-02-v1','gostudy-first-sales-c1-02-homework-v1'];
-  const pharmaPages = new Set(['student-pharma.html','pharma-c1.html','pharma-c1-02.html','pharma-c1-02-homework.html']);
+  const pharmaPages = new Set(['student-pharma.html','pharma-c1.html','pharma-c1-02.html','pharma-c1-02-homework.html','pharma-c1-03.html','pharma-c1-03-homework.html']);
   const pharmaC1 = pharmaPages.has(location.pathname.split('/').pop()) ||
     new URLSearchParams(location.search).get('course') === 'pharma-c1';
-  const pharmaKeys = ['gostudy-pharma-c1-v1','gostudy-pharma-profile-v1','gostudy-pharma-c1-02-v1','gostudy-pharma-c1-02-homework-v1'];
+  const pharmaKeys = ['gostudy-pharma-c1-v1','gostudy-pharma-profile-v1','gostudy-pharma-c1-02-v1','gostudy-pharma-c1-02-homework-v1','gostudy-pharma-c1-03-v1','gostudy-pharma-c1-03-homework-v1'];
   const keys = new Set(pharmaC1 ? pharmaKeys : firstSales ? salesKeys : feedB2 ? feedKeys : financeB1 ? financeKeys : travelA2 ? travelA2Keys : travelB2Keys);
   const courseName = pharmaC1 ? 'Pharma C1' : firstSales ? 'First Sales C1' : feedB2 ? 'Feed B2' : financeB1 ? 'Finance B1' : travelA2 ? 'Travel A2+' : 'Travel B2';
   const accountPage = 'gostudy-account.html' + (pharmaC1 ? '?course=pharma-c1' : firstSales ? '?course=first-sales' : feedB2 ? '?course=feed-b2' : financeB1 ? '?course=finance-b1' : travelA2 ? '?course=travel-a2' : '');
@@ -399,6 +399,8 @@
       ['gostudy-pharma-c1-v1','Урок 1 · Beyond the launch'],
       ['gostudy-pharma-c1-02-v1','Урок 2 · From feedback to strategy'],
       ['gostudy-pharma-c1-02-homework-v1','Домашка 2 · Pharma C1'],
+      ['gostudy-pharma-c1-03-v1','Урок 3 · Can AI Help Doctors Spot Cancer?'],
+      ['gostudy-pharma-c1-03-homework-v1','Домашка 3 · Pharma C1'],
     ]);
     const lesson4Labels = {
       hwRead1:'Что делала Элла?', hwRead2:'Проблема с поездом в 10:45', hwRead3:'Почему решили подождать?',
@@ -417,6 +419,8 @@
       'q0-0':'Масштаб проблемы','q0-1':'Возражение о календаре','q0-2':'Следующий шаг',
       'q1-0':'Итог разговора','q1-1':'Конкретная договорённость',salesFollowUp:'Письмо после звонка',salesIntegration:'Что проверить перед интеграцией',
     };
+    const pharmaThreeLabels = {"q0-0":"What does the speaker suggest before a wider launch?","q0-1":"Why might the Swedish results differ at this hospital?","q0-2":"Which outcomes does the speaker want to track?","q1-0":"What changed in the AI-supported group?","q1-1":"What does the 44% figure describe?","q1-2":"What could a hospital reasonably ask next?","q2-0":"What does 6.4 versus 5.0 per 1,000 show?","q2-1":"Which headline best fits the evidence?","pharmaPilot":"Решение о пробном запуске","pharmaHeadline":"Заголовок о результатах"};
+    const pharmaThreeHomeworkLabels = {"q0-0":"What is the role of AI in the Swedish trial?","q0-1":"What can we say about 44%?","q0-2":"What would a sensible local pilot track?","q1-0":"Which line is suitable for a report?","q1-1":"A patient asks who reviews the scan. Which reply is clearest?"};
     const courses = new Map([['travel_a2','Travel A2+'],['finance_b1','Finance B1'],['feed_b2','Feed B2'],['first_sales','First Sales C1'],['pharma_c1','Pharma C1']]);
     const rosterByCourse = new Map();
     let students = [];
@@ -455,7 +459,7 @@
         for (const [id,value] of answers) {
           const question = document.createElement('dt');
           const answer = document.createElement('dd');
-          question.textContent = (key==='gostudy-travel-a2plus-04-v1' && lesson4Labels[id]) || (key==='gostudy-finance-b1-02-v1' && finance2Labels[id]) || (key==='gostudy-first-sales-c1-02-v1' && discoveryLabels[id]) || (key==='gostudy-first-sales-c1-02-homework-v1' && discoveryHomeworkLabels[id]) || id;
+          question.textContent = (key==='gostudy-travel-a2plus-04-v1' && lesson4Labels[id]) || (key==='gostudy-finance-b1-02-v1' && finance2Labels[id]) || (key==='gostudy-first-sales-c1-02-v1' && discoveryLabels[id]) || (key==='gostudy-first-sales-c1-02-homework-v1' && discoveryHomeworkLabels[id]) || (key==='gostudy-pharma-c1-03-v1' && pharmaThreeLabels[id]) || (key==='gostudy-pharma-c1-03-homework-v1' && pharmaThreeHomeworkLabels[id]) || id;
           answer.textContent = Array.isArray(value) ? value.join(' → ') : typeof value === 'object' ? JSON.stringify(value) : String(value);
           list.append(question,answer);
         }
