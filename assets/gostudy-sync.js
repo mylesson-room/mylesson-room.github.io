@@ -10,6 +10,7 @@
     'gostudy-travel-b2-02-v1',
     'gostudy-travel-b2-02-homework-v1',
     'gostudy-travel-b2-03-v1',
+    'gostudy-travel-b2-04-v1',
     'gostudy-travel-b2-profile-v1',
   ];
   const travelA2Keys = [
@@ -56,9 +57,13 @@
   const tiktokA2 = tiktokPages.has(location.pathname.split('/').pop()) ||
     new URLSearchParams(location.search).get('course') === 'tiktok-a2';
   const tiktokKeys = ['gostudy-tiktok-a2-v1', 'gostudy-tiktok-a2-homework-v1', 'gostudy-tiktok-a2-words-v1'];
+  const currentPage = location.pathname.split('/').pop();
+  const countryHouse = ['student-country-house.html','country-house-a2-03.html'].includes(currentPage);
+  const countryHouseKeys = ['gostudy-country-house-a2-03-v1'];
+  const travelB2Cabinet = currentPage === 'student-travel-b2.html';
   const businessAI = ['business-ai-b2c1-02.html','student-business-ai.html'].includes(location.pathname.split('/').pop());
   const businessAIKeys = ['gostudy-business-ai-b2c1-02-v1'];
-  const keys = new Set(tiktokA2 ? tiktokKeys : pharmaC1 ? pharmaKeys : firstSales ? salesKeys : feedB2 ? feedKeys : financeB1 ? financeKeys : travelA2 ? travelA2Keys : businessAI ? businessAIKeys : travelB2Keys);
+  const keys = new Set(tiktokA2 ? tiktokKeys : pharmaC1 ? pharmaKeys : firstSales ? salesKeys : feedB2 ? feedKeys : financeB1 ? financeKeys : travelA2 ? travelA2Keys : businessAI ? businessAIKeys : countryHouse ? countryHouseKeys : travelB2Keys);
   const courseName = tiktokA2 ? 'TikTok A2' : pharmaC1 ? 'Pharma C1' : firstSales ? 'First Sales C1' : feedB2 ? 'Feed B2' : financeB1 ? 'Finance B1' : travelA2 ? 'Travel A2+' : 'Travel B2';
   const accountPage = 'gostudy-account.html' + (tiktokA2 ? '?course=tiktok-a2' : pharmaC1 ? '?course=pharma-c1' : firstSales ? '?course=first-sales' : feedB2 ? '?course=feed-b2' : financeB1 ? '?course=finance-b1' : travelA2 ? '?course=travel-a2' : '');
   const cabinetPage = tiktokA2 ? 'student-tiktok-a2.html' : pharmaC1 ? 'student-pharma.html' : firstSales ? 'student-first-sales.html' : feedB2 ? 'student-feed-b2.html' : financeB1 ? 'student-finance-b1.html' : travelA2 ? 'student-travel-a2.html' : 'student-travel-b2.html';
@@ -274,6 +279,7 @@
 
   function mountUnifiedAccount() {
     const destinations = new Map([
+      ['country-house', {name:'Country House · A2',path:'student-country-house.html',keys:countryHouseKeys}],
       ['business-ai', {name:'Business AI · B2–C1',path:'student-business-ai.html',keys:businessAIKeys}],
       ['travel-b2', {name:'Travel B2',path:'student-travel-b2.html',keys:travelB2Keys}],
       ['travel-a2', {name: 'Travel A2+', path: 'student-travel-a2.html', keys: travelA2Keys}],
@@ -422,31 +428,42 @@
     const home = document.getElementById('student-home');
     if (!home) return;
     const course = tiktokA2 ? 'tiktok_a2' : pharmaC1 ? 'pharma_c1' : firstSales ? 'first_sales' : feedB2 ? 'feed_b2' : financeB1 ? 'finance_b1' : 'travel_a2';
-    const lesson = businessAI ? {
+    const courseHome = countryHouse ? {
+      title: 'Before the Rain Comes', lesson: 'country-house-a2-03.html?v=workbook-1',
+      lessonKey: 'gostudy-country-house-a2-03-v1', homework: 'country-house-a2-02-homework.html',
+      homeworkTitle: 'A visit to the village shop', cover: 'assets/country-house-a2-03-cover.png',
+      vocabulary: 'country-house-a2-homework.html#vocabulary', words: 'gostudy-country-house-homework-a2-v1'
+    } : travelB2Cabinet ? {
+      title: 'The Last Connection', lesson: 'travel-b2-04.html?v=workbook-1',
+      lessonKey: 'gostudy-travel-b2-04-v1', homework: 'travel-b2-02-homework.html',
+      homeworkTitle: 'The case of the missing suitcase', cover: 'assets/travel-b2-04-cover.png',
+      vocabulary: 'travel-disruptions-b2.html#vocabulary', words: 'gostudy-travel-disruptions-b2-v1'
+    } : null;
+    const lesson = courseHome || (businessAI ? {
       title: 'From AI Pilot to Rollout',
       lesson: 'business-ai-b2c1-02.html?v=vimbox-2',
       lessonKey: 'gostudy-business-ai-b2c1-02-v1',
       homework: 'business-ai-b2c1-homework.html'
-    } : classroomCatalog[course].lessons.at(-1);
+    } : classroomCatalog[course].lessons.at(-1));
     const started = json(GoStudyStorage.getItem(lesson.lessonKey),{});
     home.innerHTML = '<div class="home-duo"><article class="home-current home-homework"><p>Домашнее задание</p><h2></h2><div class="home-actions"><a class="home-primary home-homework-link">Сделать задание</a></div></article><article class="home-current home-lesson"><p>Текущий урок</p><h2></h2><div class="home-actions"><a class="home-primary home-open-lesson"></a></div></article></div><div class="home-tools"><a class="home-tile"><strong>Словарь</strong><small>Мои слова</small></a><button type="button" class="home-tile"><strong>Тренировки</strong><small>Повторить слова</small></button></div><dialog class="home-training"><h2>Тренировка слов</h2><p role="status"></p><strong class="home-prompt"></strong><p class="home-meaning" hidden></p><div class="home-actions"><button type="button" class="home-reveal">Показать перевод</button><button type="button" class="home-next">Следующее слово</button><button type="button" class="home-close">Закрыть</button></div></dialog>';
     const cover = document.querySelector('.content-grid section img');
-    const visual = document.createElement(cover || businessAI ? 'img' : 'span');
+    const visual = document.createElement(cover || businessAI || courseHome ? 'img' : 'span');
     visual.className = 'home-cover';
-    if (cover || businessAI) { visual.src = businessAI ? 'assets/gostudy-ai-pilot.png' : cover.src; visual.alt = ''; }
+    if (cover || businessAI || courseHome) { visual.src = courseHome?.cover || (businessAI ? 'assets/gostudy-ai-pilot.png' : cover.src); visual.alt = ''; }
     else { visual.textContent = tiktokA2 ? '🎬' : '🧳'; visual.setAttribute('aria-hidden','true'); }
     home.querySelector('.home-homework').append(visual);
     home.querySelectorAll('.home-current h2').forEach(title => { title.textContent = lesson.title; });
-    if (businessAI) home.querySelector('.home-homework h2').textContent = 'AI at Work';
+    if (businessAI || courseHome) home.querySelector('.home-homework h2').textContent = courseHome?.homeworkTitle || 'AI at Work';
     const open = home.querySelector('.home-open-lesson');
     const homework = home.querySelector('.home-homework-link');
     const dictionary = home.querySelector('a.home-tile');
     open.href = lesson.lesson;
     open.textContent = started.page > 0 || Object.keys(started.answers || {}).length ? 'Продолжить урок' : 'Открыть урок';
     homework.href = lesson.homework;
-    dictionary.href = businessAI ? 'business-ai-b2c1.html#vocabulary' : tiktokA2 ? '#words' : lesson.lesson+'#vocabulary';
+    dictionary.href = courseHome ? courseHome.vocabulary : businessAI ? 'business-ai-b2c1.html#vocabulary' : tiktokA2 ? '#words' : lesson.lesson+'#vocabulary';
     if (tiktokA2) dictionary.onclick = event => { event.preventDefault(); document.getElementById('dictBtn')?.click(); };
-    const wordKey = businessAI ? 'gostudy-business-ai-shared-v1' : {tiktok_a2:'gostudy-tiktok-a2-words-v1',first_sales:'gostudy-first-sales-shared-v1'}[course] || classroomCatalog[course].lessons[0].lessonKey;
+    const wordKey = courseHome ? courseHome.words : businessAI ? 'gostudy-business-ai-shared-v1' : {tiktok_a2:'gostudy-tiktok-a2-words-v1',first_sales:'gostudy-first-sales-shared-v1'}[course] || classroomCatalog[course].lessons[0].lessonKey;
     const dialog = home.querySelector('dialog');
     const status = dialog.querySelector('[role="status"]');
     const prompt = dialog.querySelector('.home-prompt');
@@ -464,13 +481,13 @@
     }
     home.querySelector('button.home-tile').onclick = async () => {
       const run = ++generation;
-      const saved = json(GoStudyStorage.getItem(wordKey),{});
+      const saved = json(courseHome ? localStorage.getItem(wordKey) || GoStudyStorage.getItem(wordKey) : GoStudyStorage.getItem(wordKey),{});
       const own = Array.isArray(saved) ? saved : Array.isArray(saved.words) ? saved.words : [];
       words = own.filter(w => typeof w?.en === 'string' && typeof w.ru === 'string');
       index = 0;
       showWord();
       dialog.showModal();
-      if (!session || businessAI) return;
+      if (!session || businessAI || courseHome) return;
       try {
         const result = await request('/rest/v1/rpc/gostudy_'+course+'_my_words',{method:'POST',body:{}},await token());
         if (!dialog.open || run !== generation || !result.ok || !Array.isArray(result.data)) return;
@@ -536,7 +553,7 @@
 
   function mountLesson() {
     const link = document.createElement('a');
-    link.href = businessAI || document.getElementById('lesson-data') ? 'login.html' : accountPage;
+    link.href = businessAI || countryHouse || travelB2Cabinet || document.getElementById('lesson-data') ? 'login.html' : accountPage;
     link.textContent = session ? 'Аккаунт GoStudy' : 'Войти для синхронизации';
     link.className = 'gostudy-cloud-link';
     const status = document.createElement('span');
