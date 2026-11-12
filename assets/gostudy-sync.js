@@ -860,6 +860,35 @@
     const pharmaThreeLabels = {"q0-0":"What does the speaker suggest before a wider launch?","q0-1":"Why might the Swedish results differ at this hospital?","q0-2":"Which outcomes does the speaker want to track?","q1-0":"What changed in the AI-supported group?","q1-1":"What does the 44% figure describe?","q1-2":"What could a hospital reasonably ask next?","q2-0":"What does 6.4 versus 5.0 per 1,000 show?","q2-1":"Which headline best fits the evidence?","pharmaPilot":"Решение о пробном запуске","pharmaHeadline":"Заголовок о результатах"};
     const pharmaThreeHomeworkLabels = {"q0-0":"What is the role of AI in the Swedish trial?","q0-1":"What can we say about 44%?","q0-2":"What would a sensible local pilot track?","q1-0":"Which line is suitable for a report?","q1-1":"A patient asks who reviews the scan. Which reply is clearest?"};
     const courses = new Map(Object.entries(classroomCatalog).map(([id,course]) => [id,course.name]));
+    const addStudent = document.getElementById('teacher-add-student');
+    const addStudentForm = addStudent?.querySelector('form');
+    const addStudentStatus = document.getElementById('teacher-add-student-status');
+    if (addStudentForm) {
+      for (const [id,name] of courses) {
+        const option = document.createElement('option');
+        option.value = id;
+        option.textContent = name;
+        addStudentForm.elements.course.append(option);
+      }
+      addStudentForm.addEventListener('submit',async event => {
+        event.preventDefault();
+        const button = addStudentForm.querySelector('button[type="submit"]');
+        const email = addStudentForm.elements.email.value.trim();
+        const password = addStudentForm.elements.password.value;
+        const course = addStudentForm.elements.course.value;
+        button.disabled = true;
+        addStudentStatus.textContent = 'Создаём аккаунт и назначаем курс…';
+        try {
+          const result = await request('/functions/v1/gostudy-add-student',{method:'POST',body:{email,password,course}},await token());
+          if (!result.ok || result.data?.ok !== true) throw new Error(result.data?.error || 'Не удалось добавить ученика.');
+          addStudentForm.reset();
+          addStudentStatus.textContent = 'Курс назначен. Ученику можно отправить общую ссылку на вход.';
+          refresh();
+        } catch(error) {
+          addStudentStatus.textContent = error.message;
+        } finally { button.disabled = false; }
+      });
+    }
     const rosterByCourse = new Map();
     let students = [];
     let studentEmails = new Map();
@@ -937,6 +966,7 @@
           const selected = studentPicker.value || new URLSearchParams(location.search).get('selected');
           signature = next;
           students = roster;
+          if (addStudent) addStudent.hidden = !students.length;
           studentPicker.replaceChildren(...students.map(student => {
             const option = document.createElement('option');
             option.value = student.selection;
