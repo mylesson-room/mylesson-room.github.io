@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>My feed in five sentences · GoStudy</title>
+  <link rel="stylesheet" href="assets/tiktok-a2.css">
+  <link rel="stylesheet" href="assets/gostudy-sync.css">
+  <script defer src="assets/gostudy-sync.js?v=16"></script>
+  <script defer src="assets/tiktok-a2.js"></script>
+</head>
+<body data-lesson-key="gostudy-tiktok-a2-homework-v1">
+  <header class="topbar">
+    <a class="brand" href="student-tiktok-a2.html">GoStudy</a>
+    <nav aria-label="Навигация"><a class="button" href="tiktok-a2.html">К уроку</a><a class="button" href="student-tiktok-a2.html">Кабинет</a></nav>
+  </header>
+  <main class="shell" id="content">
+    <div class="hero">
+      <span class="level">Домашнее задание · A2</span>
+      <h1 lang="en">My feed in five sentences</h1>
+      <p>Повторите лексику и опишите свою ленту коротких видео.</p>
+    </div>
+    <p><button id="dictBtn" type="button">Мой словарь&nbsp;·&nbsp;<span id="wordCount">0</span></button></p>
+    
+<section class="card">
+  <h2 lang="en">1. What do you do with the video?</h2>
+  <p>Впишите <strong lang="en">save</strong>, <strong lang="en">skip</strong> или <strong lang="en">follow</strong>.</p>
+  <div lang="en">
+  <label class="task" for="home-save"><span>This recipe looks good. I want to try it later. I’ll ___ it.</span><input id="home-save" data-answer="home-save" aria-label="This recipe looks good. I want to try it later. I’ll ___ it." data-correct="save" aria-describedby="home-save-feedback" type="text" autocomplete="off" autocapitalize="none"><span id="home-save-feedback" aria-live="polite"></span></label>
+  <label class="task" for="home-skip"><span>This video is boring. I’ll ___ it.</span><input id="home-skip" data-answer="home-skip" aria-label="This video is boring. I’ll ___ it." data-correct="skip" aria-describedby="home-skip-feedback" type="text" autocomplete="off" autocapitalize="none"><span id="home-skip-feedback" aria-live="polite"></span></label>
+  <label class="task" for="home-follow"><span>I like this creator. I’ll ___ her.</span><input id="home-follow" data-answer="home-follow" aria-label="I like this creator. I’ll ___ her." data-correct="follow" aria-describedby="home-follow-feedback" type="text" autocomplete="off" autocapitalize="none"><span id="home-follow-feedback" aria-live="polite"></span></label>
+  </div>
+</section>
+<section class="card">
+  <h2 lang="en">2. My feed in five sentences</h2>
+  <p>Напишите пять предложений о том, что Вы обычно, иногда или никогда не смотрите. Расскажите, чем Вы делитесь и почему. Можно придумать ответы.</p>
+  <details><summary>Начало предложений</summary><p lang="en">I usually watch… · I sometimes save… · I never watch… · I share… with… · I like these videos because…</p></details>
+  <label class="task" for="home-feed"><span>My feed in five sentences</span><textarea id="home-feed" data-answer="home-feed" aria-label="My feed in five sentences" rows="4"></textarea></label>
+</section>
+  </main>
+  <dialog id="dictionary" aria-labelledby="dictionaryTitle">
+    <div class="menu-top"><h2 id="dictionaryTitle">Мой словарь</h2><button id="closeDict" type="button">Закрыть</button></div>
+    <form id="wordForm">
+      <label class="field-label" for="newWord">Слово или фраза</label>
+      <input id="newWord" required maxlength="150">
+      <label class="field-label" for="newMeaning">Перевод</label>
+      <input id="newMeaning" required maxlength="300">
+      <div class="dict-actions"><button class="primary" type="submit">Добавить</button></div>
+    </form>
+    <p id="dictStatus" role="status"></p>
+    <ul id="wordList"></ul>
+  </dialog>
+  <aside id="translationPop" aria-label="Перевод" hidden>
+    <div class="actions"><strong id="selectedWord"></strong><button type="button" id="closePop" aria-label="Закрыть перевод">×</button></div>
+    <p><textarea id="selectedMeaning" aria-label="Перевод" rows="2"></textarea></p>
+    <div class="translation-entry"><button type="button" id="saveSelected" aria-label="Добавить в словарь">+</button></div>
+    <p id="translateStatus" role="status"></p>
+  </aside>
+</body>
+</html>

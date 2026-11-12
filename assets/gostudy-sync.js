@@ -51,12 +51,16 @@
   const pharmaC1 = pharmaPages.has(location.pathname.split('/').pop()) ||
     new URLSearchParams(location.search).get('course') === 'pharma-c1';
   const pharmaKeys = ['gostudy-pharma-c1-v1','gostudy-pharma-profile-v1','gostudy-pharma-c1-02-v1','gostudy-pharma-c1-02-homework-v1','gostudy-pharma-c1-03-v1','gostudy-pharma-c1-03-homework-v1'];
-  const keys = new Set(pharmaC1 ? pharmaKeys : firstSales ? salesKeys : feedB2 ? feedKeys : financeB1 ? financeKeys : travelA2 ? travelA2Keys : travelB2Keys);
-  const courseName = pharmaC1 ? 'Pharma C1' : firstSales ? 'First Sales C1' : feedB2 ? 'Feed B2' : financeB1 ? 'Finance B1' : travelA2 ? 'Travel A2+' : 'Travel B2';
-  const accountPage = 'gostudy-account.html' + (pharmaC1 ? '?course=pharma-c1' : firstSales ? '?course=first-sales' : feedB2 ? '?course=feed-b2' : financeB1 ? '?course=finance-b1' : travelA2 ? '?course=travel-a2' : '');
-  const cabinetPage = pharmaC1 ? 'student-pharma.html' : firstSales ? 'student-first-sales.html' : feedB2 ? 'student-feed-b2.html' : financeB1 ? 'student-finance-b1.html' : travelA2 ? 'student-travel-a2.html' : 'student-travel-b2.html';
+  const tiktokPages = new Set(['student-tiktok-a2.html', 'tiktok-a2.html', 'tiktok-a2-homework.html']);
+  const tiktokA2 = tiktokPages.has(location.pathname.split('/').pop()) ||
+    new URLSearchParams(location.search).get('course') === 'tiktok-a2';
+  const tiktokKeys = ['gostudy-tiktok-a2-v1', 'gostudy-tiktok-a2-homework-v1', 'gostudy-tiktok-a2-words-v1'];
+  const keys = new Set(tiktokA2 ? tiktokKeys : pharmaC1 ? pharmaKeys : firstSales ? salesKeys : feedB2 ? feedKeys : financeB1 ? financeKeys : travelA2 ? travelA2Keys : travelB2Keys);
+  const courseName = tiktokA2 ? 'TikTok A2' : pharmaC1 ? 'Pharma C1' : firstSales ? 'First Sales C1' : feedB2 ? 'Feed B2' : financeB1 ? 'Finance B1' : travelA2 ? 'Travel A2+' : 'Travel B2';
+  const accountPage = 'gostudy-account.html' + (tiktokA2 ? '?course=tiktok-a2' : pharmaC1 ? '?course=pharma-c1' : firstSales ? '?course=first-sales' : feedB2 ? '?course=feed-b2' : financeB1 ? '?course=finance-b1' : travelA2 ? '?course=travel-a2' : '');
+  const cabinetPage = tiktokA2 ? 'student-tiktok-a2.html' : pharmaC1 ? 'student-pharma.html' : firstSales ? 'student-first-sales.html' : feedB2 ? 'student-feed-b2.html' : financeB1 ? 'student-finance-b1.html' : travelA2 ? 'student-travel-a2.html' : 'student-travel-b2.html';
   const table = '/rest/v1/gostudy_progress';
-  const classroomCatalog = {"travel_a2":{"name":"Travel A2+","lessons":[{"title":"A weekend away","lesson":"travel-weekend-a2.html","homework":"travel-a2-homework.html","lessonKey":"gostudy-travel-a2plus-v1","homeworkKey":"gostudy-travel-a2plus-homework-v1"},{"title":"A day out in York","lesson":"travel-a2-02.html","homework":"travel-a2-02-homework.html","lessonKey":"gostudy-travel-a2plus-02-v1","homeworkKey":"gostudy-travel-a2plus-02-homework-v1"},{"title":"A day by the sea","lesson":"travel-a2-03.html","homework":"travel-a2-03-homework.html","lessonKey":"gostudy-travel-a2plus-03-v1","homeworkKey":"gostudy-travel-a2plus-03-homework-v1"},{"title":"The train is late","lesson":"travel-a2-04.html","homework":"travel-a2-04-homework.html","lessonKey":"gostudy-travel-a2plus-04-v1","homeworkKey":"gostudy-travel-a2plus-04-homework-v1"}]},"finance_b1":{"name":"Finance B1","lessons":[{"title":"Money moves","lesson":"finance-b1.html","homework":"finance-b1-homework.html","lessonKey":"gostudy-finance-b1-v1","homeworkKey":"gostudy-finance-b1-homework-v1"},{"title":"Where did my money go?","lesson":"finance-b1-02.html","homework":"finance-b1-02-homework.html","lessonKey":"gostudy-finance-b1-02-v1","homeworkKey":"gostudy-finance-b1-02-homework-v1"}]},"feed_b2":{"name":"Feed B2","lessons":[{"title":"Your feed, your choice?","lesson":"feed-choice-b2.html","homework":"feed-choice-b2.html#homework","lessonKey":"gostudy-feed-b2-v1","homeworkKey":"gostudy-feed-b2-v1"},{"title":"Before you share","lesson":"feed-b2-02.html","homework":"feed-b2-02-homework.html","lessonKey":"gostudy-feed-b2-02-v1","homeworkKey":"gostudy-feed-b2-02-homework-v1"},{"title":"Who’s selling what?","lesson":"feed-b2-03.html","homework":"feed-b2-03-homework.html","lessonKey":"gostudy-feed-b2-03-v1","homeworkKey":"gostudy-feed-b2-03-homework-v1"},{"title":"A real photo, a false story","lesson":"feed-b2-04.html","homework":"feed-b2-04-homework.html","lessonKey":"gostudy-feed-b2-04-v1","homeworkKey":"gostudy-feed-b2-04-homework-v1"}]},"first_sales":{"name":"First Sales C1","lessons":[{"title":"Your First Sales Interview","lesson":"first-sales-c1.html","homework":"first-sales-c1-homework.html","lessonKey":"gostudy-first-sales-c1-v1","homeworkKey":"gostudy-first-sales-c1-homework-v1"},{"title":"Your First Discovery Call","lesson":"first-sales-c1-02.html","homework":"first-sales-c1-02-homework.html","lessonKey":"gostudy-first-sales-c1-02-v1","homeworkKey":"gostudy-first-sales-c1-02-homework-v1"}]},"pharma_c1":{"name":"Pharma C1","lessons":[{"title":"Pharma marketing: beyond the launch","lesson":"pharma-c1.html","homework":"pharma-c1.html#homework","lessonKey":"gostudy-pharma-c1-v1","homeworkKey":"gostudy-pharma-c1-v1"},{"title":"From feedback to strategy","lesson":"pharma-c1-02.html","homework":"pharma-c1-02-homework.html","lessonKey":"gostudy-pharma-c1-02-v1","homeworkKey":"gostudy-pharma-c1-02-homework-v1"},{"title":"Can AI Help Doctors Spot Cancer?","lesson":"pharma-c1-03.html","homework":"pharma-c1-03-homework.html","lessonKey":"gostudy-pharma-c1-03-v1","homeworkKey":"gostudy-pharma-c1-03-homework-v1"}]}};
+  const classroomCatalog = {tiktok_a2: {"name": "TikTok A2", "lessons": [{"title": "One More Video?", "lesson": "tiktok-a2.html", "homework": "tiktok-a2-homework.html", "lessonKey": "gostudy-tiktok-a2-v1", "homeworkKey": "gostudy-tiktok-a2-homework-v1"}]},"travel_a2":{"name":"Travel A2+","lessons":[{"title":"A weekend away","lesson":"travel-weekend-a2.html","homework":"travel-a2-homework.html","lessonKey":"gostudy-travel-a2plus-v1","homeworkKey":"gostudy-travel-a2plus-homework-v1"},{"title":"A day out in York","lesson":"travel-a2-02.html","homework":"travel-a2-02-homework.html","lessonKey":"gostudy-travel-a2plus-02-v1","homeworkKey":"gostudy-travel-a2plus-02-homework-v1"},{"title":"A day by the sea","lesson":"travel-a2-03.html","homework":"travel-a2-03-homework.html","lessonKey":"gostudy-travel-a2plus-03-v1","homeworkKey":"gostudy-travel-a2plus-03-homework-v1"},{"title":"The train is late","lesson":"travel-a2-04.html","homework":"travel-a2-04-homework.html","lessonKey":"gostudy-travel-a2plus-04-v1","homeworkKey":"gostudy-travel-a2plus-04-homework-v1"}]},"finance_b1":{"name":"Finance B1","lessons":[{"title":"Money moves","lesson":"finance-b1.html","homework":"finance-b1-homework.html","lessonKey":"gostudy-finance-b1-v1","homeworkKey":"gostudy-finance-b1-homework-v1"},{"title":"Where did my money go?","lesson":"finance-b1-02.html","homework":"finance-b1-02-homework.html","lessonKey":"gostudy-finance-b1-02-v1","homeworkKey":"gostudy-finance-b1-02-homework-v1"}]},"feed_b2":{"name":"Feed B2","lessons":[{"title":"Your feed, your choice?","lesson":"feed-choice-b2.html","homework":"feed-choice-b2.html#homework","lessonKey":"gostudy-feed-b2-v1","homeworkKey":"gostudy-feed-b2-v1"},{"title":"Before you share","lesson":"feed-b2-02.html","homework":"feed-b2-02-homework.html","lessonKey":"gostudy-feed-b2-02-v1","homeworkKey":"gostudy-feed-b2-02-homework-v1"},{"title":"Who’s selling what?","lesson":"feed-b2-03.html","homework":"feed-b2-03-homework.html","lessonKey":"gostudy-feed-b2-03-v1","homeworkKey":"gostudy-feed-b2-03-homework-v1"},{"title":"A real photo, a false story","lesson":"feed-b2-04.html","homework":"feed-b2-04-homework.html","lessonKey":"gostudy-feed-b2-04-v1","homeworkKey":"gostudy-feed-b2-04-homework-v1"}]},"first_sales":{"name":"First Sales C1","lessons":[{"title":"Your First Sales Interview","lesson":"first-sales-c1.html","homework":"first-sales-c1-homework.html","lessonKey":"gostudy-first-sales-c1-v1","homeworkKey":"gostudy-first-sales-c1-homework-v1"},{"title":"Your First Discovery Call","lesson":"first-sales-c1-02.html","homework":"first-sales-c1-02-homework.html","lessonKey":"gostudy-first-sales-c1-02-v1","homeworkKey":"gostudy-first-sales-c1-02-homework-v1"}]},"pharma_c1":{"name":"Pharma C1","lessons":[{"title":"Pharma marketing: beyond the launch","lesson":"pharma-c1.html","homework":"pharma-c1.html#homework","lessonKey":"gostudy-pharma-c1-v1","homeworkKey":"gostudy-pharma-c1-v1"},{"title":"From feedback to strategy","lesson":"pharma-c1-02.html","homework":"pharma-c1-02-homework.html","lessonKey":"gostudy-pharma-c1-02-v1","homeworkKey":"gostudy-pharma-c1-02-homework-v1"},{"title":"Can AI Help Doctors Spot Cancer?","lesson":"pharma-c1-03.html","homework":"pharma-c1-03-homework.html","lessonKey":"gostudy-pharma-c1-03-v1","homeworkKey":"gostudy-pharma-c1-03-homework-v1"}]}};
   const classroomStudent = new URLSearchParams(location.search).get('classStudent');
   const previewRecords = classroomStudent === null ? null : new Map();
   const classroomPages = new Map(Object.entries(classroomCatalog).flatMap(([course, spec]) =>
@@ -269,6 +273,7 @@
     const destinations = new Map([
       ['travel-a2', {name: 'Travel A2+', path: 'student-travel-a2.html', keys: travelA2Keys}],
       ['finance-b1', {name: 'Finance B1', path: 'student-finance-b1.html', keys: financeKeys}],
+      ['tiktok-a2', {name: 'TikTok A2', path: 'student-tiktok-a2.html', keys: tiktokKeys}],
       ['feed-b2', {name: 'Feed B2', path: 'student-feed-b2.html', keys: feedKeys}],
       ['first-sales', {name: 'First Sales C1', path: 'student-first-sales.html', keys: salesKeys}],
       ['pharma-c1', {name: 'Pharma C1', path: 'student-pharma.html', keys: pharmaKeys}],
@@ -408,6 +413,29 @@
     if (session) synchronize().catch(report);
   }
 
+  async function mountTiktokCabinet(content) {
+    const status = document.getElementById('cabinet-status');
+    if (!session) {
+      location.replace('login.html');
+      return;
+    }
+    try {
+      const response = await request('/rest/v1/rpc/gostudy_my_destinations', {method:'POST', body:{}}, await token());
+      if (response.status === 401) throw new Error('Срок входа истёк. Войдите снова.');
+      if (!response.ok || !Array.isArray(response.data)) throw new Error('Не удалось открыть кабинет. Обновите страницу.');
+      if (!response.data.some(row => row.course === 'tiktok-a2')) {
+        throw new Error('Урок TikTok A2 не назначен этому аккаунту.');
+      }
+      status.hidden = true;
+      content.hidden = false;
+      mountLesson();
+      mountTeacherWords();
+    } catch (error) {
+      if (error.message === 'Срок входа истёк. Войдите снова.') sessionStorage.removeItem(authKey);
+      status.querySelector('span').textContent = error.message;
+    }
+  }
+
   function mountLesson() {
     const link = document.createElement('a');
     link.href = accountPage;
@@ -430,8 +458,8 @@
   }
 
   function mountTeacherWords() {
-    if ((!travelA2 && !financeB1 && !feedB2 && !firstSales && !pharmaC1) || !session) return;
-    const course = pharmaC1 ? 'pharma_c1' : firstSales ? 'first_sales' : feedB2 ? 'feed_b2' : financeB1 ? 'finance_b1' : 'travel_a2';
+    if ((!travelA2 && !financeB1 && !feedB2 && !firstSales && !pharmaC1 && !tiktokA2) || !session) return;
+    const course = tiktokA2 ? 'tiktok_a2' : pharmaC1 ? 'pharma_c1' : firstSales ? 'first_sales' : feedB2 ? 'feed_b2' : financeB1 ? 'finance_b1' : 'travel_a2';
     const dictionary = document.getElementById('dictionary');
     const dictionaryButton = document.getElementById('dictBtn');
     const targets = [dictionary, document.getElementById('words')].filter(Boolean);
@@ -781,6 +809,8 @@
     const studentWords = document.getElementById('teacher-student-words');
     const assignedWords = document.getElementById('teacher-assigned-words');
     const lessonLabels = new Map([
+      ['gostudy-tiktok-a2-v1','Урок · One More Video?'],
+      ['gostudy-tiktok-a2-homework-v1','Домашнее задание · TikTok A2'],
       ['gostudy-travel-a2plus-v1','Урок 1 · A weekend away'],
       ['gostudy-travel-a2plus-homework-v1','Домашка 1'],
       ['gostudy-travel-a2plus-02-v1','Урок 2 · A day out in York'],
@@ -975,6 +1005,7 @@
     if (document.getElementById('teacher-login')) mountTeacher();
     else if (document.getElementById('unified-login')) mountUnifiedAccount();
     else if (document.getElementById('cloud-login')) mountAccount();
+    else if (document.getElementById('tiktok-cabinet')) mountTiktokCabinet(document.getElementById('tiktok-cabinet'));
     else if (classroomStudent !== null) mountClassroom();
     else { mountLesson(); mountTeacherWords(); }
   });

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>TikTok A2 · GoStudy</title>
+  <link rel="stylesheet" href="assets/tiktok-a2.css">
+  <link rel="stylesheet" href="assets/gostudy-sync.css">
+  <script defer src="assets/gostudy-sync.js?v=16"></script>
+  <script defer src="assets/tiktok-a2.js"></script>
+</head>
+<body data-lesson-key="">
+  <header class="topbar">
+    <a class="brand" href="student-tiktok-a2.html">GoStudy</a>
+    <nav aria-label="Навигация"><a class="button" href="tiktok-a2-homework.html">Домашнее задание</a><a class="button primary" href="tiktok-a2.html">К уроку</a></nav>
+  </header>
+  <p class="shell" id="cabinet-status" role="status"><span>Открываем кабинет…</span> <a href="login.html">Вход в GoStudy</a></p>
+  <div id="tiktok-cabinet" hidden>
+  <main class="shell" id="content">
+    <div class="hero">
+      <span class="level">Личный кабинет</span>
+      <h1 lang="en">TikTok A2</h1>
+      <p>Урок, домашнее задание и словарь.</p>
+    </div>
+    <p><button id="dictBtn" type="button">Мой словарь&nbsp;·&nbsp;<span id="wordCount">0</span></button></p>
+    
+<section class="card" id="words">
+  <h2 lang="en">One More Video?</h2>
+  <p>Послушайте историю о поездке домой, сравните два ролика и придумайте свой TikTok на 15 секунд.</p>
+  <div class="actions"><a class="button primary" href="tiktok-a2.html">Открыть урок</a><a class="button" href="tiktok-a2-homework.html">Открыть домашнее задание</a></div>
+</section>
+  </main>
+  <dialog id="dictionary" aria-labelledby="dictionaryTitle">
+    <div class="menu-top"><h2 id="dictionaryTitle">Мой словарь</h2><button id="closeDict" type="button">Закрыть</button></div>
+    <form id="wordForm">
+      <label class="field-label" for="newWord">Слово или фраза</label>
+      <input id="newWord" required maxlength="150">
+      <label class="field-label" for="newMeaning">Перевод</label>
+      <input id="newMeaning" required maxlength="300">
+      <div class="dict-actions"><button class="primary" type="submit">Добавить</button></div>
+    </form>
+    <p id="dictStatus" role="status"></p>
+    <ul id="wordList"></ul>
+  </dialog>
+  <aside id="translationPop" aria-label="Перевод" hidden>
+    <div class="actions"><strong id="selectedWord"></strong><button type="button" id="closePop" aria-label="Закрыть перевод">×</button></div>
+    <p><textarea id="selectedMeaning" aria-label="Перевод" rows="2"></textarea></p>
+    <div class="translation-entry"><button type="button" id="saveSelected" aria-label="Добавить в словарь">+</button></div>
+    <p id="translateStatus" role="status"></p>
+  </aside>
+  </div>
+</body>
+</html>
