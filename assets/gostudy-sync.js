@@ -82,10 +82,20 @@
   const json = (value, fallback = null) => {
     try { return JSON.parse(value) ?? fallback; } catch { return fallback; }
   };
+  const teacherSessionKey = 'gostudy-teacher-session-v1';
+  const teacherPage = currentPage === 'gostudy-teacher.html';
+  const teacherContext = teacherPage || classroomStudent !== null;
+  function savedTeacher() {
+    if (!teacherContext) return null;
+    try {
+      const value = json(localStorage.getItem(teacherSessionKey));
+      return value?.user?.id && value.access_token && value.refresh_token ? value : null;
+    } catch { return null; }
+  }
   function readSession() {
     try {
       const value = json(sessionStorage.getItem(authKey));
-      return value?.user?.id && value.access_token ? value : null;
+      return savedTeacher() || (value?.user?.id && value.access_token ? value : null);
     } catch { return null; }
   }
   let session = readSession();
@@ -152,22 +162,40 @@
     const data = response.status === 204 ? null : await response.json().catch(() => null);
     return {ok: response.ok, status: response.status, data};
   }
-  function saveSession(data) {
+  function saveSession(data, rememberTeacher = false) {
     session = {...data, expires_at: Date.now() + data.expires_in * 1000};
     sessionStorage.setItem(authKey, JSON.stringify(session));
+    if (rememberTeacher) localStorage.setItem(teacherSessionKey, JSON.stringify(session));
   }
   let refreshInFlight;
   async function token() {
     if (!session) throw new Error('Войдите в аккаунт GoStudy.');
+    const latestTeacher = savedTeacher();
+    if (latestTeacher?.user.id === session.user.id && latestTeacher.expires_at > session.expires_at) session = latestTeacher;
     if (session.expires_at > Date.now() + 30000) return session.access_token;
-    refreshInFlight ??= (async () => {
+    const refresh = async () => {
+      const remembered = savedTeacher();
+      if (remembered?.user.id === session.user.id && remembered.expires_at > Date.now() + 30000) {
+        session = remembered;
+        return session.access_token;
+      }
       const response = await request('/auth/v1/token?grant_type=refresh_token', {
-        method: 'POST', body: {refresh_token: session.refresh_token},
+        method: 'POST', body: {refresh_token: remembered?.user.id === session.user.id ? remembered.refresh_token : session.refresh_token},
       });
-      if (!response.ok) throw new Error('Срок входа истёк. Войдите снова.');
-      saveSession(response.data);
+      if (!response.ok) {
+        if (response.status === 400 || response.status === 401) {
+          if (remembered?.user.id === session.user.id) localStorage.removeItem(teacherSessionKey);
+          sessionStorage.removeItem(authKey);
+          if (teacherPage) location.reload();
+        }
+        throw new Error('Не удалось обновить вход. Откройте кабинет преподавателя.');
+      }
+      saveSession(response.data, remembered?.user.id === session.user.id);
       return session.access_token;
-    })().finally(() => { refreshInFlight = null; });
+    };
+    refreshInFlight ??= (navigator.locks && teacherContext
+      ? navigator.locks.request(teacherSessionKey,refresh)
+      : refresh()).finally(() => { refreshInFlight = null; });
     return refreshInFlight;
   }
 
@@ -315,6 +343,7 @@
         await pull(await token());
         if (importLocal) await importLocalProgress();
       }
+      if (destination.path === 'gostudy-teacher.html') localStorage.setItem(teacherSessionKey,JSON.stringify(session));
       location.assign(destination.path);
     }
 
@@ -1229,7 +1258,9 @@
       try {
         const result = await request('/auth/v1/token?grant_type=password',{method:'POST',body:{email:login.elements.email.value.trim(),password}});
         if (!result.ok) throw new Error('Не удалось войти. Проверьте почту и пароль.');
-        saveSession(result.data);
+        const roles = await request('/rest/v1/rpc/gostudy_my_destinations',{method:'POST',body:{}},result.data.access_token);
+        if (!roles.ok || !roles.data?.some(row=>row.course==='teacher')) throw Error('У аккаунта нет доступа к кабинету преподавателя.');
+        saveSession(result.data,true);
         setSignedIn();
         startPolling();
       } catch(error) { message.textContent = error.message; }
@@ -1252,6 +1283,7 @@
       finally { button.disabled = false; }
     });
     document.getElementById('teacher-signout').onclick = () => {
+      localStorage.removeItem(teacherSessionKey);
       sessionStorage.removeItem(authKey);
       location.reload();
     };
