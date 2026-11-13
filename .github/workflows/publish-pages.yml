@@ -1,0 +1,46 @@
+name: Verify and publish GoStudy
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: gostudy-pages-${{ github.event_name == 'pull_request' && github.ref || 'production' }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: python3 scripts/update-shared-assets.py
+      - run: npm install --no-save --no-package-lock playwright@1.58.2
+      - run: npx playwright install --with-deps chromium
+      - run: node scripts/check-pages.cjs
+      - name: Prepare static site
+        if: github.ref == 'refs/heads/main'
+        run: |
+          mkdir _site
+          cp -R -- *.html assets .nojekyll _site/
+          git ls-files -z | python3 -c 'import sys,shutil,pathlib; root=pathlib.Path("_site"); files=sys.stdin.buffer.read().split(b"\0"); [(root/p).parent.mkdir(parents=True,exist_ok=True) or shutil.copy2(p,root/p) for p in map(lambda x:pathlib.Path(x.decode()),filter(None,files)) if p.suffix.lower() in {".mp3",".wav",".ogg",".m4a",".webp",".jpg",".jpeg",".png",".svg",".gif",".woff",".woff2",".mp4",".vtt"} and p.parts[0]!="assets"]'
+      - uses: actions/upload-pages-artifact@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          path: _site
+  publish:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
