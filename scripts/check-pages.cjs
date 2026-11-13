@@ -83,8 +83,19 @@ async function main() {
           const sidebar = page.locator('.room > .side, .gostudy-shared-room > .gostudy-room-sidebar');
           await sidebar.getByRole('button', {name:'Открыть словарь'}).waitFor();
           assert.equal(await page.locator('.gostudy-classroom-back:visible').count(), 0);
+          await sidebar.getByText('Видеосвязь', {exact:true}).waitFor();
+          await page.locator('.sheet .lesson-meta').waitFor();
+          if (await page.locator('.gostudy-shared-room').count()) {
+            const first = sidebar.locator('.sections button').first();
+            await first.waitFor();
+            if (await page.locator('#lessonMenu #nav').count()) {
+              await sidebar.locator('.sections button').nth(1).click();
+              await page.locator('.lesson-meta').getByText(/^Step 2 of /).waitFor();
+              await first.click();
+            }
+          }
           const sidebarBox = await sidebar.boundingBox();
-          const sheetBox = await page.locator('.room > .sheet, .gostudy-shared-room > .shell').boundingBox();
+          const sheetBox = await page.locator('.room > .sheet').boundingBox();
           assert.ok(sidebarBox.x >= sheetBox.x + sheetBox.width - 1, 'desktop tools must sit to the right of the lesson');
           await dictionary.click();
           await page.locator('.glass-words[open]').waitFor();

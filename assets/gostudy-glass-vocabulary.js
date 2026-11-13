@@ -331,7 +331,7 @@
     toolbar.append(button('Словарь',()=>open('words'),'glass-primary'),button('Тренировать слова',()=>open('cards')));
   }
   const roomSidebar = document.querySelector('.gostudy-room-sidebar');
-  if (roomSidebar) roomSidebar.prepend(toolbar);
+  if (roomSidebar) roomSidebar.querySelector('.sections').before(toolbar);
   else (side?.querySelector('.panel') || document.querySelector('header') || lesson).after(toolbar);
   translation=document.createElement('section');translation.className='glass-translation';translation.hidden=true;
   translation.setAttribute('aria-label','Перевод выделенного текста');

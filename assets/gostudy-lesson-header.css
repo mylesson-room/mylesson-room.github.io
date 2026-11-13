@@ -7,61 +7,17 @@ header.gostudy-lesson-topbar{display:flex;align-items:center;justify-content:spa
 .gostudy-lesson-topbar+.gostudy-cloud-bar:not(:has([data-cloud-status]:not(:empty))){display:none}
 @media(max-width:380px){.gostudy-lesson-topbar .gostudy-cabinet-back{padding-inline:9px;font-size:13px}.gostudy-lesson-logo{gap:6px;font-size:1.17rem}}
 
-.gostudy-shared-room {
-  display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(220px,27%);
-  align-items:start;
-  gap:20px;
-  max-width:1320px;
-  margin-inline:auto;
-  padding:28px 24px 48px;
+body.gostudy-adapted-lesson {font:16px/1.55 Inter,system-ui,sans-serif;color:#232c33}
+.gostudy-shared-room .sheet > .shell.lesson-content {
+  display:block; width:100%; max-width:none; min-width:0;
+  margin:0; padding:28px 30px 34px;
 }
-.gostudy-shared-room > .shell {
-  display:block;
-  width:100%;
-  min-width:0;
-  max-width:none;
-  margin:0;
-  padding:clamp(18px,4vw,36px);
-  background:#fff;
-  color:#192b36;
-  border:1px solid #e1e8ef;
-  border-radius:12px;
-  box-shadow:0 9px 34px #183e6410;
-}
-.gostudy-shared-room :is(#title,.hero h1) {
-  font-size:clamp(26px,3.6vw,41px);
-  line-height:1.15;
-  letter-spacing:-.035em;
-  margin:0 0 10px;
-}
-.gostudy-shared-room .travel-cover {
-  height:auto;
-  max-height:360px;
-  object-fit:contain;
-  background:#edf3f9;
-}
-.gostudy-room-sidebar {
-  display:grid;
-  align-content:start;
-  gap:12px;
-  position:sticky;
-  top:16px;
-  min-width:0;
-  padding:15px;
-  background:#fff;
-  border:1px solid #e1e8ef;
-  border-radius:12px;
-  box-shadow:0 3px 14px #234b680b;
-}
-.gostudy-room-sidebar :is(.glass-lesson-tools,.lesson-bar) {margin:0}
-.gostudy-room-sidebar .gostudy-classroom {
-  position:static;
-  max-width:100%;
-  justify-items:stretch;
-}
-.gostudy-room-sidebar .gostudy-classroom details[open] {width:100%}
-@media(max-width:720px) {
-  .gostudy-shared-room {grid-template-columns:minmax(0,1fr);padding:12px;gap:12px}
-  .gostudy-room-sidebar {position:static;grid-row:1}
+.gostudy-shared-room .shell :is(.card,.hero) {box-shadow:none}
+.gostudy-shared-room .shell .card {padding:16px 0;border:0;background:transparent}
+.gostudy-shared-room .shell .travel-cover {height:auto;max-height:none;object-fit:contain;border-radius:10px}
+.gostudy-shared-room .gostudy-classroom {position:static;max-width:100%;justify-items:stretch;margin-bottom:14px}
+.gostudy-shared-room .gostudy-classroom details[open] {width:100%}
+.gostudy-shared-room .sections button {font-size:14px}
+@media(max-width:780px) {
+  .gostudy-shared-room .sheet > .shell.lesson-content {padding-inline:16px}
 }

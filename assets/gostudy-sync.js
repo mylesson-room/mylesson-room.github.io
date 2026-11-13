@@ -799,7 +799,7 @@
     const back = root.querySelector('a');
     back.href = 'gostudy-teacher.html?selected='+encodeURIComponent(page.course+':'+classroomStudent);
     if (document.querySelector('.gostudy-cabinet-back')) back.remove();
-    document.querySelector('.gostudy-room-sidebar')?.append(root);
+    document.querySelector('.gostudy-room-sidebar .sections')?.before(root);
     const summary = root.querySelector('summary');
     const panelStatus = root.querySelector('[role="status"]');
     const answers = root.querySelector('dl');
@@ -1345,20 +1345,66 @@
     if (!shell || document.querySelector('.room > .sheet')) return;
     const content = shell.matches('main') ? shell : shell.querySelector('main');
     if (!content) return;
+    document.body.classList.add('color-workbook', 'gostudy-adapted-lesson');
     const room = document.createElement('div');
-    room.className = 'gostudy-shared-room';
+    room.className = 'room gostudy-shared-room';
+    const sheet = document.createElement('article');
+    sheet.className = 'sheet';
     const sidebar = document.createElement('aside');
-    sidebar.className = 'gostudy-room-sidebar';
+    sidebar.className = 'side gostudy-room-sidebar';
     sidebar.setAttribute('aria-label', 'Инструменты урока');
+    sidebar.innerHTML = '<section class="panel"><div class="call-head"><strong>Видеосвязь</strong><button type="button" class="expand" aria-expanded="false" aria-controls="gostudy-call">Расширить</button></div><div class="call" id="gostudy-call">Звонок здесь пока недоступен</div></section><nav class="panel sections" aria-label="Разделы"></nav>';
+    const expand = sidebar.querySelector('.expand');
+    expand.onclick = () => {
+      const expanded = room.classList.toggle('wide');
+      expand.setAttribute('aria-expanded', expanded);
+      expand.textContent = expanded ? 'Свернуть' : 'Расширить';
+    };
+    const meta = document.createElement('div');
+    meta.className = 'lesson-meta';
+    const label = document.createElement('span');
+    label.textContent = classroomCatalog[course.replaceAll('-','_')]?.name || course;
+    const count = document.createElement('span');
+    meta.append(label, count);
+    const progress = document.createElement('progress');
+    progress.setAttribute('aria-label', 'Прогресс урока');
     shell.before(room);
-    room.append(shell, sidebar);
+    room.append(sheet, sidebar);
+    shell.classList.add('lesson-content');
+    sheet.append(meta, progress, shell);
     const menu = content.querySelector('.lesson-bar');
+    if (menu) menu.hidden = true;
+    const goal = content.querySelector('#goal');
+    if (goal) goal.classList.add('instruction');
+    const nav = document.querySelector('#lessonMenu #nav');
+    const staticSections = [...content.querySelectorAll(':scope > section.card')];
+    const sections = sidebar.querySelector('.sections');
+    function updateSections() {
+      const original = [...(nav?.querySelectorAll('button') || [])];
+      const items = nav ? original : staticSections;
+      const current = Math.max(0, original.findIndex(item => item.classList.contains('active')));
+      count.textContent = nav ? 'Step '+(current+1)+' of '+items.length : items.length+' sections';
+      progress.hidden = !nav || !items.length;
+      progress.max = items.length || 1;
+      progress.value = current+1;
+      const heading = document.createElement('strong');
+      heading.textContent = 'Разделы';
+      const buttons = items.map((item,index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = nav ? [...item.childNodes].filter(node => node.nodeType === Node.TEXT_NODE).map(node => node.textContent).join('').trim() || item.textContent : item.querySelector('h2')?.textContent || 'Section '+(index+1);
+        if (nav && index === current) button.setAttribute('aria-current','step');
+        button.onclick = () => nav ? item.click() : item.scrollIntoView({block:'start'});
+        return button;
+      });
+      sections.replaceChildren(heading, ...buttons);
+    }
+    updateSections();
+    if (nav) new MutationObserver(updateSections).observe(nav,{childList:true,subtree:true});
     for (const selector of ['.glass-lesson-tools', '.glass-translation']) {
       const tool = document.querySelector(selector);
-      if (tool) sidebar.append(tool);
+      if (tool) sections.before(tool);
     }
-    if (menu) sidebar.append(menu);
-
   }
 
   document.addEventListener('DOMContentLoaded', () => {
