@@ -8,8 +8,8 @@
   if (!legacy) return;
   const key = 'gostudy-vocabulary-'+course+'-v1';
   const storage = window.GoStudyStorage || localStorage;
-  const shared = window.GoStudyTravelWords;
-  const classMode = course === 'travel-b2' && new URLSearchParams(location.search).has('classStudent');
+  const shared = window.GoStudyWorkbookWords || window.GoStudyTravelWords;
+  const classMode = new URLSearchParams(location.search).has('classStudent');
   let assigned = [];
   const norm = text => String(text).trim().toLowerCase().replace(/\s+/g,' ').replace(/[.!?,;:]+$/,'');
   const russian = /[а-яё]/i;
