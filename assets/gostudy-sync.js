@@ -503,7 +503,7 @@
     const open = home.querySelector('.home-open-lesson');
     const homework = home.querySelector('.home-homework-link');
     const dictionary = home.querySelector('a.home-tile');
-    open.href = document.body.dataset.vocabCourse ? lesson.lesson + '&view=glass' : lesson.lesson;
+    open.href = document.body.dataset.vocabCourse ? lesson.lesson + (lesson.lesson.includes('?') ? '&' : '?') + 'view=glass' : lesson.lesson;
     open.textContent = started.page > 0 || Object.keys(started.answers || {}).length ? 'Продолжить урок' : 'Открыть урок';
     homework.href = lesson.homework;
     dictionary.href = document.body.dataset.vocabCourse ? '#student-home' : courseHome ? courseHome.vocabulary : businessAI ? 'business-ai-b2c1.html#vocabulary' : tiktokA2 ? '#words' : lesson.lesson+'#vocabulary';
@@ -616,13 +616,18 @@
     };
   }
 
-  const workbookCourse = countryHouse ? 'country-house' : businessAI ? 'business-ai' : currentPage === 'travel-b2-04.html' || travelB2Cabinet ? 'travel-b2' : null;
+  const workbookCourse = document.querySelector('meta[name=gostudy-course]')?.content || (countryHouse ? 'country-house' : businessAI ? 'business-ai' : currentPage === 'travel-b2-04.html' || travelB2Cabinet ? 'travel-b2' : null);
   if (workbookCourse) {
+    keys.add('gostudy-vocabulary-'+workbookCourse+'-v1');
+    const existingCourse = ['travel-a2','finance-b1','tiktok-a2','feed-b2','first-sales','pharma-c1'].includes(workbookCourse);
+    const existingCode = workbookCourse.replaceAll('-','_');
     const wordRpc = (action,body) => token().then(access => request(
+      existingCourse ? '/rest/v1/rpc/gostudy_'+existingCode+'_'+(action==='assign'?'assign_word':action==='remove'?'remove_word':classroomStudent?'teacher_view':'my_words') :
       '/rest/v1/rpc/'+(workbookCourse==='travel-b2'?'travel_b2':'course')+'_workbook_'+action,
-      {method:'POST',body:workbookCourse==='travel-b2'?body:{p_course:workbookCourse,...body}},access));
+      {method:'POST',body:existingCourse?(action==='read'?{}:body):workbookCourse==='travel-b2'?body:{p_course:workbookCourse,...body}},access));
     window.GoStudyWorkbookWords = window.GoStudyTravelWords = {
       assigning: classroomStudent !== null,
+      canRemoveAssigned: !existingCourse,
       signedIn: !!session,
       teacherWithoutStudent: classroomStudent === null && (() => {
         try { return !!json(localStorage.getItem(teacherSessionKey))?.user?.id; } catch { return false; }
@@ -636,7 +641,7 @@
         if (!session) return [];
         const result = await wordRpc('read',{p_student:classroomStudent});
         if (!result.ok || !Array.isArray(result.data)) throw Error('Не удалось загрузить слова.');
-        return result.data;
+        return existingCourse && classroomStudent ? (result.data.find(row=>row.id===classroomStudent)?.assigned || []) : result.data;
       },
       async add(en,ru) {
         if (!session) throw Error('Войди в кабинет преподавателя.');
@@ -1174,11 +1179,11 @@
       const heading = document.getElementById('teacher-classroom-title');
       const lessonList = document.getElementById('teacher-classroom-lessons');
       heading.textContent = catalog ? 'Класс · '+catalog.name : '';
-      lessonList.replaceChildren(...(catalog?.lessons || []).map((lesson,index) => {
+      lessonList.replaceChildren(...(catalog?.lessons.slice(-1) || []).map((lesson,index) => {
         const row = document.createElement('li');
         const link = document.createElement('a');
         link.href = classroomLink(lesson.lesson,student.id);
-        link.textContent = 'Урок '+(index+1)+' · '+lesson.title;
+        link.textContent = 'Урок '+catalog.lessons.length+' · '+lesson.title;
         row.append(link);
         if (lesson.homework) {
           const homework = document.createElement('a');

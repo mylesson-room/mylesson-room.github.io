@@ -4,8 +4,9 @@
     'business-ai':['gostudy-business-ai-shared-v1','gostudy-business-ai-b2c1-v1'],
     'country-house':['gostudy-country-house-homework-a2-v1','gostudy-country-house-lesson-a2-v1','gostudy-country-house-lesson-02-a2-v1'],
     'travel-b2':['gostudy-travel-disruptions-b2-v1','gostudy-travel-b2-02-v1']
-  }[course];
-  if (!legacy) return;
+  }[course] || [];
+  if (!course) return;
+  legacy.push(...(window.GoStudyCurrentCourses?.[course] || []));
   const key = 'gostudy-vocabulary-'+course+'-v1';
   const storage = window.GoStudyStorage || localStorage;
   const shared = window.GoStudyWorkbookWords || window.GoStudyTravelWords;
@@ -14,7 +15,7 @@
   let assigned = [];
   const norm = text => String(text).trim().toLowerCase().replace(/\s+/g,' ').replace(/[.!?,;:]+$/,'');
   const russian = /[а-яё]/i;
-  const lesson = document.querySelector('.sheet');
+  const lesson = document.querySelector('.sheet,#content');
   const compactToolbar = document.body.matches('.travel-workbook,.color-workbook');
   const by = (root,selector) => root.querySelector(selector);
   const button = (label,action,cls='') => Object.assign(document.createElement('button'),{type:'button',textContent:label,onclick:action,className:cls});
@@ -202,7 +203,8 @@
       },'glass-word-remove');
       remove.setAttribute('aria-label','Удалить '+word.en);
       remove.title='Удалить';
-      actions.append(button('Озвучить',()=>speak(word.en)),remove);
+      actions.append(button('Озвучить',()=>speak(word.en)));
+      if (!classMode || shared?.canRemoveAssigned !== false) actions.append(remove);
       row.append(content,actions);
       list.append(row);
     }
@@ -308,27 +310,27 @@
     if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dictionary.close();
   });
   document.addEventListener('click',event=>{
-    const target=event.target.closest('.home-top-nav a,.home-top-nav button,.home-tools .home-tile,#dictBtn');
+    const target=event.target.closest('.home-top-nav a,.home-top-nav button,.home-tools .home-tile,#dictBtn,a[href$="#vocabulary"],a[href$="#training"]');
     if(!target)return;
     const name=target.textContent.trim();
-    if(target.id!=='dictBtn'&&!name.startsWith('Словарь')&&!/^(Практика|Тренировки)/.test(name))return;
-    event.preventDefault();event.stopImmediatePropagation();open(target.id==='dictBtn'||name.startsWith('Словарь')?'words':'cards');
+    if(!target.hash && target.id!=='dictBtn'&&!name.startsWith('Словарь')&&!/^(Практика|Тренировки)/.test(name))return;
+    event.preventDefault();event.stopImmediatePropagation();open(target.hash==='#vocabulary'||target.id==='dictBtn'||name.startsWith('Словарь')?'words':'cards');
   },true);
   let translation, selected='', translationRun=0;
   function closeTranslation(){if(translation)translation.hidden=true;selected='';++translationRun;}
   if(!lesson)return;
   const side=document.querySelector('.side');
-  if(!side)return;
+  const oldButton = document.getElementById('dictBtn');
   const toolbar=document.createElement('div');toolbar.className='glass-lesson-tools';
-  if (compactToolbar) {
+  if (!oldButton && compactToolbar) {
     const icon = button('📖',()=>open('words'),'glass-primary glass-icon');
     icon.setAttribute('aria-label','Открыть словарь');
     icon.title='Словарь';
     toolbar.append(icon);
-  } else {
+  } else if (!oldButton) {
     toolbar.append(button('Словарь',()=>open('words'),'glass-primary'),button('Тренировать слова',()=>open('cards')));
   }
-  by(side,'.panel').after(toolbar);
+  (side?.querySelector('.panel') || document.querySelector('header') || lesson).after(toolbar);
   translation=document.createElement('section');translation.className='glass-translation';translation.hidden=true;
   translation.setAttribute('aria-label','Перевод выделенного текста');
   translation.innerHTML='<div class="glass-title"><strong></strong><button type="button" aria-label="Закрыть перевод">×</button></div><label>Перевод<textarea rows="2"></textarea></label><p role="status"></p><div class="glass-actions"></div>';
