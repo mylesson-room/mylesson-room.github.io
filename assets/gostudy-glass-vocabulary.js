@@ -66,7 +66,7 @@
       'written approval':'письменное разрешение'
     },
     'country-house': {
-      'coming':'придут', 'are coming':'придут', 'guests are coming at one':'гости придут в час', 'rain is coming':'скоро пойдёт дождь',
+      'the guests are coming at one':'гости придут в час', 'coming':'придут', 'are coming':'придут', 'guests are coming at one':'гости придут в час', 'rain is coming':'скоро пойдёт дождь',
       'chairs':'стулья', 'chair':'стул', 'shed key':'ключ от сарая', 'the shed':'сарай', 'the porch':'крыльцо', 'take four chairs out of the shed':'вынеси четыре стула из сарая', 'there’s washing on the line':'на верёвке сушится бельё', 'if it rains':'если пойдёт дождь', 'set the table':'накрыть на стол', 'bus stop':'автобусная остановка', 'line':'бельевая верёвка', 'on the line':'на бельевой верёвке',
       'it’s still drying':'оно ещё сохнет', 'it\'s still drying':'оно ещё сохнет',
       'bring it in':'занеси это в дом', 'by the kettle':'рядом с чайником',
@@ -143,17 +143,29 @@
     if (reverse) return reverse;
     if (cache.has(normalized)) return cache.get(normalized);
     if (new TextEncoder().encode(text).length>450) throw Error('Выделите более короткую фразу.');
-    const url='https://api.mymemory.translated.net/get?'+new URLSearchParams({q:text,langpair:russian.test(text)?'ru|en':'en|ru'});
-    let response;
-    try { response=await fetch(url,{signal:AbortSignal.timeout(9000),credentials:'omit',referrerPolicy:'no-referrer'}); }
-    catch(error) {
-      if(error.name==='TimeoutError'||error.name==='AbortError') throw Error('Сервис перевода не ответил. Выделите фразу ещё раз или введите перевод вручную.');
-      throw Error('Не удалось подключиться к переводу. Перевод можно ввести вручную.');
+    const sourceLanguage=russian.test(text)?'ru':'en';
+    const targetLanguage=sourceLanguage==='ru'?'en':'ru';
+    const url='https://translate.googleapis.com/translate_a/t?'+new URLSearchParams({client:'dict-chrome-ex',sl:sourceLanguage,tl:targetLanguage,q:text});
+    let result;
+    try {
+      const response=await fetch(url,{signal:AbortSignal.timeout(4500),credentials:'omit',referrerPolicy:'no-referrer'});
+      if(!response.ok) throw Error();
+      const data=await response.json();
+      result=Array.isArray(data)&&typeof data[0]==='string'?data[0].trim():'';
+      if(!result) throw Error();
+    } catch {
+      if (globalThis.Translator) {
+        try {
+          const pair={sourceLanguage,targetLanguage};
+          if(await Translator.availability(pair)==='available'){
+            const translator=await Translator.create({...pair,signal:AbortSignal.timeout(4500)});
+            try { result=(await translator.translate(text,{signal:AbortSignal.timeout(4500)})).trim(); }
+            finally { translator.destroy(); }
+          }
+        } catch {}
+      }
+      if(!result) throw Error('Перевод сейчас недоступен. Можно ввести его вручную.');
     }
-    if (!response.ok) throw Error('Перевод недоступен. Его можно ввести вручную.');
-    const data=await response.json();
-    if (Number(data.responseStatus)!==200 || !data.responseData?.translatedText) throw Error('Перевод недоступен. Его можно ввести вручную.');
-    const result=new DOMParser().parseFromString(data.responseData.translatedText,'text/html').body.textContent;
     cache.set(normalized,result);
     return result;
   }
