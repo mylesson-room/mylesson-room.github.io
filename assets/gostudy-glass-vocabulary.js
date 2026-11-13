@@ -44,6 +44,7 @@
     try { const value = JSON.parse(store.getItem(name)); return Array.isArray(value) ? value : Array.isArray(value?.words) ? value.words : []; }
     catch { return []; }
   }
+  function hiddenWords(){try{return JSON.parse(storage.getItem(key))?.removed || [];}catch{return [];}}
   function words() {
     const all = new Map();
     for (const name of shared?.assigning ? [] : legacy) {
@@ -55,7 +56,8 @@
       if (word?.en && word?.ru) all.set(norm(word.en),word);
     }
     for (const word of assigned) if (!all.has(norm(word.en))) all.set(norm(word.en),word);
-    return [...all.values()];
+    const removed = new Set(hiddenWords());
+    return [...all.values()].filter(word=>!removed.has(norm(word.en)));
   }
   async function add(a,b) {
     a=a.trim(); b=b.trim();
@@ -67,9 +69,21 @@
       return true;
     }
     const list = words().filter(word => norm(word.en)!==norm(en));
-    const record = JSON.stringify({words:[...list,{en,ru}]});
+    const record = JSON.stringify({words:[...list,{en,ru}],removed:hiddenWords().filter(value=>value!==norm(en))});
     try { storage.setItem(key,record); } catch { return false; }
     return true;
+  }
+  async function removeWord(word) {
+    const id=norm(word.en);
+    if(shared?.assigning){
+      await shared.remove(word.en);
+      assigned=assigned.filter(item=>norm(item.en)!==id);
+    }else{
+      storage.setItem(key,JSON.stringify({
+        words:read(storage,key).filter(item=>norm(item.en)!==id),
+        removed:[...new Set([...hiddenWords(),id])]
+      }));
+    }
   }
   async function translate(text) {
     const normalized=norm(text);
@@ -107,7 +121,23 @@
       const translation=document.createElement('span');
       strong.textContent=word.en; translation.textContent=word.ru;
       content.append(strong,translation);
-      row.append(content,button('Озвучить',()=>speak(word.en)));
+      const actions=document.createElement('div');
+      actions.className='glass-word-actions';
+      const remove=button('×',async()=>{
+        remove.disabled=true;
+        try {
+          await removeWord(word);
+          renderWords();
+          status.textContent='Слово удалено.';
+        } catch(error) {
+          status.textContent=error.message || 'Не удалось удалить слово.';
+          remove.disabled=false;
+        }
+      },'glass-word-remove');
+      remove.setAttribute('aria-label','Удалить '+word.en);
+      remove.title='Удалить';
+      actions.append(button('Озвучить',()=>speak(word.en)),remove);
+      row.append(content,actions);
       list.append(row);
     }
   }

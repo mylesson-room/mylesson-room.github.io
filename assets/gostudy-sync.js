@@ -555,6 +555,11 @@
   if (currentPage === 'travel-b2-04.html' || travelB2Cabinet) {
     window.GoStudyTravelWords = {
       assigning: classroomStudent !== null,
+      async remove(en) {
+        if (!session) throw Error('Войди в кабинет преподавателя.');
+        const result=await request('/rest/v1/rpc/travel_b2_workbook_remove',{method:'POST',body:{p_student:classroomStudent,p_en:en}},await token());
+        if (!result.ok || result.data !== true) throw Error('Не удалось удалить слово.');
+      },
       async read() {
         if (!session) return [];
         const result = await request('/rest/v1/rpc/travel_b2_workbook_read',{method:'POST',body:{p_student:classroomStudent}},await token());
