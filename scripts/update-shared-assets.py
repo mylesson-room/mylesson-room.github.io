@@ -12,7 +12,7 @@ def digest(url):
 
 for path in sorted(ROOT.glob('*.html')):
     original = html = path.read_text()
-    if 'data-vocab-course=' not in html and path.name not in {'login.html','gostudy-account.html','gostudy-teacher.html'}:
+    if 'data-vocab-course=' not in html and path.name not in {'login.html','gostudy-account.html','gostudy-teacher.html','gostudy-ui-kit.html'}:
         continue
     if 'data-vocab-course=' in html and 'assets/gostudy-glass-vocabulary.js' not in html:
         raise SystemExit(f'{path.name}: shared dictionary missing')

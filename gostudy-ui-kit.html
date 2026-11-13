@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GoStudy · UI‑кит урока</title>
+<link rel="stylesheet" href="assets/gostudy-lesson-room.css?v=59d24f8df5d7">
+<link rel="stylesheet" href="assets/business-ai-workbook.css?v=49dff43e2e83">
+<link rel="stylesheet" href="assets/gostudy-glass-vocabulary.css?v=56adcac829c1">
+<link rel="stylesheet" href="assets/gostudy-lesson-header.css?v=519a957a99cb">
+<link rel="stylesheet" href="assets/gostudy-color-workbook.css?v=d777b9cfb39f">
+<style>
+.kit-reference {margin-top:24px}
+.kit-reference h2 {margin-bottom:8px}
+.kit-reference dl {display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.kit-reference dl div {padding:12px;border:1px solid #dfe6ee;border-radius:7px}
+.kit-reference dd {margin:4px 0 0;color:#546977}
+.swatch {display:inline-block;width:16px;height:16px;border:1px solid #dfe6ee;border-radius:4px;vertical-align:middle;margin-right:6px;background:var(--sample)}
+</style>
+</head>
+<body class="color-workbook business-workbook">
+<header class="gostudy-lesson-topbar">
+<span class="gostudy-lesson-logo"><span class="gostudy-lesson-mark" aria-hidden="true">G</span>GoStudy</span>
+<a class="gostudy-cabinet-back" href="gostudy-teacher.html">← В личный кабинет</a>
+</header>
+<main class="room">
+<article class="sheet">
+<div class="lesson-meta"><span>Business English · B2–C1</span><span id="step-count">Step 1 of 10</span></div>
+<progress value="1" max="10" aria-label="Прогресс урока"></progress>
+<div class="lesson-content">
+<p class="label">From AI Pilot to Rollout</p>
+<h1 id="step-title" tabindex="-1" lang="en">Would you approve the pilot?</h1>
+<p class="instruction" lang="en">Discuss the decision before looking at the numbers.</p>
+<img class="lesson-cover" src="assets/gostudy-ai-pilot.png" alt="Два коллеги обсуждают результаты пилота">
+<section class="kit-reference" aria-labelledby="kit-title">
+<h2 id="kit-title">UI‑кит GoStudy</h2>
+<dl>
+<div><dt>Раскладка</dt><dd>Контейнер до 1280 px. Правая колонка 276 px. Между колонками 20 px. На узком экране одна колонка.</dd></div>
+<div><dt>Типографика</dt><dd>Inter, системный шрифт как запасной. Основной текст 16 px, метаданные 13 px, заголовок 24–34 px, инструкция 17 px.</dd></div>
+<div><dt>Поверхности</dt><dd><span class="swatch" style="--sample:#edf3f9"></span>Фон #EDF3F9<br><span class="swatch" style="--sample:#fff"></span>Карточки #FFFFFF<br><span class="swatch" style="--sample:#232c33"></span>Текст #232C33</dd></div>
+<div><dt>Навигация</dt><dd><span class="swatch" style="--sample:#d9f5fd"></span>Активный раздел #D9F5FD<br><span class="swatch" style="--sample:#00a3d9"></span>Прогресс #00A3D9</dd></div>
+<div><dt>Боковая колонка</dt><dd>Видеосвязь, кнопка словаря, статус ответов преподавателя и разделы урока. Выбранный раздел отмечен цветом и доступен с клавиатуры.</dd></div>
+<div><dt>Шапка</dt><dd>Логотип слева. Кнопка возврата справа. Словарь открывается поверх текущего урока.</dd></div>
+</dl>
+</section>
+<section class="activity" aria-label="Варианты ответов">
+<fieldset><legend lang="en">What would you do next?</legend><div class="options">
+<label><input type="radio" name="decision"><span lang="en">Approve the pilot</span></label>
+<label><input type="radio" name="decision"><span lang="en">Ask for more evidence</span></label>
+</div></fieldset>
+<details class="word-menu"><summary>Choose</summary><div class="word-options"><button type="button">Approve</button><button type="button">Review</button></div></details>
+</section>
+</div>
+<div class="step-nav"><button class="back" type="button" disabled>← Back</button><button class="cta next" type="button">Next →</button></div>
+</article>
+<aside class="side">
+<section class="panel">
+<div class="call-head"><strong>Видеосвязь</strong><button type="button" class="expand" aria-expanded="false" aria-controls="call">Расширить</button></div>
+<div class="call" id="call">Звонок здесь пока недоступен</div>
+</section>
+<div class="glass-lesson-tools"><button type="button" class="glass-primary glass-icon" aria-label="Открыть словарь" title="Словарь">📖</button></div>
+<p>Ответы ученицы обновляются автоматически</p>
+<nav class="panel sections" aria-label="Разделы"><strong>Разделы</strong></nav>
+</aside>
+</main>
+<dialog class="glass-words" aria-labelledby="kit-words"><div class="glass-title"><h2 id="kit-words">Мой словарь</h2><form method="dialog"><button aria-label="Закрыть">×</button></form></div><ul class="glass-list"><li>pilot programme · пилотная программа</li></ul></dialog>
+<script>
+const room = document.querySelector('.room');
+const expand = document.querySelector('.expand');
+const titles = ['Would you approve the pilot?', 'Read the pilot review', 'What can we conclude?', 'Use precise business language', 'Write with the right level of certainty', 'Rebuild the recommendation', 'Calculate the trade-off', 'Prepare a board update', 'Make your recommendation', 'Wrap up'];
+const sections = document.querySelector('.sections');
+const back = document.querySelector('.back');
+const next = document.querySelector('.next');
+let index = 0;
+const buttons = titles.map((title, i) => {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.textContent = title;
+  button.lang = 'en';
+  button.onclick = () => go(i);
+  sections.append(button);
+  return button;
+});
+function go(step) {
+  index = step;
+  document.querySelector('#step-title').textContent = titles[step];
+  document.querySelector('#step-count').textContent = 'Step ' + (step + 1) + ' of ' + titles.length;
+  document.querySelector('progress').value = step + 1;
+  buttons.forEach((button, i) => {
+    if (i === step) button.setAttribute('aria-current', 'step');
+    else button.removeAttribute('aria-current');
+  });
+  back.disabled = step === 0;
+  next.disabled = step === titles.length - 1;
+}
+back.onclick = () => go(index - 1);
+next.onclick = () => go(index + 1);
+expand.onclick = () => {
+  const expanded = room.classList.toggle('wide');
+  expand.setAttribute('aria-expanded', expanded);
+  expand.textContent = expanded ? 'Свернуть' : 'Расширить';
+};
+document.querySelector('.glass-icon').onclick = () => document.querySelector('.glass-words').showModal();
+const menu = document.querySelector('.word-menu');
+menu.querySelectorAll('button').forEach(button => {
+  button.onclick = () => {
+    menu.querySelector('summary').textContent = button.textContent;
+    menu.open = false;
+    menu.querySelector('summary').focus();
+  };
+});
+go(0);
+</script>
+</body>
+</html>
