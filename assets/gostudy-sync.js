@@ -933,7 +933,7 @@
           signature = next;
           render();
         }
-        panelStatus.textContent = student ? 'Ответы и слова обновляются автоматически.' : 'Этот ученик не привязан к вашему аккаунту для этого курса.';
+        panelStatus.textContent = student ? '' : 'Этот ученик не привязан к вашему аккаунту для этого курса.';
       } catch (error) {
         panelStatus.textContent = error.message;
       } finally { busy = false; }
@@ -1346,32 +1346,13 @@
     const content = shell.matches('main') ? shell : shell.querySelector('main');
     if (!content) return;
     document.body.classList.add('color-workbook', 'gostudy-adapted-lesson');
-    const room = document.createElement('div');
-    room.className = 'room gostudy-shared-room';
-    const sheet = document.createElement('article');
-    sheet.className = 'sheet';
-    const sidebar = document.createElement('aside');
-    sidebar.className = 'side gostudy-room-sidebar';
-    sidebar.setAttribute('aria-label', 'Инструменты урока');
-    sidebar.innerHTML = '<section class="panel"><div class="call-head"><strong>Видеосвязь</strong><button type="button" class="expand" aria-expanded="false" aria-controls="gostudy-call">Расширить</button></div><div class="call" id="gostudy-call">Звонок здесь пока недоступен</div></section><nav class="panel sections" aria-label="Разделы"></nav>';
-    const expand = sidebar.querySelector('.expand');
-    expand.onclick = () => {
-      const expanded = room.classList.toggle('wide');
-      expand.setAttribute('aria-expanded', expanded);
-      expand.textContent = expanded ? 'Свернуть' : 'Расширить';
-    };
-    const meta = document.createElement('div');
-    meta.className = 'lesson-meta';
-    const label = document.createElement('span');
-    label.textContent = classroomCatalog[course.replaceAll('-','_')]?.name || course;
-    const count = document.createElement('span');
-    meta.append(label, count);
-    const progress = document.createElement('progress');
-    progress.setAttribute('aria-label', 'Прогресс урока');
-    shell.before(room);
-    room.append(sheet, sidebar);
-    shell.classList.add('lesson-content');
-    sheet.append(meta, progress, shell);
+    const ui = window.GoStudyClassroomUI;
+    const courseLabel = classroomCatalog[course.replaceAll('-','_')]?.name || course;
+    const room = ui.createRoom(shell, courseLabel);
+    room.classList.add('gostudy-shared-room');
+    const sidebar = room.querySelector('.side');
+    const step = ui.createStep(room.querySelector('.sheet'));
+    step.content.append(shell);
     const menu = content.querySelector('.lesson-bar');
     if (menu) menu.hidden = true;
     const goal = content.querySelector('#goal');
@@ -1383,21 +1364,19 @@
       const original = [...(nav?.querySelectorAll('button') || [])];
       const items = nav ? original : staticSections;
       const current = Math.max(0, original.findIndex(item => item.classList.contains('active')));
-      count.textContent = nav ? 'Step '+(current+1)+' of '+items.length : items.length+' sections';
-      progress.hidden = !nav || !items.length;
-      progress.max = items.length || 1;
-      progress.value = current+1;
-      const heading = document.createElement('strong');
-      heading.textContent = 'Разделы';
-      const buttons = items.map((item,index) => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.textContent = nav ? [...item.childNodes].filter(node => node.nodeType === Node.TEXT_NODE).map(node => node.textContent).join('').trim() || item.textContent : item.querySelector('h2')?.textContent || 'Section '+(index+1);
-        if (nav && index === current) button.setAttribute('aria-current','step');
-        button.onclick = () => nav ? item.click() : item.scrollIntoView({block:'start'});
-        return button;
+      step.update(courseLabel, current, items.length);
+      const titles = items.map((item,index) => nav
+        ? [...item.childNodes].filter(node => node.nodeType === Node.TEXT_NODE).map(node => node.textContent).join('').trim() || item.textContent
+        : item.querySelector('h2')?.textContent || 'Section '+(index+1));
+      ui.renderSections(sections, titles, current, index => {
+        if (nav) items[index].click();
+        else {
+          step.update(courseLabel, index, items.length);
+          sections.querySelector('[aria-current]')?.removeAttribute('aria-current');
+          sections.querySelectorAll('button')[index].setAttribute('aria-current','step');
+          items[index].scrollIntoView({block:'start'});
+        }
       });
-      sections.replaceChildren(heading, ...buttons);
     }
     updateSections();
     if (nav) new MutationObserver(updateSections).observe(nav,{childList:true,subtree:true});

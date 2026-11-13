@@ -1,7 +1,12 @@
 (() => {
-  const room = document.querySelector('.room');
-  const sheet = room.querySelector('.sheet');
   const config = JSON.parse(document.getElementById('lesson-data').textContent);
+  const ui = window.GoStudyClassroomUI;
+  const room = ui.createRoom(document.querySelector('.room'), config.level);
+  const sheet = room.querySelector('.sheet');
+  const frame = ui.createStep(sheet);
+  const navigation = document.createElement('div');
+  navigation.className = 'step-nav';
+  sheet.append(navigation);
   const storage = window.GoStudyStorage || localStorage;
   let state;
   try { state = JSON.parse(storage.getItem(config.key)) || {}; } catch { state = {}; }
@@ -52,7 +57,7 @@
       if (!document.hidden) {
         studentAnswers = await live.read();
         showStudentAnswers();
-        liveStatus.textContent = 'Ответы ученицы обновляются автоматически';
+        liveStatus.textContent = '';
       }
     } catch (error) {
       liveStatus.textContent = error.message;
@@ -60,12 +65,6 @@
       setTimeout(pollStudentAnswers,1600);
     }
   }
-  const expand = document.querySelector('.expand');
-  expand.onclick = () => {
-    const expanded = room.classList.toggle('wide');
-    expand.setAttribute('aria-expanded',expanded);
-    expand.textContent = expanded ? 'Свернуть' : 'Расширить';
-  };
   function go(next) {
     index = next;
     save();
@@ -92,8 +91,8 @@
     const step = config.steps[index];
     const answer = state.answers[step.id];
     const current = Array.isArray(answer) ? answer : [];
-    sections.innerHTML = '<strong>Разделы</strong>'+config.steps.map((item,i) => '<button type="button" data-step="'+i+'"'+(i===index?' aria-current="step"':'')+'>'+escape(item.title)+'</button>').join('');
-    sections.querySelectorAll('button').forEach(button => { button.onclick = () => go(Number(button.dataset.step)); });
+    ui.renderSections(sections, config.steps.map(item => item.title), index, go);
+    frame.update(config.level,index,config.steps.length);
     let exercise = '';
     if (step.type === 'choice') {
       exercise = step.items.map(([question,options],i) => '<fieldset data-question="'+i+'"><legend><span class="item-number">'+(i+1)+'</span>'+escape(question)+'</legend><div class="options">'+options.map((option,j) => '<label><input type="radio" name="q'+i+'" value="'+j+'"'+(current[i]===j?' checked':'')+'><span>'+escape(option)+'</span></label>').join('')+'</div><p class="feedback" aria-live="polite"></p></fieldset>').join('');
@@ -115,7 +114,8 @@
     const source = metrics + (step.source?.length ? '<div class="source '+sourceStyle+'">'+step.source.map(p => '<p>'+escape(p)+'</p>').join('')+'</div>' : '');
     const writing = step.type === 'write' ? '<label class="writing">Your draft<textarea rows="6">'+escape(typeof answer==='string'?answer:'')+'</textarea></label><p class="draft-status" role="status"></p>' : '';
     const cover = step.id === 'original-0' ? '<img class="lesson-cover" src="'+escape(config.cover)+'" alt="'+escape(config.coverAlt || '')+'">' : '';
-    sheet.innerHTML = '<div class="lesson-meta"><span>'+escape(config.level)+'</span><span>Step '+(index+1)+' of '+config.steps.length+'</span></div><progress max="'+config.steps.length+'" value="'+(index+1)+'" aria-label="Lesson progress"></progress><div class="lesson-content"><p class="label">'+escape(config.title)+'</p><h1 tabindex="-1">'+escape(step.title)+'</h1><p class="instruction">'+escape(step.instruction)+'</p>'+cover+renderVisual(step.visual)+source+(exercise?'<section class="activity">'+exercise+'<button type="button" class="check cta">Check answers</button><p role="status" class="result"></p></section>':'')+writing+'</div><div class="step-nav"><button type="button" class="back" '+(index===0?'disabled':'')+'>← Back</button>'+(index+1===config.steps.length?'<a class="cta home-link" href="'+escape(config.cabinet)+'">Back to my course</a>':'<button type="button" class="cta next">Next →</button>')+'</div>';
+    frame.content.innerHTML = '<p class="label">'+escape(config.title)+'</p><h1 tabindex="-1">'+escape(step.title)+'</h1><p class="instruction">'+escape(step.instruction)+'</p>'+cover+renderVisual(step.visual)+source+(exercise?'<section class="activity">'+exercise+'<button type="button" class="check cta">Check answers</button><p role="status" class="result"></p></section>':'')+writing;
+    navigation.innerHTML = '<button type="button" class="back" '+(index===0?'disabled':'')+'>← Back</button>'+(index+1===config.steps.length?'<a class="cta home-link" href="'+escape(config.cabinet)+'">Back to my course</a>':'<button type="button" class="cta next">Next →</button>');
     showStudentAnswers();
     sheet.querySelector('.back').onclick = () => go(index-1);
     const next = sheet.querySelector('.next');

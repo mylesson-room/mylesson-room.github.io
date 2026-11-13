@@ -19,6 +19,12 @@
   const compactToolbar = document.body.matches('.travel-workbook,.color-workbook');
   const by = (root,selector) => root.querySelector(selector);
   const button = (label,action,cls='') => Object.assign(document.createElement('button'),{type:'button',textContent:label,onclick:action,className:cls});
+  function icon(symbol,label,action,cls='') {
+    const control=button(symbol,action,'glass-symbol '+cls);
+    control.title=label;
+    control.setAttribute('aria-label',label);
+    return control;
+  }
   const dictionary = document.createElement('dialog');
   dictionary.className = 'glass-words';
   dictionary.setAttribute('aria-labelledby','glass-vocab-title');
@@ -232,7 +238,7 @@
     finally{submit.disabled=false;}
     ++generation; clearTimeout(timer); form.reset(); renderWords(); status.textContent=classMode?'Слово добавлено ученице.':'Слово добавлено.';
   };
-  const modes={'cards':'Карточки','choice':'Выбрать перевод','type':'Ввести слово'};
+  const modes={'cards':'Карточки','choice':'Выбрать перевод','type':'Ввести слово','listen':'На слух'};
   let tab='words', index=0;
   function show(mode,reset=true) {
     if (reset || tab!==mode) index=0;
@@ -253,15 +259,17 @@
     const prompt=document.createElement('h3');prompt.textContent=tab==='type'?word.ru:word.en;
     const feedback=document.createElement('p');feedback.setAttribute('role','status');
     const next=button('Следующее слово',()=>{index++;show(tab,false);},'glass-primary');
+    if(tab==='listen') prompt.textContent='Услышь слово и выбери перевод';
     practice.append(counter,prompt);
+    if(tab==='listen') practice.append(icon('🔊','Прослушать слово',()=>speak(word.en)));
     if(tab==='cards') practice.append(button('Показать перевод',()=>{feedback.textContent=word.ru;}),button('Озвучить',()=>speak(word.en)));
-    if(tab==='choice'){
+    if(tab==='choice'||tab==='listen'){
       const distractors=[...new Set(saved.map(item=>item.ru))].filter(ru=>norm(ru)!==norm(word.ru)).slice(0,3);
-      if(!distractors.length) practice.append(document.createTextNode('Для выбора перевода нужны хотя бы два разных перевода.'));
+      if(!distractors.length) practice.append(button('Показать перевод',()=>{feedback.textContent=word.ru;}));
       else{
         const options=[...distractors]; options.splice(index%(options.length+1),0,word.ru);
         const choices=document.createElement('div');choices.className='glass-choices';
-        for(const value of options)choices.append(button(value,()=>{feedback.textContent=value===word.ru?'Верно!':'Попробуйте ещё раз.';}));
+        for(const value of options)choices.append(button(value,()=>{feedback.textContent=value===word.ru?'Верно! '+word.en+' — '+word.ru:'Попробуйте ещё раз.';}));
         practice.append(choices);
       }
     }
@@ -349,18 +357,20 @@
     if(classMode)return;
     needsClass=true;
     showClassLink();
-    by(translation,'.glass-primary').textContent='Добавить ученице';
+    const save=by(translation,'.glass-heart');
+    save.title='Добавить ученику';
+    save.setAttribute('aria-label',save.title);
     form.querySelector('[type=submit]').textContent='Добавить ученице';
   });
   const translated=by(translation,'textarea'), translationStatus=by(translation,'p');
   by(translation,'.glass-title button').onclick=closeTranslation;
-  by(translation,'.glass-actions').append(button('Озвучить',()=>speak(selected)),button(classMode || needsClass?'Добавить ученице':'В словарь',async event=>{
+  by(translation,'.glass-actions').append(icon('🔊','Озвучить',()=>speak(selected)),icon('♥',classMode || needsClass?'Добавить ученику':'В словарь',async event=>{
     const control=event.currentTarget, run=translationRun;
     control.disabled=true;
     try { if(!await add(selected,translated.value)) throw Error('Добавьте перевод, чтобы сохранить слово.'); if(run===translationRun)translationStatus.textContent=classMode?'Слово добавлено ученице.':'Добавлено в словарь.'; }
     catch(error){if(run===translationRun)translationStatus.textContent=error.message;}
     finally{control.disabled=false;}
-  },'glass-primary'));
+  },'glass-heart'));
   translated.oninput=()=>{++translationRun;translationStatus.textContent='';};
   let selecting=false, selectionTimer;
   function readSelection(){

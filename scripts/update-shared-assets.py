@@ -20,6 +20,10 @@ for path in sorted(ROOT.glob('*.html')):
         styles = ('gostudy-lesson-room.css', 'business-ai-workbook.css?v=2', 'gostudy-color-workbook.css')
         links = ''.join(f'<link rel="stylesheet" href="assets/{style}">\n' for style in styles)
         html = html.replace('</head>', links + '</head>', 1)
+    if '<meta name="gostudy-current-lesson">' in html or 'assets/gostudy-vimbox-workbook.js' in html:
+        html = re.sub(r'(<script (?:defer )?src="assets/gostudy-sync\.js)', r'<script src="assets/gostudy-classroom-ui.js"></script>\1', html, count=1) if 'assets/gostudy-classroom-ui.js' not in html else html
+    if 'id="student-home"' in html and 'assets/gostudy-lesson-header.css' not in html:
+        html = html.replace('</head>', '<link rel="stylesheet" href="assets/gostudy-lesson-header.css"></head>', 1)
     def version(match):
         url = match[1]
         stamp = digest(url)

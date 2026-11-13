@@ -11,3 +11,8 @@
 .glass-lesson-tools,.glass-actions{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}.glass-translation{padding:13px;margin-bottom:13px;border-radius:17px;box-shadow:0 6px 25px #17365824}.glass-translation textarea{resize:vertical;min-height:52px;overflow-wrap:break-word}.glass-translation .glass-actions{margin:9px 0 0}
 @media(max-width:780px){.glass-translation:not([hidden]){position:fixed;z-index:30;right:12px;bottom:12px;max-height:46dvh;overflow:auto;width:min(360px,calc(100vw - 24px));margin:0}}
 .glass-word-actions{display:flex;align-items:center;gap:6px;flex:none}.glass-words .glass-word-remove{width:30px;height:30px;min-height:30px;padding:0;font-size:19px;line-height:1;color:#754655}.glass-words .glass-word-remove:hover{background:#ffeded}
+
+.glass-translation button.glass-symbol,.glass-practice button.glass-symbol{display:inline-grid;place-items:center;width:42px;height:42px;padding:0;font-size:19px;line-height:1;border-radius:50%}
+.glass-translation button.glass-heart{color:#b63558;background:#fff1f4;border-color:#f3c1cf;font-size:24px}
+.glass-translation button.glass-heart:hover{background:#ffe0e9}
+.travel-live-status:empty,.gostudy-classroom-panel [role=status]:empty{display:none}

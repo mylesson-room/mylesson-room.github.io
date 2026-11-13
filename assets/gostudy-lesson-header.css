@@ -8,9 +8,9 @@ header.gostudy-lesson-topbar{display:flex;align-items:center;justify-content:spa
 @media(max-width:380px){.gostudy-lesson-topbar .gostudy-cabinet-back{padding-inline:9px;font-size:13px}.gostudy-lesson-logo{gap:6px;font-size:1.17rem}}
 
 body.gostudy-adapted-lesson {font:16px/1.55 Inter,system-ui,sans-serif;color:#232c33}
-.gostudy-shared-room .sheet > .shell.lesson-content {
+.gostudy-shared-room .sheet .lesson-content > .shell {
   display:block; width:100%; max-width:none; min-width:0;
-  margin:0; padding:28px 30px 34px;
+  margin:0; padding:0;
 }
 .gostudy-shared-room .shell :is(.card,.hero) {box-shadow:none}
 .gostudy-shared-room .shell .card {padding:16px 0;border:0;background:transparent}
@@ -18,6 +18,17 @@ body.gostudy-adapted-lesson {font:16px/1.55 Inter,system-ui,sans-serif;color:#23
 .gostudy-shared-room .gostudy-classroom {position:static;max-width:100%;justify-items:stretch;margin-bottom:14px}
 .gostudy-shared-room .gostudy-classroom details[open] {width:100%}
 .gostudy-shared-room .sections button {font-size:14px}
-@media(max-width:780px) {
-  .gostudy-shared-room .sheet > .shell.lesson-content {padding-inline:16px}
+
+:root {
+  --gostudy-ui-font: Inter, system-ui, sans-serif;
+  --gostudy-ui-heading-size: clamp(24px, 3vw, 34px);
+  --gostudy-ui-ink: #232c33;
+  --gostudy-ui-accent: #007eac;
+  --gostudy-ui-panel: #fff;
+  --gostudy-ui-line: #dfe6ee;
+}
+[data-shared-classroom] {font:16px/1.55 var(--gostudy-ui-font);color:var(--gostudy-ui-ink)}
+[data-shared-classroom] .sheet :is(h1,#title) {
+  font:700 var(--gostudy-ui-heading-size)/1.2 var(--gostudy-ui-font);
+  letter-spacing:-.025em;
 }

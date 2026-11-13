@@ -42,3 +42,19 @@ body.gostudy-student-home.dark{background:#13232f;color:#eaf6fc}body.gostudy-stu
 .gostudy-student-home .home-homework .home-primary{background:#007cae;border-color:#007cae}
 .gostudy-student-home .home-lesson .home-primary{background:transparent;border-color:transparent;padding-inline:0;color:#006e9b;text-decoration:underline;text-underline-offset:3px}
 @media(max-width:570px){.gostudy-student-home .home-current{min-height:190px}}
+
+body.gostudy-student-home #student-home {
+  font:16px/1.55 var(--gostudy-ui-font, Inter, system-ui, sans-serif);
+}
+body.gostudy-student-home #student-home .home-current {
+  background:var(--gostudy-ui-panel,#fff);
+  border:1px solid var(--gostudy-ui-line,#dfe6ee);
+  color:var(--gostudy-ui-ink,#232c33);
+}
+body.gostudy-student-home #student-home .home-primary {
+  background:var(--gostudy-ui-accent,#007eac);
+  border-color:var(--gostudy-ui-accent,#007eac);
+}
+body.gostudy-student-home #student-home .home-current h2 {
+  font:700 var(--gostudy-ui-heading-size,clamp(24px,3vw,34px))/1.2 var(--gostudy-ui-font,Inter,system-ui,sans-serif);
+}

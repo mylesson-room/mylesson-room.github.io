@@ -72,6 +72,10 @@ async function main() {
         const studentLink = sp.locator('.home-open-lesson');
         const teacherLink = tp.locator('.teacher-enter-class');
         await studentLink.waitFor();
+        const cabinetHeading = sp.locator('#student-home .home-lesson h2');
+        await sp.evaluate(() => document.documentElement.style.setProperty('--gostudy-ui-heading-size','29px'));
+        assert.equal(await cabinetHeading.evaluate(node => getComputedStyle(node).fontSize),'29px');
+        await sp.evaluate(() => document.documentElement.style.removeProperty('--gostudy-ui-heading-size'));
         await teacherLink.waitFor();
         for (const [page, link] of [[sp, studentLink], [tp, teacherLink]]) {
           await link.click();
@@ -85,6 +89,13 @@ async function main() {
           assert.equal(await page.locator('.gostudy-classroom-back:visible').count(), 0);
           await sidebar.getByText('Видеосвязь', {exact:true}).waitFor();
           await page.locator('.sheet .lesson-meta').waitFor();
+          await page.locator('[data-shared-classroom]').waitFor();
+          const heading = page.locator('.sheet h1').first();
+          const originalFont = await heading.evaluate(node => getComputedStyle(node).fontSize);
+          await page.evaluate(() => document.documentElement.style.setProperty('--gostudy-ui-heading-size','29px'));
+          assert.equal(await heading.evaluate(node => getComputedStyle(node).fontSize),'29px');
+          await page.evaluate(() => document.documentElement.style.removeProperty('--gostudy-ui-heading-size'));
+          assert.equal(await heading.evaluate(node => getComputedStyle(node).fontSize),originalFont);
           if (await page.locator('.gostudy-shared-room').count()) {
             const first = sidebar.locator('.sections button').first();
             await first.waitFor();
@@ -107,6 +118,9 @@ async function main() {
         await tp.locator('.glass-form input[name=meaning]').fill('проверка выпуска');
         await tp.locator('.glass-form button[type=submit]').click();
         await sp.locator('.glass-list').getByText('release check', {exact:true}).waitFor({timeout:7000});
+        await sp.getByRole('button',{name:'На слух',exact:true}).click();
+        await sp.getByRole('button',{name:'Прослушать слово',exact:true}).waitFor();
+        await sp.getByRole('button',{name:'Словарь',exact:true}).click();
         for (const page of [sp,tp]) {
           assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'horizontal overflow');
         }
