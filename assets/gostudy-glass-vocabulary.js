@@ -41,6 +41,50 @@
     'shed':'сарай', 'porch':'крыльцо', 'kettle':'чайник', 'washing line':'бельевая верёвка', 'set the table':'накрыть на стол', 'bring in':'занести внутрь', 'watering can':'лейка', 'washing':'бельё', 'guests':'гости', 'at the moment':'в данный момент',
     'reroute':'направить другим маршрутом', 'reimburse':'возмещать', 'reimbursed':'возмещён', 'step-free access':'доступ без ступеней', 'out-of-pocket expense':'расход из собственного кармана', 'advance approval':'предварительное согласование', 'miss a connection':'пропустить пересадку', 'replacement coach':'автобус на замену', 'receipt':'чек', 'lift':'лифт', 'fare':'стоимость проезда', 'reimbursement cap':'лимит возмещения'
   };
+  const courseGlossary = {
+    'travel-b2': {
+      'shared taxi':'такси на нескольких пассажиров',
+      'approve a shared taxi':'одобрить поездку на такси на нескольких пассажиров',
+      'before departure':'до отправления',
+      'operator':'перевозчик',
+      'staff':'сотрудники станции',
+      'coach':'междугородний автобус',
+      'connection':'стыковочный поезд',
+      'per vehicle':'за всю машину',
+      'on presentation of receipts':'при предъявлении чеков',
+      'keep this message and all receipts':'сохраните это сообщение и все чеки',
+      'the first train tomorrow leaves at 06:40':'первый поезд завтра отправляется в 06:40',
+      'alternatively, staff can approve a shared taxi before departure':'как вариант, сотрудники станции могут заранее одобрить поездку на такси на нескольких пассажиров',
+      'the operator will reimburse up to £60 per vehicle on presentation of receipts':'перевозчик вернёт до 60 фунтов за всю машину при предъявлении чеков',
+      'front desk':'стойка регистрации',
+      'lift':'подъёмник',
+      'the coach lift':'подъёмник в автобусе',
+      'coach lift':'подъёмник в автобусе',
+      'out of service':'не работает',
+      'out of pocket':'из своего кармана',
+      'written approval':'письменное разрешение'
+    },
+    'country-house': {
+      'line':'бельевая верёвка', 'on the line':'на бельевой верёвке',
+      'it’s still drying':'оно ещё сохнет', 'it\'s still drying':'оно ещё сохнет',
+      'bring it in':'занеси это в дом', 'by the kettle':'рядом с чайником',
+      'wet shoes':'мокрая обувь', 'the back door':'задняя дверь', 'pick some mint':'сорвать немного мяты',
+      'set the table on the porch':'накрыть на стол на крыльце'
+    },
+    'business-ai': {
+      'pilot':'пробное внедрение', 'case mix':'соотношение разных типов обращений',
+      'handling time':'время обработки обращения', 'sign-off':'окончательное одобрение',
+      'escalations':'обращения, переданные на более высокий уровень',
+      'survey response rate':'доля ответивших на опрос',
+      'staffed shifts':'смены, в которых есть сотрудники для проверки',
+      'customer-facing':'дошедший до клиента',
+      'gross time savings':'экономия времени до вычета затрат на проверку',
+      'net time savings':'экономия времени с учётом затрат на проверку',
+      'provided that':'при условии, что'
+    }
+  }[course] || {};
+  const lexicon = {...glossary,...courseGlossary};
+
   function read(store,name) {
     try { const value = JSON.parse(store.getItem(name)); return Array.isArray(value) ? value : Array.isArray(value?.words) ? value.words : []; }
     catch { return []; }
@@ -91,13 +135,18 @@
     const normalized=norm(text);
     const own=words().find(word=>norm(word.en)===normalized || norm(word.ru)===normalized);
     if (own) return norm(own.en)===normalized ? own.ru : own.en;
-    if (glossary[normalized]) return glossary[normalized];
-    const reverse=Object.keys(glossary).find(en=>norm(glossary[en])===normalized);
+    if (Object.hasOwn(lexicon,normalized)) return lexicon[normalized];
+    const reverse=Object.keys(lexicon).find(en=>norm(lexicon[en])===normalized);
     if (reverse) return reverse;
     if (cache.has(normalized)) return cache.get(normalized);
     if (new TextEncoder().encode(text).length>450) throw Error('Выделите более короткую фразу.');
     const url='https://api.mymemory.translated.net/get?'+new URLSearchParams({q:text,langpair:russian.test(text)?'ru|en':'en|ru'});
-    const response=await fetch(url,{signal:AbortSignal.timeout(9000),credentials:'omit',referrerPolicy:'no-referrer'});
+    let response;
+    try { response=await fetch(url,{signal:AbortSignal.timeout(9000),credentials:'omit',referrerPolicy:'no-referrer'}); }
+    catch(error) {
+      if(error.name==='TimeoutError'||error.name==='AbortError') throw Error('Сервис перевода не ответил. Выделите фразу ещё раз или введите перевод вручную.');
+      throw Error('Не удалось подключиться к переводу. Перевод можно ввести вручную.');
+    }
     if (!response.ok) throw Error('Перевод недоступен. Его можно ввести вручную.');
     const data=await response.json();
     if (Number(data.responseStatus)!==200 || !data.responseData?.translatedText) throw Error('Перевод недоступен. Его можно ввести вручную.');
