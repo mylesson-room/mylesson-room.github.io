@@ -10,6 +10,7 @@
   const storage = window.GoStudyStorage || localStorage;
   const shared = window.GoStudyWorkbookWords || window.GoStudyTravelWords;
   const classMode = new URLSearchParams(location.search).has('classStudent');
+  const needsClass = !classMode && shared?.teacherWithoutStudent;
   let assigned = [];
   const norm = text => String(text).trim().toLowerCase().replace(/\s+/g,' ').replace(/[.!?,;:]+$/,'');
   const russian = /[а-яё]/i;
@@ -65,7 +66,7 @@
       'written approval':'письменное разрешение'
     },
     'country-house': {
-      'line':'бельевая верёвка', 'on the line':'на бельевой верёвке',
+      'chairs':'стулья', 'chair':'стул', 'shed key':'ключ от сарая', 'the shed':'сарай', 'the porch':'крыльцо', 'take four chairs out of the shed':'вынеси четыре стула из сарая', 'there’s washing on the line':'на верёвке сушится бельё', 'if it rains':'если пойдёт дождь', 'set the table':'накрыть на стол', 'bus stop':'автобусная остановка', 'line':'бельевая верёвка', 'on the line':'на бельевой верёвке',
       'it’s still drying':'оно ещё сохнет', 'it\'s still drying':'оно ещё сохнет',
       'bring it in':'занеси это в дом', 'by the kettle':'рядом с чайником',
       'wet shoes':'мокрая обувь', 'the back door':'задняя дверь', 'pick some mint':'сорвать немного мяты',
@@ -106,6 +107,7 @@
   }
   async function add(a,b) {
     a=a.trim(); b=b.trim();
+    if (needsClass) throw Error('Выбери ученицу в кабинете преподавателя и нажми «Войти в класс».');
     if (!a || !b) return false;
     const [en,ru] = russian.test(a) && !russian.test(b) ? [b,a] : [a,b];
     if (classMode) {
@@ -313,15 +315,15 @@
   translation.setAttribute('aria-label','Перевод выделенного текста');
   translation.innerHTML='<div class="glass-title"><strong></strong><button type="button" aria-label="Закрыть перевод">×</button></div><label>Перевод<textarea rows="2"></textarea></label><p role="status"></p><div class="glass-actions"></div>';
   toolbar.after(translation);
-  if (classMode && !shared?.signedIn) {
+  if (needsClass || (classMode && !shared?.signedIn)) {
     const signIn=document.createElement('a');
     signIn.href='gostudy-teacher.html';
-    signIn.textContent='Войти как преподаватель';
+    signIn.textContent=needsClass?'Выбрать ученицу':'Войти как преподаватель';
     toolbar.append(signIn);
   }
   const translated=by(translation,'textarea'), translationStatus=by(translation,'p');
   by(translation,'.glass-title button').onclick=closeTranslation;
-  by(translation,'.glass-actions').append(button('Озвучить',()=>speak(selected)),button(classMode?'Добавить ученице':'В словарь',async event=>{
+  by(translation,'.glass-actions').append(button('Озвучить',()=>speak(selected)),button(classMode || needsClass?'Добавить ученице':'В словарь',async event=>{
     const control=event.currentTarget, run=translationRun;
     control.disabled=true;
     try { if(!await add(selected,translated.value)) throw Error('Добавьте перевод, чтобы сохранить слово.'); if(run===translationRun)translationStatus.textContent=classMode?'Слово добавлено ученице.':'Добавлено в словарь.'; }
