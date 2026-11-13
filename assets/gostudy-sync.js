@@ -85,20 +85,28 @@
   const teacherSessionKey = 'gostudy-teacher-session-v1';
   const teacherPage = currentPage === 'gostudy-teacher.html';
   const teacherContext = teacherPage || classroomStudent !== null;
-  function savedTeacher() {
-    if (!teacherContext) return null;
+  const studentSessionKey = 'gostudy-student-session-v1';
+  const rememberedKey = teacherContext ? teacherSessionKey : studentSessionKey;
+  function savedSession() {
     try {
-      const value = json(localStorage.getItem(teacherSessionKey));
+      const value = json(localStorage.getItem(rememberedKey));
       return value?.user?.id && value.access_token && value.refresh_token ? value : null;
     } catch { return null; }
   }
   function readSession() {
     try {
       const value = json(sessionStorage.getItem(authKey));
-      return savedTeacher() || (value?.user?.id && value.access_token ? value : null);
+      return (teacherContext ? savedSession() : null) || (value?.user?.id && value.access_token ? value : null) || savedSession();
     } catch { return null; }
   }
   let session = readSession();
+  window.addEventListener('storage', event => {
+    if (event.key !== rememberedKey || event.newValue !== null || !event.oldValue) return;
+    if (json(event.oldValue)?.user?.id !== session?.user?.id) return;
+    sessionStorage.removeItem(authKey);
+    session = null;
+    location.reload();
+  });
   let queue = Promise.resolve();
   let timer;
   const conflicts = new Set();
@@ -162,19 +170,19 @@
     const data = response.status === 204 ? null : await response.json().catch(() => null);
     return {ok: response.ok, status: response.status, data};
   }
-  function saveSession(data, rememberTeacher = false) {
+  function saveSession(data, persist = false) {
     session = {...data, expires_at: Date.now() + data.expires_in * 1000};
     sessionStorage.setItem(authKey, JSON.stringify(session));
-    if (rememberTeacher) localStorage.setItem(teacherSessionKey, JSON.stringify(session));
+    if (persist) localStorage.setItem(rememberedKey, JSON.stringify(session));
   }
   let refreshInFlight;
   async function token() {
     if (!session) throw new Error('Войдите в аккаунт GoStudy.');
-    const latestTeacher = savedTeacher();
-    if (latestTeacher?.user.id === session.user.id && latestTeacher.expires_at > session.expires_at) session = latestTeacher;
+    const latestSaved = savedSession();
+    if (latestSaved?.user.id === session.user.id && latestSaved.expires_at > session.expires_at) session = latestSaved;
     if (session.expires_at > Date.now() + 30000) return session.access_token;
     const refresh = async () => {
-      const remembered = savedTeacher();
+      const remembered = savedSession();
       if (remembered?.user.id === session.user.id && remembered.expires_at > Date.now() + 30000) {
         session = remembered;
         return session.access_token;
@@ -184,17 +192,19 @@
       });
       if (!response.ok) {
         if (response.status === 400 || response.status === 401) {
-          if (remembered?.user.id === session.user.id) localStorage.removeItem(teacherSessionKey);
+          if (remembered?.user.id === session.user.id) localStorage.removeItem(rememberedKey);
           sessionStorage.removeItem(authKey);
+          session = null;
           if (teacherPage) location.reload();
+          throw new Error('Срок входа истёк. Войдите снова.');
         }
-        throw new Error('Не удалось обновить вход. Откройте кабинет преподавателя.');
+        throw new Error('Не удалось обновить вход. Попробуйте ещё раз.');
       }
       saveSession(response.data, remembered?.user.id === session.user.id);
       return session.access_token;
     };
-    refreshInFlight ??= (navigator.locks && teacherContext
-      ? navigator.locks.request(teacherSessionKey,refresh)
+    refreshInFlight ??= (navigator.locks
+      ? navigator.locks.request(rememberedKey,refresh)
       : refresh()).finally(() => { refreshInFlight = null; });
     return refreshInFlight;
   }
@@ -304,6 +314,7 @@
     await authenticate(email, password);
     await pull(session.access_token);
     if (importLocal) await importLocalProgress();
+    localStorage.setItem(studentSessionKey,JSON.stringify(session));
   }
 
   function mountUnifiedAccount() {
@@ -344,6 +355,7 @@
         if (importLocal) await importLocalProgress();
       }
       if (destination.path === 'gostudy-teacher.html') localStorage.setItem(teacherSessionKey,JSON.stringify(session));
+      else localStorage.setItem(studentSessionKey,JSON.stringify(session));
       location.assign(destination.path);
     }
 
@@ -358,6 +370,7 @@
         await action();
       } catch (error) {
         if (error.message === 'Срок входа истёк. Войдите снова.') {
+          if (savedSession()?.user.id === session?.user.id) localStorage.removeItem(rememberedKey);
           sessionStorage.removeItem(authKey);
           session = null;
         }
@@ -404,6 +417,7 @@
     });
     retry.addEventListener('click', () => run(loadDestinations));
     signout.addEventListener('click', () => {
+      if (savedSession()?.user.id === session?.user.id) localStorage.removeItem(rememberedKey);
       sessionStorage.removeItem(authKey);
       location.reload();
     });
@@ -447,6 +461,7 @@
     document.getElementById('cloud-restore').onclick = () => synchronize({replace: true}).catch(report);
     document.getElementById('cloud-signout').onclick = () => {
       clearTimeout(timer);
+      if (savedSession()?.user.id === session?.user.id) localStorage.removeItem(rememberedKey);
       sessionStorage.removeItem(authKey);
       location.assign(cabinetPage);
     };
@@ -1284,6 +1299,7 @@
     });
     document.getElementById('teacher-signout').onclick = () => {
       localStorage.removeItem(teacherSessionKey);
+      if (savedSession()?.user.id === session?.user.id) localStorage.removeItem(rememberedKey);
       sessionStorage.removeItem(authKey);
       location.reload();
     };
