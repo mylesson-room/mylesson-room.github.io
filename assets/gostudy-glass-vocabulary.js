@@ -8,6 +8,8 @@
   if (!legacy) return;
   const key = 'gostudy-vocabulary-'+course+'-v1';
   const storage = window.GoStudyStorage || localStorage;
+  const shared = window.GoStudyTravelWords;
+  let assigned = [];
   const norm = text => String(text).trim().toLowerCase().replace(/\s+/g,' ').replace(/[.!?,;:]+$/,'');
   const russian = /[а-яё]/i;
   const lesson = document.querySelector('.sheet');
@@ -44,20 +46,26 @@
   }
   function words() {
     const all = new Map();
-    for (const name of legacy) {
+    for (const name of shared?.assigning ? [] : legacy) {
       for (const store of [localStorage,storage]) for (const word of read(store,name)) {
         if (word?.en && word?.ru) all.set(norm(word.en),word);
       }
     }
-    for (const store of [localStorage,storage]) for (const word of read(store,key)) {
+    for (const store of shared?.assigning ? [] : [localStorage,storage]) for (const word of read(store,key)) {
       if (word?.en && word?.ru) all.set(norm(word.en),word);
     }
+    for (const word of assigned) if (!all.has(norm(word.en))) all.set(norm(word.en),word);
     return [...all.values()];
   }
-  function add(a,b) {
+  async function add(a,b) {
     a=a.trim(); b=b.trim();
     if (!a || !b) return false;
     const [en,ru] = russian.test(a) && !russian.test(b) ? [b,a] : [a,b];
+    if (shared?.assigning) {
+      await shared.add(en,ru);
+      assigned = [...assigned.filter(word=>norm(word.en)!==norm(en)),{en,ru}];
+      return true;
+    }
     const list = words().filter(word => norm(word.en)!==norm(en));
     const record = JSON.stringify({words:[...list,{en,ru}]});
     try { storage.setItem(key,record); } catch { return false; }
@@ -117,10 +125,14 @@
     },320);
   });
   meaning.addEventListener('input',()=>{++generation;clearTimeout(timer);status.textContent='';});
-  form.onsubmit=event=>{
+  form.onsubmit=async event=>{
     event.preventDefault();
-    if (!add(term.value,meaning.value)) { status.textContent='Не удалось сохранить слово.'; return; }
-    ++generation; clearTimeout(timer); form.reset(); renderWords(); status.textContent='Слово добавлено.';
+    const submit=form.querySelector('[type=submit]');
+    submit.disabled=true;
+    try { if (!await add(term.value,meaning.value)) throw Error('Не удалось сохранить слово.'); }
+    catch(error){status.textContent=error.message;return;}
+    finally{submit.disabled=false;}
+    ++generation; clearTimeout(timer); form.reset(); renderWords(); status.textContent=shared?.assigning?'Слово добавлено ученице.':'Слово добавлено.';
   };
   const modes={'cards':'Карточки','choice':'Выбрать перевод','type':'Ввести слово'};
   let tab='words', index=0;
@@ -165,10 +177,27 @@
     }
     practice.append(feedback,next);
   }
+  let loading=false;
+  async function refreshAssigned() {
+    if (!shared || loading || !dictionary.open || document.hidden) return;
+    loading=true;
+    try {
+      const next=await shared.read();
+      if(JSON.stringify(next)!==JSON.stringify(assigned)){
+        assigned=next;
+        if(dictionary.open && tab==='words')renderWords();
+        else if(dictionary.open && !practice.querySelector('h3'))show(tab,false);
+      }
+    } catch(error){if(dictionary.open && tab==='words')status.textContent=error.message;}
+    finally{loading=false;}
+  }
+  if(shared)setInterval(refreshAssigned,3000);
+  if(shared?.assigning)form.querySelector('[type=submit]').textContent='Добавить ученице';
   function open(mode) {
     closeTranslation();
     show(mode);
     if(!dictionary.open)dictionary.showModal();
+    refreshAssigned();
   }
   by(dictionary,'.glass-close').onclick=()=>dictionary.close();
   dictionary.addEventListener('click',event=>{
@@ -204,9 +233,12 @@
   toolbar.after(translation);
   const translated=by(translation,'textarea'), translationStatus=by(translation,'p');
   by(translation,'.glass-title button').onclick=closeTranslation;
-  by(translation,'.glass-actions').append(button('Озвучить',()=>speak(selected)),button('В словарь',()=>{
-    if(!add(selected,translated.value)){translationStatus.textContent='Добавьте перевод, чтобы сохранить слово.';return;}
-    translationStatus.textContent='Добавлено в словарь.';
+  by(translation,'.glass-actions').append(button('Озвучить',()=>speak(selected)),button(shared?.assigning?'Добавить ученице':'В словарь',async event=>{
+    const control=event.currentTarget, run=translationRun;
+    control.disabled=true;
+    try { if(!await add(selected,translated.value)) throw Error('Добавьте перевод, чтобы сохранить слово.'); if(run===translationRun)translationStatus.textContent=shared?.assigning?'Слово добавлено ученице.':'Добавлено в словарь.'; }
+    catch(error){if(run===translationRun)translationStatus.textContent=error.message;}
+    finally{control.disabled=false;}
   },'glass-primary'));
   translated.oninput=()=>{++translationRun;translationStatus.textContent='';};
   let selecting=false, selectionTimer;
