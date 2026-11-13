@@ -36,3 +36,7 @@
 }
 @keyframes travel-arrive{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:440px){.travel-workbook .travel-route,.travel-workbook .travel-cards{grid-template-columns:1fr}.travel-route>div,.travel-cards>div{grid-template-columns:38px minmax(0,1fr);column-gap:9px}.travel-route span,.travel-cards span{grid-row:1/span 3}}
+
+.travel-live-status,.travel-student-answer{font-size:.875rem;color:#174c77;background:#e3f1ff;border:1px solid #c0daf2;border-radius:8px;padding:6px 10px}
+.travel-live-status{margin:0 0 12px}.travel-student-answer{margin:8px 0 0}
+.travel-workbook .activity .options label.travel-student-picked{background:#e3f1ff;border-color:#588fbe;box-shadow:0 0 0 1px #588fbe}

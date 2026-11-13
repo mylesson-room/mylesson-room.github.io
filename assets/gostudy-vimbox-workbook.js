@@ -14,6 +14,52 @@
   const escape = value => String(value).replace(/[&<>"']/g,char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const save = () => storage.setItem(config.key,JSON.stringify({...state,page:index}));
   const sections = document.querySelector('.sections');
+  const live = window.GoStudyTravelAnswers;
+  let studentAnswers = {};
+  let liveStatus;
+  if (live?.viewing) {
+    liveStatus = document.createElement('p');
+    liveStatus.className = 'travel-live-status';
+    liveStatus.setAttribute('role','status');
+    liveStatus.textContent = 'Загружаем ответы ученицы…';
+    room.querySelector('.side .panel').after(liveStatus);
+  }
+
+  function showStudentAnswers() {
+    if (!live?.viewing) return;
+    const step = config.steps[index];
+    const choices = studentAnswers[step.id] ?? studentAnswers[index];
+    for (const row of sheet.querySelectorAll('[data-question]')) {
+      const i = Number(row.dataset.question);
+      const answer = Array.isArray(choices) ? choices[i] : null;
+      const label = Number.isInteger(answer) ? step.items?.[i]?.[1]?.[answer] : null;
+      const options = row.querySelectorAll('input[type=radio]');
+      options.forEach((option,j) => option.closest('label').classList.toggle('travel-student-picked', label != null && j===answer));
+      let badge = row.querySelector('.travel-student-answer');
+      if (!label) { badge?.remove(); continue; }
+      if (!badge) {
+        badge = document.createElement('p');
+        badge.className = 'travel-student-answer';
+        row.append(badge);
+      }
+      const message = 'Ученица выбрала: '+label;
+      if (badge.textContent !== message) badge.textContent = message;
+    }
+  }
+
+  async function pollStudentAnswers() {
+    try {
+      if (!document.hidden) {
+        studentAnswers = await live.read();
+        showStudentAnswers();
+        liveStatus.textContent = 'Ответы ученицы обновляются автоматически';
+      }
+    } catch (error) {
+      liveStatus.textContent = error.message;
+    } finally {
+      setTimeout(pollStudentAnswers,1600);
+    }
+  }
   const expand = document.querySelector('.expand');
   expand.onclick = () => {
     const expanded = room.classList.toggle('wide');
@@ -70,6 +116,7 @@
     const writing = step.type === 'write' ? '<label class="writing">Your draft<textarea rows="6">'+escape(typeof answer==='string'?answer:'')+'</textarea></label><p class="draft-status" role="status"></p>' : '';
     const cover = step.id === 'original-0' ? '<img class="lesson-cover" src="'+escape(config.cover)+'" alt="'+escape(config.coverAlt || '')+'">' : '';
     sheet.innerHTML = '<div class="lesson-meta"><span>'+escape(config.level)+'</span><span>Step '+(index+1)+' of '+config.steps.length+'</span></div><progress max="'+config.steps.length+'" value="'+(index+1)+'" aria-label="Lesson progress"></progress><div class="lesson-content"><p class="label">'+escape(config.title)+'</p><h1 tabindex="-1">'+escape(step.title)+'</h1><p class="instruction">'+escape(step.instruction)+'</p>'+cover+renderVisual(step.visual)+source+(exercise?'<section class="activity">'+exercise+'<button type="button" class="check cta">Check answers</button><p role="status" class="result"></p></section>':'')+writing+'</div><div class="step-nav"><button type="button" class="back" '+(index===0?'disabled':'')+'>← Back</button>'+(index+1===config.steps.length?'<a class="cta home-link" href="'+escape(config.cabinet)+'">Back to my course</a>':'<button type="button" class="cta next">Next →</button>')+'</div>';
+    showStudentAnswers();
     sheet.querySelector('.back').onclick = () => go(index-1);
     const next = sheet.querySelector('.next');
     if (next) next.onclick = () => go(index+1);
@@ -140,4 +187,5 @@
     };
   }
   render();
+  if (live?.viewing) pollStudentAnswers();
 })();
