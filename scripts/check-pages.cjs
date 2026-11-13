@@ -28,6 +28,7 @@ async function main() {
       const student = await browser.newContext();
       const teacher = await browser.newContext();
       const assigned = [];
+      const progress = new Map();
       try {
         for (const [context, role] of [[student, 'student'], [teacher, 'teacher']]) {
           await context.addInitScript(({ id }) => {
@@ -36,8 +37,17 @@ async function main() {
           }, {id: role === 'student' ? studentId : 'teacher'});
           await context.route('https://*.supabase.co/**', route => {
             const url = route.request().url();
-            const action = url.split('/').at(-1);
+            const requestUrl = new URL(url);
+            const action = requestUrl.pathname.split('/').at(-1);
             const data = route.request().postDataJSON() || {};
+            if (action === 'gostudy_progress') {
+              if (route.request().method() === 'GET') return route.fulfill({json:[...progress.values()]});
+              assert.equal(role, 'student');
+              const key = data.lesson_key ?? requestUrl.searchParams.get('lesson_key')?.slice(3);
+              const row = {...data, lesson_key:key};
+              progress.set(key, row);
+              return route.fulfill({json:[row]});
+            }
             if (action.endsWith('_assign_word') || action.endsWith('_workbook_assign')) {
               assert.equal(role, 'teacher');
               assert.equal(data.p_student, studentId);
@@ -48,7 +58,7 @@ async function main() {
               return route.fulfill({json:assigned});
             }
             const rows = url.endsWith('gostudy_' + course + '_teacher_view')
-              ? [{ id: studentId, label: 'Test student', words: [], assigned, progress: [] }]
+              ? [{ id: studentId, label: 'Test student', words: [], assigned, progress: [...progress.values()].map(row => ({key:row.lesson_key, answers:row.state.answers})) }]
               : url.endsWith('gostudy_my_destinations')
                 ? [{ course: role === 'teacher' ? 'teacher' : course.replaceAll('_', '-') }]
                 : [];
@@ -82,6 +92,18 @@ async function main() {
         await sp.locator('.glass-list').getByText('release check', {exact:true}).waitFor({timeout:7000});
         for (const page of [sp,tp]) {
           assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'horizontal overflow');
+        }
+        if (await sp.locator('#lesson-data').count()) {
+          const step = await sp.locator('#lesson-data').evaluate(node => JSON.parse(node.textContent).steps.findIndex(step => step.type === 'choice'));
+          assert.ok(step >= 0, 'expected a multiple-choice section');
+          for (const page of [sp,tp]) {
+            await page.locator('.glass-words[open]').evaluate(dialog => dialog.close());
+            for (let i = 0; i < step; i++) await page.locator('.sheet .next').click();
+          }
+          const option = sp.locator('.sheet [data-question] label').first();
+          const label = (await option.innerText()).trim();
+          await option.click();
+          await tp.locator('.travel-student-answer').filter({hasText:label}).waitFor({timeout:10000});
         }
         console.log(course + ': both cabinets open the current lesson and shared dictionary');
       } catch (error) { throw new Error(course + ': ' + error.message, {cause: error}); }
