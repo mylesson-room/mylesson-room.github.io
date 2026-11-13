@@ -986,7 +986,6 @@
     if (addStudentForm) {
       for (const [id,name] of courses) {
         if (id === 'travel_b2') continue;
-        if (course === 'travel_b2') continue;
         const option = document.createElement('option');
         option.value = id;
         option.textContent = name;
