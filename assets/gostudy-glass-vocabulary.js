@@ -292,6 +292,11 @@
   function open(mode) {
     closeTranslation();
     show(mode);
+    if (shared && !shared.signedIn && !classMode && mode==='words') {
+      const link=document.createElement('a');
+      link.href='login.html'; link.textContent='Войти в GoStudy';
+      status.replaceChildren('Чтобы увидеть слова преподавателя, ',link,'.');
+    }
     if(classMode && !shared?.signedIn)status.textContent='Войди в кабинет преподавателя и открой урок через «Войти в класс».';
     if(!dictionary.open)dictionary.showModal();
     refreshAssigned();
@@ -303,11 +308,11 @@
     if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dictionary.close();
   });
   document.addEventListener('click',event=>{
-    const target=event.target.closest('.home-top-nav a,.home-top-nav button,.home-tools .home-tile');
+    const target=event.target.closest('.home-top-nav a,.home-top-nav button,.home-tools .home-tile,#dictBtn');
     if(!target)return;
     const name=target.textContent.trim();
-    if(!name.startsWith('Словарь')&&!/^(Практика|Тренировки)/.test(name))return;
-    event.preventDefault();event.stopImmediatePropagation();open(name.startsWith('Словарь')?'words':'cards');
+    if(target.id!=='dictBtn'&&!name.startsWith('Словарь')&&!/^(Практика|Тренировки)/.test(name))return;
+    event.preventDefault();event.stopImmediatePropagation();open(target.id==='dictBtn'||name.startsWith('Словарь')?'words':'cards');
   },true);
   let translation, selected='', translationRun=0;
   function closeTranslation(){if(translation)translation.hidden=true;selected='';++translationRun;}

@@ -59,7 +59,7 @@
     new URLSearchParams(location.search).get('course') === 'tiktok-a2';
   const tiktokKeys = ['gostudy-tiktok-a2-v1', 'gostudy-tiktok-a2-homework-v1', 'gostudy-tiktok-a2-words-v1'];
   const currentPage = location.pathname.split('/').pop();
-  const countryHouse = ['student-country-house.html','country-house-a2-03.html'].includes(currentPage);
+  const countryHouse = ['student-country-house.html','country-house-a2.html','country-house-a2-02.html','country-house-a2-03.html','country-house-a2-homework.html','country-house-a2-02-homework.html'].includes(currentPage);
   const countryHouseKeys = ['gostudy-vocabulary-country-house-v1','gostudy-country-house-a2-03-v1'];
   const travelB2Cabinet = currentPage === 'student-travel-b2.html';
   const businessAI = ['business-ai-b2c1-02.html','student-business-ai.html'].includes(location.pathname.split('/').pop());
