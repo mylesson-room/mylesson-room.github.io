@@ -80,6 +80,12 @@ async function main() {
           assert.equal(await page.locator('header.gostudy-lesson-topbar:visible').count(), 1);
           assert.equal(await page.locator('.gostudy-cabinet-back:visible').count(), 1);
           const dictionary = page.locator('.glass-lesson-tools button[aria-label="Открыть словарь"]');
+          const sidebar = page.locator('.room > .side, .gostudy-shared-room > .gostudy-room-sidebar');
+          await sidebar.getByRole('button', {name:'Открыть словарь'}).waitFor();
+          assert.equal(await page.locator('.gostudy-classroom-back:visible').count(), 0);
+          const sidebarBox = await sidebar.boundingBox();
+          const sheetBox = await page.locator('.room > .sheet, .gostudy-shared-room > .shell').boundingBox();
+          assert.ok(sidebarBox.x >= sheetBox.x + sheetBox.width - 1, 'desktop tools must sit to the right of the lesson');
           await dictionary.click();
           await page.locator('.glass-words[open]').waitFor();
           assert.equal(await page.locator('.glass-words[open]').count(), 1);

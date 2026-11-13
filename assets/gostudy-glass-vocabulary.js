@@ -330,7 +330,9 @@
   } else if (!oldButton) {
     toolbar.append(button('Словарь',()=>open('words'),'glass-primary'),button('Тренировать слова',()=>open('cards')));
   }
-  (side?.querySelector('.panel') || document.querySelector('header') || lesson).after(toolbar);
+  const roomSidebar = document.querySelector('.gostudy-room-sidebar');
+  if (roomSidebar) roomSidebar.prepend(toolbar);
+  else (side?.querySelector('.panel') || document.querySelector('header') || lesson).after(toolbar);
   translation=document.createElement('section');translation.className='glass-translation';translation.hidden=true;
   translation.setAttribute('aria-label','Перевод выделенного текста');
   translation.innerHTML='<div class="glass-title"><strong></strong><button type="button" aria-label="Закрыть перевод">×</button></div><label>Перевод<textarea rows="2"></textarea></label><p role="status"></p><div class="glass-actions"></div>';

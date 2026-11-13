@@ -796,7 +796,10 @@
     root.className = 'gostudy-classroom';
     root.innerHTML = '<a class="gostudy-classroom-back" href="gostudy-teacher.html">← К ученикам</a><details><summary>Ученик</summary><div class="gostudy-classroom-panel"><p role="status"></p><h3>Ответы в этом разделе</h3><dl></dl><h3>Слова ученика</h3><ul></ul><h3>Назначенные слова</h3><ul></ul></div></details>';
     document.body.append(root);
-    root.querySelector('a').href = 'gostudy-teacher.html?selected='+encodeURIComponent(page.course+':'+classroomStudent);
+    const back = root.querySelector('a');
+    back.href = 'gostudy-teacher.html?selected='+encodeURIComponent(page.course+':'+classroomStudent);
+    if (document.querySelector('.gostudy-cabinet-back')) back.remove();
+    document.querySelector('.gostudy-room-sidebar')?.append(root);
     const summary = root.querySelector('summary');
     const panelStatus = root.querySelector('[role="status"]');
     const answers = root.querySelector('dl');
@@ -1334,10 +1337,28 @@
     bar.innerHTML = '<span class="gostudy-lesson-logo"><span class="gostudy-lesson-mark" aria-hidden="true">G</span>GoStudy</span><a class="gostudy-cabinet-back">← В личный кабинет</a>';
     bar.querySelector('a').href = classroomStudent
       ? 'gostudy-teacher.html?selected='+encodeURIComponent(course.replaceAll('-','_')+':'+classroomStudent)
-      : 'student-'+course+'.html';
+      : course === 'pharma-c1' ? 'student-pharma.html' : 'student-'+course+'.html';
     oldHeader.hidden = true;
     oldHeader.style.setProperty('display','none','important');
     oldHeader.before(bar);
+    const shell = document.querySelector('.shell');
+    if (!shell || document.querySelector('.room > .sheet')) return;
+    const content = shell.matches('main') ? shell : shell.querySelector('main');
+    if (!content) return;
+    const room = document.createElement('div');
+    room.className = 'gostudy-shared-room';
+    const sidebar = document.createElement('aside');
+    sidebar.className = 'gostudy-room-sidebar';
+    sidebar.setAttribute('aria-label', 'Инструменты урока');
+    shell.before(room);
+    room.append(shell, sidebar);
+    const menu = content.querySelector('.lesson-bar');
+    for (const selector of ['.glass-lesson-tools', '.glass-translation']) {
+      const tool = document.querySelector(selector);
+      if (tool) sidebar.append(tool);
+    }
+    if (menu) sidebar.append(menu);
+
   }
 
   document.addEventListener('DOMContentLoaded', () => {
