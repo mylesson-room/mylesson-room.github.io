@@ -10,7 +10,7 @@
   const storage = window.GoStudyStorage || localStorage;
   const shared = window.GoStudyWorkbookWords || window.GoStudyTravelWords;
   const classMode = new URLSearchParams(location.search).has('classStudent');
-  const needsClass = !classMode && shared?.teacherWithoutStudent;
+  let needsClass = !classMode && shared?.teacherWithoutStudent;
   let assigned = [];
   const norm = text => String(text).trim().toLowerCase().replace(/\s+/g,' ').replace(/[.!?,;:]+$/,'');
   const russian = /[а-яё]/i;
@@ -66,6 +66,7 @@
       'written approval':'письменное разрешение'
     },
     'country-house': {
+      'coming':'придут', 'are coming':'придут', 'guests are coming at one':'гости придут в час', 'rain is coming':'скоро пойдёт дождь',
       'chairs':'стулья', 'chair':'стул', 'shed key':'ключ от сарая', 'the shed':'сарай', 'the porch':'крыльцо', 'take four chairs out of the shed':'вынеси четыре стула из сарая', 'there’s washing on the line':'на верёвке сушится бельё', 'if it rains':'если пойдёт дождь', 'set the table':'накрыть на стол', 'bus stop':'автобусная остановка', 'line':'бельевая верёвка', 'on the line':'на бельевой верёвке',
       'it’s still drying':'оно ещё сохнет', 'it\'s still drying':'оно ещё сохнет',
       'bring it in':'занеси это в дом', 'by the kettle':'рядом с чайником',
@@ -315,12 +316,21 @@
   translation.setAttribute('aria-label','Перевод выделенного текста');
   translation.innerHTML='<div class="glass-title"><strong></strong><button type="button" aria-label="Закрыть перевод">×</button></div><label>Перевод<textarea rows="2"></textarea></label><p role="status"></p><div class="glass-actions"></div>';
   toolbar.after(translation);
-  if (needsClass || (classMode && !shared?.signedIn)) {
+  function showClassLink() {
+    if (toolbar.querySelector('a') || !(needsClass || (classMode && !shared?.signedIn))) return;
     const signIn=document.createElement('a');
     signIn.href='gostudy-teacher.html';
     signIn.textContent=needsClass?'Выбрать ученицу':'Войти как преподаватель';
     toolbar.append(signIn);
   }
+  showClassLink();
+  document.addEventListener('gostudy-teacher-confirmed',()=>{
+    if(classMode)return;
+    needsClass=true;
+    showClassLink();
+    by(translation,'.glass-primary').textContent='Добавить ученице';
+    form.querySelector('[type=submit]').textContent='Добавить ученице';
+  });
   const translated=by(translation,'textarea'), translationStatus=by(translation,'p');
   by(translation,'.glass-title button').onclick=closeTranslation;
   by(translation,'.glass-actions').append(button('Озвучить',()=>speak(selected)),button(classMode || needsClass?'Добавить ученице':'В словарь',async event=>{
@@ -341,7 +351,10 @@
     selected=text;translation.hidden=false;by(translation,'strong').textContent=text;
     translated.value='';translationStatus.textContent='Переводим…';
     const run=++translationRun;
-    translate(text).then(result=>{if(run===translationRun){translated.value=result;translationStatus.textContent='';}}).catch(error=>{if(run===translationRun)translationStatus.textContent=error.message;});
+    const context = selection.anchorNode.parentElement?.closest('p,b,strong')?.textContent || '';
+    const resultPromise = course==='country-house' && /^(?:is )?coming$/i.test(text) && /rain is coming/i.test(context)
+      ? Promise.resolve('скоро пойдёт') : translate(text);
+    resultPromise.then(result=>{if(run===translationRun){translated.value=result;translationStatus.textContent='';}}).catch(error=>{if(run===translationRun)translationStatus.textContent=error.message;});
   }
   document.addEventListener('pointerdown',event=>{
     if(translation.contains(event.target))return;
