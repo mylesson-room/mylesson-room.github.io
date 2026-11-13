@@ -320,9 +320,9 @@
   function closeTranslation(){if(translation)translation.hidden=true;selected='';++translationRun;}
   if(!lesson)return;
   const side=document.querySelector('.side');
-  const oldButton = document.getElementById('dictBtn');
+  const oldButton = document.querySelector('meta[name=gostudy-current-lesson]') ? null : document.getElementById('dictBtn');
   const toolbar=document.createElement('div');toolbar.className='glass-lesson-tools';
-  if (!oldButton && compactToolbar) {
+  if (!oldButton && (compactToolbar || document.querySelector('meta[name=gostudy-current-lesson]'))) {
     const icon = button('📖',()=>open('words'),'glass-primary glass-icon');
     icon.setAttribute('aria-label','Открыть словарь');
     icon.title='Словарь';
