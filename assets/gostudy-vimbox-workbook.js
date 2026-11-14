@@ -121,13 +121,14 @@
     const sourceStyle = step.style || ({'original-1':'memo','original-4':'conversation','prepare-a-board-update':'writing-brief','original-5':'role-brief'})[step.id] || '';
     const metrics = step.metrics ? '<dl class="metrics">'+step.metrics.map(([value,label])=>'<div><dt>'+escape(label)+'</dt><dd>'+escape(value)+'</dd></div>').join('')+'</dl>' : '';
     const source = metrics + (step.source?.length ? '<div class="source '+sourceStyle+'">'+step.source.map(p => '<p>'+escape(p)+'</p>').join('')+'</div>' : '');
+    const audio = step.audio ? '<div class="source"><audio controls preload="metadata" aria-label="Голосовое сообщение" style="width:100%" src="'+escape(step.audio.src)+'"></audio><details><summary>Расшифровка</summary><p>'+escape(step.audio.transcript)+'</p></details></div>' : '';
     const writing = step.type === 'write' ? '<label class="writing">Ваш ответ<textarea rows="6">'+escape(typeof answer==='string'?answer:'')+'</textarea></label><p class="draft-status" role="status"></p>' : '';
     const cover = step.id === 'original-0' && config.cover ? '<img class="lesson-cover" src="'+escape(config.cover)+'" alt="'+escape(config.coverAlt || '')+'">' : '';
     const teacherNotes = live?.viewing && step.teacherNotes
       ? '<details class="source"><summary>Карточка преподавателя</summary><p>'+escape(step.teacherNotes)+'</p></details>' : '';
     const studentDraft = live?.viewing && step.type === 'write'
       ? '<blockquote class="gostudy-live-draft source" aria-label="Ответ ученика" hidden></blockquote>' : '';
-    frame.content.innerHTML = '<p class="label">'+escape(config.title)+'</p><h1 tabindex="-1">'+escape(step.title)+'</h1><p class="instruction">'+escape(step.instruction)+'</p>'+cover+renderVisual(step.visual)+source+(exercise?'<section class="activity">'+exercise+'<button type="button" class="check cta">Проверить ответы</button><p role="status" class="result"></p></section>':'')+writing+studentDraft+teacherNotes;
+    frame.content.innerHTML = '<p class="label">'+escape(config.title)+'</p><h1 tabindex="-1">'+escape(step.title)+'</h1><p class="instruction">'+escape(step.instruction)+'</p>'+cover+renderVisual(step.visual)+source+audio+(exercise?'<section class="activity">'+exercise+'<button type="button" class="check cta">Проверить ответы</button><p role="status" class="result"></p></section>':'')+writing+studentDraft+teacherNotes;
     navigation.innerHTML = '<button type="button" class="back" '+(index===0?'disabled':'')+'>← Назад</button>'+(index+1===config.steps.length?'<a class="cta home-link" href="'+escape(config.cabinet)+'">В личный кабинет</a>':'<button type="button" class="cta next">Далее →</button>');
     showStudentAnswers();
     sheet.querySelector('.back').onclick = () => go(index-1);

@@ -501,7 +501,7 @@
     else { visual.textContent = generalB1 ? '☕' : tiktokA2 ? '🎬' : '🧳'; visual.setAttribute('aria-hidden','true'); }
     home.querySelector('.home-homework').append(visual);
     home.querySelectorAll('.home-current h2').forEach(title => { title.textContent = lesson.title; });
-    if (generalB1) home.querySelector('.home-homework h2').textContent = 'Coffee after work';
+    if (generalB1) home.querySelector('.home-homework h2').textContent = 'Make time for a walk';
     if (businessAI || courseHome) home.querySelector('.home-homework h2').textContent = courseHome?.homeworkTitle || 'AI at Work';
     const open = home.querySelector('.home-open-lesson');
     const homework = home.querySelector('.home-homework-link');

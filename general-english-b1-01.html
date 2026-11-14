@@ -9,156 +9,125 @@
   "key": "gostudy-general-english-b1-01-v1",
   "steps": [
     {
-      "id": "start",
-      "title": "When are you free?",
-      "instruction": "Suggest a time for coffee this week. Ask your teacher when they are free.",
+      "id": "arrange-probe",
+      "title": "A free evening",
+      "instruction": "You’d like to catch up with a friend this week. Start the conversation and find out when they’re free.",
       "source": [
-        "General English B1 · Module 1: Making arrangements",
-        "By the end of the lesson, you can suggest a time, offer another option when it doesn’t work, and confirm the day, time and place.",
-        "Think of the last time you arranged to meet someone. What did you need to agree on?"
+        "You can meet for about an hour. Think of two times that would actually work for you."
       ],
-      "type": null,
-      "items": null,
-      "visual": {"kind":"cards","cards":[["☕","The plan","Meet for coffee","Choose a time this week."],["📅","The challenge","Two calendars","Find a time that works for both of you."],["💬","The result","A confirmed plan","Agree the day, time and place."]]},
-      "teacherNotes": "5 min. Ask for one concrete suggestion before showing a model. Reply that the time doesn’t work and pause. Listen for whether the learner offers an alternative."
+      "teacherNotes": "4 мин. Сыграй друга. На первое предложение ответь “I can’t make it then.” Сделай паузу. Отметь, предлагает ли ученица другое время и задаёт ли встречный вопрос. Если это уже уверенно получается, сократи третий этап."
     },
     {
-      "id": "read",
-      "title": "A plan that works for both",
-      "instruction": "Read the chat. Find the first suggestion, why it fails, and the final plan.",
+      "id": "arrange-listen",
+      "title": "Can we make Friday work?",
+      "instruction": "Listen once. What is Sam trying to arrange? Listen again and work out which Friday option gives you more than an hour.",
       "source": [
-        "Maya: Fancy a coffee this week? How about Wednesday at six?",
-        "Dan: I can’t make Wednesday. I’m working late. Would Friday at six thirty work for you?",
-        "Maya: Friday works for me. Do you mean this Friday, the 20th?",
-        "Dan: Yes. Shall we meet at the café next to the station?",
-        "Maya: Sounds good. See you this Friday at 6:30 at the café next to the station!"
+        "You get a voice message from Sam. You’re free from 7 p.m. on Friday and want at least 90 minutes to play."
       ],
+      "teacherNotes": "8 мин. После первого прослушивания попроси назвать цель сообщения. После второго спроси, чем отличаются заведения. Попроси объяснить, почему кафе у станции не подходит при старте в семь. Открой расшифровку после второй попытки, если нужна опора.",
       "type": "choice",
       "items": [
         [
-          "Why does Dan suggest a different day?",
+          "Where can you play for 90 minutes on Friday?",
           [
-            "The café is closed.",
-            "He is working late.",
-            "He has a train to catch."
+            "At the café by the station at seven.",
+            "At the place on Park Street at seven.",
+            "At either place if you start at half past six."
           ],
           1,
-          "Dan is working late on Wednesday."
+          "Sam can start at seven. Park Street stays open until ten."
         ],
         [
-          "What does Maya check before agreeing?",
+          "What does Sam say about Saturday?",
           [
-            "Which Friday Dan means.",
-            "Whether the café is open.",
-            "How long Dan can stay."
-          ],
-          0,
-          "She checks the date, because “Friday” could be ambiguous."
-        ],
-        [
-          "What is the final plan?",
-          [
-            "Wednesday at 6 at the station.",
-            "Friday at 6 at the café.",
-            "Friday the 20th at 6:30 at the café next to the station."
+            "It is impossible for him.",
+            "He prefers Saturday to Friday.",
+            "He can meet, but would prefer not to."
           ],
           2,
-          "The last message confirms all three details."
+          "He is free but would rather keep the evening free."
         ]
       ],
-      "style": "conversation",
-      "teacherNotes": "8 min. Ask the learner to point to the message that proves each answer. Then compare “Friday works for me” with “I can’t make Wednesday”."
+      "audio": {
+        "src": "assets/general-english-b1-01-voicemail.mp3",
+        "transcript": "Hey, it's Sam. About that board-game night: I can make Friday, but I won't get away from work until half past six, so seven is the earliest I could meet. The café near the station is handy for me, but it shuts at eight. If we want more than an hour, the place on Park Street is open until ten. I'm free on Saturday too, but I'd rather keep that evening free if we can. What works for you?"
+      }
     },
     {
-      "id": "language",
-      "title": "Find the right response",
-      "instruction": "Complete the replies. Then say each reply aloud with a different day or time.",
+      "id": "arrange-language",
+      "title": "Keep the conversation going",
+      "instruction": "Match each reply to what it does. Then say the replies with a different day or reason.",
       "source": [
-        "Suggest a time: How about Thursday at seven? / Would Saturday morning work for you?",
-        "Decline and offer another time: I can’t make Thursday. Could we do Saturday instead?",
-        "Check and confirm: Do you mean this Saturday? / Great, see you at eleven at the café."
+        "“I can make Friday, but not before seven.” → Say when you’re available and give a limit.",
+        "“Would seven thirty work for you?” → Offer a specific alternative.",
+        "“I’d rather keep Saturday free, if we can.” → State a preference and leave room to negotiate.",
+        "“Just to check, do you mean the one on Park Street?” → Check a detail before agreeing."
       ],
-      "type": "gap",
+      "teacherNotes": "8 мин. Сопоставьте жёсткое ограничение not before seven и гибкое предпочтение I’d rather. Попроси поставить смысловое ударение на seven в уточнении. Для устной подстановки меняй одну деталь за раз, затем попроси произнести реплику целиком.",
+      "type": "match",
       "items": [
         [
-          "How about ___ at seven?",
+          "A colleague asks about Thursday. You’re busy until six.",
           [
-            "meet",
-            "meeting",
-            "to meet"
-          ],
-          1,
-          "Use How about + -ing, or name a day or time directly."
-        ],
-        [
-          "I can’t ___ Thursday. Could we do Saturday instead?",
-          [
-            "make",
-            "join at",
-            "take"
+            "Thursday works, but not before six.",
+            "Do you mean next Thursday?",
+            "I’d rather leave Thursday free."
           ],
           0,
-          "I can’t make Thursday means Thursday isn’t possible for me."
+          "The reply gives a hard time limit."
         ],
         [
-          "Would Saturday morning ___ for you?",
+          "You can meet on Friday, but Sunday is more convenient.",
           [
-            "suit to",
-            "come",
-            "work"
-          ],
-          2,
-          "Would Saturday morning work for you? is a natural way to suggest a time."
-        ],
-        [
-          "Do you mean ___ Saturday or the week after?",
-          [
-            "in this",
-            "this",
-            "at this"
+            "I can’t make Friday.",
+            "Friday’s fine, but I’d rather meet on Sunday.",
+            "Do you mean Friday evening?"
           ],
           1,
-          "Use this Saturday with no preposition."
+          "This makes the preference clear without ruling out Friday."
+        ],
+        [
+          "Two cafés have similar names. You want to check the address.",
+          [
+            "Would half past six work?",
+            "I’d rather go on Sunday.",
+            "Just to check, do you mean the one on Park Street?"
+          ],
+          2,
+          "This checks the location before you agree."
         ]
-      ],
-      "teacherNotes": "10 min. Model the rhythm of “Would Saturday work for you?” Ask the learner to replace both the day and the time. Give a reason you cannot make one suggestion and ask for a new one."
+      ]
     },
     {
-      "id": "rehearse",
-      "title": "Offer another time",
-      "instruction": "Respond to your teacher without reading out a complete model.",
+      "id": "arrange-reply",
+      "title": "Reply to Sam",
+      "instruction": "Send Sam an oral reply. Give one workable option and ask one question before you confirm.",
       "source": [
-        "Round 1: Your teacher suggests Tuesday at 6 p.m. You are working until 7. Offer a different time.",
-        "Round 2: Your teacher says “Saturday morning”. Find out exactly what time they mean.",
-        "Round 3: Your teacher suggests two cafés with similar names. Check which one they mean."
+        "You’re happy with Park Street, but you need to leave by 8:45 p.m. Ask whether seven works for Sam and check exactly where to meet.",
+        "Try once. Listen to Sam’s reply, then confirm what you agreed in one sentence."
       ],
-      "type": null,
-      "items": null,
-      "teacherNotes": "7 min. Round 2: say “I meant 10:30.” Round 3: offer Riverside Café and Riverside Bakery. If the learner needs support, offer only a sentence starter."
+      "teacherNotes": "7 мин. Сыграй Сэма. Принимай 19:00, уточни, что на Park Street встречаетесь у входа, а не внутри. Если ученица подтверждает без уточнения, ответь “Which entrance do you mean?” Если застряла, дай только начало “Would … work?”"
     },
     {
-      "id": "meet",
-      "title": "Find a time for coffee",
-      "instruction": "Talk to your teacher. Find a 30-minute slot that works for both of you and agree where to meet.",
+      "id": "arrange-negotiate",
+      "title": "Choose a plan together",
+      "instruction": "You and your friend want at least 90 minutes together. Find out what works for them, compare two options and agree on one.",
       "source": [
-        "Your calendar: Thursday 7:00–8:00 p.m. or Saturday 10:00 a.m.–12:00 noon.",
-        "On Saturday, you have to leave by noon. Riverside Café is easy for you to reach.",
-        "Your teacher has a different calendar. Ask questions and listen to their answers before you decide."
+        "On Friday you can meet from 6:30 to 9 p.m. You’re free on Sunday from 2 to 5 p.m.",
+        "Riverside Café is open until 9 p.m. on Friday, but it’s a 30-minute trip for you. You’d prefer somewhere closer.",
+        "Market Café is close to you and is open until 5 p.m. on Sunday. You can spend up to £12."
       ],
-      "type": null,
-      "items": null,
-      "teacherNotes": "12 min. Keep this card private. You are free Thursday 5:30–6:30 p.m. and Saturday 10:30 a.m.–12:30 p.m. Start with “How about Thursday at six?” On Saturday you prefer Market Café, but Riverside Café also works if the learner suggests it. Any 30-minute slot inside Saturday 10:30–12:00 is valid. Check that the learner offers an alternative, clarifies details and agrees the place. If they finish quickly, say you have just found out the chosen café opens at eleven and ask them to adjust."
+      "teacherNotes": "15 мин. Ты — друг. Начни “How about Friday at half past six at Market Café?” По пятницам Market Café закрывается в 19:30. Ты можешь в Riverside в пятницу с 19:00, там оба укладываетесь в £12. В воскресенье ты свободен с 14:30, но можешь остаться только до 16:30. Market Cafe подходит по бюджету. Тебе предпочтительнее пятница, поскольку воскресенье — единственный свободный день. Сообщай детали в ответ на вопросы. Рабочие решения: Riverside в пятницу 19:00–20:30 или Market в воскресенье 14:30–16:00 либо 15:00–16:30. Прими любой обоснованный план. Если ученица застряла, спроси “What do we need to find out first?”"
     },
     {
-      "id": "confirm",
-      "title": "Confirm the plan",
-      "instruction": "Write a short message to your teacher confirming the exact plan you agreed on.",
+      "id": "arrange-confirm",
+      "title": "Make the agreement clear",
+      "instruction": "Write your friend a short confirmation message about the plan you just agreed on.",
       "source": [
-        "Include the day, the time and the place. Add a friendly opening or closing if you like."
+        "Include the day, the start time, the meeting place and one detail that matters to your friend."
       ],
-      "type": "write",
-      "items": null,
-      "teacherNotes": "8 min. Compare the message with what you agreed aloud. Give one correction on clarity and one on natural phrasing. Success: the learner offered an alternative, checked a detail and confirmed day, time and place accurately."
+      "teacherNotes": "8 мин. До разбора зафиксируй, что ученица сделала самостоятельно: выяснила ограничение, сравнила два варианта с причиной, уточнила и точно подтвердила итог. Если нужно, отработай одну реплику и попроси повторить только этот момент. В следующем занятии дай новое сообщение о переносе уже согласованного плана.",
+      "type": "write"
     }
   ]
-}</script><script src="assets/gostudy-classroom-ui.js?v=682c88fc9048"></script><script src="assets/gostudy-sync.js?v=9c16b3530da8"></script><script src="assets/gostudy-vimbox-workbook.js?v=a69707ef7127"></script><script src="assets/gostudy-current-courses.js?v=ce1df270d0e5" defer></script><script src="assets/gostudy-glass-vocabulary.js?v=6fdb633ecd11" defer></script></body></html>
+}</script><script src="assets/gostudy-classroom-ui.js?v=682c88fc9048"></script><script src="assets/gostudy-sync.js?v=a67ee39c6c5c"></script><script src="assets/gostudy-vimbox-workbook.js?v=b484016d0d39"></script><script src="assets/gostudy-current-courses.js?v=ce1df270d0e5" defer></script><script src="assets/gostudy-glass-vocabulary.js?v=6fdb633ecd11" defer></script></body></html>

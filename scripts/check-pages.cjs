@@ -4,7 +4,7 @@ const { readFile } = require('node:fs/promises');
 const { runInNewContext } = require('node:vm');
 const { chromium } = require('playwright');
 
-const mime = { html: 'text/html', js: 'application/javascript', css: 'text/css' };
+const mime = { html: 'text/html', js: 'application/javascript', css: 'text/css', mp3: 'audio/mpeg' };
 const server = createServer(async (req, res) => {
   try {
     const path = new URL(req.url, 'http://localhost').pathname;
@@ -82,7 +82,7 @@ async function main() {
           assert.equal(await homework.getAttribute('href'),current.homework);
           const hp = await student.newPage();
           await hp.goto(origin + '/' + current.homework);
-          await hp.locator('.sheet h1').filter({hasText:'Coffee after work'}).waitFor();
+          await hp.locator('.sheet h1').filter({hasText:'Make time for a walk'}).waitFor();
           await hp.close();
         }
         for (const [page, link] of [[sp, studentLink], [tp, teacherLink]]) {
@@ -138,6 +138,14 @@ async function main() {
           for (const page of [sp,tp]) {
             await page.locator('.glass-words[open]').evaluate(dialog => dialog.close());
             for (let i = 0; i < step; i++) await page.locator('.sheet .next').click();
+          }
+          if (course === 'general_english_b1') {
+            await sp.locator('audio').evaluate(audio => new Promise((resolve,reject) => {
+              if (audio.readyState >= 1) return resolve();
+              audio.addEventListener('loadedmetadata',resolve,{once:true});
+              audio.addEventListener('error',reject,{once:true});
+            }));
+            assert.ok(await sp.locator('audio').evaluate(audio => audio.duration > 20 && audio.duration < 60));
           }
           const option = sp.locator('.sheet [data-question] label').first();
           const label = (await option.innerText()).trim();
