@@ -257,6 +257,16 @@ header{height:72px;padding:0 30px;border-bottom:1px solid #e4e8f2;box-shadow:0 2
 ::selection{background:#abeef8;color:#102242}
 @media(max-width:680px){.selection-translate{width:min(370px,calc(100vw - 20px));max-height:55dvh;box-shadow:0 13px 40px #151e3660}}
 @media print{.selection-translate{display:none!important}}
+
+/* Reliable touch/desktop translator launcher + manual fallback */
+.translate-launcher{position:fixed;right:22px;bottom:98px;z-index:100;background:#05b3d1;color:#fff;border:0;box-shadow:0 8px 28px #085e8580;border-radius:25px;padding:13px 18px;font-size:16px;font-weight:800;cursor:pointer}
+.translate-launcher span{font-size:13px;margin-left:6px}
+.translation-input-label{display:block;font-size:11px;color:#8b96aa;font-weight:650;margin:8px 0 5px}
+.translation-input{width:100%;resize:vertical;min-height:44px;max-height:95px;border:1px solid #dbe5f0;border-radius:9px;background:#fff;padding:8px 10px;font-size:13px}
+.translation-action-row{display:flex;align-items:center;gap:12px;margin:9px 0 12px;font-size:12px;color:#7d8da5}
+.translation-action-row button{background:#eef8fb;color:#058eaa;border-color:#c9e8f1}
+@media(max-width:720px){.translate-launcher{right:12px;bottom:85px;padding:11px 14px}.translate-launcher span{font-size:12px}}
+@media print{.translate-launcher{display:none}}
 </style></head><body>
 <header><a class="brand" href="student-business-ai-finance.html">Go<span>Study</span></a><div class="header-right"><div class="header-progress"><div class="header-progress-bar"><div id="headerBar"></div></div><span id="headerPage">1 of 8</span></div><span class="save-indicator">● <span id="saved">Answers saved on this device</span></span><a href="business-ai-finance-b2.html">← Lesson 1</a><a href="student-business-ai-finance.html">My classroom</a></div></header>
 <div class="layout"><aside class="sidebar">
@@ -276,9 +286,10 @@ header{height:72px;padding:0 30px;border-bottom:1px solid #e4e8f2;box-shadow:0 2
 <main class="lesson"><section class="hero"><span class="eyebrow">GO STUDY · AI & FINANCE · LESSON 02</span><h1>Can AI predict a <em>financial crisis</em> before it happens?</h1><p>Financial forecasting, risk management and the limits of artificial intelligence.</p><div class="hero-chips"><span>✦ B2 · Upper-intermediate</span><span>◷ 55 min</span><span>▤ 8 activities</span></div></section>
 <section id="page-0" class="page active"><div class="panel"><div class="activity-head"><div class="activity-icon">◉</div><div class="activity-titles"><span class="eyebrow">SPEAKING · 5 MIN</span><h2>1. Let's talk</h2><div class="section-subtitle">Would you trust an AI forecast?</div></div></div><p class="lead">Look at the AI prediction and discuss the questions. Support your opinions with examples.</p><div class="warmup-scene"><div class="scene-top"><span class="scene-badge">✦ NORTHBRIDGE AI REPORT</span><span class="scene-live">● Updated just now</span></div><div class="scene-chart"><div class="scene-copy"><small>Forecasted cash balance</small><strong>€65,000</strong><span>▼ 35% below safety threshold</span></div><svg viewBox="0 0 330 110" role="img" aria-label="Illustrative declining cash forecast"><defs><linearGradient id="cashfade" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#86dce9" stop-opacity=".40"/><stop offset="1" stop-color="#86dce9" stop-opacity="0"/></linearGradient></defs><path d="M0 30 C35 20 44 48 77 41 S137 28 159 58 S216 54 239 76 S302 80 330 99 L330 110 L0 110Z" fill="url(#cashfade)"/><path d="M0 30 C35 20 44 48 77 41 S137 28 159 58 S216 54 239 76 S302 80 330 99" fill="none" stroke="#0ab5cf" stroke-width="4" stroke-linecap="round"/><circle cx="330" cy="99" r="6" fill="#0ab5cf" stroke="white" stroke-width="3"/></svg></div><div class="scene-footer"><span>⚠ Potential liquidity risk in 60 days</span><b>Review forecast ↗</b></div></div><ol class="questions"><li>Would you trust AI to predict your company's financial future?</li><li>Which financial decisions should never be made by AI alone?</li><li>Can AI identify risks that experienced financial analysts might miss?</li><li>Would you invest in a company that relies heavily on AI-generated financial forecasts?</li></ol><div class="tip"><b>Useful language</b><p>I would be reluctant to rely on AI because…<br>One potential advantage is…<br>Human oversight is essential when…</p></div></div></section><section id="page-1" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">Aa</div><div class="activity-titles"><span class="eyebrow">VOCABULARY · 10 MIN</span><h2>2. Financial vocabulary</h2><div class="section-subtitle">Financial intelligence</div></div></div><p class="lead">Match the eight financial terms with their definitions. Press <b>Check answers</b> when you finish.</p><div id="vocab"></div><button class="primary" onclick="checkVocab()">Check answers</button><p id="vocabScore" class="feedback" aria-live="polite"></p></div></section><section id="page-2" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">▤</div><div class="activity-titles"><span class="eyebrow">READING · 10 MIN</span><h2>3. Read & analyse</h2><div class="section-subtitle">The forecast that changed everything</div></div></div><p class="lead">Read this fictional business case, then answer the questions.</p><div class="reading-layout"><article class="article"><span class="case">CASE STUDY · NORTHBRIDGE RETAIL</span><h3>An AI system predicted a cash shortage. Was it right?</h3><p>Northbridge Retail, a medium-sized European company, had experienced steady revenue growth for three years. However, despite increasing sales, the company regularly struggled with cash flow.</p><p>Its finance department introduced an AI-powered forecasting system. The software analysed historical sales, supplier payments, seasonal trends and customer payment behaviour.</p><p>Within two weeks, the system identified a potential liquidity problem. It predicted that the company's available cash could fall below €100,000 within the next 60 days. Surprisingly, the traditional financial forecast had shown no serious problems.</p><p>The AI model highlighted three early warning signs: several large customers were paying invoices later than usual, inventory costs had increased, and sales growth was slowing in one important market.</p><p>The finance director, Emma Collins, was initially sceptical. She believed the system might be overreacting to temporary changes. Rather than accepting the prediction immediately, her team investigated the data. They discovered that one major customer was experiencing financial difficulties and had delayed several payments.</p><p>Northbridge negotiated new payment terms with suppliers, postponed a non-essential investment and contacted customers with overdue invoices. Six weeks later, the company avoided the predicted cash shortage.</p><p>However, the finance director emphasised an important distinction: the software had identified a risk, but human judgement was responsible for evaluating the evidence and choosing how to respond. The company continued using AI for forecasting, but all major financial decisions still required human approval.</p></article><aside class="case-column"><div class="signal-card"><div class="signal-emoji">📉</div><b>Liquidity alert</b><span>The AI predicts cash will drop below a critical threshold.</span><strong>&lt; €100,000</strong><small>Over the next 60 days</small></div><div class="signal-card"><div class="signal-emoji">◷</div><b>Payment delays</b><span>Major clients are taking longer to settle invoices.</span><strong>Early warning</strong></div><div class="signal-card"><div class="signal-emoji">✓</div><b>Human decision</b><span>Finance teams verify the data and make the final call.</span><strong>Human oversight</strong></div></aside></div><h3 class="question-heading">Answer the questions</h3><div id="reading"></div><button class="primary" onclick="checkReading()">Check answers</button><p id="readingScore" class="feedback" aria-live="polite"></p></div></section><section id="page-3" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">✎</div><div class="activity-titles"><span class="eyebrow">LANGUAGE PRACTICE · 8 MIN</span><h2>4. Use the language</h2><div class="section-subtitle">Talking about financial risks</div></div></div><p class="lead">Complete the sentences using expressions from the vocabulary section.</p><div id="gaps"></div><button class="primary" onclick="checkGaps()">Check answers</button><p id="gapsScore" class="feedback" aria-live="polite"></p></div></section><section id="page-4" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">▥</div><div class="activity-titles"><span class="eyebrow">CASE ANALYSIS · 10 MIN</span><h2>5. Financial decision lab</h2><div class="section-subtitle">Trust the forecast?</div></div></div><p class="lead">You are the Finance Director. The company's minimum comfortable cash balance is <b>€100,000</b>.</p><div class="decision-metrics"><div><small>Cash safety target</small><b>€100,000</b><span>Minimum comfortable cash</span></div><div><small>Expected forecast</small><b>€65,000</b><span>Projected in 60 days</span></div><div><small>Potential funding gap</small><b>€35,000</b><span>To restore target balance</span></div></div><div class="chart"><div class="chart-row"><span>Optimistic</span><div class="track"><div style="width:90%;background:#4aaf91"></div></div><b>€180,000</b></div><div class="chart-row"><span>Expected</span><div class="track"><div style="width:32.5%;background:#6971df"></div></div><b>€65,000</b></div><div class="chart-row"><span>Pessimistic</span><div class="track negative"><div style="width:20%;background:#df7c77"></div></div><b>−€40,000</b></div><small>Illustrative cash positions after 60 days. The pessimistic scenario implies a shortfall.</small></div><ol class="questions"><li>Which scenario concerns you most, and why?</li><li>How much additional cash is required to reach the target in the expected scenario?</li><li>Should the company cut spending immediately or investigate further?</li><li>What additional data would you request?</li></ol><h3>Make your decision</h3><div id="decision" class="choices"><label><input type="radio" name="decision" value="cut"> Reduce spending immediately</label><label><input type="radio" name="decision" value="investigate"> Investigate and prepare contingency measures</label><label><input type="radio" name="decision" value="ignore"> Ignore the forecast until the shortage occurs</label></div><p id="decisionAdvice" class="tip" aria-live="polite">Choose a strategy to reveal its possible consequences.</p><label class="field-label" for="decisionNotes">Explain your decision</label><textarea id="decisionNotes" data-save="decisionNotes" placeholder="I would recommend… because…"></textarea></div></section><section id="page-5" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">◎</div><div class="activity-titles"><span class="eyebrow">SPEAKING · 8 MIN</span><h2>6. CEO meeting</h2><div class="section-subtitle">Convince the CEO</div></div></div><p class="lead">The CEO believes the finances are under control. Your task is to secure approval for two preventive measures.</p><div class="role-grid"><div class="role"><div class="role-icon">01</div><h3>Finance Director</h3><p>Explain the risk, present the figures, defend your interpretation and recommend concrete actions.</p></div><div class="role"><div class="role-icon">02</div><h3>CEO</h3><p>Challenge the model's reliability, question the cost and ask what would happen if the forecast is wrong.</p></div></div><div class="tip"><b>Useful expressions</b><p>According to the latest forecast…<br>There is a significant risk that…<br>We should take into account…<br>I would recommend implementing…<br>We should avoid relying solely on…</p></div><label class="field-label" for="roleNotes">Notes from the discussion</label><textarea id="roleNotes" data-save="roleNotes" placeholder="My main argument…"></textarea></div></section><section id="page-6" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">◌</div><div class="activity-titles"><span class="eyebrow">CRITICAL THINKING · 4 MIN</span><h2>7. Your opinion</h2><div class="section-subtitle">Who is responsible when AI gets it wrong?</div></div></div><p class="lead">A company follows an AI-generated financial forecast and loses €2 million. The model was supplied by an external provider.</p><div class="tip"><b>Who should be accountable?</b><p>The CFO who approved the decision? The software provider? The analysts who failed to question the forecast? Or should responsibility be shared?</p></div><p>Give a <b>60-second opinion</b> and use at least three new financial expressions.</p><textarea data-save="finalOpinion" aria-label="Your final opinion" placeholder="In my view, responsibility should…"></textarea></div></section><section id="page-7" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">✉</div><div class="activity-titles"><span class="eyebrow">HOMEWORK · 15–20 MIN</span><h2>8. Writing task</h2><div class="section-subtitle">Recommend an AI forecasting tool</div></div></div><p class="lead">Write a 140–180 word email to your CEO. Describe the potential benefits, two major risks, your implementation recommendation and why human oversight matters.</p><textarea id="homework" data-save="homework" style="min-height:260px" placeholder="Dear CEO,&#10;&#10;I am writing to recommend…"></textarea><div class="homework-tools"><span id="wordCount">0 words · Target: 140–180</span><button class="outline" onclick="copyHomework()">Copy email</button></div><details class="teacher"><summary>Teacher notes & answers</summary><p>Focus on evidence-based hedging, risk assessment and recommendation language. In the expected scenario the target gap is €35,000. A strong student distinguishes model output from verified evidence and explains potential trade-offs.</p></details></div></section>
 <div class="pager"><button class="outline" id="back">← Back</button><div class="pager-right"><button class="outline" id="skip" type="button">Skip</button><span id="pageCount"></span><button class="primary" id="next">Next activity ✓</button></div></div><div class="footer">Original lesson material · Fictional Northbridge Retail case. Answers are stored locally in your browser; this page is not a live teacher sync.</div></main></div>
+<button type="button" id="translateLauncher" class="translate-launcher" aria-label="Перевести текст">文A <span>Перевод</span></button>
 <div class="selection-translate" id="selectionTranslate" role="region" aria-label="Перевод выделенного текста" aria-live="polite">
 <div class="selection-top"><span class="selection-title">✦ ПЕРЕВОД · EN ↔ RU</span><button class="selection-close" id="selectionClose" type="button" aria-label="Закрыть">×</button></div>
-<div class="selection-source" id="selectionSource"></div>
+<div class="selection-source" id="selectionSource"></div><label class="translation-input-label" for="translationInput">Выделенный текст или введите вручную</label><textarea id="translationInput" class="translation-input" rows="2" placeholder="Select a word or type a sentence"></textarea><div class="translation-action-row"><button type="button" id="translateNow" class="selection-save">Перевести</button><span id="translationDirection">EN → RU</span></div>
 <div class="selection-target" id="selectionTarget">Получаем перевод…</div>
 <div class="selection-hint" id="selectionHint">Предварительный перевод · MyMemory. Google Translate откроется по кнопке.</div>
 <div class="selection-actions"><a id="selectionGoogle" class="selection-google" target="_blank" rel="noopener noreferrer">↗ Google Translate</a><button id="selectionSave" class="selection-save" type="button">＋ В словарь</button></div>
@@ -322,77 +333,105 @@ window.addWord=i=>{let words=readWords(),w=VOCAB[i];if(!words.some(x=>x.en.toLow
 window.exportAnswers=()=>{let lines=["AI in Finance — Lesson 2","Exported "+new Date().toLocaleString(),...Object.entries(state.values).map(([k,v])=>k+": "+v)].join("\n\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([lines],{type:"text/plain;charset=utf-8"}));a.download="ai-in-finance-lesson-2-answers.txt";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
 drawWords();go(state.page);
 
-/* Translation is triggered only for a user text selection inside the lesson.
-   Google Translate is opened via its public website (no secret API key).
-   The inline translation preview uses MyMemory's public translation endpoint. */
-(function(){
-const pop=document.getElementById("selectionTranslate");
-const source=document.getElementById("selectionSource");
-const target=document.getElementById("selectionTarget");
-const hint=document.getElementById("selectionHint");
-const google=document.getElementById("selectionGoogle");
-const saveBtn=document.getElementById("selectionSave");
-const cls=document.getElementById("selectionClose");
-let current="",meaning="",version=0,timer;
-let control;
-function hide(){pop.classList.remove("is-visible");current="";meaning="";version++;if(control){control.abort();control=null}}
-function eligibleNode(n){const el=n?.nodeType===1?n:n?.parentElement;if(!el)return false;if(el.closest("input,textarea,select,button,a,[contenteditable=true],.selection-translate,.sidebar,header"))return false;return !!el.closest(".lesson .page,.lesson .hero")}
-function position(rect){const w=Math.min(370,window.innerWidth-24);const h=pop.offsetHeight||245;let left=Math.max(12,Math.min(window.innerWidth-w-12,rect.left+(rect.width-w)/2));let top=rect.bottom+10;if(top+h>window.innerHeight-10)top=rect.top-h-10;top=Math.max(10,Math.min(top,window.innerHeight-h-10));pop.style.left=Math.round(left)+"px";pop.style.top=Math.round(top)+"px"}
-async function show(){
- const selection=window.getSelection();
- if(!selection||selection.isCollapsed||!selection.rangeCount)return;
- if(!eligibleNode(selection.anchorNode)||!eligibleNode(selection.focusNode))return;
- const phrase=selection.toString().trim().replace(/\s+/g," ");
- if(!phrase||phrase.length>1200)return;
- if(phrase===current&&pop.classList.contains("is-visible"))return;
- if(control)control.abort();
- const rect=selection.getRangeAt(0).getBoundingClientRect();
- if(!rect.width&&!rect.height)return;
- current=phrase;meaning="";version++;const token=version;
- const russian=/[А-Яа-яЁё]/.test(phrase),from=russian?"ru":"en",to=russian?"en":"ru";
- source.textContent=phrase;
- target.textContent="Получаем перевод…";hint.textContent="Предварительный перевод · MyMemory. Google Translate откроется по кнопке.";
- google.href="https://translate.google.com/?"+new URLSearchParams({sl:from,tl:to,text:phrase,op:"translate"});
- saveBtn.disabled=true;saveBtn.textContent="＋ В словарь";
- pop.classList.add("is-visible");position(rect);
- control=new AbortController();
- const abort=control;const timeout=setTimeout(()=>abort.abort(),10000);
- try{
-  const url="https://api.mymemory.translated.net/get?"+new URLSearchParams({q:phrase,langpair:from+"|"+to});
-  const response=await fetch(url,{signal:abort.signal,credentials:"omit",referrerPolicy:"no-referrer"});
-  if(!response.ok)throw Error("service response");
-  const data=await response.json();
-  if(token!==version)return;
-  const translated=String(data?.responseData?.translatedText||"").trim();
-  const status=Number(data?.responseStatus||0);
-  if(!translated||status>=400||/QUERY LENGTH LIMIT|MYMEMORY WARNING/i.test(translated))throw Error("translation unavailable");
-  meaning=translated;target.textContent=translated;saveBtn.disabled=false;
-  hint.textContent="Предварительный перевод · MyMemory. Для перевода Google нажмите кнопку.";
-  position(rect);
- }catch(e){if(token!==version)return;target.textContent="Предпросмотр недоступен. Откройте перевод в Google Translate.";hint.textContent="Google Translate работает без API-ключа через отдельную вкладку.";saveBtn.disabled=true;position(rect)}
- finally{clearTimeout(timeout)}
-}
-function schedule(){clearTimeout(timer);timer=setTimeout(show,180)}
-document.addEventListener("pointerup",e=>{if(pop.contains(e.target))return;schedule()});
-document.addEventListener("keyup",e=>{if(e.key==="Shift"||e.key==="ArrowLeft"||e.key==="ArrowRight"||e.key==="ArrowUp"||e.key==="ArrowDown")schedule()});
-document.addEventListener("selectionchange",()=>{const sel=window.getSelection();if(sel&&!sel.isCollapsed)schedule()});
-cls.addEventListener("click",hide);
-document.addEventListener("pointerdown",e=>{if(pop.classList.contains("is-visible")&&!pop.contains(e.target)&&!eligibleNode(e.target))hide()});
-document.addEventListener("keydown",e=>{if(e.key==="Escape")hide()});
-document.querySelector(".lesson").addEventListener("scroll",()=>{if(pop.classList.contains("is-visible"))hide()},{passive:true});
-document.querySelectorAll("#nav button,#back,#next,#skip").forEach(b=>b.addEventListener("click",hide));
-saveBtn.addEventListener("click",()=>{
- if(!current||!meaning)return;
- const isRussian=/[А-Яа-яЁё]/.test(current);
- const word={en:isRussian?meaning:current,ru:isRussian?current:meaning};
- try{
-  const object=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");
-  object.words=Array.isArray(object.words)?object.words:[];
-  if(!object.words.some(w=>String(w.en||"").toLowerCase()===word.en.toLowerCase()))object.words.push(word);
-  localStorage.setItem(WORDS_KEY,JSON.stringify(object));
-  drawWords();saveBtn.textContent="✓ Сохранено";
- }catch(e){saveBtn.textContent="Не удалось сохранить"}
-});
-})();
 
+/* GoStudy translation: manual launcher always works; text selection works on mouse/touch/keyboard.
+   MyMemory provides optional translation preview. Google Translate opens directly with full text. */
+(function(){
+ const byId=id=>document.getElementById(id);
+ const pop=byId("selectionTranslate"),launcher=byId("translateLauncher"),source=byId("selectionSource");
+ const target=byId("selectionTarget"),hint=byId("selectionHint"),google=byId("selectionGoogle");
+ const input=byId("translationInput"),direction=byId("translationDirection"),translateBtn=byId("translateNow");
+ const saveBtn=byId("selectionSave"),close=byId("selectionClose");
+ let phrase="",translation="",controller=null,request=0,selectionTimer=0;
+ let savedText="";
+ function clean(t){return String(t||"").replace(/\s+/g," ").trim().slice(0,1500)}
+ function isEligible(n){
+   const el=n?.nodeType===1?n:n?.parentElement;
+   return !!(el&&el.closest(".lesson")&&!el.closest("textarea,input,select,button,a,.selection-translate"));
+ }
+ function hide(){pop.classList.remove("is-visible");if(controller)controller.abort();request++;controller=null}
+ function locate(rect){
+   const w=Math.min(370,innerWidth-24),h=pop.offsetHeight||290;
+   const x=rect?rect.left+(rect.width-w)/2:innerWidth-w-16;
+   const y=rect?(rect.bottom+12):Math.max(14,innerHeight-h-85);
+   const left=Math.max(12,Math.min(innerWidth-w-12,x));
+   let top=rect&&y+h>innerHeight-12?rect.top-h-12:y;
+   top=Math.max(10,Math.min(Math.max(10,innerHeight-h-10),top));
+   pop.style.left=Math.round(left)+"px";pop.style.top=Math.round(top)+"px";
+ }
+ function urlFor(t){
+   const from=/[А-Яа-яЁё]/.test(t)?"ru":"en",to=from==="en"?"ru":"en";
+   direction.textContent=from.toUpperCase()+" → "+to.toUpperCase();
+   google.href="https://translate.google.com/?"+new URLSearchParams({sl:from,tl:to,text:t,op:"translate"});
+   return {from,to}
+ }
+ function open(t,rect){
+   phrase=clean(t);translation="";
+   source.textContent=phrase||"Введите слово или предложение";
+   input.value=phrase;target.textContent=phrase?"Нажмите «Перевести» или откройте Google Translate.":"Введите текст, затем нажмите «Перевести».";
+   hint.textContent="Google Translate открывается в отдельной вкладке. Предпросмотр внутри урока — MyMemory.";
+   saveBtn.disabled=true;saveBtn.textContent="＋ В словарь";
+   google.href="https://translate.google.com/";
+   if(phrase)urlFor(phrase);
+   pop.classList.add("is-visible");locate(rect);
+   if(phrase)translate(phrase);
+ }
+ async function translate(value){
+   const t=clean(value);
+   if(!t)return;
+   phrase=t;source.textContent=t;input.value=t;
+   const {from,to}=urlFor(t);
+   saveBtn.disabled=true;target.textContent="Переводим…";hint.textContent="Перевод внутри урока: MyMemory. Для Google нажмите синюю кнопку.";
+   if(controller)controller.abort();
+   const seq=++request;controller=new AbortController();
+   const ctrl=controller,timeout=setTimeout(()=>ctrl.abort(),9000);
+   try{
+     const resp=await fetch("https://api.mymemory.translated.net/get?"+new URLSearchParams({q:t,langpair:from+"|"+to}),{signal:ctrl.signal});
+     if(!resp.ok)throw Error("HTTP "+resp.status);
+     const data=await resp.json();
+     if(request!==seq)return;
+     const result=String(data?.responseData?.translatedText||"").trim();
+     if(!result||Number(data?.responseStatus||0)>=400||/QUERY LENGTH LIMIT|MYMEMORY WARNING/i.test(result))throw Error("Translation unavailable");
+     translation=result;target.textContent=result;hint.textContent="Перевод MyMemory · для варианта Google нажмите Google Translate.";
+     saveBtn.disabled=false;
+   }catch(e){
+     if(request!==seq)return;
+     target.textContent="Встроенный перевод сейчас недоступен. Используйте Google Translate ниже.";
+     hint.textContent="Google Translate откроет именно этот текст в новой вкладке.";
+   }finally{clearTimeout(timeout)}
+   locate(null);
+ }
+ function selectionOpen(){
+   const selection=window.getSelection();
+   if(!selection||selection.isCollapsed||!selection.rangeCount||!isEligible(selection.anchorNode)||!isEligible(selection.focusNode))return;
+   const text=clean(selection.toString());
+   if(!text)return;
+   let rect=selection.getRangeAt(0).getBoundingClientRect();
+   if(!Number.isFinite(rect.left)||(!rect.width&&!rect.height))rect=null;
+   if(text===savedText&&pop.classList.contains("is-visible"))return;
+   savedText=text;open(text,rect);
+ }
+ function schedule(){clearTimeout(selectionTimer);selectionTimer=setTimeout(selectionOpen,100)}
+ document.addEventListener("mouseup",e=>{if(!pop.contains(e.target))schedule()});
+ document.addEventListener("touchend",e=>{if(!pop.contains(e.target))setTimeout(selectionOpen,250)},{passive:true});
+ document.addEventListener("keyup",e=>{if(e.key==="Shift"||e.key.startsWith("Arrow"))schedule()});
+ launcher.addEventListener("click",()=>{let text="";const sel=window.getSelection();if(sel&&!sel.isCollapsed)text=clean(sel.toString());open(text||phrase,null);input.focus()});
+ translateBtn.addEventListener("click",()=>translate(input.value));
+ input.addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.metaKey||e.ctrlKey)){e.preventDefault();translate(input.value)}});
+ close.addEventListener("click",hide);
+ document.addEventListener("keydown",e=>{if(e.key==="Escape")hide()});
+ document.addEventListener("pointerdown",e=>{if(pop.classList.contains("is-visible")&&!pop.contains(e.target)&&e.target!==launcher&&!isEligible(e.target))hide()});
+ document.querySelectorAll("#nav button,#back,#next,#skip").forEach(el=>el.addEventListener("click",hide));
+ saveBtn.addEventListener("click",()=>{
+   if(!phrase||!translation)return;
+   const ru=/[А-Яа-яЁё]/.test(phrase);
+   const word={en:ru?translation:phrase,ru:ru?phrase:translation};
+   try{
+    const data=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");
+    data.words=Array.isArray(data.words)?data.words:[];
+    if(!data.words.some(w=>String(w.en).toLowerCase()===word.en.toLowerCase()))data.words.push(word);
+    localStorage.setItem(WORDS_KEY,JSON.stringify(data));drawWords();saveBtn.textContent="✓ Сохранено";
+   }catch(e){saveBtn.textContent="Не удалось сохранить"}
+ });
+})();
 </script></body></html>
