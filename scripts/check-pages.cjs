@@ -77,6 +77,14 @@ async function main() {
         assert.equal(await cabinetHeading.evaluate(node => getComputedStyle(node).fontSize),'29px');
         await sp.evaluate(() => document.documentElement.style.removeProperty('--gostudy-ui-heading-size'));
         await teacherLink.waitFor();
+        if (course === 'general_english_b1') {
+          const homework = sp.locator('.home-homework-link');
+          assert.equal(await homework.getAttribute('href'),current.homework);
+          const hp = await student.newPage();
+          await hp.goto(origin + '/' + current.homework);
+          await hp.locator('.sheet h1').filter({hasText:'Coffee after work'}).waitFor();
+          await hp.close();
+        }
         for (const [page, link] of [[sp, studentLink], [tp, teacherLink]]) {
           await link.click();
           await page.waitForURL(url => url.pathname === expected);
@@ -135,6 +143,14 @@ async function main() {
           const label = (await option.innerText()).trim();
           await option.click();
           await tp.locator('.travel-student-answer').filter({hasText:label}).waitFor({timeout:10000});
+        }
+        if (course === 'general_english_b1') {
+          await sp.locator('.sections button').last().click();
+          await tp.locator('.sections button').last().click();
+          assert.equal(await sp.getByText('Карточка преподавателя').count(),0);
+          await tp.getByText('Карточка преподавателя').waitFor();
+          await sp.locator('.writing textarea').fill('See you on Saturday at eleven at Riverside Café!');
+          await tp.locator('.gostudy-live-draft').filter({hasText:'Riverside Café'}).waitFor({timeout:10000});
         }
         console.log(course + ': both cabinets open the current lesson and shared dictionary');
       } catch (error) { throw new Error(course + ': ' + error.message, {cause: error}); }

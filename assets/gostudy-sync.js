@@ -64,12 +64,16 @@
   const travelB2Cabinet = currentPage === 'student-travel-b2.html';
   const businessAI = ['business-ai-b2c1-02.html','student-business-ai.html'].includes(location.pathname.split('/').pop());
   const businessAIKeys = ['gostudy-vocabulary-business-ai-v1','gostudy-business-ai-b2c1-02-v1'];
-  const keys = new Set(tiktokA2 ? tiktokKeys : pharmaC1 ? pharmaKeys : firstSales ? salesKeys : feedB2 ? feedKeys : financeB1 ? financeKeys : travelA2 ? travelA2Keys : businessAI ? businessAIKeys : countryHouse ? countryHouseKeys : travelB2Keys);
+  const generalB1Course = 'general-english-b1';
+  const generalB1Cabinet = currentPage === 'student-general-english-b1.html';
+  const generalB1 = generalB1Cabinet || document.querySelector('meta[name=gostudy-course]')?.content === generalB1Course;
+  const generalB1Keys = ['gostudy-vocabulary-general-english-b1-v1','gostudy-general-english-b1-01-v1','gostudy-general-english-b1-01-homework-v1'];
+  const keys = new Set(generalB1 ? generalB1Keys : tiktokA2 ? tiktokKeys : pharmaC1 ? pharmaKeys : firstSales ? salesKeys : feedB2 ? feedKeys : financeB1 ? financeKeys : travelA2 ? travelA2Keys : businessAI ? businessAIKeys : countryHouse ? countryHouseKeys : travelB2Keys);
   const courseName = tiktokA2 ? 'TikTok A2' : pharmaC1 ? 'Pharma C1' : firstSales ? 'First Sales C1' : feedB2 ? 'Feed B2' : financeB1 ? 'Finance B1' : travelA2 ? 'Travel A2+' : 'Travel B2';
   const accountPage = 'gostudy-account.html' + (tiktokA2 ? '?course=tiktok-a2' : pharmaC1 ? '?course=pharma-c1' : firstSales ? '?course=first-sales' : feedB2 ? '?course=feed-b2' : financeB1 ? '?course=finance-b1' : travelA2 ? '?course=travel-a2' : '');
   const cabinetPage = tiktokA2 ? 'student-tiktok-a2.html' : pharmaC1 ? 'student-pharma.html' : firstSales ? 'student-first-sales.html' : feedB2 ? 'student-feed-b2.html' : financeB1 ? 'student-finance-b1.html' : travelA2 ? 'student-travel-a2.html' : 'student-travel-b2.html';
   const table = '/rest/v1/gostudy_progress';
-  const classroomCatalog = {business_ai:{name:"Business AI · B2–C1",lessons:[{title:"AI at Work",lesson:"business-ai-b2c1.html",lessonKey:"gostudy-business-ai-b2c1-v1"},{title:"From AI Pilot to Rollout",lesson:"business-ai-b2c1-02.html",lessonKey:"gostudy-business-ai-b2c1-02-v1",homework:"business-ai-b2c1-homework.html"}]},country_house:{"name":"Country House · A2","lessons":[{"title":"A rainy weekend at the country house","lesson":"country-house-a2.html","lessonKey":"gostudy-country-house-lesson-a2-v1","homework":"country-house-a2-homework.html"},{"title":"A visit to the village shop","lesson":"country-house-a2-02.html","lessonKey":"gostudy-country-house-lesson-02-a2-v1","homework":"country-house-a2-02-homework.html"},{"title":"Before the Rain Comes","lesson":"country-house-a2-03.html?v=workbook-1&view=glass&words=11&live=1","lessonKey":"gostudy-country-house-a2-03-v1","homework":"country-house-a2-03-homework.html?v=1","homeworkKey":"gostudy-country-house-a2-03-homework-v1"}]},travel_b2:{"name":"Travel B2","lessons":[{"title":"When the trip goes off plan","lesson":"travel-disruptions-b2.html","lessonKey":"gostudy-travel-disruptions-b2-v1","homework":"travel-homework-b2.html"},{"title":"The case of the missing suitcase","lesson":"travel-b2-02.html","lessonKey":"gostudy-travel-b2-02-v1","homework":"travel-b2-02-homework.html"},{"title":"A Room That Wasn’t There","lesson":"travel-b2-03.html","lessonKey":"gostudy-travel-b2-03-v1"},{"title":"The Last Connection","lesson":"travel-b2-04.html?view=glass&header=1&style=2&words=3&live=1","lessonKey":"gostudy-travel-b2-04-v1"}]},tiktok_a2: {"name": "TikTok A2", "lessons": [{"title": "One More Video?", "lesson": "tiktok-a2.html", "homework": "tiktok-a2-homework.html", "lessonKey": "gostudy-tiktok-a2-v1", "homeworkKey": "gostudy-tiktok-a2-homework-v1"}]},"travel_a2":{"name":"Travel A2+","lessons":[{"title":"A weekend away","lesson":"travel-weekend-a2.html","homework":"travel-a2-homework.html","lessonKey":"gostudy-travel-a2plus-v1","homeworkKey":"gostudy-travel-a2plus-homework-v1"},{"title":"A day out in York","lesson":"travel-a2-02.html","homework":"travel-a2-02-homework.html","lessonKey":"gostudy-travel-a2plus-02-v1","homeworkKey":"gostudy-travel-a2plus-02-homework-v1"},{"title":"A day by the sea","lesson":"travel-a2-03.html","homework":"travel-a2-03-homework.html","lessonKey":"gostudy-travel-a2plus-03-v1","homeworkKey":"gostudy-travel-a2plus-03-homework-v1"},{"title":"The train is late","lesson":"travel-a2-04.html","homework":"travel-a2-04-homework.html","lessonKey":"gostudy-travel-a2plus-04-v1","homeworkKey":"gostudy-travel-a2plus-04-homework-v1"}]},"finance_b1":{"name":"Finance B1","lessons":[{"title":"Money moves","lesson":"finance-b1.html","homework":"finance-b1-homework.html","lessonKey":"gostudy-finance-b1-v1","homeworkKey":"gostudy-finance-b1-homework-v1"},{"title":"Where did my money go?","lesson":"finance-b1-02.html","homework":"finance-b1-02-homework.html","lessonKey":"gostudy-finance-b1-02-v1","homeworkKey":"gostudy-finance-b1-02-homework-v1"}]},"feed_b2":{"name":"Feed B2","lessons":[{"title":"Your feed, your choice?","lesson":"feed-choice-b2.html","homework":"feed-choice-b2.html#homework","lessonKey":"gostudy-feed-b2-v1","homeworkKey":"gostudy-feed-b2-v1"},{"title":"Before you share","lesson":"feed-b2-02.html","homework":"feed-b2-02-homework.html","lessonKey":"gostudy-feed-b2-02-v1","homeworkKey":"gostudy-feed-b2-02-homework-v1"},{"title":"Who’s selling what?","lesson":"feed-b2-03.html","homework":"feed-b2-03-homework.html","lessonKey":"gostudy-feed-b2-03-v1","homeworkKey":"gostudy-feed-b2-03-homework-v1"},{"title":"A real photo, a false story","lesson":"feed-b2-04.html","homework":"feed-b2-04-homework.html","lessonKey":"gostudy-feed-b2-04-v1","homeworkKey":"gostudy-feed-b2-04-homework-v1"}]},"first_sales":{"name":"First Sales C1","lessons":[{"title":"Your First Sales Interview","lesson":"first-sales-c1.html","homework":"first-sales-c1-homework.html","lessonKey":"gostudy-first-sales-c1-v1","homeworkKey":"gostudy-first-sales-c1-homework-v1"},{"title":"Your First Discovery Call","lesson":"first-sales-c1-02.html","homework":"first-sales-c1-02-homework.html","lessonKey":"gostudy-first-sales-c1-02-v1","homeworkKey":"gostudy-first-sales-c1-02-homework-v1"}]},"pharma_c1":{"name":"Pharma C1","lessons":[{"title":"Pharma marketing: beyond the launch","lesson":"pharma-c1.html","homework":"pharma-c1.html#homework","lessonKey":"gostudy-pharma-c1-v1","homeworkKey":"gostudy-pharma-c1-v1"},{"title":"From feedback to strategy","lesson":"pharma-c1-02.html","homework":"pharma-c1-02-homework.html","lessonKey":"gostudy-pharma-c1-02-v1","homeworkKey":"gostudy-pharma-c1-02-homework-v1"},{"title":"Can AI Help Doctors Spot Cancer?","lesson":"pharma-c1-03.html","homework":"pharma-c1-03-homework.html","lessonKey":"gostudy-pharma-c1-03-v1","homeworkKey":"gostudy-pharma-c1-03-homework-v1"}]}};
+  const classroomCatalog = {general_english_b1:{name:"General English B1",lessons:[{title:"When are you free?",lesson:"general-english-b1-01.html",lessonKey:"gostudy-general-english-b1-01-v1",homework:"general-english-b1-01-homework.html",homeworkKey:"gostudy-general-english-b1-01-homework-v1"}]},business_ai:{name:"Business AI · B2–C1",lessons:[{title:"AI at Work",lesson:"business-ai-b2c1.html",lessonKey:"gostudy-business-ai-b2c1-v1"},{title:"From AI Pilot to Rollout",lesson:"business-ai-b2c1-02.html",lessonKey:"gostudy-business-ai-b2c1-02-v1",homework:"business-ai-b2c1-homework.html"}]},country_house:{"name":"Country House · A2","lessons":[{"title":"A rainy weekend at the country house","lesson":"country-house-a2.html","lessonKey":"gostudy-country-house-lesson-a2-v1","homework":"country-house-a2-homework.html"},{"title":"A visit to the village shop","lesson":"country-house-a2-02.html","lessonKey":"gostudy-country-house-lesson-02-a2-v1","homework":"country-house-a2-02-homework.html"},{"title":"Before the Rain Comes","lesson":"country-house-a2-03.html?v=workbook-1&view=glass&words=11&live=1","lessonKey":"gostudy-country-house-a2-03-v1","homework":"country-house-a2-03-homework.html?v=1","homeworkKey":"gostudy-country-house-a2-03-homework-v1"}]},travel_b2:{"name":"Travel B2","lessons":[{"title":"When the trip goes off plan","lesson":"travel-disruptions-b2.html","lessonKey":"gostudy-travel-disruptions-b2-v1","homework":"travel-homework-b2.html"},{"title":"The case of the missing suitcase","lesson":"travel-b2-02.html","lessonKey":"gostudy-travel-b2-02-v1","homework":"travel-b2-02-homework.html"},{"title":"A Room That Wasn’t There","lesson":"travel-b2-03.html","lessonKey":"gostudy-travel-b2-03-v1"},{"title":"The Last Connection","lesson":"travel-b2-04.html?view=glass&header=1&style=2&words=3&live=1","lessonKey":"gostudy-travel-b2-04-v1"}]},tiktok_a2: {"name": "TikTok A2", "lessons": [{"title": "One More Video?", "lesson": "tiktok-a2.html", "homework": "tiktok-a2-homework.html", "lessonKey": "gostudy-tiktok-a2-v1", "homeworkKey": "gostudy-tiktok-a2-homework-v1"}]},"travel_a2":{"name":"Travel A2+","lessons":[{"title":"A weekend away","lesson":"travel-weekend-a2.html","homework":"travel-a2-homework.html","lessonKey":"gostudy-travel-a2plus-v1","homeworkKey":"gostudy-travel-a2plus-homework-v1"},{"title":"A day out in York","lesson":"travel-a2-02.html","homework":"travel-a2-02-homework.html","lessonKey":"gostudy-travel-a2plus-02-v1","homeworkKey":"gostudy-travel-a2plus-02-homework-v1"},{"title":"A day by the sea","lesson":"travel-a2-03.html","homework":"travel-a2-03-homework.html","lessonKey":"gostudy-travel-a2plus-03-v1","homeworkKey":"gostudy-travel-a2plus-03-homework-v1"},{"title":"The train is late","lesson":"travel-a2-04.html","homework":"travel-a2-04-homework.html","lessonKey":"gostudy-travel-a2plus-04-v1","homeworkKey":"gostudy-travel-a2plus-04-homework-v1"}]},"finance_b1":{"name":"Finance B1","lessons":[{"title":"Money moves","lesson":"finance-b1.html","homework":"finance-b1-homework.html","lessonKey":"gostudy-finance-b1-v1","homeworkKey":"gostudy-finance-b1-homework-v1"},{"title":"Where did my money go?","lesson":"finance-b1-02.html","homework":"finance-b1-02-homework.html","lessonKey":"gostudy-finance-b1-02-v1","homeworkKey":"gostudy-finance-b1-02-homework-v1"}]},"feed_b2":{"name":"Feed B2","lessons":[{"title":"Your feed, your choice?","lesson":"feed-choice-b2.html","homework":"feed-choice-b2.html#homework","lessonKey":"gostudy-feed-b2-v1","homeworkKey":"gostudy-feed-b2-v1"},{"title":"Before you share","lesson":"feed-b2-02.html","homework":"feed-b2-02-homework.html","lessonKey":"gostudy-feed-b2-02-v1","homeworkKey":"gostudy-feed-b2-02-homework-v1"},{"title":"Who’s selling what?","lesson":"feed-b2-03.html","homework":"feed-b2-03-homework.html","lessonKey":"gostudy-feed-b2-03-v1","homeworkKey":"gostudy-feed-b2-03-homework-v1"},{"title":"A real photo, a false story","lesson":"feed-b2-04.html","homework":"feed-b2-04-homework.html","lessonKey":"gostudy-feed-b2-04-v1","homeworkKey":"gostudy-feed-b2-04-homework-v1"}]},"first_sales":{"name":"First Sales C1","lessons":[{"title":"Your First Sales Interview","lesson":"first-sales-c1.html","homework":"first-sales-c1-homework.html","lessonKey":"gostudy-first-sales-c1-v1","homeworkKey":"gostudy-first-sales-c1-homework-v1"},{"title":"Your First Discovery Call","lesson":"first-sales-c1-02.html","homework":"first-sales-c1-02-homework.html","lessonKey":"gostudy-first-sales-c1-02-v1","homeworkKey":"gostudy-first-sales-c1-02-homework-v1"}]},"pharma_c1":{"name":"Pharma C1","lessons":[{"title":"Pharma marketing: beyond the launch","lesson":"pharma-c1.html","homework":"pharma-c1.html#homework","lessonKey":"gostudy-pharma-c1-v1","homeworkKey":"gostudy-pharma-c1-v1"},{"title":"From feedback to strategy","lesson":"pharma-c1-02.html","homework":"pharma-c1-02-homework.html","lessonKey":"gostudy-pharma-c1-02-v1","homeworkKey":"gostudy-pharma-c1-02-homework-v1"},{"title":"Can AI Help Doctors Spot Cancer?","lesson":"pharma-c1-03.html","homework":"pharma-c1-03-homework.html","lessonKey":"gostudy-pharma-c1-03-v1","homeworkKey":"gostudy-pharma-c1-03-homework-v1"}]}};
   const classroomStudent = new URLSearchParams(location.search).get('classStudent');
   const previewRecords = classroomStudent === null ? null : new Map();
   const classroomPages = new Map(Object.entries(classroomCatalog).flatMap(([course, spec]) =>
@@ -319,6 +323,7 @@
 
   function mountUnifiedAccount() {
     const destinations = new Map([
+      [generalB1Course, {name:'General English B1',path:'student-general-english-b1.html',keys:generalB1Keys}],
       ['country-house', {name:'Country House · A2',path:'student-country-house.html',keys:countryHouseKeys}],
       ['business-ai', {name:'Business AI · B2–C1',path:'student-business-ai.html',keys:businessAIKeys}],
       ['travel-b2', {name:'Travel B2',path:'student-travel-b2.html',keys:travelB2Keys}],
@@ -484,7 +489,7 @@
       homeworkTitle: 'The case of the missing suitcase', cover: 'assets/travel-b2-04-cover.png',
       vocabulary: 'travel-disruptions-b2.html#vocabulary', words: 'gostudy-travel-disruptions-b2-v1'
     } : null;
-    const catalogCourse = countryHouse ? 'country_house' : travelB2Cabinet ? 'travel_b2' : businessAI ? 'business_ai' : course;
+    const catalogCourse = generalB1 ? 'general_english_b1' : countryHouse ? 'country_house' : travelB2Cabinet ? 'travel_b2' : businessAI ? 'business_ai' : course;
     const currentLesson = classroomCatalog[catalogCourse].lessons.at(-1);
     const lesson = {...courseHome,...currentLesson,homework:currentLesson.homework || courseHome?.homework};
     const started = json(GoStudyStorage.getItem(lesson.lessonKey),{});
@@ -493,9 +498,10 @@
     const visual = document.createElement(cover || businessAI || courseHome ? 'img' : 'span');
     visual.className = 'home-cover';
     if (cover || businessAI || courseHome) { visual.src = courseHome?.cover || (businessAI ? 'assets/gostudy-ai-pilot.png' : cover.src); visual.alt = ''; }
-    else { visual.textContent = tiktokA2 ? '🎬' : '🧳'; visual.setAttribute('aria-hidden','true'); }
+    else { visual.textContent = generalB1 ? '☕' : tiktokA2 ? '🎬' : '🧳'; visual.setAttribute('aria-hidden','true'); }
     home.querySelector('.home-homework').append(visual);
     home.querySelectorAll('.home-current h2').forEach(title => { title.textContent = lesson.title; });
+    if (generalB1) home.querySelector('.home-homework h2').textContent = 'Coffee after work';
     if (businessAI || courseHome) home.querySelector('.home-homework h2').textContent = courseHome?.homeworkTitle || 'AI at Work';
     const open = home.querySelector('.home-open-lesson');
     const homework = home.querySelector('.home-homework-link');
@@ -569,7 +575,7 @@
     document.body.classList.add('gostudy-student-home');
   }
 
-  async function mountTiktokCabinet(content) {
+  async function mountProtectedCabinet(content, course, title) {
     const status = document.getElementById('cabinet-status');
     if (!session) {
       location.replace('login.html');
@@ -579,8 +585,8 @@
       const response = await request('/rest/v1/rpc/gostudy_my_destinations', {method:'POST', body:{}}, await token());
       if (response.status === 401) throw new Error('Срок входа истёк. Войдите снова.');
       if (!response.ok || !Array.isArray(response.data)) throw new Error('Не удалось открыть кабинет. Обновите страницу.');
-      if (!response.data.some(row => row.course === 'tiktok-a2')) {
-        throw new Error('Урок TikTok A2 не назначен этому аккаунту.');
+      if (!response.data.some(row => row.course === course)) {
+        throw new Error('Курс '+title+' не назначен этому аккаунту.');
       }
       status.hidden = true;
       content.hidden = false;
@@ -594,6 +600,8 @@
   }
 
   const liveLesson = {
+    'general-english-b1-01.html':['general_english_b1',generalB1Keys[1]],
+    'general-english-b1-01-homework.html':['general_english_b1',generalB1Keys[2]],
     'business-ai-b2c1-02.html':['business_ai','gostudy-business-ai-b2c1-02-v1'],
     'travel-b2-04.html':['travel_b2','gostudy-travel-b2-04-v1'],
     'country-house-a2-03.html':['country_house','gostudy-country-house-a2-03-v1'],
@@ -1087,7 +1095,7 @@
     const addStudentStatus = document.getElementById('teacher-add-student-status');
     if (addStudentForm) {
       for (const [id,name] of courses) {
-        if (['travel_b2','country_house','business_ai'].includes(id)) continue;
+        if (['travel_b2','country_house','business_ai','general_english_b1'].includes(id)) continue;
         const option = document.createElement('option');
         option.value = id;
         option.textContent = name;
@@ -1171,7 +1179,7 @@
     function renderStudent() {
       renderStudentList();
       const student = students.find(row => row.selection === studentPicker.value);
-      wordForm.hidden = !student || ['travel_b2','country_house','business_ai'].includes(student.course);
+      wordForm.hidden = !student || ['travel_b2','country_house','business_ai','general_english_b1'].includes(student.course);
       wordItems(studentWords, student?.words);
       wordItems(assignedWords, student?.assigned);
       const classroom = document.getElementById('teacher-classroom');
@@ -1408,7 +1416,8 @@
     else if (document.getElementById('teacher-login')) mountTeacher();
     else if (document.getElementById('unified-login')) mountUnifiedAccount();
     else if (document.getElementById('cloud-login')) mountAccount();
-    else if (document.getElementById('tiktok-cabinet')) mountTiktokCabinet(document.getElementById('tiktok-cabinet'));
+    else if (generalB1Cabinet) mountProtectedCabinet(document.getElementById('general-b1-cabinet'),generalB1Course,'General English B1');
+    else if (document.getElementById('tiktok-cabinet')) mountProtectedCabinet(document.getElementById('tiktok-cabinet'),'tiktok-a2','TikTok A2');
     else if (classroomStudent !== null) mountClassroom();
     else { mountStudentHome(); mountLesson(); mountTeacherWords(); }
   });
