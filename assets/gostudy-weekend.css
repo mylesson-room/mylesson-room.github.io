@@ -1,0 +1,19 @@
+.weekend-workbook .lesson-content { background:#fffdf9; }
+.weekend-workbook .lesson-meta { color:#224083;background:#edf3ff; }
+.weekend-workbook .sheet .label { color:#4f3f9d; }
+.weekend-workbook .sheet h1 { color:#172f5d; }
+.weekend-workbook .instruction { color:#215d78; }
+.weekend-workbook .lesson-cover { aspect-ratio: 2.35; object-fit:cover; border-radius:16px; margin:16px 0 22px; }
+.weekend-workbook .travel-cards { grid-template-columns:repeat(auto-fit,minmax(min(170px,100%),1fr)); }
+.weekend-workbook .travel-cards > div { border-radius:16px; min-height:130px; }
+.weekend-workbook .travel-cards > div:nth-child(1) { background:#e7edff; border-color:#cad7fa; color:#283d87; }
+.weekend-workbook .travel-cards > div:nth-child(2) { background:#fff0e6; border-color:#f3d4bc; color:#713b24; }
+.weekend-workbook .travel-cards > div:nth-child(3) { background:#e9f7ed; border-color:#c5e4d0; color:#225e43; }
+.weekend-workbook .source { border-radius:12px; margin-block:16px; padding:14px 18px; }
+.weekend-workbook .source p { margin:8px 0; }
+.weekend-workbook .source audio { margin-bottom:8px; }
+.weekend-workbook .activity { background:transparent; }
+.weekend-workbook .activity fieldset { padding:12px; border:1px solid #dce4f1; border-radius:12px; }
+.weekend-workbook .activity .options { padding-left:0; }
+.weekend-workbook .activity .options label { flex:1 1 165px; }
+.weekend-workbook .sections button[aria-current] { background:#e7edff; border-color:#92a6df; }

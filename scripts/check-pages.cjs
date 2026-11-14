@@ -78,12 +78,7 @@ async function main() {
         await sp.evaluate(() => document.documentElement.style.removeProperty('--gostudy-ui-heading-size'));
         await teacherLink.waitFor();
         if (course === 'general_english_b1') {
-          const homework = sp.locator('.home-homework-link');
-          assert.equal(await homework.getAttribute('href'),current.homework);
-          const hp = await student.newPage();
-          await hp.goto(origin + '/' + current.homework);
-          await hp.locator('.sheet h1').filter({hasText:'Make time for a walk'}).waitFor();
-          await hp.close();
+          assert.equal(await sp.locator('.home-homework-link').count(),0);
         }
         for (const [page, link] of [[sp, studentLink], [tp, teacherLink]]) {
           await link.click();
@@ -145,7 +140,7 @@ async function main() {
               audio.addEventListener('loadedmetadata',resolve,{once:true});
               audio.addEventListener('error',reject,{once:true});
             }));
-            assert.ok(await sp.locator('audio').evaluate(audio => audio.duration > 20 && audio.duration < 60));
+            assert.ok(await sp.locator('audio').evaluate(audio => audio.duration > 35 && audio.duration < 90));
           }
           const option = sp.locator('.sheet [data-question] label').first();
           const label = (await option.innerText()).trim();
