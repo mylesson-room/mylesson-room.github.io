@@ -213,7 +213,17 @@ async function checkMigratedRooms(browser, origin) {
       await sp.getByRole('textbox',{name:'Сообщение'}).fill('Classroom check');
       await sp.getByRole('button',{name:'Отправить'}).click();
       await tp.getByRole('log').getByText(/Classroom check/).waitFor();
-      console.log(lesson.course + ': v1 cabinet, answers, reset, vocabulary and chat verified');
+      await sp.setViewportSize({width:390,height:844});
+      const pager = sp.locator('.step-nav,.page-controls');
+      await pager.waitFor();
+      const mobile = await pager.evaluate(node => {
+        const box = node.getBoundingClientRect();
+        return {position:getComputedStyle(node).position, bottom:box.bottom, width:box.width, viewport:innerHeight, screenWidth:innerWidth, contentWidth:document.documentElement.scrollWidth};
+      });
+      assert.equal(mobile.position,'fixed','navigation should stay visible on an iPhone-width screen');
+      assert.ok(Math.abs(mobile.bottom-mobile.viewport) <= 1 && Math.abs(mobile.width-mobile.screenWidth) <= 1,'navigation fills the bottom edge on mobile');
+      assert.ok(mobile.contentWidth <= mobile.screenWidth+1,'mobile lesson has no horizontal overflow');
+      console.log(lesson.course + ': v1 cabinet, answers, reset, vocabulary, chat and mobile layout verified');
     } finally {
       await student.close();
       await teacher.close();
