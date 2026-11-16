@@ -292,10 +292,18 @@ async function checkFinanceRoom(browser, origin) {
     assert.equal(events.find(event => event.kind === 'word')?.payload.en,'stress test');
 
     const word = tp.getByText('Forecasted cash balance',{exact:true});
-    const box = await word.boundingBox();
-    await tp.mouse.dblclick(box.x+22,box.y+box.height/2);
+    await word.evaluate(element => {
+      const node = element.firstChild;
+      const range = document.createRange();
+      range.setStart(node,0);
+      range.setEnd(node,'Forecasted'.length);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+      document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
+    });
     await tp.locator('#selectionTarget').fill('уточнённый прогноз');
-    await tp.getByRole('button',{name:'Добавить в словарь',exact:true}).click();
+    await tp.locator('#selectionSave').click();
+    await tp.waitForFunction(() => window.FinanceLive.words().some(word => word.ru === 'уточнённый прогноз'));
     for(const page of [sp,tp]){
       await page.locator('#finance-toast').filter({hasText:'уточнённый прогноз'}).waitFor();
       await page.getByRole('button',{name:'Dictionary',exact:true}).click();

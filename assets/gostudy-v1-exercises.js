@@ -156,8 +156,8 @@
     function fromSaved(saved) {
       const values = {};
       if (!saved || typeof saved!=='object') return values;
-      for (const [key,{step,slot,page}] of fields) {
-        const answer = saved[step] ?? saved[page];
+      for (const [key,{step,slot}] of fields) {
+        const answer = saved[step] ?? (/^original-\d+$/.test(step) ? saved[step.slice(9)] : undefined);
         const value = slot === undefined ? answer : answer?.[slot];
         if (value != null && valid(key,value)) values[key] = value;
       }
@@ -165,7 +165,10 @@
     }
     function toSaved(values,previous={}) {
       const answers = {...previous};
-      for (const step of new Set([...fields.values()].map(field=>field.step))) delete answers[step];
+      for (const step of new Set([...fields.values()].map(field=>field.step))) {
+        delete answers[step];
+        if (/^original-\d+$/.test(step)) delete answers[step.slice(9)];
+      }
       for (const [key,{step,slot}] of fields) {
         const value = values[key];
         if (value === undefined || value === '' || value === null) continue;
