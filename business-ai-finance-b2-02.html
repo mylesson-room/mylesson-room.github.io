@@ -333,13 +333,17 @@ header{height:46px;padding:0 30px;border-bottom:1px solid #e4e8f2;box-shadow:0 2
 .finance-correct{outline:1px solid #94d6b9;background:#effcf5}
 #finance-toast{position:fixed;right:14px;bottom:58px;width:clamp(158px,17vw,270px);z-index:160;padding:12px 14px;border-radius:12px;background:#e8fbf2;color:#165c47;box-shadow:0 6px 22px #123c3c30;overflow-wrap:anywhere}
 #finance-toast span{display:block;font-size:13px}
-#finance-celebrate{position:fixed;bottom:49px;left:50%;z-index:170;pointer-events:none;text-align:center;animation:finance-enter .6s ease-out both}
-.finance-fireworks{display:block;color:#c66a08;font-size:38px;animation:finance-spark .65s ease-in-out infinite alternate}
-.clap-left,.clap-right{animation:finance-clap .32s ease-in-out infinite alternate}.clap-right{--clap-dir:8px}.clap-left{--clap-dir:-8px}
-@keyframes finance-enter{from{transform:translate(-60vw,0)}to{transform:translate(-50%,0)}}
-@keyframes finance-clap{to{transform:translateX(var(--clap-dir))}}
-@keyframes finance-spark{to{transform:scale(1.2);opacity:.55}}
-@media(prefers-reduced-motion:reduce){#finance-celebrate,.finance-fireworks,.clap-left,.clap-right{animation:none}#finance-celebrate{transform:translateX(-50%)}}
+#finance-celebrate{position:fixed;inset:0;z-index:170;pointer-events:none;overflow:hidden}
+.finance-salute{position:absolute;top:40%;left:clamp(52px,15vw,220px);width:0;height:0}
+.finance-salute.right{left:auto;right:clamp(52px,15vw,220px);top:55%}
+.finance-salute i{position:absolute;left:var(--x,0px);top:var(--y,0px);width:6px;height:6px;border-radius:50%;opacity:0;background:#ffe58d;box-shadow:0 -32px #a87aff,23px -24px #45def9,32px 0 #ffc762,23px 24px #ff7592,0 32px #74eeb4,-23px 24px #a87aff,-32px 0 #45def9,-23px -24px #ffc762,12px -39px #fff3bd,-14px 38px #fff3bd;animation:finance-burst 1.25s cubic-bezier(.12,.6,.35,1) var(--delay,0s) both}
+.finance-salute i:nth-child(2){--x:24px;--y:39px;--delay:.65s}
+.finance-salute i:nth-child(3){--x:-19px;--y:-42px;--delay:1.43s}
+.finance-salute.right i:first-child{--delay:.18s}
+.finance-salute.right i:nth-child(2){--delay:.86s}
+.finance-salute.right i:nth-child(3){--delay:1.7s}
+@keyframes finance-burst{0%{opacity:0;transform:scale(.15)}18%{opacity:1}100%{opacity:0;transform:scale(1.7)}}
+@media(prefers-reduced-motion:reduce){.finance-salute i{animation:none;opacity:1}}
 </style></head><body data-finance-live>
 <header><a class="brand lesson-brand" href="student-business-ai-finance.html" aria-label="My classroom"><svg viewBox="350 140 835 650" width="55" height="43" aria-hidden="true" focusable="false"><defs><linearGradient id="crownGold" x1="0" y1="1" x2=".72" y2="0" gradientUnits="objectBoundingBox"><stop stop-color="#3a2815"/><stop offset=".36" stop-color="#765019"/><stop offset=".68" stop-color="#e9ad50"/><stop offset=".83" stop-color="#9c621a"/><stop offset="1" stop-color="#d89b3e"/></linearGradient></defs><g fill="url(#crownGold)"><path d="M770 150Q786 246 865 257Q786 269 770 365Q754 269 675 257Q754 246 770 150Z"/><path d="M574 301Q580 341 614 346Q580 352 574 392Q568 352 533 346Q568 341 574 301ZM968 301Q974 341 1008 346Q974 352 968 392Q962 352 928 346Q962 341 968 301Z"/><path d="M360 379C535 516 710 570 770 327C830 570 1005 516 1176 381C1109 478 1065 557 1046 623L1041 619C1046 569 1060 523 1084 474C931 576 806 534 770 365C734 534 609 576 454 474C478 523 492 569 496 619L491 623C472 558 427 478 360 379Z"/><path d="M430 679C571 571 690 599 767 702C679 614 568 614 430 679ZM1108 679C967 571 850 599 773 702C861 614 970 614 1108 679Z"/><path d="M367 747C521 631 663 645 770 738C877 645 1018 631 1171 747C1009 674 868 669 770 782C672 669 530 674 367 747Z"/></g></svg></a><div class="header-right"><button type="button" class="lesson-dictionary-button" id="openLessonDictionary" aria-haspopup="dialog" aria-controls="lessonDictionary"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-3-2-6-2-9-1v13c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1v13"/></svg>Dictionary</button><a class="lesson-home-link" href="student-business-ai-finance.html" aria-label="Student dashboard"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v11h14V9m-9 11v-6h4v6"/></svg></a></div></header>
 <dialog class="lesson-dictionary" id="lessonDictionary" aria-labelledby="lessonDictionaryTitle">
@@ -372,7 +376,7 @@ header{height:46px;padding:0 30px;border-bottom:1px solid #e4e8f2;box-shadow:0 2
   </div>
   <a id="selectionGoogle" target="_blank" rel="noopener noreferrer" hidden>Открыть в Google Translate</a>
 </div>
-<div id="finance-toast" hidden role="status"></div><div id="finance-celebrate" hidden aria-hidden="true"><span class="finance-fireworks">✦ ✧ ✦</span><svg viewBox="0 0 100 122" width="100" height="122"><circle cx="50" cy="24" r="16" fill="#f9b97d"/><path d="M36 20q14-26 29-1" fill="#35365d"/><path d="M43 28q7 7 14 0" fill="none" stroke="#633748" stroke-width="2"/><rect x="33" y="45" width="34" height="47" rx="14" fill="#12adc9"/><path d="m43 89-9 27m23-27 9 27" stroke="#473874" stroke-width="9" stroke-linecap="round"/><path class="clap-left" d="M34 54q-12 20 14 13" stroke="#f9b97d" fill="none" stroke-width="9" stroke-linecap="round"/><path class="clap-right" d="M66 54q12 20-14 13" stroke="#f9b97d" fill="none" stroke-width="9" stroke-linecap="round"/></svg></div>
+<div id="finance-toast" hidden role="status"></div><div id="finance-celebrate" hidden aria-hidden="true"><span class="finance-salute left"><i></i><i></i><i></i></span><span class="finance-salute right"><i></i><i></i><i></i></span></div>
 <script src="assets/gostudy-sync.js?v=finance-live-1"></script><script src="assets/gostudy-finance-live.js?v=1"></script>
 <script>
 const LESSONS=[{"label":"Warm-up","minutes":5},{"label":"Vocabulary","minutes":10},{"label":"Reading","minutes":10},{"label":"Language practice","minutes":8},{"label":"Decision lab","minutes":10},{"label":"Role-play","minutes":8},{"label":"Final discussion","minutes":4},{"label":"Homework","minutes":15}];
@@ -501,7 +505,7 @@ function celebrate(){
   clearTimeout(celebrationTimer);
   requestAnimationFrame(() => {
     panel.hidden = false;
-    celebrationTimer = setTimeout(() => { panel.hidden = true; }, 4000);
+    celebrationTimer = setTimeout(() => { panel.hidden = true; }, 3000);
   });
 }
 function gradeSection(key, animate = false){

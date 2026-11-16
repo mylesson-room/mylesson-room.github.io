@@ -14,11 +14,108 @@ const server = createServer(async (req, res) => {
   } catch { res.writeHead(404).end(); }
 });
 
+async function checkFinanceRoom(browser, origin) {
+  const studentId = '11111111-1111-4111-8111-111111111111';
+  const teacherId = '22222222-2222-4222-8222-222222222222';
+  const student = await browser.newContext();
+  const teacher = await browser.newContext();
+  const events = [];
+  const lessonUrl = origin + '/business-ai-finance-b2-02.html';
+  const status = 'Онлайн · общая комната';
+  try {
+    for (const [context, id, role] of [[student, studentId, 'student'], [teacher, teacherId, 'teacher']]) {
+      await context.addInitScript(({id, role}) => {
+        const session = JSON.stringify({user:{id}, access_token:'test-' + role, expires_at:Date.now() + 3600000});
+        sessionStorage.setItem('gostudy-cloud-session-v1',session);
+        localStorage.setItem('gostudy-' + role + '-session-v1',session);
+      }, {id,role});
+      await context.route('https://*.supabase.co/**', route => {
+        const request = route.request();
+        const url = new URL(request.url());
+        assert.equal(request.headers().authorization, 'Bearer test-' + role);
+        if (url.pathname.endsWith('/gostudy_finance_room')) {
+          return route.fulfill({json:[{teacher_id:teacherId, student_id:studentId}]});
+        }
+        if (url.pathname.endsWith('/gostudy_finance_events')) {
+          if (request.method() === 'POST') {
+            const event = request.postDataJSON();
+            events.push({...event,seq:events.length + 1,actor:id});
+            return route.fulfill({status:201});
+          }
+          const cursor = Number(url.searchParams.get('seq').slice(3));
+          return route.fulfill({json:events.filter(event=>event.seq > cursor)});
+        }
+        return route.fulfill({status:404,json:[]});
+      });
+      await context.route('https://api.mymemory.translated.net/**', route => route.fulfill({
+        json:{responseStatus:200,responseData:{translatedText:'прогнозируемый'}}
+      }));
+    }
+    const sp = await student.newPage();
+    const tp = await teacher.newPage();
+    const cabinet = await student.newPage();
+    await Promise.all([sp.goto(lessonUrl),tp.goto(lessonUrl+'?classStudent=finance'),cabinet.goto(origin+'/student-business-ai-finance.html')]);
+    await Promise.all([sp.getByText(status,{exact:true}).waitFor(),tp.getByText(status,{exact:true}).waitFor()]);
+
+    const word = tp.getByText('Forecasted cash balance',{exact:true});
+    const box = await word.boundingBox();
+    await tp.mouse.dblclick(box.x+22,box.y+box.height/2);
+    await tp.getByRole('button',{name:'Добавить в словарь',exact:true}).click();
+    for(const page of [sp,tp]){
+      await page.locator('#finance-toast').filter({hasText:'прогнозируемый'}).waitFor();
+      await page.getByRole('button',{name:'Dictionary',exact:true}).click();
+      await page.getByRole('dialog').getByText('прогнозируемый',{exact:false}).waitFor();
+      await page.getByRole('button',{name:'Close dictionary'}).click();
+    }
+    await cabinet.locator('#vocabCount').filter({hasText:'1 слово'}).waitFor();
+    await cabinet.locator('#practiceCard').click();
+    await cabinet.locator('#practiceQuestion').filter({hasText:/forecasted|прогнозируемый/i}).waitFor();
+
+    await sp.getByRole('button',{name:'Continue',exact:true}).click();
+    await tp.locator('#page-1.active').waitFor();
+    const pick = async (page,index,choice) => {
+      const picker = page.locator('.definition-picker').nth(index);
+      await picker.locator('summary').click();
+      await picker.locator('button[data-choice="'+choice+'"]').click();
+    };
+    await pick(sp,0,2);
+    await tp.locator('#vf0').filter({hasText:'Correct'}).waitFor();
+    await pick(tp,0,1);
+    await sp.locator('#vf0').filter({hasText:'Try again'}).waitFor();
+    const reset = page => page.locator('.page.active .finance-reset');
+    await reset(tp).click();
+    await sp.locator('.definition-picker summary').first().filter({hasText:'Choose a definition'}).waitFor();
+    await pick(tp,0,2);
+    await sp.locator('#vf0').filter({hasText:'Correct'}).waitFor();
+    await reset(sp).click();
+    await tp.locator('.definition-picker summary').first().filter({hasText:'Choose a definition'}).waitFor();
+
+    for(const [index,choice] of [2,5,1,7,4,0,6,3].entries()) await pick(sp,index,choice);
+    const celebration = sp.locator('#finance-celebrate');
+    await celebration.waitFor();
+    assert.equal(await celebration.locator('.finance-salute').count(),2);
+    await tp.locator('#finance-celebrate').waitFor();
+    await celebration.waitFor({state:'hidden',timeout:4500});
+    assert.equal(await sp.getByRole('button',{name:'Check answers'}).count(),0);
+
+    for(const [sender,receiver,note] of [[sp,tp,'Сообщение ученика'],[tp,sp,'Сообщение преподавателя']]){
+      await sender.getByRole('textbox',{name:'Сообщение'}).fill(note);
+      await sender.getByRole('button',{name:'Отправить'}).click();
+      await receiver.locator('#finance-messages').getByText(note,{exact:true}).waitFor();
+    }
+    console.log('business-ai-finance: vocabulary, training, chat, navigation, answers, shared reset and celebration verified in two contexts');
+  } finally {
+    await student.close();
+    await teacher.close();
+  }
+}
+
 async function main() {
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const browser = await chromium.launch(process.env.GOSTUDY_CHROME ? {executablePath: process.env.GOSTUDY_CHROME} : {});
   try {
     const origin = 'http://127.0.0.1:' + server.address().port;
+    await checkFinanceRoom(browser, origin);
     const source = await readFile('assets/gostudy-sync.js', 'utf8');
     const catalog = runInNewContext('('+source.match(/const classroomCatalog = ([^\n]+);/)[1]+')');
     const studentId = '11111111-1111-4111-8111-111111111111';
