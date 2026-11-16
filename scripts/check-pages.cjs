@@ -76,11 +76,12 @@ async function checkFinanceRoom(browser, origin) {
     const word = tp.getByText('Forecasted cash balance',{exact:true});
     const box = await word.boundingBox();
     await tp.mouse.dblclick(box.x+22,box.y+box.height/2);
+    await tp.locator('#selectionTarget').fill('уточнённый прогноз');
     await tp.getByRole('button',{name:'Добавить в словарь',exact:true}).click();
     for(const page of [sp,tp]){
-      await page.locator('#finance-toast').filter({hasText:'прогнозируемый'}).waitFor();
+      await page.locator('#finance-toast').filter({hasText:'уточнённый прогноз'}).waitFor();
       await page.getByRole('button',{name:'Dictionary',exact:true}).click();
-      await page.getByRole('dialog').getByText('прогнозируемый',{exact:false}).waitFor();
+      await page.getByRole('dialog').getByText('уточнённый прогноз',{exact:false}).waitFor();
       await page.getByRole('button',{name:'Close dictionary'}).click();
     }
     await cabinet.locator('#vocabCount').filter({hasText:'2 слова'}).waitFor();
@@ -140,6 +141,15 @@ async function checkFinanceRoom(browser, origin) {
       await sender.getByRole('button',{name:'Отправить'}).click();
       await receiver.locator('#finance-messages').getByText(note,{exact:true}).waitFor();
     }
+    // Manual bilingual entry also works after automatic translation is edited.
+    await tp.getByRole('button',{name:'Dictionary',exact:true}).click();
+    await tp.locator('#dictionarySource').fill('cash flow');
+    await tp.locator('#dictionaryTranslation').fill('денежный поток');
+    await tp.locator('#dictionaryAddForm button[type=submit]').click();
+    await sp.getByRole('button',{name:'Dictionary',exact:true}).click();
+    await sp.locator('#myWords').getByText('cash flow',{exact:false}).waitFor();
+    await sp.getByRole('button',{name:'Close dictionary'}).click();
+    await tp.getByRole('button',{name:'Close dictionary'}).click();
     console.log('business-ai-finance: teacher roster, local word recovery, vocabulary, training, chat, navigation, answers, shared reset and celebration verified in two contexts');
   } finally {
     await student.close();
