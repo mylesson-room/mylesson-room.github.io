@@ -76,7 +76,10 @@ async function main() {
         }
         const sp = await student.newPage();
         const tp = await teacher.newPage();
-        await sp.goto(origin + (course === 'pharma_c1' ? '/student-pharma.html' : '/student-' + course.replaceAll('_', '-') + '.html'));
+        if (course === 'general_english_b1_stories') {
+          await sp.goto(origin + '/student-travel-b2.html');
+          await sp.waitForURL(url => url.pathname === '/student-general-english-b1-stories.html');
+        } else await sp.goto(origin + (course === 'pharma_c1' ? '/student-pharma.html' : '/student-' + course.replaceAll('_', '-') + '.html'));
         await tp.goto(origin + '/gostudy-teacher.html');
         const studentLink = sp.locator('.home-open-lesson');
         const teacherLink = tp.locator('.teacher-enter-class');
@@ -126,6 +129,13 @@ async function main() {
         }
         assert.equal(new URL(tp.url()).searchParams.get('classStudent'), studentId);
         assert.equal(new URL(sp.url()).searchParams.has('classStudent'), false);
+        if (course === 'general_english_b1_stories') {
+          const key = 'gostudy-vocabulary-general-english-b1-stories-v1';
+          progress.set(key,{lesson_key:key,revision:1,state:{words:[{en:'restored phrase',ru:'восстановленная фраза'}]}});
+          await sp.locator('.glass-words[open]').evaluate(() => window.dispatchEvent(new Event('online')));
+          await sp.locator('.glass-list').getByText('restored phrase',{exact:true}).waitFor();
+          assert.equal(await sp.locator('.glass-words[open]').count(),1);
+        }
         await tp.locator('.glass-form input[name=term]').fill('release check');
         await tp.locator('.glass-form input[name=meaning]').fill('проверка выпуска');
         await tp.locator('.glass-form button[type=submit]').click();

@@ -298,6 +298,11 @@
     finally{loading=false;}
   }
   if(shared)setInterval(refreshAssigned,3000);
+  if(course==='general-english-b1-stories') {
+    document.addEventListener('gostudy-stories-vocabulary-updated',()=>{
+      if(dictionary.open && tab==='words')renderWords();
+    });
+  }
   if(classMode)form.querySelector('[type=submit]').textContent='Добавить ученице';
   function open(mode) {
     closeTranslation();

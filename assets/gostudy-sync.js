@@ -250,9 +250,11 @@
       }
       const value = JSON.stringify(row.state);
       if (replace || row.revision > local.revision) {
-        changed ||= value !== local.value;
+        const vocabularyChanged = row.lesson_key === storiesKeys[0] && value !== local.value;
+        changed ||= !vocabularyChanged && value !== local.value;
         writeRecord(row.lesson_key, {revision: row.revision, value, dirty: false});
         conflicts.delete(row.lesson_key);
+        if (vocabularyChanged) document.dispatchEvent(new Event('gostudy-stories-vocabulary-updated'));
       }
     }
     return changed;
@@ -596,6 +598,10 @@
       if (response.status === 401) throw new Error('Срок входа истёк. Войдите снова.');
       if (!response.ok || !Array.isArray(response.data)) throw new Error('Не удалось открыть кабинет. Обновите страницу.');
       if (!response.data.some(row => row.course === course)) {
+        if (course === 'travel-b2' && response.data.some(row => row.course === storiesCourse)) {
+          location.replace('student-general-english-b1-stories.html');
+          return;
+        }
         throw new Error('Курс '+title+' не назначен этому аккаунту.');
       }
       status.hidden = true;
@@ -1469,6 +1475,7 @@
     else if (document.getElementById('teacher-login')) mountTeacher();
     else if (document.getElementById('unified-login')) mountUnifiedAccount();
     else if (document.getElementById('cloud-login')) mountAccount();
+    else if (travelB2Cabinet) mountProtectedCabinet(document.getElementById('travel-b2-cabinet'),'travel-b2','Travel B2');
     else if (storiesCabinet) mountProtectedCabinet(document.getElementById('general-b1-cabinet'),storiesCourse,'General English B1');
     else if (generalB1Cabinet) mountProtectedCabinet(document.getElementById('general-b1-cabinet'),generalB1Course,'General English B1');
     else if (document.getElementById('tiktok-cabinet')) mountProtectedCabinet(document.getElementById('tiktok-cabinet'),'tiktok-a2','TikTok A2');
