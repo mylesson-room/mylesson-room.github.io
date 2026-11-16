@@ -395,8 +395,8 @@ function getValue(k){return state.values[k]??""}
 function go(n){
   state.page=Math.max(0,Math.min(n,LESSONS.length-1));
   document.querySelectorAll(".page").forEach((page,index)=>page.classList.toggle("active",index===state.page));
-  $("#back").disabled=state.page===0;
   $("#next").textContent=state.page===LESSONS.length-1?"Finish lesson":"Continue";
+  setLessonNavigationAccess();
   $(".lesson-content").scrollTop=0;
   if(window.matchMedia("(max-width: 800px)").matches){
     const content=$(".lesson-content");
@@ -405,7 +405,21 @@ function go(n){
   }
   save();
 }
-$("#back").onclick=()=>go(state.page-1);$("#next").onclick=()=>go(state.page===LESSONS.length-1?0:state.page+1);
+function teacherControlsNavigation(){return !window.FinanceLive?.connected() || window.FinanceLive.teacher();}
+function navigateFromControls(nextPage){
+  if(!teacherControlsNavigation())return;
+  go(nextPage);
+  if(window.FinanceLive?.connected())window.FinanceLive.send("page",{page:state.page});
+}
+function setLessonNavigationAccess(){
+  const studentFollower=window.FinanceLive?.connected() && !window.FinanceLive.teacher();
+  $("#back").disabled=studentFollower||state.page===0;
+  $("#next").disabled=studentFollower;
+  $("#back").title=studentFollower?"Раздел выбирает преподаватель":"";
+  $("#next").title=studentFollower?"Раздел выбирает преподаватель":"";
+}
+$("#back").onclick=()=>navigateFromControls(state.page-1);
+$("#next").onclick=()=>navigateFromControls(state.page===LESSONS.length-1?0:state.page+1);
 const defs=[VOCAB[5][1],VOCAB[2][1],VOCAB[0][1],VOCAB[7][1],VOCAB[4][1],VOCAB[1][1],VOCAB[6][1],VOCAB[3][1]];
 const optionLabel = index => String.fromCharCode(65 + index) + ". " + defs[index];
 $("#vocab").innerHTML = VOCAB.map((word, index) => `
@@ -609,7 +623,16 @@ document.addEventListener("finance-word",event=>{
   if(event.detail.notify)showWord(event.detail.word);
 });
 document.addEventListener("finance-connect",()=>{sections.forEach((keys,page)=>{if(keys.length)clearSection(page)});});
+let latestTeacherPage = null;
 document.addEventListener("finance-ready",()=>{
+  setLessonNavigationAccess();
+  if(window.FinanceLive?.connected()){
+    if(window.FinanceLive.teacher()){
+      window.FinanceLive.send("page",{page:state.page});
+    }else if(latestTeacherPage !== null){
+      go(latestTeacherPage);
+    }
+  }
   drawWords();
   document.querySelectorAll("#finance-chat-form input,#finance-chat-form button").forEach(control=>{control.disabled=false});
   $(".finance-login").hidden=true;
@@ -632,9 +655,9 @@ document.addEventListener("finance-event",event=>{
     clearSection(payload.page);
     if(!initial && !own) $("#finance-activity").textContent=role+" сбросил задание";
   }
-  if(kind==="page" && !initial && !own && Number.isInteger(payload.page) && LESSONS[payload.page]){
-    $("#finance-activity").textContent=role+" открыл "+LESSONS[payload.page].label;
-    if(teacher && !FinanceLive.teacher()) go(payload.page);
+  if(kind==="page" && teacher && Number.isInteger(payload.page) && LESSONS[payload.page]){
+    latestTeacherPage=payload.page;
+    if(!own && !FinanceLive.teacher() && !initial) go(payload.page);
   }
   if(kind==="chat" && typeof payload.text==="string"){
     const message=document.createElement("li");
@@ -654,9 +677,7 @@ $("#finance-chat-form").addEventListener("submit",event=>{
   const value=input.value.trim();
   if(value && window.FinanceLive?.send("chat",{text:value}))input.value="";
 });
-["back","next"].forEach(id=>$("#"+id).addEventListener("click",()=>{
-  if(window.FinanceLive?.teacher()) window.FinanceLive.send("page",{page:state.page});
-}));
+
 drawWords();go(location.hash === "#homework" ? LESSONS.length - 1 : state.page);
 
 
