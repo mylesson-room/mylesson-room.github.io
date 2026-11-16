@@ -348,7 +348,7 @@ header{height:46px;padding:0 30px;border-bottom:1px solid #e4e8f2;box-shadow:0 2
   <div class="selection-target" id="selectionTarget" role="status"></div>
   <div class="selection-tools">
     <button id="selectionSave" type="button" aria-label="Добавить в словарь" title="Добавить в словарь" disabled>+</button>
-    <button id="selectionClose" type="button" aria-label="Закрыть перевод" title="Закрыть перевод">×</button>
+
   </div>
   <a id="selectionGoogle" target="_blank" rel="noopener noreferrer" hidden>Открыть в Google Translate</a>
 </div>
@@ -484,7 +484,7 @@ drawWords();go(location.hash === "#homework" ? LESSONS.length - 1 : state.page);
 (function(){
  const byId = id => document.getElementById(id);
  const pop = byId("selectionTranslate"), target = byId("selectionTarget");
- const google = byId("selectionGoogle"), saveBtn = byId("selectionSave"), close = byId("selectionClose");
+ const google = byId("selectionGoogle"), saveBtn = byId("selectionSave");
  let range = null;
  let phrase="",translation="",controller=null,request=0,selectionTimer=0;
  let savedText="";
@@ -572,7 +572,7 @@ drawWords();go(location.hash === "#homework" ? LESSONS.length - 1 : state.page);
 
  document.addEventListener("scroll", locate, true);
  window.addEventListener("resize", locate);
- close.addEventListener("click",hide);
+
  document.addEventListener("keydown",e=>{if(e.key==="Escape")hide()});
  document.addEventListener("pointerdown",e=>{if(pop.classList.contains("is-visible")&&!pop.contains(e.target))hide()});
  document.querySelectorAll("#back,#next").forEach(el=>el.addEventListener("click",hide));
