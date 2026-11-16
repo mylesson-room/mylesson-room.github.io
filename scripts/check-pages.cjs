@@ -57,6 +57,15 @@ async function main() {
             if (action.endsWith('_my_words') || action.endsWith('_workbook_read')) {
               return route.fulfill({json:assigned});
             }
+            if (action === 'gostudy_b1_stories_content') {
+              assert.equal(course, 'general_english_b1_stories');
+              assert.equal(data.p_student, role === 'teacher' ? studentId : null);
+              const key = data.p_homework ? current.homeworkKey : current.lessonKey;
+              return route.fulfill({json:{
+                key, title:current.title, level:'B1', cabinet:'student-general-english-b1-stories.html',
+                steps:[{id:'test-choice',title:data.p_homework ? 'Homework' : 'What happened?',instruction:'Choose a reply.',type:'choice',items:[['What did they do?',['Changed dinner plans','Went home alone'],0]]}],
+              }});
+            }
             const rows = url.endsWith('gostudy_' + course + '_teacher_view')
               ? [{ id: studentId, label: 'Test student', words: [], assigned, progress: [...progress.values()].map(row => ({key:row.lesson_key, answers:row.state.answers})) }]
               : url.endsWith('gostudy_my_destinations')
@@ -154,6 +163,10 @@ async function main() {
           await tp.getByText('Карточка преподавателя').waitFor();
           await sp.locator('.writing textarea').fill('See you on Saturday at eleven at Riverside Café!');
           await tp.locator('.gostudy-live-draft').filter({hasText:'Riverside Café'}).waitFor({timeout:10000});
+        }
+        if (course === 'general_english_b1_stories') {
+          await sp.goto(origin + '/' + current.homework);
+          await sp.getByRole('heading',{name:'Homework',exact:true}).waitFor();
         }
         console.log(course + ': both cabinets open the current lesson and shared dictionary');
       } catch (error) { throw new Error(course + ': ' + error.message, {cause: error}); }
