@@ -754,7 +754,8 @@ drawWords();go(location.hash === "#homework" ? LESSONS.length - 1 : state.page);
  const google = byId("selectionGoogle"), saveBtn = byId("selectionSave");
  let range = null;
  let phrase="",translation="",controller=null,request=0,selectionTimer=0;
- let savedText="";
+ let savedText="",selectionEdited=false;
+ target.addEventListener("input",()=>{selectionEdited=true;translation=target.value.trim();saveBtn.disabled=!translation;});
  function clean(t){return String(t||"").replace(/\s+/g," ").trim().slice(0,1500)}
  function isEligible(n){
    const el=n?.nodeType===1?n:n?.parentElement;
@@ -803,11 +804,10 @@ drawWords();go(location.hash === "#homework" ? LESSONS.length - 1 : state.page);
      if(request!==seq)return;
      const result=String(data?.responseData?.translatedText||"").trim();
      if(!result||Number(data?.responseStatus||0)>=400||/QUERY LENGTH LIMIT|MYMEMORY WARNING/i.test(result))throw Error("Translation unavailable");
-     translation=result;target.textContent=result;
-     saveBtn.disabled=false;
+     if(!selectionEdited){translation=result;target.value=result;saveBtn.disabled=false;}
    }catch(e){
      if(request!==seq)return;
-     target.textContent="Перевод недоступен.";
+     if(!selectionEdited)target.value="";
      google.hidden=false;
    }finally{clearTimeout(timeout)}
    locate();
@@ -822,12 +822,13 @@ drawWords();go(location.hash === "#homework" ? LESSONS.length - 1 : state.page);
    range = selectedRange.cloneRange();
    savedText = phrase = text;
    translation = "";
+   selectionEdited=false;
    saveBtn.disabled = true;
    saveBtn.textContent = "+";
    saveBtn.title = "Добавить в словарь";
    saveBtn.setAttribute("aria-label", saveBtn.title);
    google.hidden = true;
-   target.textContent = "Переводим…";
+   target.value = "";
    pop.classList.add("is-visible");
    locate();
    if (range) translate(text);
@@ -844,19 +845,9 @@ drawWords();go(location.hash === "#homework" ? LESSONS.length - 1 : state.page);
  document.addEventListener("pointerdown",e=>{if(pop.classList.contains("is-visible")&&!pop.contains(e.target))hide()});
  document.querySelectorAll("#back,#next").forEach(el=>el.addEventListener("click",hide));
  saveBtn.addEventListener("click",()=>{
-   if(!phrase||!translation)return;
-   const ru=/[А-Яа-яЁё]/.test(phrase);
-   const word={en:ru?translation:phrase,ru:ru?phrase:translation};
-   if(window.FinanceLive?.send("word",word)){
-    saveBtn.textContent="✓";saveBtn.disabled=true;
-    return;
-   }
-   try{
-    const data=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");
-    data.words=Array.isArray(data.words)?data.words:[];
-    if(!data.words.some(w=>String(w.en).toLowerCase()===word.en.toLowerCase()))data.words.push(word);
-    localStorage.setItem(WORDS_KEY,JSON.stringify(data));drawWords();saveBtn.textContent="✓";saveBtn.title="Сохранено";saveBtn.setAttribute("aria-label",saveBtn.title);saveBtn.disabled=true;
-   }catch(e){saveBtn.title="Не удалось сохранить";saveBtn.setAttribute("aria-label",saveBtn.title)}
+   const word=makeWord(phrase,target.value.trim());
+   if(saveVocabulary(word)){saveBtn.textContent="✓";saveBtn.disabled=true;}
+
  });
 })();
 </script></body></html>
