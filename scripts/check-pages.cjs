@@ -87,18 +87,29 @@ async function checkFinanceRoom(browser, origin) {
     await cabinet.locator('#practiceCard').click();
     await cabinet.locator('#practiceQuestion').filter({hasText:/forecasted|прогнозируемый|stress test|стресс-тест/i}).waitFor();
 
-    // Student can explore independently; this must not navigate the teacher.
+    // Both participants browse independently; only an explicit teacher command moves the student.
+    const move = tp.locator('#moveStudent');
+    assert.equal(await sp.locator('#moveStudent').isVisible(),false,'Only teacher can see the move action');
     await sp.getByRole('button',{name:'Continue',exact:true}).click();
     await sp.locator('#page-1.active').waitFor();
     await sp.getByRole('button',{name:'Continue',exact:true}).click();
     await sp.locator('#page-2.active').waitFor();
-    assert.equal(await tp.locator('#page-0.active').count(),1,'Student navigation must not move the teacher');
-    assert.equal(events.filter(event=>event.kind==='page'&&event.actor===studentId).length,0,'Student page changes must not broadcast');
-    // A subsequent teacher click always brings the student to the teacher's selected page.
+    assert.equal(await tp.locator('#page-0.active').count(),1,'Student browsing must not move the teacher');
+    await move.waitFor({state:'visible'});
     await tp.getByRole('button',{name:'Continue',exact:true}).click();
     await tp.locator('#page-1.active').waitFor();
+    assert.equal(await sp.locator('#page-2.active').count(),1,'Teacher browsing must not move the student');
+    await move.click();
     await sp.locator('#page-1.active').waitFor();
+    await move.waitFor({state:'hidden'});
+    await sp.getByRole('button',{name:'Back',exact:false}).click();
+    await sp.locator('#page-0.active').waitFor();
+    await move.waitFor({state:'visible'});
+    await move.click();
+    await sp.locator('#page-1.active').waitFor();
+    await move.waitFor({state:'hidden'});
     assert.equal(await sp.locator('#finance-activity').isVisible(),false,'Technical navigation notices must remain hidden');
+    assert.equal(events.filter(event=>event.kind==='page' && event.payload?.action==='move' && event.actor===teacherId).length,2,'Only explicit teacher actions should move the student');
     const pick = async (page,index,choice) => {
       const picker = page.locator('.definition-picker').nth(index);
       await picker.locator('summary').click();
