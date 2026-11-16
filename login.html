@@ -3,31 +3,97 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Вход в GoStudy</title>
+<meta name="theme-color" content="#ffffff">
+<title>Вход · GoStudy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/gostudy-sync.css?v=d9356e89a210">
-<style>.cloud-account main{box-sizing:border-box}#unified-destinations{display:grid;gap:10px;margin:16px 0}#unified-destinations:empty{margin:0}#unified-dashboard>p{overflow-wrap:anywhere}#unified-dashboard button+button{margin-left:8px}#unified-destinations button+button{margin-left:0}</style>
+<style>
+:root{--ink:#101f33;--muted:#71839b;--blue:#087fe5;--line:#dfeaf4;--pale:#e7f7ff}
+*{box-sizing:border-box}
+html{min-height:100%}
+body.cloud-account{margin:0;min-height:100vh;padding:0;background:radial-gradient(ellipse 62% 70% at 100% 75%,#e9eafd 0,transparent 76%),radial-gradient(ellipse 65% 70% at 4% 8%,#e5f7ff 0,transparent 74%),#fff;color:var(--ink);font:500 16px/1.55 'Manrope',Arial,sans-serif;letter-spacing:-.02em}
+body.cloud-account a{color:#0a7fda;text-decoration:none}
+button,input{font:inherit}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid #279ce7;outline-offset:3px}
+.login-top{height:82px;padding:0 clamp(20px,4vw,70px);display:flex;align-items:center;justify-content:space-between;background:#ffffffec;border-bottom:1px solid #e9eef3}
+.login-logo{display:inline-flex;align-items:center;gap:7px;color:#101d34!important;font:700 clamp(25px,2.3vw,35px)/1 'Playfair Display',Georgia,serif;letter-spacing:-.04em}
+.login-logo svg{width:63px;height:49px;flex:none}
+.login-top__right{font-size:13px;color:#8292a4;font-weight:700}
+body.cloud-account main{width:min(1080px,calc(100% - 40px));margin:clamp(28px,5vw,74px) auto 60px;padding:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.88fr);border:1px solid #dce9f5;border-radius:28px;background:white;box-shadow:0 20px 65px #38669a12;overflow:hidden}
+.login-content{min-width:0;padding:clamp(26px,4.5vw,62px)}
+.login-back{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14px}
+.login-back svg{width:17px;height:17px}
+.login-eyebrow{margin:35px 0 8px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:#5792ba}
+body.cloud-account h1{font:700 clamp(35px,3.6vw,52px)/1.15 'Playfair Display',Georgia,serif;letter-spacing:-.035em;margin:0 0 17px;color:#101e36}
+.login-description{margin:0 0 34px;max-width:440px;font-size:15px;line-height:1.7;color:#687c94;font-weight:500}
+body.cloud-account #unified-login{display:grid;gap:0}
+body.cloud-account #unified-login>label:not(.cloud-check){font-size:13px;font-weight:800;color:#2c435e;margin:0 0 9px}
+body.cloud-account #unified-login input:not([type=checkbox]){display:block;width:100%;border:1.5px solid #d5e3f0;background:#fbfdff;border-radius:12px;color:#132440;font-size:15px;padding:13px 16px;min-height:52px;margin-bottom:21px;transition:border-color .15s,box-shadow .15s}
+body.cloud-account #unified-login input:not([type=checkbox]):focus{outline:0;border-color:#159fe9;box-shadow:0 0 0 3px #159fe91d;background:white}
+body.cloud-account #unified-login .cloud-check{display:flex;align-items:flex-start;gap:11px;margin:0 0 26px;font-size:12px;line-height:1.7;color:#71839a;cursor:pointer;font-weight:500}
+body.cloud-account .cloud-check input[type=checkbox]{appearance:none;width:18px;height:18px;border:1.5px solid #b6cadc;border-radius:5px;flex:none;margin:2px 0 0;background:#fff;cursor:pointer;position:relative}
+body.cloud-account .cloud-check input[type=checkbox]:checked{background:#058eeb;border-color:#058eeb}
+body.cloud-account .cloud-check input[type=checkbox]:checked:after{content:"";position:absolute;left:5px;top:1px;width:5px;height:9px;border:solid white;border-width:0 2px 2px 0;transform:rotate(45deg)}
+body.cloud-account #unified-login>button[type=submit]{width:100%;min-height:54px;border:0;border-radius:12px;background:linear-gradient(180deg,#14aff6,#0078db);box-shadow:0 7px 17px #0988d72b;color:white;font:800 16px 'Manrope',Arial,sans-serif;letter-spacing:-.025em;transition:filter .15s,transform .15s;cursor:pointer}
+body.cloud-account #unified-login>button[type=submit]:hover{filter:brightness(1.04);transform:translateY(-1px)}
+body.cloud-account #unified-login>button[type=submit]:disabled{opacity:.58;cursor:wait}
+#unified-status{font-size:13px;line-height:1.6;color:#3d6886;overflow-wrap:anywhere;margin:18px 0 0}
+#unified-status:empty{display:none}
+#unified-dashboard{margin-top:25px;padding:22px;border-radius:18px;background:#f0f8ff;border:1px solid #d5e9f7}
+#unified-dashboard>p{overflow-wrap:anywhere;margin:0 0 16px;color:#405c79;font-size:14px}
+#unified-destinations{display:grid;gap:10px;margin:16px 0}
+#unified-destinations:empty{margin:0}
+#unified-dashboard button,#unified-destinations button{border:0;border-radius:10px;background:#0b85dd;color:white;padding:11px 15px;min-height:44px;font:700 14px 'Manrope',Arial,sans-serif}
+#unified-dashboard button+button{margin-left:8px}
+#unified-destinations button+button{margin-left:0}
+.login-visual{position:relative;min-height:560px;display:flex;align-items:center;justify-content:center;flex-direction:column;background:linear-gradient(148deg,#e5faff 0%,#e2f3ff 44%,#e5eafb 100%);overflow:hidden;padding:45px 32px;text-align:center}
+.login-visual:before{content:"";position:absolute;width:390px;height:390px;top:8%;right:-31%;background:#bef1ff88;border-radius:50%}
+.login-visual:after{content:"";position:absolute;width:260px;height:260px;bottom:-19%;left:-18%;background:#cddafa77;border-radius:50%}
+.visual-art{position:relative;z-index:1;width:min(100%,330px);aspect-ratio:1}
+.visual-art svg{display:block;width:100%;height:100%;filter:drop-shadow(0 15px 20px #5785be22)}
+.visual-text{position:relative;z-index:1;margin:0;color:#102c54;font:700 26px/1.25 'Playfair Display',Georgia,serif}
+.visual-subtext{position:relative;z-index:1;max-width:290px;margin:12px auto 0;color:#647d9d;font:600 13px/1.65 'Manrope',Arial,sans-serif}
+body.cloud-account [hidden]{display:none!important}
+@media(max-width:760px){.login-top{height:69px;padding:0 20px}.login-logo svg{width:51px;height:41px}body.cloud-account main{width:min(540px,calc(100% - 28px));grid-template-columns:1fr;margin:28px auto 35px;border-radius:23px}.login-content{padding:28px 25px 32px}.login-eyebrow{margin-top:23px}.login-visual{display:none}body.cloud-account h1{font-size:38px}.login-description{margin-bottom:26px}}
+@media(max-width:400px){.login-content{padding:24px 19px 28px}.login-top__right{display:none}body.cloud-account h1{font-size:34px}}
+@media(prefers-reduced-motion:reduce){body.cloud-account #unified-login>button[type=submit]{transition:none}body.cloud-account #unified-login>button[type=submit]:hover{transform:none}}
+</style>
 <script src="assets/gostudy-sync.js?v=finance-live-1" defer></script>
 </head>
 <body class="cloud-account">
+<header class="login-top">
+<a href="gostudy.html" class="login-logo" aria-label="GoStudy — на главную"><svg viewBox="350 140 835 650" width="55" height="43" aria-hidden="true" focusable="false"><defs><linearGradient id="crownGold" x1="0" y1="1" x2=".72" y2="0" gradientUnits="objectBoundingBox"><stop stop-color="#3a2815"/><stop offset=".36" stop-color="#765019"/><stop offset=".68" stop-color="#e9ad50"/><stop offset=".83" stop-color="#9c621a"/><stop offset="1" stop-color="#d89b3e"/></linearGradient></defs><g fill="url(#crownGold)"><path d="M770 150Q786 246 865 257Q786 269 770 365Q754 269 675 257Q754 246 770 150Z"/><path d="M574 301Q580 341 614 346Q580 352 574 392Q568 352 533 346Q568 341 574 301ZM968 301Q974 341 1008 346Q974 352 968 392Q962 352 928 346Q962 341 968 301Z"/><path d="M360 379C535 516 710 570 770 327C830 570 1005 516 1176 381C1109 478 1065 557 1046 623L1041 619C1046 569 1060 523 1084 474C931 576 806 534 770 365C734 534 609 576 454 474C478 523 492 569 496 619L491 623C472 558 427 478 360 379Z"/><path d="M430 679C571 571 690 599 767 702C679 614 568 614 430 679ZM1108 679C967 571 850 599 773 702C861 614 970 614 1108 679Z"/><path d="M367 747C521 631 663 645 770 738C877 645 1018 631 1171 747C1009 674 868 669 770 782C672 669 530 674 367 747Z"/></g></svg><span>GoStudy</span></a>
+<span class="login-top__right">Ваша платформа для английского</span>
+</header>
 <main>
-  <a href="gostudy.html">← GoStudy</a>
-  <h1>Вход в GoStudy</h1>
-  <p>Войдите по почте и паролю, чтобы открыть свои уроки.</p>
-  <form id="unified-login" method="post" hidden>
-    <label for="unified-login-email">Электронная почта</label>
-    <input id="unified-login-email" name="email" type="email" autocomplete="username" required>
-    <label for="unified-password">Пароль</label>
-    <input id="unified-password" name="password" type="password" autocomplete="current-password" required>
-    <label class="cloud-check"><input type="checkbox" name="importLocal"> Перенести прогресс из этого браузера, если облачной копии ещё нет</label>
-    <button type="submit">Войти</button>
-  </form>
-  <p id="unified-status" role="status"></p>
-  <section id="unified-dashboard" aria-label="Ваши кабинеты" hidden>
-    <p id="unified-email"></p>
-    <div id="unified-destinations"></div>
-    <button id="unified-retry" type="button" hidden>Повторить</button>
-    <button id="unified-signout" type="button">Выйти</button>
-  </section>
+<section class="login-content">
+<a class="login-back" href="gostudy.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" aria-hidden="true"><path d="m14 5-7 7 7 7M7 12h14"/></svg>На главную</a>
+<p class="login-eyebrow">Личный кабинет GoStudy</p>
+<h1>С возвращением!</h1>
+<p class="login-description">Войдите по электронной почте и паролю, чтобы продолжить занятия.</p>
+<form id="unified-login" method="post" hidden>
+<label for="unified-login-email">Электронная почта</label>
+<input id="unified-login-email" name="email" type="email" autocomplete="username" placeholder="you@example.com" required>
+<label for="unified-password">Пароль</label>
+<input id="unified-password" name="password" type="password" autocomplete="current-password" placeholder="Введите пароль" required>
+<label class="cloud-check"><input type="checkbox" name="importLocal"> Перенести прогресс из этого браузера, если облачной копии ещё нет</label>
+<button type="submit">Войти</button>
+</form>
+<p id="unified-status" role="status"></p>
+<section id="unified-dashboard" aria-label="Ваши кабинеты" hidden>
+<p id="unified-email"></p>
+<div id="unified-destinations"></div>
+<button id="unified-retry" type="button" hidden>Повторить</button>
+<button id="unified-signout" type="button">Выйти</button>
+</section>
+</section>
+<aside class="login-visual" aria-hidden="true">
+<div class="visual-art"><svg viewBox="0 0 360 360" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="screen" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#29477b"/><stop offset="1" stop-color="#5482c9"/></linearGradient><linearGradient id="goldCoin" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffecab"/><stop offset="1" stop-color="#d69c25"/></linearGradient></defs><circle cx="178" cy="165" r="142" fill="#c5f0ff"/><g transform="rotate(7 180 160)"><rect x="78" y="73" width="223" height="162" rx="16" fill="#96b6e4"/><rect x="87" y="79" width="206" height="146" rx="11" fill="url(#screen)"/><rect x="111" y="102" width="76" height="74" rx="14" stroke="#acd9fc" stroke-width="3" stroke-dasharray="7 8" fill="none"/><text x="130" y="149" font-size="32" font-family="Arial" font-weight="bold" fill="white">Aa</text><rect x="212" y="163" width="15" height="36" rx="4" fill="#4dc6ff"/><rect x="235" y="137" width="15" height="62" rx="4" fill="#74d7ff"/><rect x="258" y="114" width="15" height="85" rx="4" fill="#a0e2ff"/><path d="M65 235H314l24 19q6 8-12 11H53q-17-3-11-11Z" fill="#819ac8"/><path d="M120 241h135l16 12H104Z" fill="#c3d5ef"/></g><g transform="translate(250 35)"><rect width="70" height="65" rx="21" fill="white" opacity=".94"/><path d="m14 43 15-15 11 7 17-22" fill="none" stroke="#05a6e9" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="M45 13h12v12" fill="none" stroke="#05a6e9" stroke-width="5"/></g><g fill="url(#goldCoin)" stroke="#d59e36" stroke-width="2"><ellipse cx="95" cy="274" rx="37" ry="12"/><path d="M58 262v13c0 8 16 12 37 12s37-4 37-12v-13" fill="#e8b44a"/><ellipse cx="95" cy="262" rx="37" ry="12"/><ellipse cx="126" cy="298" rx="32" ry="11"/><path d="M94 286v13c0 8 14 11 32 11s32-3 32-11v-13" fill="#e9b84d"/><ellipse cx="126" cy="286" rx="32" ry="11"/></g></svg></div>
+<p class="visual-text">Ваши занятия. Ваш прогресс.</p>
+<p class="visual-subtext">Все материалы и задания в одном пространстве.</p>
+</aside>
 </main>
 </body>
 </html>
