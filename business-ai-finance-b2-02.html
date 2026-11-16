@@ -353,7 +353,7 @@ $("#openLessonDictionary").addEventListener("click",()=>{drawWords();$("#lessonD
 function drawWords(){let w=readWords();$("#wordCountSidebar").textContent=w.length;$("#myWords").innerHTML=w.slice().reverse().map(x=>'<small><b>'+esc(x.en)+'</b> — '+esc(x.ru)+'</small>').join("")||'<small>No words saved yet.</small>'}
 window.addWord=i=>{let words=readWords(),w=VOCAB[i];if(!words.some(x=>x.en.toLowerCase()===w[0].toLowerCase())){words.push({en:w[0],ru:w[2]});try{let obj=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");obj.words=words;localStorage.setItem(WORDS_KEY,JSON.stringify(obj))}catch(e){alert("Vocabulary saving unavailable")}}drawWords()};
 window.exportAnswers=()=>{let lines=["AI in Finance — Lesson 2","Exported "+new Date().toLocaleString(),...Object.entries(state.values).map(([k,v])=>k+": "+v)].join("\n\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([lines],{type:"text/plain;charset=utf-8"}));a.download="ai-in-finance-lesson-2-answers.txt";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)};
-drawWords();go(state.page);
+drawWords();go(location.hash === "#homework" ? LESSONS.length - 1 : state.page);
 
 
 /* GoStudy translation: manual launcher always works; text selection works on mouse/touch/keyboard.
