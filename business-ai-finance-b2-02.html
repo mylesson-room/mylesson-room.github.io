@@ -634,7 +634,7 @@ document.addEventListener("finance-event",event=>{
   }
   if(kind==="page" && !initial && !own && Number.isInteger(payload.page) && LESSONS[payload.page]){
     $("#finance-activity").textContent=role+" открыл "+LESSONS[payload.page].label;
-    if(!teacher && FinanceLive.teacher()) go(payload.page);
+    if(teacher && !FinanceLive.teacher()) go(payload.page);
   }
   if(kind==="chat" && typeof payload.text==="string"){
     const message=document.createElement("li");
@@ -655,7 +655,7 @@ $("#finance-chat-form").addEventListener("submit",event=>{
   if(value && window.FinanceLive?.send("chat",{text:value}))input.value="";
 });
 ["back","next"].forEach(id=>$("#"+id).addEventListener("click",()=>{
-  window.FinanceLive?.send("page",{page:state.page});
+  if(window.FinanceLive?.teacher()) window.FinanceLive.send("page",{page:state.page});
 }));
 drawWords();go(location.hash === "#homework" ? LESSONS.length - 1 : state.page);
 
