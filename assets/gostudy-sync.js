@@ -218,7 +218,7 @@
   }
 
   if (document.body?.hasAttribute('data-finance-live')) {
-    window.GoStudyFinanceAuth = {token, request, userId: () => session?.user?.id};
+    window.GoStudyFinanceAuth = {token, request, userId: () => session?.user?.id, classroomStudent};
     return;
   }
   async function push(key, accessToken) {
@@ -334,6 +334,7 @@
   function mountUnifiedAccount() {
     const destinations = new Map([
       ['business-ai-finance', {name:'AI in Finance · B2',path:'student-business-ai-finance.html'}],
+      ['general-english-b2', {name:'General English B2',path:'student-general-english-b2.html'}],
       [storiesCourse, {name:'General English B1',path:'student-general-english-b1-stories.html',keys:storiesKeys}],
       [generalB1Course, {name:'General English B1',path:'student-general-english-b1.html',keys:generalB1Keys}],
       ['country-house', {name:'Country House · A2',path:'student-country-house.html',keys:countryHouseKeys}],
@@ -1156,12 +1157,14 @@
     const pharmaThreeLabels = {"q0-0":"What does the speaker suggest before a wider launch?","q0-1":"Why might the Swedish results differ at this hospital?","q0-2":"Which outcomes does the speaker want to track?","q1-0":"What changed in the AI-supported group?","q1-1":"What does the 44% figure describe?","q1-2":"What could a hospital reasonably ask next?","q2-0":"What does 6.4 versus 5.0 per 1,000 show?","q2-1":"Which headline best fits the evidence?","pharmaPilot":"Решение о пробном запуске","pharmaHeadline":"Заголовок о результатах"};
     const pharmaThreeHomeworkLabels = {"q0-0":"What is the role of AI in the Swedish trial?","q0-1":"What can we say about 44%?","q0-2":"What would a sensible local pilot track?","q1-0":"Which line is suitable for a report?","q1-1":"A patient asks who reviews the scan. Which reply is clearest?"};
     const financeCourse = 'business_ai_finance';
+    const generalB2 = 'general_english_b2';
     const financeLesson = 'business-ai-finance-b2-02.html';
     const legacyTeacherCourses = new Set(['art_b1','ielts_reading','sweden_a2']);
     const teacherCatalog = {...classroomCatalog,
       art_b1:{name:'Art & Mosaics · B1',lessons:[{title:'Small pieces, big ideas',lesson:'art-mosaics-b1.html',homework:'art-b1-homework.html'}]},
       ielts_reading:{name:'IELTS Reading',lessons:[{title:'IELTS Reading · Lesson 1',lesson:'ielts-reading-01.html',homework:'ielts-reading-01-homework.html'}]},
       sweden_a2:{name:'Sweden · A2',lessons:[{title:'Sweden · Lesson 1',lesson:'sweden-a2.html',homework:'sweden-a2-01-homework.html'}]},
+      [generalB2]:{name:'General English B2',lessons:[{title:'The Hidden Cost of Convenience',lesson:'general-english-b2-01.html',homework:'general-english-b2-01.html#homework'}]},
       [financeCourse]:{
       name:'AI in Finance · B2',
       lessons:[{title:'AI in Finance · Lesson 2',lesson:financeLesson,homework:financeLesson+'#homework'}],
@@ -1172,7 +1175,7 @@
     const addStudentStatus = document.getElementById('teacher-add-student-status');
     if (addStudentForm) {
       for (const [id,name] of courses) {
-        if (id === financeCourse || ['country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(id)) continue;
+        if (id === financeCourse || id === generalB2 || ['country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(id)) continue;
         const option = document.createElement('option');
         option.value = id;
         option.textContent = name;
@@ -1256,7 +1259,7 @@
     function renderStudent() {
       renderStudentList();
       const student = students.find(row => row.selection === studentPicker.value);
-      wordForm.hidden = !student || student.course === financeCourse || ['travel_b2','art_b1','ielts_reading','sweden_a2','country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(student.course);
+      wordForm.hidden = !student || student.course === financeCourse || student.course === generalB2 || ['travel_b2','art_b1','ielts_reading','sweden_a2','country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(student.course);
       wordItems(studentWords, student?.words);
       wordItems(assignedWords, student?.assigned);
       const classroom = document.getElementById('teacher-classroom');
@@ -1345,6 +1348,15 @@
             if (!response.ok || !Array.isArray(response.data)) throw new Error(label);
             rosterByCourse.set(course, response.data.map(row => ({
               id:row.student_id, label:'Михаил', course, selection:course+':'+row.student_id,
+            })));
+            return;
+          }
+          if (course === generalB2) {
+            const query = new URLSearchParams({select:'student_id,student_label',course:'eq.general-english-b2',teacher_id:'eq.'+session.user.id});
+            const response = await request('/rest/v1/gostudy_classroom_rooms?'+query, {}, access);
+            if (!response.ok || !Array.isArray(response.data)) throw new Error(label);
+            rosterByCourse.set(course,response.data.map(row=>({
+              id:row.student_id,label:row.student_label,course,selection:course+':'+row.student_id,
             })));
             return;
           }

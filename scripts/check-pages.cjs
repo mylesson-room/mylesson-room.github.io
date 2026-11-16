@@ -14,6 +14,78 @@ const server = createServer(async (req, res) => {
   } catch { res.writeHead(404).end(); }
 });
 
+async function checkGeneralB2Room(browser, origin) {
+  const studentId = '33333333-3333-4333-8333-333333333333';
+  const teacherId = '44444444-4444-4444-8444-444444444444';
+  const roomId = '55555555-5555-4555-8555-555555555555';
+  const lessonUrl = origin + '/general-english-b2-01.html';
+  const events = [];
+  const student = await browser.newContext();
+  const teacher = await browser.newContext();
+  try {
+    for (const [context,id,role] of [[student,studentId,'student'],[teacher,teacherId,'teacher']]) {
+      await context.addInitScript(({id,role}) => {
+        const session = JSON.stringify({user:{id},access_token:'test-'+role,expires_at:Date.now()+3600000});
+        localStorage.setItem('gostudy-'+role+'-session-v1',session);
+        sessionStorage.setItem('gostudy-cloud-session-v1',session);
+      },{id,role});
+      await context.route('https://*.supabase.co/**',route => {
+        const request = route.request();
+        const url = new URL(request.url());
+        assert.equal(request.headers().authorization,'Bearer test-'+role);
+        if (url.pathname.endsWith('/gostudy_classroom_rooms')) {
+          assert.equal(url.searchParams.get('course'),'eq.general-english-b2');
+          return route.fulfill({json:[{id:roomId,teacher_id:teacherId,student_id:studentId,student_label:'Виктория'}]});
+        }
+        if (url.pathname.endsWith('/gostudy_classroom_events')) {
+          assert.equal(url.searchParams.get('room_id'),'eq.'+roomId);
+          const cursor = Number(url.searchParams.get('seq').slice(3));
+          return route.fulfill({json:events.filter(event=>event.seq>cursor)});
+        }
+        if (url.pathname.endsWith('/gostudy_classroom_send')) {
+          const event = request.postDataJSON();
+          assert.equal(event.p_room,roomId);
+          events.push({actor:id,seq:events.length+1,kind:event.p_kind,payload:event.p_payload});
+          return route.fulfill({json:true});
+        }
+        return route.fulfill({json:[]});
+      });
+    }
+    const sp = await student.newPage();
+    const tp = await teacher.newPage();
+    await Promise.all([sp.goto(origin+'/student-general-english-b2.html'),tp.goto(origin+'/gostudy-teacher.html')]);
+    await sp.getByRole('heading',{name:/Виктория/}).waitFor();
+    await Promise.all([
+      sp.getByRole('link',{name:'Открыть урок 1 General English B2'}).click(),
+      tp.locator('.teacher-student-row').filter({hasText:'Виктория'}).getByRole('link',{name:/Войти в класс/}).click(),
+    ]);
+    await tp.waitForURL(lessonUrl+'?classStudent='+studentId);
+    for (const page of [sp,tp]) {
+      await page.getByRole('heading',{name:'The Hidden Cost of Convenience'}).waitFor();
+      await page.getByRole('button',{name:'Continue',exact:true}).click();
+    }
+    const choice = sp.locator('.definition-picker').first();
+    await choice.locator('summary').click();
+    await choice.getByRole('button',{name:/gaining one benefit/}).click();
+    await tp.locator('.definition-picker summary').first().filter({hasText:'gaining one benefit'}).waitFor();
+    await tp.getByRole('button',{name:'Сбросить ответы',exact:true}).click();
+    await choice.locator('summary').filter({hasText:'Choose a definition'}).waitFor();
+    await tp.getByRole('button',{name:/Save word/}).first().click();
+    await sp.locator('#finance-toast').filter({hasText:'trade-off'}).waitFor();
+    const classroom = await student.newPage();
+    await classroom.goto(origin+'/student-general-english-b2.html');
+    await classroom.locator('#vocabCount').filter({hasText:'1 слово'}).waitFor();
+    await classroom.locator('#practiceCard').click();
+    await classroom.locator('#practiceQuestion').filter({hasText:'trade-off'}).waitFor();
+    await sp.getByRole('textbox',{name:'Сообщение'}).fill('Ready to begin');
+    await sp.getByRole('button',{name:'Отправить'}).click();
+    await tp.getByText('Ready to begin',{exact:true}).waitFor();
+  } finally {
+    await student.close();
+    await teacher.close();
+  }
+}
+
 async function checkFinanceRoom(browser, origin) {
   const studentId = '11111111-1111-4111-8111-111111111111';
   const teacherId = '22222222-2222-4222-8222-222222222222';
@@ -163,6 +235,7 @@ async function main() {
   try {
     const origin = 'http://127.0.0.1:' + server.address().port;
     await checkFinanceRoom(browser, origin);
+    await checkGeneralB2Room(browser, origin);
     const source = await readFile('assets/gostudy-sync.js', 'utf8');
     const catalog = runInNewContext('('+source.match(/const classroomCatalog = ([^\n]+);/)[1]+')');
     const studentId = '11111111-1111-4111-8111-111111111111';

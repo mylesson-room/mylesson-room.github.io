@@ -2,6 +2,17 @@
   const auth = window.GoStudyFinanceAuth;
   if (!auth) return;
   const status = document.querySelector("#finance-live-status");
+  const accessStatus = document.querySelector(".classroom-access");
+  const course = document.body.dataset.classroomCourse;
+  const lesson = document.body.dataset.classroomLesson;
+  const user = auth.userId();
+  const selectedStudent = auth.classroomStudent;
+  const classroomQuery = course && new URLSearchParams({
+    select:"id,teacher_id,student_id,student_label",
+    course:"eq."+course,
+    lesson_path:"eq."+lesson,
+    student_id:"eq."+(selectedStudent || user),
+  });
   const words = new Map();
   let room;
   let cursor = 0;
@@ -17,6 +28,13 @@
   }
   function show(message) {
     if (status) status.textContent = message;
+    if (accessStatus && !accessStatus.hidden) {
+      const text = document.createTextNode(message+" ");
+      const link = document.createElement("a");
+      link.href = message.includes("доступа") || !user ? "login.html" : location.href;
+      link.textContent = link.href === location.href ? "Обновить" : "Войти в GoStudy";
+      accessStatus.replaceChildren(text,link);
+    }
   }
   function apply(events, initial) {
     for (const event of events) {
@@ -40,16 +58,25 @@
     busy = true;
     try {
       if (!room) {
-        room = (await request(roomPath))[0];
+        const list = await request(classroomQuery ? "/rest/v1/gostudy_classroom_rooms?"+classroomQuery : roomPath);
+        room = course ? list.find(row => selectedStudent ? row.teacher_id === user : row.student_id === user) : list[0];
         if (!room) { show("Для этого аккаунта нет доступа к комнате."); return; }
         document.dispatchEvent(new Event("finance-connect"));
       }
       let batch;
       do {
-        batch = await request(eventPath + "?select=seq,actor,kind,payload&order=seq.asc&limit=500&seq=gt." + cursor);
+        const path = course ? "/rest/v1/gostudy_classroom_events" : eventPath;
+        const filter = course ? "&room_id=eq."+room.id : "";
+        batch = await request(path + "?select=seq,actor,kind,payload&order=seq.asc&limit=500&seq=gt." + cursor + filter);
         apply(batch, initial);
       } while (batch.length === 500);
-      if (!caughtUp) document.dispatchEvent(new Event("finance-ready"));
+      if (!caughtUp) {
+        if (course) {
+          document.body.classList.add("classroom-authorized");
+          if (accessStatus) accessStatus.hidden = true;
+        }
+        document.dispatchEvent(new CustomEvent("finance-ready",{detail:course ? room : null}));
+      }
       caughtUp = true;
       show("Онлайн · общая комната");
     } catch (error) {
@@ -59,6 +86,7 @@
     }
   }
   function localWords() {
+    if (course) return [];
     try {
       const snapshot = JSON.parse(localStorage.getItem("gostudy-business-ai-shared-v1") || "{}");
       if (!Array.isArray(snapshot.words)) return [];
@@ -87,7 +115,12 @@
       const event = {id:crypto.randomUUID(),kind,payload};
       const post = async () => {
         try {
-          await request(eventPath, {method:"POST",body:event});
+          if (course) {
+            const saved = await request("/rest/v1/rpc/gostudy_classroom_send", {
+              method:"POST",body:{p_room:room.id,p_id:event.id,p_kind:event.kind,p_payload:event.payload}
+            });
+            if (!saved) throw new Error("Нет доступа к комнате.");
+          } else await request(eventPath, {method:"POST",body:event});
         } catch (error) {
           if (error.status !== 409) throw error;
         }
