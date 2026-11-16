@@ -217,6 +217,10 @@
     return refreshInFlight;
   }
 
+  if (document.body.hasAttribute('data-finance-live')) {
+    window.GoStudyFinanceAuth = {token, request, userId: () => session?.user?.id};
+    return;
+  }
   async function push(key, accessToken) {
     const current = readRecord(key);
     if (!current.dirty || conflicts.has(key)) return;
@@ -329,6 +333,7 @@
 
   function mountUnifiedAccount() {
     const destinations = new Map([
+      ['business-ai-finance', {name:'AI in Finance · B2',path:'student-business-ai-finance.html'}],
       [storiesCourse, {name:'General English B1',path:'student-general-english-b1-stories.html',keys:storiesKeys}],
       [generalB1Course, {name:'General English B1',path:'student-general-english-b1.html',keys:generalB1Keys}],
       ['country-house', {name:'Country House · A2',path:'student-country-house.html',keys:countryHouseKeys}],

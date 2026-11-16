@@ -321,7 +321,26 @@ header{height:46px;padding:0 30px;border-bottom:1px solid #e4e8f2;box-shadow:0 2
 #selectionGoogle{grid-column:1/-1;color:#087faa;font-size:13px;text-decoration:underline}
 @media(max-width:800px){.layout{height:auto}.lesson-divider{display:none}.lesson{min-height:0}.footer{padding-bottom:var(--lesson-toolbar-height)}.pager{position:fixed;bottom:0;left:0;right:0;z-index:12;padding:0 12px}}
 @media(max-width:540px){:root{--lesson-toolbar-height:41px}.pager button{height:34px}}
-</style></head><body>
+
+.finance-chat{margin-top:14px;padding:14px;background:#fff;border:1px solid #e2ebf5;border-radius:15px}
+.finance-chat h2{margin:0;font-size:16px}.finance-chat p{font-size:12px;margin:4px 0;color:#536781}.finance-login{font-size:12px;color:#087faa;text-decoration:underline}
+#finance-messages{list-style:none;padding:0;margin:9px 0;max-height:200px;overflow:auto}
+#finance-messages li{padding:7px 9px;margin:4px 0;border-radius:8px;background:#eff6fc;overflow-wrap:anywhere}
+#finance-messages strong,#finance-messages span{display:block;font-size:13px}
+#finance-chat-form{display:flex;gap:6px}#finance-chat-form input{min-width:0;flex:1;border:1px solid #cfdaeb;border-radius:8px;padding:5px}
+#finance-chat-form button{background:#e3f6fb;color:#086c8c;border:0;border-radius:8px;font-size:12px}
+.finance-reset{margin-left:auto;align-self:flex-start;width:30px;height:30px;border:0;border-radius:8px;background:#fff0ef;color:#af4f50;font-size:20px;line-height:1}
+.finance-correct{outline:1px solid #94d6b9;background:#effcf5}
+#finance-toast{position:fixed;right:14px;bottom:58px;width:clamp(158px,17vw,270px);z-index:160;padding:12px 14px;border-radius:12px;background:#e8fbf2;color:#165c47;box-shadow:0 6px 22px #123c3c30;overflow-wrap:anywhere}
+#finance-toast span{display:block;font-size:13px}
+#finance-celebrate{position:fixed;bottom:49px;left:50%;z-index:170;pointer-events:none;text-align:center;animation:finance-enter .6s ease-out both}
+.finance-fireworks{display:block;color:#c66a08;font-size:38px;animation:finance-spark .65s ease-in-out infinite alternate}
+.clap-left,.clap-right{animation:finance-clap .32s ease-in-out infinite alternate}.clap-right{--clap-dir:8px}.clap-left{--clap-dir:-8px}
+@keyframes finance-enter{from{transform:translate(-60vw,0)}to{transform:translate(-50%,0)}}
+@keyframes finance-clap{to{transform:translateX(var(--clap-dir))}}
+@keyframes finance-spark{to{transform:scale(1.2);opacity:.55}}
+@media(prefers-reduced-motion:reduce){#finance-celebrate,.finance-fireworks,.clap-left,.clap-right{animation:none}#finance-celebrate{transform:translateX(-50%)}}
+</style></head><body data-finance-live>
 <header><a class="brand lesson-brand" href="student-business-ai-finance.html" aria-label="My classroom"><svg viewBox="350 140 835 650" width="55" height="43" aria-hidden="true" focusable="false"><defs><linearGradient id="crownGold" x1="0" y1="1" x2=".72" y2="0" gradientUnits="objectBoundingBox"><stop stop-color="#3a2815"/><stop offset=".36" stop-color="#765019"/><stop offset=".68" stop-color="#e9ad50"/><stop offset=".83" stop-color="#9c621a"/><stop offset="1" stop-color="#d89b3e"/></linearGradient></defs><g fill="url(#crownGold)"><path d="M770 150Q786 246 865 257Q786 269 770 365Q754 269 675 257Q754 246 770 150Z"/><path d="M574 301Q580 341 614 346Q580 352 574 392Q568 352 533 346Q568 341 574 301ZM968 301Q974 341 1008 346Q974 352 968 392Q962 352 928 346Q962 341 968 301Z"/><path d="M360 379C535 516 710 570 770 327C830 570 1005 516 1176 381C1109 478 1065 557 1046 623L1041 619C1046 569 1060 523 1084 474C931 576 806 534 770 365C734 534 609 576 454 474C478 523 492 569 496 619L491 623C472 558 427 478 360 379Z"/><path d="M430 679C571 571 690 599 767 702C679 614 568 614 430 679ZM1108 679C967 571 850 599 773 702C861 614 970 614 1108 679Z"/><path d="M367 747C521 631 663 645 770 738C877 645 1018 631 1171 747C1009 674 868 669 770 782C672 669 530 674 367 747Z"/></g></svg></a><div class="header-right"><button type="button" class="lesson-dictionary-button" id="openLessonDictionary" aria-haspopup="dialog" aria-controls="lessonDictionary"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-3-2-6-2-9-1v13c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1v13"/></svg>Dictionary</button><a class="lesson-home-link" href="student-business-ai-finance.html" aria-label="Student dashboard"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v11h14V9m-9 11v-6h4v6"/></svg></a></div></header>
 <dialog class="lesson-dictionary" id="lessonDictionary" aria-labelledby="lessonDictionaryTitle">
   <div class="lesson-dictionary-heading"><h2 id="lessonDictionaryTitle">My vocabulary <span id="wordCountSidebar">0</span></h2>
@@ -338,10 +357,11 @@ header{height:46px;padding:0 30px;border-bottom:1px solid #e4e8f2;box-shadow:0 2
 <div class="video-actions"><a class="call-btn" href="https://telemost.yandex.ru/" target="_blank" rel="noopener noreferrer">↗ Open Telemost</a><span>Откроется отдельно</span></div>
 <p class="video-help">Место для видео преподавателя и ученика. Живой звонок внутри страницы появится после подключения видеосервиса.</p>
 </div>
+<section class="finance-chat" aria-label="Чат урока"><h2>Чат урока</h2><p id="finance-live-status" role="status">Подключаемся…</p><a href="login.html" class="finance-login">Войти в GoStudy</a><p id="finance-activity" role="status"></p><ol id="finance-messages" aria-live="polite"></ol><form id="finance-chat-form"><input aria-label="Сообщение" maxlength="1000" placeholder="Сообщение" required disabled><button type="submit" disabled>Отправить</button></form></section>
 </aside>
 <div class="lesson-divider" id="lessonDivider" role="separator" tabindex="0" aria-label="Resize video and exercises" aria-orientation="vertical" aria-valuemin="22" aria-valuemax="55" aria-valuenow="33" aria-controls="lessonVideo"></div>
 <main class="lesson"><div class="lesson-content"><section class="hero"><h1>Can AI predict a <em>financial crisis</em> before it happens?</h1></section>
-<section id="page-0" class="page active"><div class="panel"><div class="activity-head"><div class="activity-icon">◉</div><div class="activity-titles"><h2>1. Let's talk</h2></div></div><p class="lead">Look at the AI prediction and discuss the questions. Support your opinions with examples.</p><div class="warmup-scene"><div class="scene-top"><span class="scene-badge">✦ NORTHBRIDGE AI REPORT</span><span class="scene-live">● Updated just now</span></div><div class="scene-chart"><div class="scene-copy"><small>Forecasted cash balance</small><strong>€65,000</strong><span>▼ 35% below safety threshold</span></div><svg viewBox="0 0 330 110" role="img" aria-label="Illustrative declining cash forecast"><defs><linearGradient id="cashfade" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#86dce9" stop-opacity=".40"/><stop offset="1" stop-color="#86dce9" stop-opacity="0"/></linearGradient></defs><path d="M0 30 C35 20 44 48 77 41 S137 28 159 58 S216 54 239 76 S302 80 330 99 L330 110 L0 110Z" fill="url(#cashfade)"/><path d="M0 30 C35 20 44 48 77 41 S137 28 159 58 S216 54 239 76 S302 80 330 99" fill="none" stroke="#0ab5cf" stroke-width="4" stroke-linecap="round"/><circle cx="330" cy="99" r="6" fill="#0ab5cf" stroke="white" stroke-width="3"/></svg></div><div class="scene-footer"><span>⚠ Potential liquidity risk in 60 days</span><b>Review forecast ↗</b></div></div><ol class="questions"><li>Would you trust AI to predict your company's financial future?</li><li>Which financial decisions should never be made by AI alone?</li><li>Can AI identify risks that experienced financial analysts might miss?</li><li>Would you invest in a company that relies heavily on AI-generated financial forecasts?</li></ol><div class="tip"><b>Useful language</b><p>I would be reluctant to rely on AI because…<br>One potential advantage is…<br>Human oversight is essential when…</p></div></div></section><section id="page-1" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">Aa</div><div class="activity-titles"><h2>2. Financial vocabulary</h2></div></div><p class="lead">Match the eight financial terms with their definitions. Press <b>Check answers</b> when you finish.</p><div id="vocab"></div><button class="primary" onclick="checkVocab()">Check answers</button><p id="vocabScore" class="feedback" aria-live="polite"></p></div></section><section id="page-2" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">▤</div><div class="activity-titles"><h2>3. Read & analyse</h2></div></div><p class="lead">Read this fictional business case, then answer the questions.</p><div class="reading-layout"><article class="article"><span class="case">CASE STUDY · NORTHBRIDGE RETAIL</span><h3>An AI system predicted a cash shortage. Was it right?</h3><p>Northbridge Retail, a medium-sized European company, had experienced steady revenue growth for three years. However, despite increasing sales, the company regularly struggled with cash flow.</p><p>Its finance department introduced an AI-powered forecasting system. The software analysed historical sales, supplier payments, seasonal trends and customer payment behaviour.</p><p>Within two weeks, the system identified a potential liquidity problem. It predicted that the company's available cash could fall below €100,000 within the next 60 days. Surprisingly, the traditional financial forecast had shown no serious problems.</p><p>The AI model highlighted three early warning signs: several large customers were paying invoices later than usual, inventory costs had increased, and sales growth was slowing in one important market.</p><p>The finance director, Emma Collins, was initially sceptical. She believed the system might be overreacting to temporary changes. Rather than accepting the prediction immediately, her team investigated the data. They discovered that one major customer was experiencing financial difficulties and had delayed several payments.</p><p>Northbridge negotiated new payment terms with suppliers, postponed a non-essential investment and contacted customers with overdue invoices. Six weeks later, the company avoided the predicted cash shortage.</p><p>However, the finance director emphasised an important distinction: the software had identified a risk, but human judgement was responsible for evaluating the evidence and choosing how to respond. The company continued using AI for forecasting, but all major financial decisions still required human approval.</p></article><aside class="case-column"><div class="signal-card"><div class="signal-emoji">📉</div><b>Liquidity alert</b><span>The AI predicts cash will drop below a critical threshold.</span><strong>&lt; €100,000</strong><small>Over the next 60 days</small></div><div class="signal-card"><div class="signal-emoji">◷</div><b>Payment delays</b><span>Major clients are taking longer to settle invoices.</span><strong>Early warning</strong></div><div class="signal-card"><div class="signal-emoji">✓</div><b>Human decision</b><span>Finance teams verify the data and make the final call.</span><strong>Human oversight</strong></div></aside></div><h3 class="question-heading">Answer the questions</h3><div id="reading"></div><button class="primary" onclick="checkReading()">Check answers</button><p id="readingScore" class="feedback" aria-live="polite"></p></div></section><section id="page-3" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">✎</div><div class="activity-titles"><h2>4. Use the language</h2></div></div><p class="lead">Complete the sentences using expressions from the vocabulary section.</p><div id="gaps"></div><button class="primary" onclick="checkGaps()">Check answers</button><p id="gapsScore" class="feedback" aria-live="polite"></p></div></section><section id="page-4" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">▥</div><div class="activity-titles"><h2>5. Financial decision lab</h2></div></div><p class="lead">You are the Finance Director. The company's minimum comfortable cash balance is <b>€100,000</b>.</p><div class="decision-metrics"><div><small>Cash safety target</small><b>€100,000</b><span>Minimum comfortable cash</span></div><div><small>Expected forecast</small><b>€65,000</b><span>Projected in 60 days</span></div><div><small>Potential funding gap</small><b>€35,000</b><span>To restore target balance</span></div></div><div class="chart"><div class="chart-row"><span>Optimistic</span><div class="track"><div style="width:90%;background:#4aaf91"></div></div><b>€180,000</b></div><div class="chart-row"><span>Expected</span><div class="track"><div style="width:32.5%;background:#6971df"></div></div><b>€65,000</b></div><div class="chart-row"><span>Pessimistic</span><div class="track negative"><div style="width:20%;background:#df7c77"></div></div><b>−€40,000</b></div><small>Illustrative cash positions after 60 days. The pessimistic scenario implies a shortfall.</small></div><ol class="questions"><li>Which scenario concerns you most, and why?</li><li>How much additional cash is required to reach the target in the expected scenario?</li><li>Should the company cut spending immediately or investigate further?</li><li>What additional data would you request?</li></ol><h3>Make your decision</h3><div id="decision" class="choices"><label><input type="radio" name="decision" value="cut"> Reduce spending immediately</label><label><input type="radio" name="decision" value="investigate"> Investigate and prepare contingency measures</label><label><input type="radio" name="decision" value="ignore"> Ignore the forecast until the shortage occurs</label></div><p id="decisionAdvice" class="tip" aria-live="polite">Choose a strategy to reveal its possible consequences.</p><label class="field-label" for="decisionNotes">Explain your decision</label><textarea id="decisionNotes" data-save="decisionNotes" placeholder="I would recommend… because…"></textarea></div></section><section id="page-5" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">◎</div><div class="activity-titles"><h2>6. CEO meeting</h2></div></div><p class="lead">The CEO believes the finances are under control. Your task is to secure approval for two preventive measures.</p><div class="role-grid"><div class="role"><div class="role-icon">01</div><h3>Finance Director</h3><p>Explain the risk, present the figures, defend your interpretation and recommend concrete actions.</p></div><div class="role"><div class="role-icon">02</div><h3>CEO</h3><p>Challenge the model's reliability, question the cost and ask what would happen if the forecast is wrong.</p></div></div><div class="tip"><b>Useful expressions</b><p>According to the latest forecast…<br>There is a significant risk that…<br>We should take into account…<br>I would recommend implementing…<br>We should avoid relying solely on…</p></div><label class="field-label" for="roleNotes">Notes from the discussion</label><textarea id="roleNotes" data-save="roleNotes" placeholder="My main argument…"></textarea></div></section><section id="page-6" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">◌</div><div class="activity-titles"><h2>7. Your opinion</h2></div></div><p class="lead">A company follows an AI-generated financial forecast and loses €2 million. The model was supplied by an external provider.</p><div class="tip"><b>Who should be accountable?</b><p>The CFO who approved the decision? The software provider? The analysts who failed to question the forecast? Or should responsibility be shared?</p></div><p>Give a <b>60-second opinion</b> and use at least three new financial expressions.</p><textarea data-save="finalOpinion" aria-label="Your final opinion" placeholder="In my view, responsibility should…"></textarea></div></section><section id="page-7" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">✉</div><div class="activity-titles"><h2>8. Writing task</h2></div></div><p class="lead">Write a 140–180 word email to your CEO. Describe the potential benefits, two major risks, your implementation recommendation and why human oversight matters.</p><textarea id="homework" data-save="homework" style="min-height:260px" placeholder="Dear CEO,&#10;&#10;I am writing to recommend…"></textarea><div class="homework-tools"><span id="wordCount">0 words · Target: 140–180</span><button class="outline" onclick="copyHomework()">Copy email</button></div><details class="teacher"><summary>Teacher notes & answers</summary><p>Focus on evidence-based hedging, risk assessment and recommendation language. In the expected scenario the target gap is €35,000. A strong student distinguishes model output from verified evidence and explains potential trade-offs.</p></details></div></section>
+<section id="page-0" class="page active"><div class="panel"><div class="activity-head"><div class="activity-icon">◉</div><div class="activity-titles"><h2>1. Let's talk</h2></div></div><p class="lead">Look at the AI prediction and discuss the questions. Support your opinions with examples.</p><div class="warmup-scene"><div class="scene-top"><span class="scene-badge">✦ NORTHBRIDGE AI REPORT</span><span class="scene-live">● Updated just now</span></div><div class="scene-chart"><div class="scene-copy"><small>Forecasted cash balance</small><strong>€65,000</strong><span>▼ 35% below safety threshold</span></div><svg viewBox="0 0 330 110" role="img" aria-label="Illustrative declining cash forecast"><defs><linearGradient id="cashfade" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#86dce9" stop-opacity=".40"/><stop offset="1" stop-color="#86dce9" stop-opacity="0"/></linearGradient></defs><path d="M0 30 C35 20 44 48 77 41 S137 28 159 58 S216 54 239 76 S302 80 330 99 L330 110 L0 110Z" fill="url(#cashfade)"/><path d="M0 30 C35 20 44 48 77 41 S137 28 159 58 S216 54 239 76 S302 80 330 99" fill="none" stroke="#0ab5cf" stroke-width="4" stroke-linecap="round"/><circle cx="330" cy="99" r="6" fill="#0ab5cf" stroke="white" stroke-width="3"/></svg></div><div class="scene-footer"><span>⚠ Potential liquidity risk in 60 days</span><b>Review forecast ↗</b></div></div><ol class="questions"><li>Would you trust AI to predict your company's financial future?</li><li>Which financial decisions should never be made by AI alone?</li><li>Can AI identify risks that experienced financial analysts might miss?</li><li>Would you invest in a company that relies heavily on AI-generated financial forecasts?</li></ol><div class="tip"><b>Useful language</b><p>I would be reluctant to rely on AI because…<br>One potential advantage is…<br>Human oversight is essential when…</p></div></div></section><section id="page-1" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">Aa</div><div class="activity-titles"><h2>2. Financial vocabulary</h2></div></div><p class="lead">Match the eight financial terms with their definitions. </p><div id="vocab"></div><p id="vocabScore" class="feedback" aria-live="polite"></p></div></section><section id="page-2" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">▤</div><div class="activity-titles"><h2>3. Read & analyse</h2></div></div><p class="lead">Read this fictional business case, then answer the questions.</p><div class="reading-layout"><article class="article"><span class="case">CASE STUDY · NORTHBRIDGE RETAIL</span><h3>An AI system predicted a cash shortage. Was it right?</h3><p>Northbridge Retail, a medium-sized European company, had experienced steady revenue growth for three years. However, despite increasing sales, the company regularly struggled with cash flow.</p><p>Its finance department introduced an AI-powered forecasting system. The software analysed historical sales, supplier payments, seasonal trends and customer payment behaviour.</p><p>Within two weeks, the system identified a potential liquidity problem. It predicted that the company's available cash could fall below €100,000 within the next 60 days. Surprisingly, the traditional financial forecast had shown no serious problems.</p><p>The AI model highlighted three early warning signs: several large customers were paying invoices later than usual, inventory costs had increased, and sales growth was slowing in one important market.</p><p>The finance director, Emma Collins, was initially sceptical. She believed the system might be overreacting to temporary changes. Rather than accepting the prediction immediately, her team investigated the data. They discovered that one major customer was experiencing financial difficulties and had delayed several payments.</p><p>Northbridge negotiated new payment terms with suppliers, postponed a non-essential investment and contacted customers with overdue invoices. Six weeks later, the company avoided the predicted cash shortage.</p><p>However, the finance director emphasised an important distinction: the software had identified a risk, but human judgement was responsible for evaluating the evidence and choosing how to respond. The company continued using AI for forecasting, but all major financial decisions still required human approval.</p></article><aside class="case-column"><div class="signal-card"><div class="signal-emoji">📉</div><b>Liquidity alert</b><span>The AI predicts cash will drop below a critical threshold.</span><strong>&lt; €100,000</strong><small>Over the next 60 days</small></div><div class="signal-card"><div class="signal-emoji">◷</div><b>Payment delays</b><span>Major clients are taking longer to settle invoices.</span><strong>Early warning</strong></div><div class="signal-card"><div class="signal-emoji">✓</div><b>Human decision</b><span>Finance teams verify the data and make the final call.</span><strong>Human oversight</strong></div></aside></div><h3 class="question-heading">Answer the questions</h3><div id="reading"></div><p id="readingScore" class="feedback" aria-live="polite"></p></div></section><section id="page-3" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">✎</div><div class="activity-titles"><h2>4. Use the language</h2></div></div><p class="lead">Complete the sentences using expressions from the vocabulary section.</p><div id="gaps"></div><p id="gapsScore" class="feedback" aria-live="polite"></p></div></section><section id="page-4" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">▥</div><div class="activity-titles"><h2>5. Financial decision lab</h2></div></div><p class="lead">You are the Finance Director. The company's minimum comfortable cash balance is <b>€100,000</b>.</p><div class="decision-metrics"><div><small>Cash safety target</small><b>€100,000</b><span>Minimum comfortable cash</span></div><div><small>Expected forecast</small><b>€65,000</b><span>Projected in 60 days</span></div><div><small>Potential funding gap</small><b>€35,000</b><span>To restore target balance</span></div></div><div class="chart"><div class="chart-row"><span>Optimistic</span><div class="track"><div style="width:90%;background:#4aaf91"></div></div><b>€180,000</b></div><div class="chart-row"><span>Expected</span><div class="track"><div style="width:32.5%;background:#6971df"></div></div><b>€65,000</b></div><div class="chart-row"><span>Pessimistic</span><div class="track negative"><div style="width:20%;background:#df7c77"></div></div><b>−€40,000</b></div><small>Illustrative cash positions after 60 days. The pessimistic scenario implies a shortfall.</small></div><ol class="questions"><li>Which scenario concerns you most, and why?</li><li>How much additional cash is required to reach the target in the expected scenario?</li><li>Should the company cut spending immediately or investigate further?</li><li>What additional data would you request?</li></ol><h3>Make your decision</h3><div id="decision" class="choices"><label><input type="radio" name="decision" value="cut"> Reduce spending immediately</label><label><input type="radio" name="decision" value="investigate"> Investigate and prepare contingency measures</label><label><input type="radio" name="decision" value="ignore"> Ignore the forecast until the shortage occurs</label></div><p id="decisionAdvice" class="tip" aria-live="polite">Choose a strategy to reveal its possible consequences.</p><label class="field-label" for="decisionNotes">Explain your decision</label><textarea id="decisionNotes" data-save="decisionNotes" placeholder="I would recommend… because…"></textarea></div></section><section id="page-5" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">◎</div><div class="activity-titles"><h2>6. CEO meeting</h2></div></div><p class="lead">The CEO believes the finances are under control. Your task is to secure approval for two preventive measures.</p><div class="role-grid"><div class="role"><div class="role-icon">01</div><h3>Finance Director</h3><p>Explain the risk, present the figures, defend your interpretation and recommend concrete actions.</p></div><div class="role"><div class="role-icon">02</div><h3>CEO</h3><p>Challenge the model's reliability, question the cost and ask what would happen if the forecast is wrong.</p></div></div><div class="tip"><b>Useful expressions</b><p>According to the latest forecast…<br>There is a significant risk that…<br>We should take into account…<br>I would recommend implementing…<br>We should avoid relying solely on…</p></div><label class="field-label" for="roleNotes">Notes from the discussion</label><textarea id="roleNotes" data-save="roleNotes" placeholder="My main argument…"></textarea></div></section><section id="page-6" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">◌</div><div class="activity-titles"><h2>7. Your opinion</h2></div></div><p class="lead">A company follows an AI-generated financial forecast and loses €2 million. The model was supplied by an external provider.</p><div class="tip"><b>Who should be accountable?</b><p>The CFO who approved the decision? The software provider? The analysts who failed to question the forecast? Or should responsibility be shared?</p></div><p>Give a <b>60-second opinion</b> and use at least three new financial expressions.</p><textarea data-save="finalOpinion" aria-label="Your final opinion" placeholder="In my view, responsibility should…"></textarea></div></section><section id="page-7" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">✉</div><div class="activity-titles"><h2>8. Writing task</h2></div></div><p class="lead">Write a 140–180 word email to your CEO. Describe the potential benefits, two major risks, your implementation recommendation and why human oversight matters.</p><textarea id="homework" data-save="homework" style="min-height:260px" placeholder="Dear CEO,&#10;&#10;I am writing to recommend…"></textarea><div class="homework-tools"><span id="wordCount">0 words · Target: 140–180</span><button class="outline" onclick="copyHomework()">Copy email</button></div><details class="teacher"><summary>Teacher notes & answers</summary><p>Focus on evidence-based hedging, risk assessment and recommendation language. In the expected scenario the target gap is €35,000. A strong student distinguishes model output from verified evidence and explains potential trade-offs.</p></details></div></section>
 <div class="footer">Original lesson material · Fictional Northbridge Retail case. Answers are stored locally in your browser; this page is not a live teacher sync.</div></div></main></div><nav class="pager" aria-label="Lesson navigation"><button type="button" class="outline" id="back">← Back</button><button type="button" class="primary" id="next">Continue</button></nav>
 
 <div class="selection-translate" id="selectionTranslate" role="region" aria-label="Перевод выделенного текста">
@@ -352,6 +372,8 @@ header{height:46px;padding:0 30px;border-bottom:1px solid #e4e8f2;box-shadow:0 2
   </div>
   <a id="selectionGoogle" target="_blank" rel="noopener noreferrer" hidden>Открыть в Google Translate</a>
 </div>
+<div id="finance-toast" hidden role="status"></div><div id="finance-celebrate" hidden aria-hidden="true"><span class="finance-fireworks">✦ ✧ ✦</span><svg viewBox="0 0 100 122" width="100" height="122"><circle cx="50" cy="24" r="16" fill="#f9b97d"/><path d="M36 20q14-26 29-1" fill="#35365d"/><path d="M43 28q7 7 14 0" fill="none" stroke="#633748" stroke-width="2"/><rect x="33" y="45" width="34" height="47" rx="14" fill="#12adc9"/><path d="m43 89-9 27m23-27 9 27" stroke="#473874" stroke-width="9" stroke-linecap="round"/><path class="clap-left" d="M34 54q-12 20 14 13" stroke="#f9b97d" fill="none" stroke-width="9" stroke-linecap="round"/><path class="clap-right" d="M66 54q12 20-14 13" stroke="#f9b97d" fill="none" stroke-width="9" stroke-linecap="round"/></svg></div>
+<script src="assets/gostudy-sync.js?v=finance-live-1"></script><script src="assets/gostudy-finance-live.js?v=1"></script>
 <script>
 const LESSONS=[{"label":"Warm-up","minutes":5},{"label":"Vocabulary","minutes":10},{"label":"Reading","minutes":10},{"label":"Language practice","minutes":8},{"label":"Decision lab","minutes":10},{"label":"Role-play","minutes":8},{"label":"Final discussion","minutes":4},{"label":"Homework","minutes":15}];
 const VOCAB=[["cash flow forecast","A prediction of how much money will enter and leave a business","прогноз денежных потоков"],["liquidity","The ability to meet financial obligations when they are due","ликвидность"],["credit risk","The possibility that a borrower will fail to repay money","кредитный риск"],["early warning sign","An indication of a potential problem before it becomes serious","ранний признак проблемы"],["outlier","A data point that is very different from the usual pattern","аномальное значение"],["forecast accuracy","How closely predictions match actual results","точность прогноза"],["risk exposure","The extent to which a business could be affected by a possible loss","подверженность риску"],["stress test","An analysis of how a business would perform under difficult conditions","стресс-тест"]];
@@ -363,8 +385,8 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 let state={page:0,values:{}};
 try{const old=JSON.parse(localStorage.getItem(STORAGE)||"null");if(old&&typeof old==="object"){state.page=Math.max(0,Math.min(LESSONS.length-1,Number(old.page)||0));state.values=old.values&&typeof old.values==="object"?old.values:{}}}catch(e){}
-function save(){try{localStorage.setItem(STORAGE,JSON.stringify(state))}catch(error){console.warn("Unable to save lesson progress on this device",error)}}
-function setValue(k,v){state.values[k]=v;save()}
+function save(){if(window.FinanceLive?.connected())return;try{localStorage.setItem(STORAGE,JSON.stringify(state))}catch(error){console.warn("Unable to save lesson progress on this device",error)}}
+function setValue(k,v){state.values[k]=v;save();sendAnswer(k,v)}
 function getValue(k){return state.values[k]??""}
 function go(n){
   state.page=Math.max(0,Math.min(n,LESSONS.length-1));
@@ -405,13 +427,14 @@ definitionPickers.forEach((picker, index) => {
     options.forEach(option => option.setAttribute("aria-pressed", String(option.dataset.choice === value)));
   }
   showChoice(getValue(key));
+  picker.addEventListener("finance-redraw", () => showChoice(getValue(key)));
   summary.addEventListener("click", () => {
     definitionPickers.forEach(other => { if (other !== picker) other.open = false; });
   });
   options.forEach(option => option.addEventListener("click", () => {
     setValue(key, option.dataset.choice);
     showChoice(option.dataset.choice);
-    $("#vf" + index).textContent = "";
+    gradeSection("v", true);
     picker.open = false;
     summary.focus();
   }));
@@ -425,34 +448,21 @@ definitionPickers.forEach((picker, index) => {
 document.addEventListener("pointerdown", event => {
   definitionPickers.forEach(picker => { if (!picker.contains(event.target)) picker.open = false; });
 });
-window.checkVocab = () => {
-  let correct = 0;
-  VOCAB.forEach((word, index) => {
-    const value = getValue("v" + index);
-    const ok = value !== "" && defs[Number(value)] === word[1];
-    correct += Number(ok);
-    const feedback = $("#vf" + index);
-    feedback.textContent = ok ? "✓ Correct" : "Correct: " + word[1];
-    feedback.className = "feedback " + (ok ? "good" : "bad");
-  });
-  $("#vocabScore").textContent = correct + " / " + VOCAB.length + " correct";
-};
+
 $("#reading").innerHTML=READING.map((x,i)=>'<div class="question-item"><strong>'+(i+1)+'. '+esc(x[0])+'</strong>'+x[1].map((s,j)=>'<label><input type="radio" name="read'+i+'" value="'+j+'">'+esc(s)+'</label>').join("")+'<span class="result" id="rf'+i+'"></span></div>').join("");
-document.querySelectorAll("#reading input").forEach(x=>{x.checked=getValue(x.name)===x.value;x.onchange=()=>setValue(x.name,x.value)});
-window.checkReading=()=>{let n=0;READING.forEach((x,i)=>{let ok=getValue("read"+i)===String(x[2]);n+=ok?1:0;$("#rf"+i).className="result "+(ok?"good":"bad");$("#rf"+i).textContent=ok?"✓ Correct":"Answer: "+x[1][x[2]]});$("#readingScore").textContent=n+" / 4 correct"};
+document.querySelectorAll("#reading input").forEach(x=>{x.checked=getValue(x.name)===x.value;x.onchange=()=>{setValue(x.name,x.value);gradeSection("read", true)}});
 $("#gaps").innerHTML=GAPS.map((x,i)=>'<div class="gap-item"><label for="gap'+i+'">'+(i+1)+'. '+esc(x[0])+'</label><input id="gap'+i+'" autocomplete="off" data-key="gap'+i+'" placeholder="Type the missing expression"><small class="feedback" id="gf'+i+'"></small></div>').join("");
-document.querySelectorAll("#gaps input").forEach((x,i)=>{x.value=getValue("gap"+i);x.oninput=()=>setValue("gap"+i,x.value)});
-window.checkGaps=()=>{let n=0;GAPS.forEach((x,i)=>{let ok=getValue("gap"+i).trim().toLowerCase().replace(/\s+/g," ")===x[1];n+=ok?1:0;$("#gf"+i).className="feedback "+(ok?"good":"bad");$("#gf"+i).textContent=ok?"✓ Correct":"Answer: "+x[1]});$("#gapsScore").textContent=n+" / 6 correct"};
+document.querySelectorAll("#gaps input").forEach((x,i)=>{x.value=getValue("gap"+i);x.oninput=()=>setValue("gap"+i,x.value);x.onblur=()=>gradeSection("gap",true);x.onkeydown=event=>{if(event.key==="Enter"){event.preventDefault();gradeSection("gap",true)}}});
 const advice={cut:"Immediate cuts may preserve liquidity but could unnecessarily damage growth if the forecast proves wrong.",investigate:"Investigating while preparing contingency measures can balance caution and business continuity. Act quickly if evidence confirms the risk.",ignore:"Ignoring the forecast avoids immediate disruption but may leave too little time to respond to a cash shortage."};
 document.querySelectorAll("#decision input").forEach(x=>{x.checked=getValue("decision")===x.value;x.onchange=()=>{setValue("decision",x.value);$("#decisionAdvice").textContent=advice[x.value]}});
 if(advice[getValue("decision")])$("#decisionAdvice").textContent=advice[getValue("decision")];
 document.querySelectorAll("[data-save]").forEach(x=>{x.value=getValue(x.dataset.save);x.oninput=()=>{setValue(x.dataset.save,x.value);if(x.id==="homework")updateWords()}});
 function updateWords(){let n=$("#homework").value.trim().split(/\s+/).filter(Boolean).length;$("#wordCount").textContent=n+" words · Target: 140–180"}updateWords();
 window.copyHomework=()=>navigator.clipboard.writeText($("#homework").value).then(()=>alert("Email copied")).catch(()=>alert("Copy unavailable in this browser"));
-function readWords(){try{const v=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");return Array.isArray(v.words)?v.words:[]}catch(e){return []}}
+function readWords(){if(window.FinanceLive?.connected())return FinanceLive.words();try{const v=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");return Array.isArray(v.words)?v.words:[]}catch(e){return []}}
 $("#openLessonDictionary").addEventListener("click",()=>{drawWords();$("#lessonDictionary").showModal()});
 function drawWords(){let w=readWords();$("#wordCountSidebar").textContent=w.length;$("#myWords").innerHTML=w.slice().reverse().map(x=>'<small><b>'+esc(x.en)+'</b> — '+esc(x.ru)+'</small>').join("")||'<small>No words saved yet.</small>'}
-window.addWord=i=>{let words=readWords(),w=VOCAB[i];if(!words.some(x=>x.en.toLowerCase()===w[0].toLowerCase())){words.push({en:w[0],ru:w[2]});try{let obj=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");obj.words=words;localStorage.setItem(WORDS_KEY,JSON.stringify(obj))}catch(e){alert("Vocabulary saving unavailable")}}drawWords()};
+window.addWord=i=>{let words=readWords(),w=VOCAB[i];if(window.FinanceLive?.send("word",{en:w[0],ru:w[2]}))return;if(!words.some(x=>x.en.toLowerCase()===w[0].toLowerCase())){words.push({en:w[0],ru:w[2]});try{let obj=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");obj.words=words;localStorage.setItem(WORDS_KEY,JSON.stringify(obj))}catch(e){alert("Vocabulary saving unavailable")}}drawWords()};
 
 const lessonDivider = $("#lessonDivider");
 const layout = $(".layout");
@@ -478,6 +488,170 @@ lessonDivider.addEventListener("keydown", event => {
   event.preventDefault();
   changeVideoWidth(Number(lessonDivider.getAttribute("aria-valuenow")) + step);
 });
+const checks = {
+  v: {answers:VOCAB.map(word => String(defs.indexOf(word[1]))),feedback:"vf",score:"vocabScore"},
+  read: {answers:READING.map(row => String(row[2])),feedback:"rf",score:"readingScore"},
+  gap: {answers:GAPS.map(row => row[1]),feedback:"gf",score:"gapsScore"}
+};
+const completed = new Set();
+let celebrationTimer;
+function celebrate(){
+  const panel = $("#finance-celebrate");
+  panel.hidden = true;
+  clearTimeout(celebrationTimer);
+  requestAnimationFrame(() => {
+    panel.hidden = false;
+    celebrationTimer = setTimeout(() => { panel.hidden = true; }, 4000);
+  });
+}
+function gradeSection(key, animate = false){
+  const {answers,feedback,score} = checks[key];
+  let count = 0, attempted = 0;
+  answers.forEach((answer,index) => {
+    const value = String(getValue(key + index)).trim().toLowerCase().replace(/\s+/g," ");
+    const correct = value === answer;
+    attempted += Number(Boolean(value));
+    count += Number(correct);
+    const result = $("#" + feedback + index);
+    result.textContent = value ? (correct ? "✓ Correct" : "Try again") : "";
+    result.classList.toggle("good",correct);
+    result.classList.toggle("bad",Boolean(value) && !correct);
+    result.closest(".term,.question-item,.gap-item")?.classList.toggle("finance-correct",correct);
+  });
+  const label = $("#" + score);
+  if (label) label.textContent = attempted ? count + " / " + answers.length + " correct" : "";
+  if(count === answers.length){
+    if(animate && !completed.has(key)) celebrate();
+    completed.add(key);
+  }else completed.delete(key);
+}
+const sections = [
+  [], checks.v.answers.map((_,i) => "v"+i), checks.read.answers.map((_,i) => "read"+i),
+  checks.gap.answers.map((_,i) => "gap"+i), ["decision","decisionNotes"], ["roleNotes"], ["finalOpinion"], ["homework"]
+];
+const sectionGrades = [null,"v","read","gap"];
+const allowedKeys = new Set(sections.flat());
+const pending = new Map();
+function sendAnswer(key,value){
+  if (!window.FinanceLive?.connected()) return;
+  clearTimeout(pending.get(key)?.timer);
+  if (!/^(gap\d+|decisionNotes|roleNotes|finalOpinion|homework)$/.test(key)) {
+    FinanceLive.send("answer",{key,value});
+    return;
+  }
+  const timer=setTimeout(() => flushAnswer(key),250);
+  pending.set(key,{timer,value});
+}
+function flushAnswer(key) {
+  const item = pending.get(key);
+  if (!item) return;
+  clearTimeout(item.timer);
+  pending.delete(key);
+  FinanceLive.send("answer",{key,value:item.value});
+}
+window.addEventListener("pagehide",() => [...pending.keys()].forEach(flushAnswer));
+function redrawAnswer(key){
+  if(/^v\d+$/.test(key)){
+    definitionPickers[Number(key.slice(1))]?.dispatchEvent(new Event("finance-redraw"));
+    return;
+  }
+  document.querySelectorAll("input,textarea").forEach(input => {
+    if (input.type === "radio" && input.name === key) input.checked = input.value === getValue(key);
+    if (input.dataset.save === key || input.id === key) input.value = getValue(key);
+  });
+  if(key==="decision") $("#decisionAdvice").textContent=advice[getValue(key)]||"";
+  if(key==="homework") updateWords();
+}
+function clearSection(page){
+  sections[page]?.forEach(key=>{
+    clearTimeout(pending.get(key)?.timer);
+    pending.delete(key);
+    delete state.values[key];
+    redrawAnswer(key);
+  });
+  if(sectionGrades[page]) gradeSection(sectionGrades[page]);
+  save();
+}
+sections.forEach((keys,page)=>{
+  if(!keys.length)return;
+  const button=document.createElement("button");
+  button.type="button";
+  button.className="finance-reset";
+  button.textContent="×";
+  button.title="Сбросить ответы";
+  button.setAttribute("aria-label",button.title);
+  button.addEventListener("click",()=>{
+    clearSection(page);
+    window.FinanceLive?.send("reset",{page});
+  });
+  $("#page-"+page+" .activity-head").append(button);
+});
+Object.keys(checks).forEach(key=>gradeSection(key));
+let toastTimer;
+function showWord(word){
+  const toast=$("#finance-toast");
+  toast.replaceChildren();
+  const title=document.createElement("strong");
+  title.textContent=word.en;
+  const meaning=document.createElement("span");
+  meaning.textContent=word.ru;
+  toast.append(title,meaning);
+  toast.hidden=false;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{toast.hidden=true},5000);
+}
+document.addEventListener("finance-word",event=>{
+  drawWords();
+  if(event.detail.notify)showWord(event.detail.word);
+});
+document.addEventListener("finance-connect",()=>{sections.forEach((keys,page)=>{if(keys.length)clearSection(page)});});
+document.addEventListener("finance-ready",()=>{
+  drawWords();
+  document.querySelectorAll("#finance-chat-form input,#finance-chat-form button").forEach(control=>{control.disabled=false});
+  $(".finance-login").hidden=true;
+});
+document.addEventListener("finance-event",event=>{
+  const {kind,payload,initial,own,teacher}=event.detail;
+  const role=teacher?"Преподаватель":"Ученик";
+  if(kind==="answer" && allowedKeys.has(payload.key) && typeof payload.value==="string"){
+    const key=payload.key;
+    if(!pending.has(key)){
+      state.values[key]=payload.value;
+      redrawAnswer(key);
+      const type=Object.keys(checks).find(name=>key.startsWith(name) && /^\d+$/.test(key.slice(name.length)));
+      if(type) gradeSection(type,!initial && !own);
+      save();
+    }
+    if(!initial && !own) $("#finance-activity").textContent=role+" изменил ответ";
+  }
+  if(kind==="reset" && Number.isInteger(payload.page) && sections[payload.page]){
+    clearSection(payload.page);
+    if(!initial && !own) $("#finance-activity").textContent=role+" сбросил задание";
+  }
+  if(kind==="page" && !initial && !own && Number.isInteger(payload.page) && LESSONS[payload.page]){
+    $("#finance-activity").textContent=role+" открыл "+LESSONS[payload.page].label;
+  }
+  if(kind==="chat" && typeof payload.text==="string"){
+    const message=document.createElement("li");
+    const author=document.createElement("strong");
+    author.textContent=own?"Вы":role;
+    const body=document.createElement("span");
+    body.textContent=payload.text;
+    message.append(author,body);
+    const list=$("#finance-messages");
+    list.append(message);
+    list.scrollTop=list.scrollHeight;
+  }
+});
+$("#finance-chat-form").addEventListener("submit",event=>{
+  event.preventDefault();
+  const input=event.currentTarget.querySelector("input");
+  const value=input.value.trim();
+  if(value && window.FinanceLive?.send("chat",{text:value}))input.value="";
+});
+["back","next"].forEach(id=>$("#"+id).addEventListener("click",()=>{
+  window.FinanceLive?.send("page",{page:state.page});
+}));
 drawWords();go(location.hash === "#homework" ? LESSONS.length - 1 : state.page);
 
 
@@ -580,6 +754,10 @@ drawWords();go(location.hash === "#homework" ? LESSONS.length - 1 : state.page);
    if(!phrase||!translation)return;
    const ru=/[А-Яа-яЁё]/.test(phrase);
    const word={en:ru?translation:phrase,ru:ru?phrase:translation};
+   if(window.FinanceLive?.send("word",word)){
+    saveBtn.textContent="✓";saveBtn.disabled=true;
+    return;
+   }
    try{
     const data=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");
     data.words=Array.isArray(data.words)?data.words:[];
