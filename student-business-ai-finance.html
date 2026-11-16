@@ -239,6 +239,25 @@ dialog h2{font-family:'Playfair Display',Georgia,serif}
 @media(max-width:900px){.vocabulary-home{gap:14px}.vocab-feature{padding:28px 20px;min-height:230px;gap:10px}.vocab-feature__icon{width:55px;height:55px;border-radius:15px}.vocab-feature__icon svg{width:37px;height:37px}.vocab-feature__art{opacity:.65;right:0}.vocab-feature__copy strong{font-size:25px}.vocab-feature__copy>span:not(.vocab-feature__meta){font-size:13px}}
 @media(max-width:650px){.vocabulary-home{grid-template-columns:1fr;margin:26px 0}.vocab-feature{min-height:207px;padding:28px 22px;border-radius:19px}.vocab-feature__art{width:170px;height:120px;right:4px;bottom:2px}.vocab-feature__copy{max-width:74%;padding-top:6px}.vocab-feature__arrow{right:17px;top:17px;width:34px;height:34px;font-size:27px}.vocab-feature__icon{width:53px;height:53px}}
 @media(prefers-reduced-motion:reduce){.vocab-feature{transition:none}.vocab-feature:hover{transform:none}}
+
+/* Two action panels: practice launch and future conversational AI. */
+.vocab-feature--action{cursor:default;min-height:260px;padding:36px 30px 98px;transform:none!important}
+.vocab-feature--action:hover{transform:none;box-shadow:0 5px 22px #5477ab0c}
+.vocab-feature--action .vocab-feature__copy{max-width:76%;padding-top:10px}
+.vocab-feature--action .vocab-feature__copy strong{font-family:'Manrope',Arial,sans-serif;font-size:clamp(22px,1.75vw,27px);letter-spacing:-.045em}
+.vocab-feature--action .vocab-feature__art{width:175px;height:135px;bottom:14px;right:11px;opacity:.96}
+.vocab-feature--action .vocab-feature__art--cards{right:12px;bottom:23px}
+.vocab-feature--action .flashcard{width:120px;height:88px}
+.vocab-feature--action .flashcard--front{font-size:17px}
+.vocab-feature__cta{position:absolute;bottom:29px;left:30px;z-index:4;background:linear-gradient(180deg,#168dff,#0362e0);border:0;color:white;padding:13px 23px;min-height:46px;border-radius:11px;font:800 15px 'Manrope',Arial,sans-serif;cursor:pointer;box-shadow:0 6px 15px #1874ea2a;transition:filter .15s ease}
+.vocab-feature__cta:hover{filter:brightness(1.07)}
+.vocab-feature__cta span{margin-left:10px;font-size:19px;vertical-align:-1px}
+.vocab-feature__cta--disabled{background:#a8b8ce;color:white;box-shadow:none;cursor:not-allowed}
+.vocab-feature__cta--disabled:hover{filter:none}
+.vocab-feature--ai{background:linear-gradient(135deg,#fafaff,#edf1ff 65%,#dce6ff)}
+.vocab-feature__art--robot svg{height:100%;width:100%;filter:drop-shadow(0 6px 8px #6898d328)}
+@media(max-width:900px){.vocab-feature--action{min-height:245px;padding:25px 20px 83px}.vocab-feature__cta{left:20px;bottom:22px;padding:11px 17px}.vocab-feature--action .vocab-feature__art{width:135px;right:4px}.vocab-feature--action .vocab-feature__copy strong{font-size:21px}}
+@media(max-width:650px){.vocab-feature--action{min-height:220px;padding:25px 20px 78px}.vocab-feature--action .vocab-feature__art{width:145px;height:120px}.vocab-feature--action .vocab-feature__copy{max-width:72%}.vocab-feature--action .vocab-feature__copy strong{font-size:21px}.vocab-feature__cta{bottom:19px}}
 </style>
 </head>
 <body>
@@ -255,19 +274,19 @@ dialog h2{font-family:'Playfair Display',Georgia,serif}
 <section class="card lesson-card"><small>Следующее занятие</small><span class="illustration lesson-art" aria-hidden="true"><svg viewBox="0 0 225 195" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="calBlue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0eaff7"/><stop offset="1" stop-color="#3d7fdb"/></linearGradient></defs><circle cx="113" cy="99" r="91" fill="#c3efff"/><g transform="rotate(7 110 93)"><rect x="34" y="49" width="145" height="118" rx="14" fill="#eaf8ff" stroke="#8dbce3" stroke-width="3"/><path d="M34 63q0-14 14-14h117q14 0 14 14v25H34Z" fill="url(#calBlue)"/><g stroke="#9fb6d3" stroke-width="5" fill="none"><path d="M71 56V37q0-15 11-15t11 15v19M130 56V37q0-15 11-15t11 15v19"/></g><g fill="#d8e8fa"><rect x="51" y="101" width="25" height="20" rx="4"/><rect x="84" y="101" width="25" height="20" rx="4"/><rect x="117" y="101" width="25" height="20" rx="4"/><rect x="51" y="129" width="25" height="20" rx="4"/><rect x="84" y="129" width="25" height="20" rx="4"/><rect x="117" y="129" width="25" height="20" rx="4"/></g><rect x="84" y="101" width="25" height="20" rx="4" fill="#ffc84d"/></g><circle cx="172" cy="144" r="40" fill="#fff" stroke="#426fbd" stroke-width="8"/><circle cx="172" cy="144" r="29" fill="#f8fcff"/><path d="M172 122v23l15 9" fill="none" stroke="#285396" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><h2>Суббота в 11:00 МСК</h2><p>AI in Finance — Lesson 2</p><div class="actions"><a class="primary" href="business-ai-finance-b2-02.html"><svg style="width:19px;height:19px;vertical-align:-4px;margin-right:6px" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="2" y="5" width="14" height="14" rx="3"/><path d="m16 10 6-4v12l-6-4Z"/></svg>К уроку</a><button class="link" type="button" disabled>Перенести</button><span aria-hidden="true">·</span><a class="link" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=AI%20in%20Finance&amp;dates=20261121T080000Z%2F20261121T085500Z">Добавить в календарь <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></a></div></section>
 </div>
 
-<section class="vocabulary-home" aria-label="Словарь и тренировки слов">
-  <button class="vocab-feature vocab-feature--dictionary" id="dictionaryCard" type="button" aria-haspopup="dialog" aria-controls="words">
-    <span class="vocab-feature__icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><rect x="9" y="6" width="30" height="35" rx="5" fill="#2B7FF0"/><path d="M14 11h20v21H14z" fill="#DCEEFF"/><text x="16" y="27" font-size="15" font-family="Georgia,serif" fill="#215EB8" font-weight="bold">Aa</text><path d="M14 37h19" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></span>
-    <span class="vocab-feature__copy"><strong>Словарь</strong><span>Ваши слова и фразы</span><span class="vocab-feature__meta" id="vocabCount">Проверяем словарь…</span></span>
-    <span class="vocab-feature__art vocab-feature__art--cards" aria-hidden="true"><span class="flashcard flashcard--back"></span><span class="flashcard flashcard--front">finance <svg viewBox="0 0 24 24" fill="none" stroke="#238bea" stroke-width="2.2" stroke-linecap="round"><path d="M5 9H2v6h3l5 4V5L5 9Z"/><path d="M14 8a6 6 0 0 1 0 8M17 5a10 10 0 0 1 0 14"/></svg></span></span>
-    <span class="vocab-feature__arrow" aria-hidden="true">›</span>
-  </button>
-  <button class="vocab-feature vocab-feature--practice" id="practiceCard" type="button" aria-haspopup="dialog" aria-controls="practiceDialog">
+<section class="vocabulary-home" aria-label="Тренировки и искусственный интеллект">
+  <div class="vocab-feature vocab-feature--practice vocab-feature--action">
     <span class="vocab-feature__icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="17" stroke="#287DEF" stroke-width="5"/><circle cx="24" cy="24" r="10" stroke="#80B5FF" stroke-width="4"/><circle cx="24" cy="24" r="4" fill="#287DEF"/><path d="M24 24 39 9m0 0h-9m9 0v9" stroke="#154CA7" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-    <span class="vocab-feature__copy"><strong>Тренировки слов</strong><span>Закрепляйте лексику<br>в интерактивных форматах</span><span class="vocab-feature__meta">Карточки · Повторение</span></span>
-    <span class="vocab-feature__art vocab-feature__art--target" aria-hidden="true"><svg viewBox="0 0 150 140" fill="none"><circle cx="66" cy="72" r="52" fill="#DCE9FF"/><circle cx="66" cy="72" r="43" stroke="#397FF0" stroke-width="12"/><circle cx="66" cy="72" r="26" stroke="#97BCFF" stroke-width="10"/><circle cx="66" cy="72" r="10" fill="#2875DE"/><path d="m66 72 54-51" stroke="#E5A42D" stroke-width="6" stroke-linecap="round"/><path d="m120 21 3-15-11 9-5-11-5 23" fill="#F5C256" stroke="#CF9126" stroke-width="2"/><rect x="84" y="91" width="60" height="40" rx="7" fill="white" transform="rotate(9 84 91)"/><path d="m103 109 5 5 10-12" stroke="#22B66A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-    <span class="vocab-feature__arrow" aria-hidden="true">›</span>
-  </button>
+    <span class="vocab-feature__copy"><strong>Тренировки слов</strong><span>Закрепляйте лексику из урока<br>в разных форматах</span><span class="vocab-feature__meta" id="vocabCount">Проверяем словарь…</span></span>
+    <span class="vocab-feature__art vocab-feature__art--cards" aria-hidden="true"><span class="flashcard flashcard--back"></span><span class="flashcard flashcard--front">finance <svg viewBox="0 0 24 24" fill="none" stroke="#238bea" stroke-width="2.2" stroke-linecap="round"><path d="M5 9H2v6h3l5 4V5L5 9Z"/><path d="M14 8a6 6 0 0 1 0 8M17 5a10 10 0 0 1 0 14"/></svg></span></span>
+    <button class="vocab-feature__cta" type="button" id="practiceCard" aria-haspopup="dialog" aria-controls="practiceDialog">Тренировать слова <span aria-hidden="true">→</span></button>
+  </div>
+  <div class="vocab-feature vocab-feature--ai vocab-feature--action">
+    <span class="vocab-feature__icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="m23 5 4.5 12L40 22l-12.5 4.5L23 39l-4.5-12.5L6 22l12.5-5Z" fill="#3F86E6"/><path d="m38 3 2 5 5 2-5 2-2 5-2-5-5-2 5-2Z" fill="#8FBCFF"/></svg></span>
+    <span class="vocab-feature__copy"><strong>Поговорить с ИИ</strong><span>Практикуйте английский<br>в диалоге с умным ассистентом</span><span class="vocab-feature__meta">Голосовой собеседник</span></span>
+    <span class="vocab-feature__art vocab-feature__art--robot" aria-hidden="true"><svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="robotMetal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#9bbdf4"/></linearGradient><linearGradient id="robotFace" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1a3675"/><stop offset="1" stop-color="#081e4c"/></linearGradient></defs><ellipse cx="92" cy="155" rx="49" ry="12" fill="#9bb8ea" opacity=".3"/><rect x="57" y="104" width="73" height="55" rx="24" fill="url(#robotMetal)" stroke="#a2b9e3"/><circle cx="68" cy="134" r="9" fill="#c3d8fb"/><circle cx="116" cy="134" r="9" fill="#c3d8fb"/><path d="M84 134q9-9 18 0" fill="none" stroke="#d5a23c" stroke-width="4" stroke-linecap="round"/><rect x="36" y="28" width="116" height="98" rx="42" fill="url(#robotMetal)" stroke="#9fbde8" stroke-width="4"/><rect x="44" y="39" width="100" height="75" rx="33" fill="url(#robotFace)"/><path d="M66 75q8-14 16 0M105 75q8-14 16 0" stroke="#6cdbff" stroke-width="7" stroke-linecap="round" fill="none"/><circle cx="36" cy="82" r="12" fill="#7ca8ec" stroke="white" stroke-width="4"/><circle cx="152" cy="82" r="12" fill="#7ca8ec" stroke="white" stroke-width="4"/><path d="m69 10-3 9m61-13 6 9" stroke="#429af3" stroke-width="6" stroke-linecap="round"/></svg></span>
+    <button class="vocab-feature__cta vocab-feature__cta--disabled" type="button" disabled aria-label="Поговорить с ИИ — в разработке">В разработке</button>
+  </div>
 </section>
 </main>
 
@@ -349,7 +368,7 @@ function openPractice() {
   practiceDialog.showModal();
 }
 document.querySelector('#openWords').addEventListener('click',openVocabulary);
-document.querySelector('#dictionaryCard').addEventListener('click',openVocabulary);
+
 document.querySelector('#practiceCard').addEventListener('click',openPractice);
 document.querySelector('#practiceFromWords').addEventListener('click',openPractice);
 document.querySelector('#revealWord').addEventListener('click',() => {
