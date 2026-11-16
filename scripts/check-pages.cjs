@@ -303,7 +303,18 @@ async function checkFinanceRoom(browser, origin) {
     });
     await tp.locator('#selectionTarget').fill('уточнённый прогноз');
     await tp.locator('#selectionSave').click();
-    await tp.waitForFunction(() => window.FinanceLive.words().some(word => word.ru === 'уточнённый прогноз'));
+    try {
+      await tp.waitForFunction(() => window.FinanceLive.words().some(word => word.ru === 'уточнённый прогноз'),undefined,{timeout:4000});
+    } catch (error) {
+      const state = await tp.evaluate(() => ({
+        text:document.querySelector('#selectionTarget').value,
+        selection:window.getSelection()?.toString(),
+        button:document.querySelector('#selectionSave').textContent,
+        status:document.querySelector('#finance-live-status').textContent,
+        words:window.FinanceLive.words()
+      }));
+      throw new Error('Edited translation was not saved: '+JSON.stringify({events,state}),{cause:error});
+    }
     for(const page of [sp,tp]){
       await page.locator('#finance-toast').filter({hasText:'уточнённый прогноз'}).waitFor();
       await page.getByRole('button',{name:'Dictionary',exact:true}).click();
