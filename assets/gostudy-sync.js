@@ -1152,13 +1152,19 @@
     };
     const pharmaThreeLabels = {"q0-0":"What does the speaker suggest before a wider launch?","q0-1":"Why might the Swedish results differ at this hospital?","q0-2":"Which outcomes does the speaker want to track?","q1-0":"What changed in the AI-supported group?","q1-1":"What does the 44% figure describe?","q1-2":"What could a hospital reasonably ask next?","q2-0":"What does 6.4 versus 5.0 per 1,000 show?","q2-1":"Which headline best fits the evidence?","pharmaPilot":"Решение о пробном запуске","pharmaHeadline":"Заголовок о результатах"};
     const pharmaThreeHomeworkLabels = {"q0-0":"What is the role of AI in the Swedish trial?","q0-1":"What can we say about 44%?","q0-2":"What would a sensible local pilot track?","q1-0":"Which line is suitable for a report?","q1-1":"A patient asks who reviews the scan. Which reply is clearest?"};
-    const courses = new Map(Object.entries(classroomCatalog).map(([id,course]) => [id,course.name]));
+    const financeCourse = 'business_ai_finance';
+    const financeLesson = 'business-ai-finance-b2-02.html';
+    const teacherCatalog = {...classroomCatalog,[financeCourse]:{
+      name:'AI in Finance · B2',
+      lessons:[{title:'AI in Finance · Lesson 2',lesson:financeLesson,homework:financeLesson+'#homework'}],
+    }};
+    const courses = new Map(Object.entries(teacherCatalog).map(([id,course]) => [id,course.name]));
     const addStudent = document.getElementById('teacher-add-student');
     const addStudentForm = addStudent?.querySelector('form');
     const addStudentStatus = document.getElementById('teacher-add-student-status');
     if (addStudentForm) {
       for (const [id,name] of courses) {
-        if (['travel_b2','country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(id)) continue;
+        if (id === financeCourse || ['travel_b2','country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(id)) continue;
         const option = document.createElement('option');
         option.value = id;
         option.textContent = name;
@@ -1199,7 +1205,7 @@
       if (count) count.textContent = 'Количество учеников '+new Set(students.map(student=>student.id)).size;
       for (const student of students) {
         const label = student.email || student.label;
-        const course = classroomCatalog[student.course]?.name || '';
+        const course = teacherCatalog[student.course]?.name || '';
         if (!(label+' '+(student.label || '')+' '+course).toLowerCase().includes(query)) continue;
         const row = document.createElement('div');
         row.className = 'teacher-student-row';
@@ -1217,7 +1223,7 @@
         info.append(name,subtitle,level);
         const enter = document.createElement('a');
         enter.className = 'teacher-enter-class';
-        enter.href = classroomLink(classroomCatalog[student.course].lessons.at(-1).lesson,student.id);
+        enter.href = classroomLink(teacherCatalog[student.course].lessons.at(-1).lesson,student.id);
         enter.textContent = '→ Войти в класс';
         const button = document.createElement('button');
         button.type = 'button';
@@ -1242,11 +1248,11 @@
     function renderStudent() {
       renderStudentList();
       const student = students.find(row => row.selection === studentPicker.value);
-      wordForm.hidden = !student || ['travel_b2','country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(student.course);
+      wordForm.hidden = !student || student.course === financeCourse || ['travel_b2','country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(student.course);
       wordItems(studentWords, student?.words);
       wordItems(assignedWords, student?.assigned);
       const classroom = document.getElementById('teacher-classroom');
-      const catalog = student && classroomCatalog[student.course];
+      const catalog = student && teacherCatalog[student.course];
       classroom.hidden = !catalog;
       const heading = document.getElementById('teacher-classroom-title');
       const lessonList = document.getElementById('teacher-classroom-lessons');
@@ -1320,12 +1326,20 @@
       try {
         const access = await token();
         const lookup = async () => {
-          if (studentEmails.size && students.every(student => studentEmails.has(student.id))) return;
+          if (studentEmails.size && students.every(student => student.course === financeCourse || studentEmails.has(student.id))) return;
           const response = await request('/rest/v1/rpc/gostudy_teacher_student_emails',{method:'POST',body:{}},access);
           if (!response.ok || !Array.isArray(response.data)) throw new Error('Не удалось загрузить почту учеников.');
           studentEmails = new Map(response.data.map(row => [row.id,row.email]));
         };
         const results = await Promise.allSettled([lookup(),...Array.from(courses, async ([course,label]) => {
+          if (course === financeCourse) {
+            const response = await request('/rest/v1/gostudy_finance_room?select=student_id&teacher_id=eq.' + encodeURIComponent(session.user.id), {}, access);
+            if (!response.ok || !Array.isArray(response.data)) throw new Error(label);
+            rosterByCourse.set(course, response.data.map(row => ({
+              id:row.student_id, label:'Михаил', course, selection:course+':'+row.student_id,
+            })));
+            return;
+          }
           const response = await request('/rest/v1/rpc/gostudy_' + course + '_teacher_view', {method:'POST',body:{}}, access);
           if (!response.ok || !Array.isArray(response.data)) throw new Error(label);
           rosterByCourse.set(course, response.data.map(row => ({...row,course,selection:course+':'+row.id})));

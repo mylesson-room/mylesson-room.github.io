@@ -28,6 +28,7 @@ async function checkFinanceRoom(browser, origin) {
         const session = JSON.stringify({user:{id}, access_token:'test-' + role, expires_at:Date.now() + 3600000});
         sessionStorage.setItem('gostudy-cloud-session-v1',session);
         localStorage.setItem('gostudy-' + role + '-session-v1',session);
+        if(role === 'student') localStorage.setItem('gostudy-business-ai-shared-v1', JSON.stringify({words:[{en:'stress test',ru:'стресс-тест'}]}));
       }, {id,role});
       await context.route('https://*.supabase.co/**', route => {
         const request = route.request();
@@ -45,7 +46,7 @@ async function checkFinanceRoom(browser, origin) {
           const cursor = Number(url.searchParams.get('seq').slice(3));
           return route.fulfill({json:events.filter(event=>event.seq > cursor)});
         }
-        return route.fulfill({status:404,json:[]});
+        return route.fulfill({json:[]});
       });
       await context.route('https://api.mymemory.translated.net/**', route => route.fulfill({
         json:{responseStatus:200,responseData:{translatedText:'прогнозируемый'}}
@@ -54,8 +55,23 @@ async function checkFinanceRoom(browser, origin) {
     const sp = await student.newPage();
     const tp = await teacher.newPage();
     const cabinet = await student.newPage();
-    await Promise.all([sp.goto(lessonUrl),tp.goto(lessonUrl+'?classStudent=finance'),cabinet.goto(origin+'/student-business-ai-finance.html')]);
+    await Promise.all([sp.goto(lessonUrl),tp.goto(origin+'/gostudy-teacher.html'),cabinet.goto(origin+'/student-business-ai-finance.html')]);
+    const pupilRow = tp.locator('.teacher-student-row').filter({hasText:'Михаил'});
+    await pupilRow.getByRole('link',{name:/Войти в класс/}).click();
+    await tp.waitForURL(lessonUrl + '?classStudent=' + studentId);
     await Promise.all([sp.getByText(status,{exact:true}).waitFor(),tp.getByText(status,{exact:true}).waitFor()]);
+
+    await cabinet.locator('#vocabCount').filter({hasText:'1 слово'}).waitFor();
+    await sp.getByRole('button',{name:'Dictionary',exact:true}).click();
+    await sp.getByRole('dialog').getByText('stress test',{exact:true}).waitFor();
+    await sp.getByRole('button',{name:'Close dictionary'}).click();
+    assert.equal(events.length,0,'Opening a classroom must not import local words implicitly');
+    await cabinet.locator('#openWords').click();
+    await cabinet.locator('#importFinanceWords').click();
+    await cabinet.locator('#financeImportStatus').filter({hasText:'доступны на других устройствах'}).waitFor();
+    await cabinet.locator('#words').getByRole('button',{name:'Закрыть'}).click();
+    await tp.locator('#finance-toast').filter({hasText:'стресс-тест'}).waitFor();
+    assert.equal(events[0].payload.en,'stress test');
 
     const word = tp.getByText('Forecasted cash balance',{exact:true});
     const box = await word.boundingBox();
@@ -67,9 +83,9 @@ async function checkFinanceRoom(browser, origin) {
       await page.getByRole('dialog').getByText('прогнозируемый',{exact:false}).waitFor();
       await page.getByRole('button',{name:'Close dictionary'}).click();
     }
-    await cabinet.locator('#vocabCount').filter({hasText:'1 слово'}).waitFor();
+    await cabinet.locator('#vocabCount').filter({hasText:'2 слова'}).waitFor();
     await cabinet.locator('#practiceCard').click();
-    await cabinet.locator('#practiceQuestion').filter({hasText:/forecasted|прогнозируемый/i}).waitFor();
+    await cabinet.locator('#practiceQuestion').filter({hasText:/forecasted|прогнозируемый|stress test|стресс-тест/i}).waitFor();
 
     await sp.getByRole('button',{name:'Continue',exact:true}).click();
     await tp.locator('#page-1.active').waitFor();
@@ -103,7 +119,7 @@ async function checkFinanceRoom(browser, origin) {
       await sender.getByRole('button',{name:'Отправить'}).click();
       await receiver.locator('#finance-messages').getByText(note,{exact:true}).waitFor();
     }
-    console.log('business-ai-finance: vocabulary, training, chat, navigation, answers, shared reset and celebration verified in two contexts');
+    console.log('business-ai-finance: teacher roster, local word recovery, vocabulary, training, chat, navigation, answers, shared reset and celebration verified in two contexts');
   } finally {
     await student.close();
     await teacher.close();

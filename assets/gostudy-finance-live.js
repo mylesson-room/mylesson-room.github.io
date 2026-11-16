@@ -58,10 +58,30 @@
       busy = false;
     }
   }
+  function localWords() {
+    try {
+      const snapshot = JSON.parse(localStorage.getItem("gostudy-business-ai-shared-v1") || "{}");
+      if (!Array.isArray(snapshot.words)) return [];
+      return snapshot.words.filter(word => typeof word?.en === "string" && word.en.trim())
+        .map(word => ({en:word.en.trim(),ru:typeof word.ru === "string" ? word.ru.trim() : ""}));
+    } catch { return []; }
+  }
+  function missingLocalWords() {
+    if (room?.student_id !== auth.userId() || !room) return [];
+    return localWords().filter(word => word.ru && !words.has(word.en.toLowerCase()));
+  }
   window.FinanceLive = {
     connected: () => Boolean(room),
     teacher: () => room?.teacher_id === auth.userId(),
-    words: () => [...words.values()],
+    words() {
+      const combined = new Map();
+      if (!room || room.student_id === auth.userId()) {
+        for (const word of localWords()) combined.set(word.en.toLowerCase(),word);
+      }
+      for (const [key,word] of words) combined.set(key,word);
+      return [...combined.values()];
+    },
+    missingLocalWords,
     send(kind, payload) {
       if (!room) return false;
       const event = {id:crypto.randomUUID(),kind,payload};

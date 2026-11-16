@@ -358,8 +358,10 @@ dialog h2{font-family:'Playfair Display',Georgia,serif}
   <div class="dialog-top"><h2 id="wordsTitle">Мой словарь</h2><form method="dialog"><button aria-label="Закрыть">×</button></form></div>
   <p class="dialog-description">Слова, добавленные во время занятий AI in Finance.</p>
   <p id="wordsTotal" class="dialog-description" aria-live="polite"></p>
+  <button type="button" id="importFinanceWords" class="secondary" hidden>Перенести старые слова из этого браузера</button>
+  <p id="financeImportStatus" class="dialog-description" role="status"></p>
   <ul id="wordsList"></ul>
-  <p id="wordsEmpty" hidden>Слов пока нет. Добавьте слова в уроке — они появятся здесь на этом устройстве.</p>
+  <p id="wordsEmpty" hidden>Слов пока нет. Добавьте слова в уроке — они появятся здесь.</p>
   <div class="dialog-actions"><button type="button" class="primary" id="practiceFromWords">Тренировать слова</button></div>
 </dialog>
 <dialog id="practiceDialog" class="vocab-dialog practice-dialog" aria-labelledby="practiceTitle">
@@ -487,7 +489,30 @@ window.addEventListener('pageshow',updateVocabularyCount);
 window.addEventListener('storage',event => {if(event.key === WORDS_STORAGE_KEY)updateVocabularyCount();});
 updateVocabularyCount();
 </script>
-<script src="assets/gostudy-sync.js?v=finance-live-1"></script><script src="assets/gostudy-finance-live.js?v=1"></script>
-<script>document.addEventListener("finance-ready", updateVocabularyCount);document.addEventListener("finance-word", updateVocabularyCount);</script>
+<script src="assets/gostudy-sync.js?v=finance-roster-2"></script><script src="assets/gostudy-finance-live.js?v=finance-roster-2"></script>
+<script>
+const importButton = document.querySelector("#importFinanceWords");
+const importStatus = document.querySelector("#financeImportStatus");
+function refreshFinanceVocabulary() {
+  updateVocabularyCount();
+  const missing = window.FinanceLive?.missingLocalWords() || [];
+  importButton.hidden = missing.length === 0;
+  if (!missing.length && importButton.disabled) importStatus.textContent = "Старые слова теперь доступны на других устройствах.";
+  if (wordsDialog.open) openVocabulary();
+}
+importButton.addEventListener("click", () => {
+  const words = window.FinanceLive?.missingLocalWords() || [];
+  if (!words.length) return;
+  importButton.disabled = true;
+  importStatus.textContent = "Переносим слова в ваш аккаунт…";
+  for (const word of words) FinanceLive.send("word",word);
+  setTimeout(() => {
+    importButton.disabled = false;
+    if (window.FinanceLive?.missingLocalWords().length) importStatus.textContent = "Часть слов ещё не перенеслась. Можно повторить.";
+  },12000);
+});
+document.addEventListener("finance-ready", refreshFinanceVocabulary);
+document.addEventListener("finance-word", refreshFinanceVocabulary);
+</script>
 </body>
 </html>
