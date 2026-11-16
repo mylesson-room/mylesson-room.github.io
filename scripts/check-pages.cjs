@@ -87,10 +87,17 @@ async function checkFinanceRoom(browser, origin) {
     await cabinet.locator('#practiceCard').click();
     await cabinet.locator('#practiceQuestion').filter({hasText:/forecasted|прогнозируемый|stress test|стресс-тест/i}).waitFor();
 
-    assert.equal(await sp.getByRole('button',{name:'Continue',exact:true}).isDisabled(),true,'Student must not lead navigation');
-    await tp.getByRole('button',{name:'Continue',exact:true}).click();
+    // Student can explore independently; this must not navigate the teacher.
+    await sp.getByRole('button',{name:'Continue',exact:true}).click();
     await sp.locator('#page-1.active').waitFor();
+    await sp.getByRole('button',{name:'Continue',exact:true}).click();
+    await sp.locator('#page-2.active').waitFor();
+    assert.equal(await tp.locator('#page-0.active').count(),1,'Student navigation must not move the teacher');
+    assert.equal(events.filter(event=>event.kind==='page'&&event.actor===studentId).length,0,'Student page changes must not broadcast');
+    // A subsequent teacher click always brings the student to the teacher's selected page.
+    await tp.getByRole('button',{name:'Continue',exact:true}).click();
     await tp.locator('#page-1.active').waitFor();
+    await sp.locator('#page-1.active').waitFor();
     assert.equal(await sp.locator('#finance-activity').isVisible(),false,'Technical navigation notices must remain hidden');
     const pick = async (page,index,choice) => {
       const picker = page.locator('.definition-picker').nth(index);
