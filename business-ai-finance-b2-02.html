@@ -134,7 +134,7 @@ body{background:#fff;font-size:16px;line-height:1.48;color:var(--ink)}
 button,input,select,textarea{transition:border-color .15s,background .15s,box-shadow .15s,transform .15s}
 button:hover:not(:disabled){filter:brightness(.98)}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #50ceea;outline-offset:2px}
-header{height:54px;padding:0 30px;border-bottom:1px solid #e4e8f2;box-shadow:0 2px 14px #202b5409}
+header{height:46px;padding:0 30px;border-bottom:1px solid #e4e8f2;box-shadow:0 2px 14px #202b5409}
 .brand{font-size:31px;font-weight:850;letter-spacing:-1.5px;color:#0baac8}
 .brand span{color:#0baac8}
 .header-right{gap:16px}
@@ -237,7 +237,7 @@ header{height:54px;padding:0 30px;border-bottom:1px solid #e4e8f2;box-shadow:0 2
 .pager-right{gap:14px}.pager #pageCount{color:#8b93a5}
 @media(max-width:1250px){.save-indicator{display:none}.layout{grid-template-columns:minmax(260px,1fr) minmax(0,2fr)}.lesson{padding:22px 20px 110px}.pager{margin-left:-20px;margin-right:-20px;padding:13px 20px}.term{grid-template-columns:1fr}.term .feedback{grid-column:1}.reading-layout{grid-template-columns:1fr}.case-column{grid-template-columns:repeat(3,minmax(0,1fr))}.question-item{grid-template-columns:1fr}.question-item label,.question-item .result{grid-column:1}}
 @media(max-width:800px){.layout{height:auto;display:block;overflow:visible}.sidebar{height:auto;position:static;border:0;padding:12px}.video-workspace{display:grid;grid-template-columns:1.1fr 1fr}.video-top{grid-column:1/-1}.video-preview{aspect-ratio:4/3;min-height:160px}.video-actions{align-items:flex-start;flex-direction:column;justify-content:center}.video-help{display:none}.lesson-sidebar{background:transparent}.lesson-sidebar .nav{display:flex;overflow-x:auto}.nav button{white-space:nowrap;flex:none}.lesson{height:auto;overflow:visible;padding:12px 18px 100px}.hero{padding:0 5px 15px}.panel{padding:5px;min-height:400px}.pager{position:sticky;bottom:0;margin:0 -18px -100px;padding:12px 18px}.header-progress{display:none}.decision-metrics{grid-template-columns:1fr 1fr 1fr}}
-@media(max-width:540px){header{height:48px;padding:0 12px}.brand{font-size:24px}.header-right{gap:5px}.header-right a{padding:7px 8px;font-size:11px}.hero h1{font-size:27px}.hero-chips{gap:5px}.hero-chips span{padding:5px 7px}.activity-head{gap:12px}.activity-icon{height:47px;width:47px;font-size:22px}.activity-titles h2{font-size:26px}.section-subtitle{font-size:14px}.scene-chart{display:block;padding:17px}.scene-copy strong{font-size:37px}.scene-chart svg{height:110px}.scene-footer{font-size:11px;padding:12px}.case-column{grid-template-columns:1fr}.decision-metrics{grid-template-columns:1fr}.pager #pageCount{display:none}.pager .outline{min-width:0}.pager .primary{min-width:0}.pager-right{gap:6px}.pager{padding:10px}.pager .primary{padding:10px 12px}}
+@media(max-width:540px){header{height:41px;padding:0 12px}.brand{font-size:24px}.header-right{gap:5px}.header-right a{padding:7px 8px;font-size:11px}.hero h1{font-size:27px}.hero-chips{gap:5px}.hero-chips span{padding:5px 7px}.activity-head{gap:12px}.activity-icon{height:47px;width:47px;font-size:22px}.activity-titles h2{font-size:26px}.section-subtitle{font-size:14px}.scene-chart{display:block;padding:17px}.scene-copy strong{font-size:37px}.scene-chart svg{height:110px}.scene-footer{font-size:11px;padding:12px}.case-column{grid-template-columns:1fr}.decision-metrics{grid-template-columns:1fr}.pager #pageCount{display:none}.pager .outline{min-width:0}.pager .primary{min-width:0}.pager-right{gap:6px}.pager{padding:10px}.pager .primary{padding:10px 12px}}
 @media print{.lesson{height:auto;overflow:visible}.pager{display:none!important}}
 
 /* Selection translation popup · Google Translate action + contextual preview */
@@ -268,8 +268,9 @@ header{height:54px;padding:0 30px;border-bottom:1px solid #e4e8f2;box-shadow:0 2
 @media(max-width:720px){.translate-launcher{right:12px;bottom:85px;padding:11px 14px}.translate-launcher span{font-size:12px}}
 @media print{.translate-launcher{display:none}}
 .lesson-brand{display:inline-flex;align-items:center;flex:none}
-.lesson-brand svg{width:48px;height:37px}
-.header-right .lesson-dictionary-button{display:inline-flex;align-items:center;gap:6px;background:#edf7fc;border:0;color:#087faa;border-radius:12px;font-weight:700;padding:9px 14px;white-space:nowrap}
+.lesson-brand svg{width:41px;height:32px}
+.header-right .lesson-dictionary-button{display:inline-flex;align-items:center;gap:6px;background:#edf7fc;border:0;color:#087faa;border-radius:12px;font-weight:700;height:36px;padding:0 12px;white-space:nowrap}
+.lesson-dictionary-button svg{width:15px;height:15px}
 .header-right .lesson-dictionary-button:hover{background:#e0f1fa}
 .lesson-dictionary{width:min(440px,calc(100% - 32px));max-height:75vh;padding:20px;color:var(--ink);background:#fff;border:1px solid var(--stroke);border-radius:16px;box-shadow:0 18px 48px #18254b30}
 .lesson-dictionary::backdrop{background:#18254b55}
@@ -278,9 +279,10 @@ header{height:54px;padding:0 30px;border-bottom:1px solid #e4e8f2;box-shadow:0 2
 .lesson-dictionary-heading h2 span{font-size:13px;color:var(--muted);margin-left:5px}
 .lesson-dictionary-heading button{border:0;border-radius:8px;background:#edf7fc;color:#087faa;width:40px;height:40px;font-size:23px}
 .lesson-dictionary #myWords small{display:block;padding:8px 0;border-top:1px solid var(--stroke);overflow-wrap:anywhere}
-@media(max-width:540px){.lesson-brand svg{width:43px;height:34px}.header-right .lesson-dictionary-button{padding:7px 8px;font-size:11px}.lesson-dictionary-button svg{width:14px;height:14px}}
-.header-right .lesson-home-link{display:inline-grid;place-items:center;width:44px;height:44px;padding:0;flex:none}
+.header-right .lesson-home-link{display:inline-grid;place-items:center;width:36px;height:36px;padding:0;flex:none}
+.lesson-home-link svg{width:16px;height:16px}
 .header-right .lesson-home-link:hover{background:#e0f1fa}
+@media(max-width:540px){.lesson-brand svg{width:37px;height:29px}.header-right .lesson-dictionary-button{height:34px;padding:0 8px;font-size:11px}.lesson-dictionary-button svg{width:14px;height:14px}.header-right .lesson-home-link{width:34px;height:34px}}
 </style></head><body>
 <header><a class="brand lesson-brand" href="student-business-ai-finance.html" aria-label="My classroom"><svg viewBox="350 140 835 650" width="55" height="43" aria-hidden="true" focusable="false"><defs><linearGradient id="crownGold" x1="0" y1="1" x2=".72" y2="0" gradientUnits="objectBoundingBox"><stop stop-color="#3a2815"/><stop offset=".36" stop-color="#765019"/><stop offset=".68" stop-color="#e9ad50"/><stop offset=".83" stop-color="#9c621a"/><stop offset="1" stop-color="#d89b3e"/></linearGradient></defs><g fill="url(#crownGold)"><path d="M770 150Q786 246 865 257Q786 269 770 365Q754 269 675 257Q754 246 770 150Z"/><path d="M574 301Q580 341 614 346Q580 352 574 392Q568 352 533 346Q568 341 574 301ZM968 301Q974 341 1008 346Q974 352 968 392Q962 352 928 346Q962 341 968 301Z"/><path d="M360 379C535 516 710 570 770 327C830 570 1005 516 1176 381C1109 478 1065 557 1046 623L1041 619C1046 569 1060 523 1084 474C931 576 806 534 770 365C734 534 609 576 454 474C478 523 492 569 496 619L491 623C472 558 427 478 360 379Z"/><path d="M430 679C571 571 690 599 767 702C679 614 568 614 430 679ZM1108 679C967 571 850 599 773 702C861 614 970 614 1108 679Z"/><path d="M367 747C521 631 663 645 770 738C877 645 1018 631 1171 747C1009 674 868 669 770 782C672 669 530 674 367 747Z"/></g></svg></a><div class="header-right"><button type="button" class="lesson-dictionary-button" id="openLessonDictionary" aria-haspopup="dialog" aria-controls="lessonDictionary"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-3-2-6-2-9-1v13c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1v13"/></svg>Dictionary</button><a class="lesson-home-link" href="student-business-ai-finance.html" aria-label="Student dashboard"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v11h14V9m-9 11v-6h4v6"/></svg></a></div></header>
 <dialog class="lesson-dictionary" id="lessonDictionary" aria-labelledby="lessonDictionaryTitle">
