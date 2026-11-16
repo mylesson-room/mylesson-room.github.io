@@ -169,18 +169,18 @@ async function checkMigratedRooms(browser, origin) {
       await tp.waitForURL(url => url.pathname === '/'+lesson.path && url.searchParams.get('classStudent') === studentId);
       for (const page of [sp,tp]) {
         await page.getByText('Онлайн · общая комната',{exact:true}).waitFor();
-        const tools = await page.locator('.v1-room-video').boundingBox();
-        const content = await page.locator('.room .sheet,.shell > main').boundingBox();
+        const tools = await page.locator('.video-workspace').boundingBox();
+        const content = await page.locator('.lesson').boundingBox();
         assert.ok(tools.x+tools.width <= content.x+1,'video and chat should be to the left of the lesson');
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth+1),'horizontal overflow');
       }
-      await sp.getByRole('button',{name:/Далее|Next/}).first().click();
+      await sp.getByRole('button',{name:'Continue',exact:true}).click();
       if (lesson.course === 'art-b1') {
         try {
           await sp.locator('#v1').waitFor({timeout:8000});
           await tp.locator('#v1').waitFor({timeout:8000});
         } catch (error) {
-          throw new Error('Art navigation: '+JSON.stringify({errors,events,student:await sp.locator('#title').textContent(),teacher:await tp.locator('#title').textContent()}),{cause:error});
+          throw new Error('Art navigation: '+JSON.stringify({errors,events,student:await sp.locator('.page.active h2').first().textContent(),teacher:await tp.locator('.page.active h2').first().textContent()}),{cause:error});
         }
         await sp.locator('#v1').selectOption('the focal point');
         await tp.locator('#v1.correct').waitFor();
@@ -189,23 +189,23 @@ async function checkMigratedRooms(browser, origin) {
         await tp.locator('#v1').selectOption('the focal point');
         await sp.locator('#v1.correct').waitFor();
         await tp.getByRole('button',{name:'Dictionary'}).click();
-        await tp.locator('#newWord').fill('shared entry');
-        await tp.locator('#newMeaning').fill('общее слово');
-        await tp.getByRole('button',{name:/Save word/}).click();
+        await tp.locator('#dictionarySource').fill('shared entry');
+        await tp.locator('#dictionaryTranslation').fill('общее слово');
+        await tp.locator('#dictionaryAddForm button[type=submit]').click();
       } else {
         const step = await sp.locator('#lesson-data').evaluate(node => JSON.parse(node.textContent).steps.findIndex(step => step.type === 'choice'));
         assert.ok(step >= 1);
-        for (let i=1;i<step;i++) await sp.getByRole('button',{name:/Далее/}).first().click();
-        await tp.locator('fieldset .options label').first().waitFor();
-        await sp.locator('fieldset .options label').first().click();
-        await tp.locator('fieldset input[type=radio]:checked').first().waitFor();
+        for (let i=1;i<step;i++) await sp.getByRole('button',{name:'Continue',exact:true}).click();
+        await tp.locator('.page.active fieldset .options label').first().waitFor();
+        await sp.locator('.page.active fieldset .options label').first().click();
+        await tp.locator('.page.active fieldset input[type=radio]:checked').first().waitFor();
         await tp.getByRole('button',{name:'Сбросить ответы'}).click();
-        await sp.waitForFunction(() => !document.querySelector('fieldset input[type=radio]:checked'));
-        await tp.locator('fieldset .options label').first().click();
-        await sp.locator('fieldset input[type=radio]:checked').first().waitFor();
+        await sp.waitForFunction(() => !document.querySelector('.page.active fieldset input[type=radio]:checked'));
+        await tp.locator('.page.active fieldset .options label').first().click();
+        await sp.locator('.page.active fieldset input[type=radio]:checked').first().waitFor();
         await tp.evaluate(() => window.FinanceLive.send('word',{en:'shared entry',ru:'общее слово'}));
       }
-      await sp.locator('.v1-room-word').filter({hasText:'shared entry — общее слово'}).waitFor();
+      await sp.locator('#finance-toast').filter({hasText:'shared entry'}).waitFor();
       await cabinet.goto(origin+'/'+lesson.cab);
       await cabinet.getByRole('button',{name:/Тренировки слов/}).click();
       const expectedWord = lesson.course === 'art-b1' ? 'old word' : 'shared entry';
@@ -214,7 +214,7 @@ async function checkMigratedRooms(browser, origin) {
       await sp.getByRole('button',{name:'Отправить'}).click();
       await tp.getByRole('log').getByText(/Classroom check/).waitFor();
       await sp.setViewportSize({width:390,height:844});
-      const pager = sp.locator('.step-nav,.page-controls');
+      const pager = sp.locator('.pager');
       await pager.waitFor();
       const mobile = await pager.evaluate(node => {
         const box = node.getBoundingClientRect();
@@ -223,6 +223,7 @@ async function checkMigratedRooms(browser, origin) {
       assert.equal(mobile.position,'fixed','navigation should stay visible on an iPhone-width screen');
       assert.ok(Math.abs(mobile.bottom-mobile.viewport) <= 1 && Math.abs(mobile.width-mobile.screenWidth) <= 1,'navigation fills the bottom edge on mobile');
       assert.ok(mobile.contentWidth <= mobile.screenWidth+1,lesson.course+': mobile lesson overflows '+JSON.stringify(mobile));
+      assert.deepEqual(errors,[]);
       console.log(lesson.course + ': v1 cabinet, answers, reset, vocabulary, chat and mobile layout verified');
     } finally {
       await student.close();

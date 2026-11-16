@@ -12,7 +12,7 @@
 <div class="hello"><h1>Хев а найс дей!</h1></div>
 <div class="cards">
 <a id="assignment" class="card homework homework-link" href="%%HOMEWORK%%" aria-label="Открыть домашнее задание"><h2>Домашнее задание</h2><p class="homework-subject">%%TITLE%%</p>%%HOMEWORK_DURATION%%<span class="tile-arrow" aria-hidden="true">›</span></a>
-<a class="card lesson-card lesson-card-link" href="%%LESSON%%" aria-label="%%LESSON_LABEL%%"><small>Текущий урок · %%COURSE%%</small><h2>%%TITLE%%</h2><span class="lesson-date">Открыть урок</span><span class="tile-arrow" aria-hidden="true">›</span></a>
+<a class="card lesson-card lesson-card-link" href="%%LESSON%%" aria-label="%%LESSON_LABEL%%"><small>Текущий урок · %%COURSE%%</small><h2>%%TITLE%%</h2><span class="lesson-date">%%LESSON_NOTE%%</span><span class="tile-arrow" aria-hidden="true">›</span></a>
 </div>
 
 <section class="vocabulary-home" aria-label="Тренировки и искусственный интеллект">
@@ -35,6 +35,7 @@
 <dialog id="words" class="vocab-dialog" aria-labelledby="wordsTitle">
   <div class="dialog-top"><h2 id="wordsTitle">Мой словарь</h2><form method="dialog"><button aria-label="Закрыть">×</button></form></div>
   <p class="dialog-description">Слова, добавленные во время занятий %%TITLE%%.</p>
+%%IMPORT_WORDS%%
   <p id="wordsTotal" class="dialog-description" aria-live="polite"></p>
   <ul id="wordsList"></ul>
   <p id="wordsEmpty" hidden>Слов пока нет. Добавьте слова в уроке — они появятся здесь.</p>
@@ -58,6 +59,8 @@
   const values = {
     LESSON_LABEL:escape(settings.lessonLabel || "Открыть урок "+settings.course), CABINET:escape(settings.cabinet), COURSE:escape(settings.course), TITLE:escape(settings.title),
     HOMEWORK:escape(settings.homework), LESSON:escape(settings.lesson), STUDENT:escape(settings.student),
+    LESSON_NOTE:escape(settings.schedule || 'Открыть урок'),
+    IMPORT_WORDS:settings.importWords ? '<button type="button" id="importFinanceWords" class="secondary" hidden>Перенести старые слова из этого браузера</button><p id="financeImportStatus" role="status"></p>' : '',
     HOMEWORK_DURATION:settings.duration ? '<small>'+escape(settings.duration)+'</small>' : '', PREVIOUS:previous,
   };
   document.body.insertAdjacentHTML('afterbegin', markup.replace(/%%([A-Z_]+)%%/g, (_,key) => values[key]));

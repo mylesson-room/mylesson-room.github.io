@@ -1,13 +1,43 @@
+(async () => {
+const config = window.GoStudyLesson;
+const {vocab:VOCAB=[], reading:READING=[], gaps:GAPS=[], advice={}, key:STORAGE, wordsKey:WORDS_KEY} = config;
+const LESSONS = config.labels || config.steps;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const workbook = config.steps ? window.GoStudyExercises.render(config,esc) : null;
+const student = window.GoStudyFinanceAuth.classroomStudent;
+const stores = window.GoStudyStorage || localStorage;
+let cached = {};
 let state={page:0,values:{}};
-try{const old=document.body.dataset.classroomCourse?null:JSON.parse(localStorage.getItem(STORAGE)||"null");if(old&&typeof old==="object"){state.page=Math.max(0,Math.min(LESSONS.length-1,Number(old.page)||0));state.values=old.values&&typeof old.values==="object"?old.values:{}}}catch(e){}
-function save(){if(document.body.dataset.classroomCourse||window.FinanceLive?.connected())return;try{localStorage.setItem(STORAGE,JSON.stringify(state))}catch(error){console.warn("Unable to save lesson progress on this device",error)}}
+if (config.preserve === 'cloud') await window.GoStudyV1Progress?.ready;
+try {
+  if (workbook && student && config.preserve === 'cloud') cached = {answers:await window.GoStudyTravelAnswers.read()};
+  else if (workbook && !student) cached = JSON.parse(stores.getItem(STORAGE)||'{}') || {};
+  else if (!document.body.dataset.classroomCourse) cached = JSON.parse(localStorage.getItem(STORAGE)||'{}') || {};
+} catch {}
+state.page = Math.max(0,Math.min(LESSONS.length-1,Number(cached.page)||0));
+state.values = workbook ? workbook.fromSaved(cached.answers) : cached.values || {};
+let replaying = true;
+function save(){
+  if (replaying || student) return;
+  if (workbook) {
+    const record = {...cached,page:state.page,answers:workbook.toSaved(state.values,cached.answers)};
+    if (config.preserve === 'cloud') record.version = 2;
+    try { stores.setItem(STORAGE,JSON.stringify(record)); cached = record; } catch {}
+  } else if (!document.body.dataset.classroomCourse && !window.FinanceLive?.connected()) {
+    try { localStorage.setItem(STORAGE,JSON.stringify(state)); } catch {}
+  }
+}
 function setValue(k,v){state.values[k]=v;save();sendAnswer(k,v)}
 function getValue(k){return state.values[k]??""}
 function go(n){
   state.page=Math.max(0,Math.min(n,LESSONS.length-1));
   document.querySelectorAll(".page").forEach((page,index)=>page.classList.toggle("active",index===state.page));
+  document.querySelectorAll('#lessonSections button').forEach((button,index) => {
+    if (index === state.page) button.setAttribute('aria-current','step');
+    else button.removeAttribute('aria-current');
+  });
+  for (const audio of document.querySelectorAll('.page:not(.active) audio')) if (!audio.paused) audio.pause();
   $("#next").textContent=state.page===LESSONS.length-1?"Finish lesson":"Continue";
   setLessonNavigationAccess();
   updateMoveStudentButton();
@@ -46,9 +76,10 @@ $("#moveStudent").onclick=()=>{
   if(!window.FinanceLive?.connected() || !window.FinanceLive.teacher() || latestStudentPage===state.page)return;
   window.FinanceLive.send("page",{action:"move",page:state.page});
 };
-const defs=[VOCAB[5][1],VOCAB[2][1],VOCAB[0][1],VOCAB[7][1],VOCAB[4][1],VOCAB[1][1],VOCAB[6][1],VOCAB[3][1]];
+const defs = [5,2,0,7,4,1,6,3].flatMap(index => VOCAB[index] ? [VOCAB[index][1]] : []);
+const definitionPickers = [];
 const optionLabel = index => String.fromCharCode(65 + index) + ". " + defs[index];
-$("#vocab").innerHTML = VOCAB.map((word, index) => `
+if ($("#vocab")) $("#vocab").innerHTML = VOCAB.map((word, index) => `
   <div class="term">
     <div class="vocab-term" id="term${index}">${index + 1}. ${esc(word[0])}
       <button type="button" onclick="addWord(${index})" title="Save to vocabulary">＋ Save word</button>
@@ -61,7 +92,7 @@ $("#vocab").innerHTML = VOCAB.map((word, index) => `
     </details>
     <span id="vf${index}" class="feedback"></span>
   </div>`).join("");
-const definitionPickers = [...document.querySelectorAll(".definition-picker")];
+definitionPickers.push(...document.querySelectorAll(".definition-picker"));
 definitionPickers.forEach((picker, index) => {
   const key = "v" + index;
   const summary = picker.querySelector("summary");
@@ -93,16 +124,43 @@ document.addEventListener("pointerdown", event => {
   definitionPickers.forEach(picker => { if (!picker.contains(event.target)) picker.open = false; });
 });
 
-$("#reading").innerHTML=READING.map((x,i)=>'<div class="question-item"><strong>'+(i+1)+'. '+esc(x[0])+'</strong>'+x[1].map((s,j)=>'<label><input type="radio" name="read'+i+'" value="'+j+'">'+esc(s)+'</label>').join("")+'<span class="result" id="rf'+i+'"></span></div>').join("");
+if ($("#reading")) $("#reading").innerHTML=READING.map((x,i)=>'<div class="question-item"><strong>'+(i+1)+'. '+esc(x[0])+'</strong>'+x[1].map((s,j)=>'<label><input type="radio" name="read'+i+'" value="'+j+'">'+esc(s)+'</label>').join("")+'<span class="result" id="rf'+i+'"></span></div>').join("");
 document.querySelectorAll("#reading input").forEach(x=>{x.checked=getValue(x.name)===x.value;x.onchange=()=>{setValue(x.name,x.value);gradeSection("read", true)}});
-$("#gaps").innerHTML=GAPS.map((x,i)=>'<div class="gap-item"><label for="gap'+i+'">'+(i+1)+'. '+esc(x[0])+'</label><input id="gap'+i+'" autocomplete="off" data-key="gap'+i+'" placeholder="Type the missing expression"><small class="feedback" id="gf'+i+'"></small></div>').join("");
+if ($("#gaps")) $("#gaps").innerHTML=GAPS.map((x,i)=>'<div class="gap-item"><label for="gap'+i+'">'+(i+1)+'. '+esc(x[0])+'</label><input id="gap'+i+'" autocomplete="off" data-key="gap'+i+'" placeholder="Type the missing expression"><small class="feedback" id="gf'+i+'"></small></div>').join("");
 document.querySelectorAll("#gaps input").forEach((x,i)=>{x.value=getValue("gap"+i);x.oninput=()=>{setValue("gap"+i,x.value);if(x.value.trim().toLowerCase().replace(/\s+/g," ")===GAPS[i][1])gradeSection("gap",true)};x.onblur=()=>gradeSection("gap",true);x.onkeydown=event=>{if(event.key==="Enter"){event.preventDefault();gradeSection("gap",true)}}});
 document.querySelectorAll("#decision input").forEach(x=>{x.checked=getValue("decision")===x.value;x.onchange=()=>{setValue("decision",x.value);$("#decisionAdvice").textContent=advice[x.value]}});
 if(advice[getValue("decision")])$("#decisionAdvice").textContent=advice[getValue("decision")];
 document.querySelectorAll("[data-save]").forEach(x=>{x.value=getValue(x.dataset.save);x.oninput=()=>{setValue(x.dataset.save,x.value);if(x.id==="homework")updateWords()}});
-function updateWords(){let n=$("#homework").value.trim().split(/\s+/).filter(Boolean).length;$("#wordCount").textContent=n+" words · Target: 140–180"}updateWords();
+function updateWords(){
+  const homework = $("#homework");
+  if (!homework) return;
+  const n = homework.value.trim().split(/\s+/).filter(Boolean).length;
+  $("#wordCount").textContent=n+" words · Target: 140–180";
+}
+updateWords();
 window.copyHomework=()=>navigator.clipboard.writeText($("#homework").value).then(()=>alert("Email copied")).catch(()=>alert("Copy unavailable in this browser"));
-function readWords(){if(window.FinanceLive?.connected())return FinanceLive.words();if(document.body.dataset.classroomCourse)return [];try{const v=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");return Array.isArray(v.words)?v.words:[]}catch(e){return []}}
+function readWords(){
+  if (config.preserve) {
+    const words = new Map();
+    for (const key of student ? [] : [...(config.legacyWords || []),WORDS_KEY]) for (const store of new Set([localStorage,stores])) {
+      try {
+        const record = JSON.parse(store.getItem(key)||'{}');
+        for (const word of record.words || []) {
+          if (typeof word.en === 'string' && word.en.trim()) words.set(word.en.trim().toLowerCase(),word);
+        }
+        for (const removed of record.removed || []) words.delete(removed);
+      } catch {}
+    }
+    for (const word of window.FinanceLive?.words() || []) words.set(word.en.trim().toLowerCase(),word);
+    return [...words.values()];
+  }
+  if(window.FinanceLive?.connected())return FinanceLive.words();
+  if(document.body.dataset.classroomCourse)return [];
+  try{
+    const v=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");
+    return Array.isArray(v.words)?v.words:[];
+  } catch { return []; }
+}
 $("#openLessonDictionary").addEventListener("click",()=>{drawWords();$("#lessonDictionary").showModal()});
 function drawWords(){let w=readWords();$("#wordCountSidebar").textContent=w.length;$("#myWords").innerHTML=w.slice().reverse().map(x=>'<small><b>'+esc(x.en)+'</b> — '+esc(x.ru)+'</small>').join("")||'<small>No words saved yet.</small>'}
 window.addWord=i=>{let words=readWords(),w=VOCAB[i];if(window.FinanceLive?.send("word",{en:w[0],ru:w[2]})||document.body.dataset.classroomCourse)return;if(!words.some(x=>x.en.toLowerCase()===w[0].toLowerCase())){words.push({en:w[0],ru:w[2]});try{let obj=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");obj.words=words;localStorage.setItem(WORDS_KEY,JSON.stringify(obj))}catch(e){alert("Vocabulary saving unavailable")}}drawWords()};
@@ -214,32 +272,37 @@ function gradeSection(key, animate = false){
     completed.add(key);
   }else completed.delete(key);
 }
-const sections = [
+const sections = workbook?.sections || [
   [], checks.v.answers.map((_,i) => "v"+i), checks.read.answers.map((_,i) => "read"+i),
   checks.gap.answers.map((_,i) => "gap"+i), ["decision","decisionNotes"], ["roleNotes"], ["finalOpinion"], ["homework"]
 ];
-const sectionGrades = [null,"v","read","gap"];
+const sectionGrades = workbook ? [] : [null,"v","read","gap"];
 const allowedKeys = new Set(sections.flat());
 const pending = new Map();
 function sendAnswer(key,value){
   if (!window.FinanceLive?.connected()) return;
   clearTimeout(pending.get(key)?.timer);
-  if (!/^(gap\d+|decisionNotes|roleNotes|finalOpinion|homework)$/.test(key)) {
-    FinanceLive.send("answer",{key,value});
+  const field = workbook?.fields.get(key);
+  const payload = field ? {page:field.page,key,value} : {key,value};
+  const typing = field ? workbook.controls.get(key)?.[0]?.tagName === 'TEXTAREA' :
+    /^(gap\d+|decisionNotes|roleNotes|finalOpinion|homework)$/.test(key);
+  if (!typing) {
+    FinanceLive.send("answer",payload);
     return;
   }
   const timer=setTimeout(() => flushAnswer(key),250);
-  pending.set(key,{timer,value});
+  pending.set(key,{timer,payload});
 }
 function flushAnswer(key) {
   const item = pending.get(key);
   if (!item) return;
   clearTimeout(item.timer);
   pending.delete(key);
-  FinanceLive.send("answer",{key,value:item.value});
+  FinanceLive.send("answer",item.payload);
 }
 window.addEventListener("pagehide",() => [...pending.keys()].forEach(flushAnswer));
 function redrawAnswer(key){
+  if (workbook) return workbook.redraw(key,getValue(key),setExerciseValue);
   if(/^v\d+$/.test(key)){
     definitionPickers[Number(key.slice(1))]?.dispatchEvent(new Event("finance-redraw"));
     return;
@@ -258,6 +321,7 @@ function clearSection(page){
     delete state.values[key];
     redrawAnswer(key);
   });
+  if(workbook) workbook.grade(page,getValue,false);
   if(sectionGrades[page]) gradeSection(sectionGrades[page]);
   save();
 }
@@ -275,7 +339,36 @@ sections.forEach((keys,page)=>{
   });
   $("#page-"+page+" .activity-head").append(button);
 });
-Object.keys(checks).forEach(key=>gradeSection(key));
+if (!workbook) Object.keys(checks).forEach(key=>gradeSection(key));
+function setExerciseValue(key,value,animate = true) {
+  if (!workbook.valid(key,value)) return;
+  setValue(key,value);
+  if (workbook.controls.get(key)?.[0]?.hasAttribute('data-order')) redrawAnswer(key);
+  if (workbook.grade(workbook.fields.get(key).page,getValue,animate)) celebrate();
+}
+if (workbook) {
+  for (const [key,controls] of workbook.controls) {
+    redrawAnswer(key);
+    for (const control of controls) {
+      if (control.hasAttribute('data-order')) continue;
+      const type = control.tagName === 'TEXTAREA' ? 'input' : 'change';
+      control.addEventListener(type,()=>setExerciseValue(key,control.value));
+    }
+  }
+  sections.forEach((_,page)=>workbook.grade(page,getValue,false));
+}
+document.querySelectorAll('[data-lesson-word]').forEach(button => button.addEventListener('click', () => {
+  saveVocabulary(config.lessonWords?.[Number(button.dataset.lessonWord)]);
+}));
+const sectionMenu = document.querySelector('#lessonSections');
+LESSONS.forEach((part,page) => {
+  const button = document.createElement('button');
+  button.type='button';
+  button.className='outline';
+  button.textContent=part.label || part.title;
+  button.onclick=()=>navigateFromControls(page);
+  sectionMenu.append(button);
+});
 let toastTimer;
 function showWord(word){
   const toast=$("#finance-toast");
@@ -293,13 +386,16 @@ document.addEventListener("finance-word",event=>{
   drawWords();
   if(event.detail.notify)showWord(event.detail.word);
 });
-document.addEventListener("finance-connect",()=>{sections.forEach((keys,page)=>{if(keys.length)clearSection(page)});});
+document.addEventListener("finance-connect",()=>{
+  replaying = true;
+  if (!workbook) sections.forEach((keys,page)=>{if(keys.length)clearSection(page)});
+});
 document.addEventListener("finance-ready",()=>{
-  if(document.body.dataset.classroomCourse){
-    const back=$(".lesson-brand");
-    if(FinanceLive.teacher())back.href="gostudy-teacher.html";
-    if (restoredPage !== null && location.hash !== "#homework") go(restoredPage);
+  if(FinanceLive.teacher()) {
+    for (const back of document.querySelectorAll('.lesson-brand,.lesson-home-link')) back.href="gostudy-teacher.html";
   }
+  if (restoredPage !== null && location.hash !== "#homework") go(restoredPage);
+  replaying = false;
   setLessonNavigationAccess();
   sendPagePresence();
   updateMoveStudentButton();
@@ -310,12 +406,13 @@ document.addEventListener("finance-ready",()=>{
 document.addEventListener("finance-event",event=>{
   const {kind,payload,initial,own,teacher}=event.detail;
   const role=teacher?"Преподаватель":"Ученик";
-  if(kind==="answer" && allowedKeys.has(payload.key) && typeof payload.value==="string"){
+  if(kind==="answer" && allowedKeys.has(payload.key) && (workbook ? workbook.valid(payload.key,payload.value) : typeof payload.value==="string")){
     const key=payload.key;
     if(!pending.has(key)){
       state.values[key]=payload.value;
       redrawAnswer(key);
       const type=Object.keys(checks).find(name=>key.startsWith(name) && /^\d+$/.test(key.slice(name.length)));
+      if(workbook && workbook.grade(workbook.fields.get(key).page,getValue,!initial && !own)) celebrate();
       if(type) gradeSection(type,!initial && !own);
       save();
     }
@@ -326,7 +423,9 @@ document.addEventListener("finance-event",event=>{
     if(!initial && !own) $("#finance-activity").textContent=role+" сбросил задание";
   }
   if(kind==="page" && Number.isInteger(payload.page) && LESSONS[payload.page]){
-    if (own && initial && payload.action === "presence") restoredPage = payload.page;
+    if (own && initial && (payload.action === "presence" || !payload.action)) restoredPage = payload.page;
+    if (workbook && !own && !initial && !teacher && FinanceLive.teacher() && payload.action !== 'move') go(payload.page);
+    if (payload.moveStudent && teacher && !own && !initial && !FinanceLive.teacher()) go(payload.page);
     if(payload.action==="presence" && !teacher && FinanceLive.teacher()){
       latestStudentPage=payload.page;
       updateMoveStudentButton();
@@ -356,6 +455,7 @@ $("#finance-chat-form").addEventListener("submit",event=>{
 });
 
 drawWords();go(location.hash === "#homework" ? LESSONS.length - 1 : state.page);
+if (!config.course || workbook) replaying = false;
 
 
 (function(){
@@ -459,4 +559,8 @@ drawWords();go(location.hash === "#homework" ? LESSONS.length - 1 : state.page);
    if(saveVocabulary(word)){saveBtn.textContent="✓";saveBtn.disabled=true;}
 
  });
+})();
+const liveScript = document.createElement('script');
+liveScript.src = document.body.dataset.liveScript;
+document.head.append(liveScript);
 })();
