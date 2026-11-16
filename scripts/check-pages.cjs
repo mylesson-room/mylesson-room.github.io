@@ -71,7 +71,7 @@ async function checkFinanceRoom(browser, origin) {
     await cabinet.locator('#financeImportStatus').filter({hasText:'доступны на других устройствах'}).waitFor();
     await cabinet.locator('#words').getByRole('button',{name:'Закрыть'}).click();
     await tp.locator('#finance-toast').filter({hasText:'стресс-тест'}).waitFor();
-    assert.equal(events[0].payload.en,'stress test');
+    assert.equal(events.find(event => event.kind === 'word')?.payload.en,'stress test');
 
     const word = tp.getByText('Forecasted cash balance',{exact:true});
     const box = await word.boundingBox();
