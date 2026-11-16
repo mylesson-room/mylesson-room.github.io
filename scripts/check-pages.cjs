@@ -150,6 +150,8 @@ async function checkMigratedRooms(browser, origin) {
       const sp = await student.newPage();
       const tp = await teacher.newPage();
       const cabinet = await student.newPage();
+      const errors = [];
+      for (const [page,label] of [[sp,'student'],[tp,'teacher']]) page.on('pageerror',error=>errors.push(label+': '+error.message));
       await Promise.all([sp.goto(origin+'/'+lesson.cab),tp.goto(origin+'/'+lesson.path+'?classStudent='+studentId)]);
       const card = sp.locator('.lesson-card');
       await card.getByRole('heading',{name:lesson.title}).waitFor();
@@ -158,7 +160,12 @@ async function checkMigratedRooms(browser, origin) {
       for (const page of [sp,tp]) await page.getByText('Онлайн · общая комната',{exact:true}).waitFor();
       await sp.getByRole('button',{name:/Далее|Next/}).first().click();
       if (lesson.course === 'art-b1') {
-        await tp.locator('#v1').waitFor();
+        try {
+          await sp.locator('#v1').waitFor({timeout:8000});
+          await tp.locator('#v1').waitFor({timeout:8000});
+        } catch (error) {
+          throw new Error('Art navigation: '+JSON.stringify({errors,events,student:await sp.locator('#title').textContent(),teacher:await tp.locator('#title').textContent()}),{cause:error});
+        }
         await sp.locator('#v1').selectOption('the focal point');
         await tp.locator('#v1.correct').waitFor();
         await tp.getByRole('button',{name:'Сбросить ответы'}).click();

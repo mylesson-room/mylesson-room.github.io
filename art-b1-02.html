@@ -91,7 +91,6 @@ try{const s=JSON.parse(storageAdapter.getItem(key)||'null');if(s&&typeof s==='ob
 const sharedWordKey="gostudy-art-b1-v1";
 let lastWords = '';
 let previousAnswers = structuredClone(state.answers);
-let previousPage = state.page;
 function updateLiveWords() {
   const combined = new Map(state.words.map(word => [norm(word.en),word]));
   for (const word of window.FinanceLive?.words() || []) combined.set(norm(word.en),word);
@@ -110,8 +109,6 @@ function readSharedWords(){
 readSharedWords();
 window.addEventListener('pageshow',()=>{readSharedWords();updateLiveWords();});
 function save(){
-  if (roomSync && !replaying && previousPage !== state.page) roomSync.page(state.page);
-  previousPage = state.page;
   for (const [id,value] of Object.entries(state.answers)) {
     if (!replaying && answerPages[state.page]?.includes(id) && JSON.stringify(previousAnswers[id]) !== JSON.stringify(value)) {
       roomSync?.answer(state.page,id,value);
@@ -134,8 +131,7 @@ roomSync = classroom.mount({
   currentPage: () => state.page,
   openPage(page) {
     if (!answerPages[page]) return;
-    previousPage = page;
-    go(page);
+    go(page,false);
   },
   applyAnswer({page,key,value},initial) {
     if (!answerPages[page]?.includes(key)) return;
@@ -198,7 +194,7 @@ function installLesson(){installGapChecks();$$('[data-position]').forEach(b=>b.o
 
 function feedback(ci,qi){const id=`q${ci}-${qi}`,v=state.answers[id];if(v===undefined)return;const ok=Number(v)===CLIPS[ci].qs[qi][2];$('#fb-'+id).textContent=ok?'✓ Верно!':'Попробуйте ещё раз. Вернитесь к тексту или аудио.';$$(`[name="${id}"]`).forEach(el=>{el.closest('label').classList.toggle('correct',el.checked&&ok);el.closest('label').classList.toggle('incorrect',el.checked&&!ok);});}
 function stop(){clearPractice();const a=$('#lessonAudio');if(a)a.pause();}
-function render(){const p=pages[state.page];$('#pageLabel').textContent=`TRAVEL / ${String(state.page+1).padStart(2,'0')} · ≈ ${p[2]} MIN`;$('#title').textContent=p[0];$('#goal').textContent=p[1];$('#teacherTips').textContent=p[3];$('#counter').textContent=`${state.page+1} / ${pages.length}`;$('#prev').disabled=state.page===0;$('#next').textContent=state.page===7?'Итог ✓':'Далее →';$('#content').innerHTML=[feedWelcome,feedWords,feedReading,feedListening,feedLab,feedDebate,feedWriting,feedFinish][state.page]();
+function render(){const p=pages[state.page];$('#pageLabel').textContent=`ART / ${String(state.page+1).padStart(2,'0')} · ≈ ${p[2]} MIN`;$('#title').textContent=p[0];$('#goal').textContent=p[1];$('#teacherTips').textContent=p[3];$('#counter').textContent=`${state.page+1} / ${pages.length}`;$('#prev').disabled=state.page===0;$('#next').textContent=state.page===7?'Итог ✓':'Далее →';$('#content').innerHTML=[feedWelcome,feedWords,feedReading,feedListening,feedLab,feedDebate,feedWriting,feedFinish][state.page]();
 if (answerPages[state.page].length) {
   const controls = document.createElement('div');
   controls.className = 'v1-room-activity';
@@ -206,7 +202,7 @@ if (answerPages[state.page].length) {
   $('#content').prepend(controls);
 }
 $('#nav').innerHTML=pages.map((p,i)=>`<button data-page="${i}" class="${i===state.page?'active':''}"><span>${String(i+1).padStart(2,'0')}</span>${esc(p[0])}</button>`).join('');$$('[data-page]').forEach(b=>b.onclick=()=>go(Number(b.dataset.page)));$$('[data-answer]').forEach(el=>el.oninput=()=>{state.answers[el.dataset.answer]=el.value;save();});$$('[data-can]').forEach(el=>el.onchange=()=>{state.answers[el.dataset.can]=el.checked;save();});$$('[data-add]').forEach(b=>b.onclick=()=>{const w=words[Number(b.dataset.add)];addWord(w[0],w[1]);});$$('[data-q]').forEach(el=>{const [ci,qi]=el.dataset.q.split(':').map(Number);el.onchange=()=>{state.answers[`q${ci}-${qi}`]=Number(el.value);save();feedback(ci,qi);};feedback(ci,qi);});if($('#checkGaps'))$('#checkGaps').onclick=()=>$$('[data-gap]').forEach(el=>{const ok=norm(el.value)===norm(el.dataset.gap);el.classList.toggle('correct',ok);el.classList.toggle('incorrect',!ok);$('#fb-'+el.id).textContent=ok?'✓ Correct.':'Попробуйте ещё раз. Можно открыть таблицу-подсказку.';});if($('#speed'))$('#speed').onchange=e=>$('#lessonAudio').playbackRate=Number(e.target.value);if($('#lessonAudio'))$('#lessonAudio').onerror=()=>notify('Audio unavailable. Open the script to practise together.');installLesson();document.body.classList.toggle('dark',!!state.dark);save();}
-function go(i){stop();$('#translationPop').hidden=true;if($('#lessonMenu').open)$('#lessonMenu').close();state.page=i;render();$('#title').focus({preventScroll:true});window.scrollTo({top:0,behavior:'smooth'});}
+function go(i,sync=true){if(sync) roomSync.page(i);stop();$('#translationPop').hidden=true;if($('#lessonMenu').open)$('#lessonMenu').close();state.page=i;render();$('#title').focus({preventScroll:true});window.scrollTo({top:0,behavior:'smooth'});}
 $('#prev').onclick=()=>go(Math.max(0,state.page-1));$('#next').onclick=()=>state.page<pages.length-1?go(state.page+1):notify('Урок завершён. Можно вернуться к любому разделу.');$('#themeBtn').onclick=()=>{state.dark=!state.dark;document.body.classList.toggle('dark',state.dark);save();};$('#menuBtn').onclick=()=>{$('#lessonMenu').showModal();$('#menuBtn').setAttribute('aria-expanded','true');};$('#closeMenu').onclick=()=>$('#lessonMenu').close();$('#lessonMenu').onclose=()=>$('#menuBtn').setAttribute('aria-expanded','false');
 function addWord(en,ru){en=en.trim();ru=ru.trim();if(/[а-яё]/i.test(en)&&/[a-z]/i.test(ru)&&!/[а-яё]/i.test(ru)){[en,ru]=[ru,en];}if(!en||!ru){notify('Add a word and its translation.');return false;}if (roomSync.word(en,ru)) return true;const old=state.words.find(w=>norm(w.en)===norm(en));if(old)old.ru=ru;else state.words.push({en,ru});save();notify(old?'Translation updated.':'Word saved ✓');return true;}
 function renderWords(){const list=$('#wordList');list.innerHTML=state.words.length?state.words.map((w,i)=>`<div class="dictrow"><div><strong>${esc(w.en)}</strong><p>${esc(w.ru)}</p></div><div><button type="button" class="small-button" data-speak-word>🔊 Прослушать слово</button> <button class="small-button" data-edit="${i}" aria-label="Edit ${esc(w.en)}">Edit</button> <button class="small-button" data-delete="${i}" aria-label="Delete ${esc(w.en)}">✕</button></div></div>`).join(''):'<p class="muted dict-empty">Пока пусто. Выделите слово в уроке или добавьте его выше.</p>';$$('[data-edit]').forEach(b=>b.onclick=()=>{const w=state.words[Number(b.dataset.edit)];manualVersion++;clearTimeout(manualTimer);manualStatus.textContent='';$('#newWord').value=w.en;$('#newMeaning').value=w.ru;$('#newMeaning').focus();});$$('[data-delete]').forEach(b=>b.onclick=()=>{state.words.splice(Number(b.dataset.delete),1);save();renderWords();});}
@@ -296,7 +292,7 @@ function renderTraining(){const t=training,entry=t.queue[t.index];if(!entry){con
 
 
 
-window.addEventListener('pagehide',stop);if(!Number.isInteger(state.page)||state.page<0||state.page>=pages.length)state.page=0;if(location.hash==='#homework')location.replace('homework-02.html');render();if(location.hash==='#vocabulary')openDict();if(location.hash==='#training')openTraining();if(!storage){$('#storageNote').hidden=false;$('#storageNote').textContent='Saving unavailable. Export your work before closing.';}
+window.addEventListener('pagehide',stop);if(!Number.isInteger(state.page)||state.page<0||state.page>=pages.length)state.page=0;if(location.hash==='#homework')location.replace('art-b1-02-homework.html');render();if(location.hash==='#vocabulary')openDict();if(location.hash==='#training')openTraining();if(!storage){$('#storageNote').hidden=false;$('#storageNote').textContent='Saving unavailable. Export your work before closing.';}
 </script><script>
 (()=>{
 const fmt=n=>Number.isFinite(n)?Math.floor(n/60)+':'+String(Math.floor(n%60)).padStart(2,'0'):'0:00';
