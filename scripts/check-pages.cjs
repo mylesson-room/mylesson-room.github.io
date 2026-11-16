@@ -59,13 +59,13 @@ async function checkFinanceRoom(browser, origin) {
     const pupilRow = tp.locator('.teacher-student-row').filter({hasText:'Михаил'});
     await pupilRow.getByRole('link',{name:/Войти в класс/}).click();
     await tp.waitForURL(lessonUrl + '?classStudent=' + studentId);
-    await Promise.all([sp.getByText(status,{exact:true}).waitFor(),tp.getByText(status,{exact:true}).waitFor()]);
+    await Promise.all([sp,tp].map(page => page.waitForFunction(expected => document.querySelector('#finance-live-status')?.textContent === expected,status)));
 
     await cabinet.locator('#vocabCount').filter({hasText:'1 слово'}).waitFor();
     await sp.getByRole('button',{name:'Dictionary',exact:true}).click();
     await sp.getByRole('dialog').getByText('stress test',{exact:true}).waitFor();
     await sp.getByRole('button',{name:'Close dictionary'}).click();
-    assert.equal(events.length,0,'Opening a classroom must not import local words implicitly');
+    assert.equal(events.filter(event => event.kind === 'word').length,0,'Opening a classroom must not import local words implicitly');
     await cabinet.locator('#openWords').click();
     await cabinet.locator('#importFinanceWords').click();
     await cabinet.locator('#financeImportStatus').filter({hasText:'доступны на других устройствах'}).waitFor();
@@ -87,8 +87,11 @@ async function checkFinanceRoom(browser, origin) {
     await cabinet.locator('#practiceCard').click();
     await cabinet.locator('#practiceQuestion').filter({hasText:/forecasted|прогнозируемый|stress test|стресс-тест/i}).waitFor();
 
-    await sp.getByRole('button',{name:'Continue',exact:true}).click();
+    assert.equal(await sp.getByRole('button',{name:'Continue',exact:true}).isDisabled(),true,'Student must not lead navigation');
+    await tp.getByRole('button',{name:'Continue',exact:true}).click();
+    await sp.locator('#page-1.active').waitFor();
     await tp.locator('#page-1.active').waitFor();
+    assert.equal(await sp.locator('#finance-activity').isVisible(),false,'Technical navigation notices must remain hidden');
     const pick = async (page,index,choice) => {
       const picker = page.locator('.definition-picker').nth(index);
       await picker.locator('summary').click();
