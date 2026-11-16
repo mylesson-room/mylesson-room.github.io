@@ -129,6 +129,7 @@ async function checkMigratedRooms(browser, origin) {
           const request = route.request();
           const url = new URL(request.url());
           if (url.pathname.endsWith('/gostudy_classroom_rooms')) {
+            if (!url.searchParams.has('lesson_path')) return route.fulfill({json:[]});
             assert.equal(url.searchParams.get('course'),'eq.'+lesson.course);
             assert.equal(url.searchParams.get('student_id'),'eq.'+studentId);
             return route.fulfill({json:[{id:roomId,teacher_id:teacherId,student_id:studentId,student_label:lesson.student}]});
@@ -144,6 +145,11 @@ async function checkMigratedRooms(browser, origin) {
             events.push({actor:id,seq:events.length+1,kind:event.p_kind,payload:event.p_payload});
             return route.fulfill({json:true});
           }
+          const action = url.pathname.split('/').at(-1);
+          if (role === 'teacher' && (action === 'gostudy_'+lesson.course.replaceAll('-','_')+'_teacher_view' ||
+            (action === 'gostudy_legacy_teacher_view' && lesson.course === 'art-b1' && request.postDataJSON().p_course === 'art_b1'))) {
+            return route.fulfill({json:[{id:studentId,label:lesson.student,words:[],assigned:[],progress:[]}]});
+          }
           return route.fulfill({json:[]});
         });
       }
@@ -152,12 +158,22 @@ async function checkMigratedRooms(browser, origin) {
       const cabinet = await student.newPage();
       const errors = [];
       for (const [page,label] of [[sp,'student'],[tp,'teacher']]) page.on('pageerror',error=>errors.push(label+': '+error.message));
-      await Promise.all([sp.goto(origin+'/'+lesson.cab),tp.goto(origin+'/'+lesson.path+'?classStudent='+studentId)]);
+      await Promise.all([sp.goto(origin+'/'+lesson.cab),tp.goto(origin+'/gostudy-teacher.html')]);
       const card = sp.locator('.lesson-card');
       await card.getByRole('heading',{name:lesson.title}).waitFor();
       assert.equal(await card.getAttribute('href'),lesson.path);
-      await card.click();
-      for (const page of [sp,tp]) await page.getByText('Онлайн · общая комната',{exact:true}).waitFor();
+      await Promise.all([
+        card.click(),
+        tp.locator('.teacher-student-row').filter({hasText:lesson.student}).getByRole('link',{name:/Войти в класс/}).click(),
+      ]);
+      await tp.waitForURL(url => url.pathname === '/'+lesson.path && url.searchParams.get('classStudent') === studentId);
+      for (const page of [sp,tp]) {
+        await page.getByText('Онлайн · общая комната',{exact:true}).waitFor();
+        const tools = await page.locator('.v1-room-video').boundingBox();
+        const content = await page.locator('.room .sheet,.shell > main').boundingBox();
+        assert.ok(tools.x+tools.width <= content.x+1,'video and chat should be to the left of the lesson');
+        assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth+1),'horizontal overflow');
+      }
       await sp.getByRole('button',{name:/Далее|Next/}).first().click();
       if (lesson.course === 'art-b1') {
         try {
@@ -170,6 +186,8 @@ async function checkMigratedRooms(browser, origin) {
         await tp.locator('#v1.correct').waitFor();
         await tp.getByRole('button',{name:'Сбросить ответы'}).click();
         await sp.waitForFunction(() => document.querySelector('#v1')?.value === '');
+        await tp.locator('#v1').selectOption('the focal point');
+        await sp.locator('#v1.correct').waitFor();
         await tp.getByRole('button',{name:'Dictionary'}).click();
         await tp.locator('#newWord').fill('shared entry');
         await tp.locator('#newMeaning').fill('общее слово');
@@ -183,6 +201,8 @@ async function checkMigratedRooms(browser, origin) {
         await tp.locator('fieldset input[type=radio]:checked').first().waitFor();
         await tp.getByRole('button',{name:'Сбросить ответы'}).click();
         await sp.waitForFunction(() => !document.querySelector('fieldset input[type=radio]:checked'));
+        await tp.locator('fieldset .options label').first().click();
+        await sp.locator('fieldset input[type=radio]:checked').first().waitFor();
         await tp.evaluate(() => window.FinanceLive.send('word',{en:'shared entry',ru:'общее слово'}));
       }
       await sp.locator('.v1-room-word').filter({hasText:'shared entry — общее слово'}).waitFor();
@@ -356,6 +376,7 @@ async function main() {
     const catalog = runInNewContext('('+source.match(/const classroomCatalog = ([^\n]+);/)[1]+')');
     const studentId = '11111111-1111-4111-8111-111111111111';
     for (const [course, entry] of Object.entries(catalog)) {
+      if (course === 'business_ai' || course === 'country_house') continue; // Checked against the v1 interface above.
       const current = entry.lessons.at(-1);
       const expected = new URL(current.lesson, origin).pathname;
       const student = await browser.newContext();
