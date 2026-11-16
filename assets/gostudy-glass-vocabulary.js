@@ -345,7 +345,7 @@
   const oldButton = document.querySelector('meta[name=gostudy-current-lesson]') ? null : document.getElementById('dictBtn');
   const toolbar=document.createElement('div');toolbar.className='glass-lesson-tools';
   if (!oldButton && (compactToolbar || document.querySelector('meta[name=gostudy-current-lesson]'))) {
-    const icon = button(inRoom ? 'Dictionary' : '📖',()=>open('words'),'glass-primary glass-icon');
+    const icon = button('📖',()=>open('words'),'glass-primary glass-icon');
     icon.setAttribute('aria-label','Открыть словарь');
     icon.title='Словарь';
     toolbar.append(icon);

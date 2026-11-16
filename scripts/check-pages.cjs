@@ -222,7 +222,7 @@ async function checkMigratedRooms(browser, origin) {
       });
       assert.equal(mobile.position,'fixed','navigation should stay visible on an iPhone-width screen');
       assert.ok(Math.abs(mobile.bottom-mobile.viewport) <= 1 && Math.abs(mobile.width-mobile.screenWidth) <= 1,'navigation fills the bottom edge on mobile');
-      assert.ok(mobile.contentWidth <= mobile.screenWidth+1,'mobile lesson has no horizontal overflow');
+      assert.ok(mobile.contentWidth <= mobile.screenWidth+1,lesson.course+': mobile lesson overflows '+JSON.stringify(mobile));
       console.log(lesson.course + ': v1 cabinet, answers, reset, vocabulary, chat and mobile layout verified');
     } finally {
       await student.close();
