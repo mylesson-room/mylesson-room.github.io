@@ -40,6 +40,88 @@ dialog{width:min(440px,calc(100% - 30px));border:1px solid var(--line);border-ra
  .goal{margin:3.1vw 0 2.6vw;gap:1.25vw}.goal-icon{width:6.25vw;height:6.25vw;font-size:3vw;border-width:.45vw}.goal h2{font-size:clamp(20px,1.6vw,32px)}.goal p,.skills,.stats p{font-size:clamp(14px,1.2vw,24px)}
  .skills{gap:2vw 2.45vw}.track{height:.62vw;margin-top:.85vw}.stats{margin-top:3.05vw;gap:1.85vw}.stat{padding:1.25vw;min-height:9.5vw}.stat strong{font-size:clamp(29px,2.5vw,50px)}.stat p{margin:0 0 1.35vw}
 }
+
+/* GoStudy premium dashboard — approved desktop visual, 2026-11-17 */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap');
+:root{--ink:#101f33;--muted:#7b8897;--blue:#058ae3;--accent:#039cf0;--pale:#e3f7ff;--line:#e8edf2}
+body{font-family:'Manrope','DM Sans',Arial,sans-serif;letter-spacing:-.018em}
+.top{background:#fff;border-bottom:1px solid #e9eef2}
+.brand{font-family:'Playfair Display',Georgia,serif;font-weight:700;letter-spacing:-1.35px;color:#101f33}
+.brand a>svg{width:72px;height:54px}
+.brand .round{margin-left:2px}
+.nav{font-weight:700}
+.nav a,.nav button{transition:color .2s ease}
+.nav [aria-current]{padding:8px 21px;border-radius:28px;background:#dff4fe}
+.nav a:hover,.nav button:not(:disabled):hover{color:#078edd}
+.profile>span{font-weight:600}
+.profile strong{font-size:14px}
+main{width:min(77%,1120px)}
+.pills{gap:12px}
+.pill{font-weight:700;border-radius:28px;padding:10px 19px;box-shadow:0 1px 1px #152a4508}
+.hello h1{font-family:'Playfair Display',Georgia,serif;font-weight:700;letter-spacing:-.025em;color:#0c1c32}
+.teacher{font-weight:600}
+.teacher strong{color:#078fe2}
+.cards{grid-template-columns:1.19fr 1fr;gap:24px}
+.card{border-radius:17px;background:linear-gradient(124deg,#eafaff 0%,#dff5ff 100%);overflow:hidden;isolation:isolate;box-shadow:0 3px 16px #256b9510}
+.card small{font-weight:600;color:#6a7b8e}
+.card h2{font-family:'Playfair Display',Georgia,serif;font-weight:700;line-height:1.14;letter-spacing:-.02em;color:#0d1d34}
+.homework h2{max-width:66%}
+.card p{font-weight:700;color:#52657f}
+.primary{border-radius:11px;background:linear-gradient(180deg,#08a8f8,#0079dc);padding:12px 24px;color:white;box-shadow:0 4px 10px #028feb26;font-weight:800;transition:transform .15s,filter .15s}
+.primary:hover{filter:brightness(1.04);transform:translateY(-1px)}
+.primary:disabled,.primary[aria-disabled="true"]{opacity:.45;cursor:not-allowed;pointer-events:none}
+.illustration{background:transparent;border-radius:0;display:flex;align-items:center;justify-content:center;width:37%;height:74%;top:15%;right:2%;aspect-ratio:auto;font-size:initial}
+.illustration svg{width:100%;height:100%;filter:drop-shadow(0 10px 12px #0d608a1b)}
+.lesson-art{width:36%;height:76%;right:1%;top:13%}
+.lesson-card h2{max-width:76%;font-size:clamp(22px,1.85vw,32px)}
+.lesson-card p{max-width:70%}
+.lesson-card .actions{position:relative;z-index:2}
+.goal{margin-top:40px}
+.goal-icon{border-color:#e2e8ee;border-top-color:#12a2ef;box-shadow:inset 0 0 0 4px #fff}
+.goal h2{font-family:'Playfair Display',Georgia,serif;font-size:25px;font-weight:700}
+.goal p{font-weight:600}
+.skill-name{font-weight:700;letter-spacing:-.025em}
+.skill-name svg{width:22px;height:22px;color:#8b9aa6}
+.track,.stat .track{height:9px;background:#e0e6ed}
+.stats{gap:24px;margin-top:40px}
+.stat{border-radius:17px;background:linear-gradient(140deg,#f8fafc,#f0f4f9);padding:22px 24px;min-height:143px}
+.stat strong{font-family:'Playfair Display',Georgia,serif;font-weight:700}
+.stat p{font-weight:600;color:#65758b}
+.stat>svg{width:24px;height:24px;color:#aebac1}
+@media(min-width:1051px){
+ .top{height:78px;min-height:78px;padding:0 2.2%}
+ .brand{font-size:clamp(24px,2.15vw,35px);gap:8px}
+ .brand a>svg{width:70px;height:51px}
+ .nav{font-size:clamp(14px,1.15vw,18px);gap:clamp(16px,1.55vw,28px)}
+ .round,.avatar{height:46px;width:46px;min-width:46px}
+ .balance{height:46px}
+ main{width:min(77%,1120px);margin:26px auto 22px}
+ .pill{font-size:16px;padding:10px 18px}
+ .hello{margin:32px 0 29px}
+ .hello h1{font-size:clamp(32px,2.7vw,46px)}
+ .teacher{font-size:15px}
+ .cards{gap:24px}
+ .card{min-height:266px;padding:27px;border-radius:17px}
+ .card small{font-size:15px}
+ .card h2{font-size:clamp(28px,2.25vw,38px);margin:19px 0 12px}
+ .lesson-card h2{font-size:clamp(23px,1.9vw,32px)}
+ .card p{font-size:15px}
+ .card .actions{font-size:15px}
+ .primary{padding:12px 22px}
+ .goal{margin:38px 0 26px;gap:18px}
+ .goal-icon{width:88px;height:88px;font-size:33px;border-width:6px}
+ .goal h2{font-size:24px}
+ .goal p,.skills,.stats p{font-size:15px}
+ .skills{gap:28px 30px}
+ .track{height:9px;margin-top:13px}
+ .stats{margin-top:38px;gap:24px}
+ .stat{padding:20px 22px;min-height:144px}
+ .stat strong{font-size:38px}
+ .stat p{margin:3px 0 19px}
+}
+@media(max-width:1050px){main{width:min(92%,860px)}.card{min-height:230px}.brand a>svg{width:48px;height:39px}}
+@media(max-width:720px){.cards{grid-template-columns:1fr}.card{min-height:225px}.illustration{width:33%;right:0}.hello h1{font-size:29px}.teacher{font-size:13px}.stats{gap:12px}.stat{padding:15px}.stat strong{font-size:28px}}
+
 </style>
 </head>
 <body>
@@ -52,8 +134,8 @@ dialog{width:min(440px,calc(100% - 30px));border:1px solid var(--line);border-ra
 <nav class="pills" aria-label="Программы"><span class="pill">🇬🇧 Английский</span><span class="pill"><span class="talks-dot" aria-hidden="true">♥</span> Talks</span><span class="pill"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7" r="2.7" fill="currentColor" stroke="none"/><circle cx="5" cy="8" r="2" fill="currentColor" stroke="none"/><circle cx="19" cy="8" r="2" fill="currentColor" stroke="none"/><path d="M8 14a4 4 0 0 1 8 0v3H8Zm-6 0a3 3 0 0 1 5-2v4H2Zm15-2a3 3 0 0 1 5 2v2h-5Z" fill="currentColor" stroke="none"/></svg> Разговорные клубы</span><span class="pill">★ Premium</span></nav>
 <div class="hello"><h1>Хев а найс дей, Михаил!</h1><span class="teacher">Преподаватель · <strong>Данил</strong><span class="avatar tiny" aria-hidden="true">Д</span></span></div>
 <div class="cards">
-<section id="assignment" class="card homework"><small>Домашнее задание · 15–20 мин</small><h2>AI in Finance</h2><span class="illustration" aria-hidden="true">✉️</span><div class="actions"><a class="primary" href="business-ai-finance-b2-02.html#homework">Сделать задание</a></div></section>
-<section class="card"><small>Следующее занятие</small><h2>Суббота в 11:00</h2><p>Сб 11:00 МСК · AI in Finance</p><div class="actions"><a class="primary" href="business-ai-finance-b2-02.html">К уроку</a><button class="link" type="button" disabled>Перенести</button><span aria-hidden="true">·</span><a class="link" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=AI%20in%20Finance&amp;dates=20261121T080000Z%2F20261121T085500Z">Добавить в календарь <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></a></div></section>
+<section id="assignment" class="card homework"><small>Домашнее задание · 15–20 мин</small><h2>AI in Finance</h2><span class="illustration" aria-hidden="true"><svg viewBox="0 0 250 200" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="laptop" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#243d73"/><stop offset="1" stop-color="#527fca"/></linearGradient><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe99c"/><stop offset="1" stop-color="#e6a82f"/></linearGradient></defs><circle cx="132" cy="92" r="87" fill="#c3efff"/><g transform="rotate(8 130 100)"><rect x="58" y="42" width="144" height="111" rx="9" fill="#b8d2ec"/><rect x="62" y="45" width="136" height="104" rx="7" fill="url(#laptop)" stroke="#7589bf" stroke-width="3"/><rect x="83" y="63" width="57" height="58" rx="8" fill="none" stroke="#a8d6fb" stroke-width="2" stroke-dasharray="4 5"/><text x="91" y="101" font-size="24" font-weight="700" font-family="Arial" fill="white">AI</text><rect x="151" y="104" width="11" height="25" rx="3" fill="#58caff"/><rect x="167" y="89" width="11" height="40" rx="3" fill="#7bd5ff"/><rect x="183" y="76" width="8" height="53" rx="3" fill="#aadfff"/><path d="M52 151h157l15 13q3 4-6 6H45q-10 0-6-6Z" fill="#8398c5"/><path d="M95 154h75l8 7H86Z" fill="#cdd8eb"/></g><g fill="url(#gold)" stroke="#d49d32" stroke-width="1.3"><ellipse cx="45" cy="161" rx="23" ry="8"/><path d="M22 149v12q0 8 23 8t23-8v-12" fill="#eab948"/><ellipse cx="45" cy="149" rx="23" ry="8"/><ellipse cx="65" cy="172" rx="19" ry="7"/><path d="M46 162v10q0 7 19 7t19-7v-10" fill="#eab948"/><ellipse cx="65" cy="162" rx="19" ry="7"/></g><g transform="translate(177 8)"><rect width="56" height="49" rx="14" fill="white" opacity=".9"/><path d="m13 33 11-11 9 6 11-15" fill="none" stroke="#04a8ed" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M35 13h9v9" fill="none" stroke="#04a8ed" stroke-width="3"/></g></svg></span><div class="actions"><a class="primary" href="business-ai-finance-b2-02.html#homework">Сделать задание</a></div></section>
+<section class="card lesson-card"><small>Следующее занятие</small><span class="illustration lesson-art" aria-hidden="true"><svg viewBox="0 0 225 195" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="calBlue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0eaff7"/><stop offset="1" stop-color="#3d7fdb"/></linearGradient></defs><circle cx="113" cy="99" r="91" fill="#c3efff"/><g transform="rotate(7 110 93)"><rect x="34" y="49" width="145" height="118" rx="14" fill="#eaf8ff" stroke="#8dbce3" stroke-width="3"/><path d="M34 63q0-14 14-14h117q14 0 14 14v25H34Z" fill="url(#calBlue)"/><g stroke="#9fb6d3" stroke-width="5" fill="none"><path d="M71 56V37q0-15 11-15t11 15v19M130 56V37q0-15 11-15t11 15v19"/></g><g fill="#d8e8fa"><rect x="51" y="101" width="25" height="20" rx="4"/><rect x="84" y="101" width="25" height="20" rx="4"/><rect x="117" y="101" width="25" height="20" rx="4"/><rect x="51" y="129" width="25" height="20" rx="4"/><rect x="84" y="129" width="25" height="20" rx="4"/><rect x="117" y="129" width="25" height="20" rx="4"/></g><rect x="84" y="101" width="25" height="20" rx="4" fill="#ffc84d"/></g><circle cx="172" cy="144" r="40" fill="#fff" stroke="#426fbd" stroke-width="8"/><circle cx="172" cy="144" r="29" fill="#f8fcff"/><path d="M172 122v23l15 9" fill="none" stroke="#285396" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><h2>Суббота в 11:00 МСК</h2><p>AI in Finance — Lesson 2</p><div class="actions"><a class="primary" href="business-ai-finance-b2-02.html">К уроку</a><button class="link" type="button" disabled>Перенести</button><span aria-hidden="true">·</span><a class="link" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=AI%20in%20Finance&amp;dates=20261121T080000Z%2F20261121T085500Z">Добавить в календарь <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></a></div></section>
 </div>
 <section aria-label="Прогресс">
 <div class="goal"><div class="goal-icon" aria-hidden="true">🇺🇸</div><div><h2>Иду к Upper-Intermediate</h2><p>Новая цель</p></div></div>
