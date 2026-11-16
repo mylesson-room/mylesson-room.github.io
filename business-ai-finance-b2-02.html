@@ -408,18 +408,18 @@ function go(n){
   }
   save();
 }
-function teacherControlsNavigation(){return !window.FinanceLive?.connected() || window.FinanceLive.teacher();}
 function navigateFromControls(nextPage){
-  if(!teacherControlsNavigation())return;
+  // Both participants can browse locally. Only the teacher broadcasts a navigation command.
   go(nextPage);
-  if(window.FinanceLive?.connected())window.FinanceLive.send("page",{page:state.page});
+  if(window.FinanceLive?.connected() && window.FinanceLive.teacher()){
+    window.FinanceLive.send("page",{page:state.page});
+  }
 }
 function setLessonNavigationAccess(){
-  const studentFollower=window.FinanceLive?.connected() && !window.FinanceLive.teacher();
-  $("#back").disabled=studentFollower||state.page===0;
-  $("#next").disabled=studentFollower;
-  $("#back").title=studentFollower?"Раздел выбирает преподаватель":"";
-  $("#next").title=studentFollower?"Раздел выбирает преподаватель":"";
+  $("#back").disabled=state.page===0;
+  $("#next").disabled=false;
+  $("#back").removeAttribute("title");
+  $("#next").removeAttribute("title");
 }
 $("#back").onclick=()=>navigateFromControls(state.page-1);
 $("#next").onclick=()=>navigateFromControls(state.page===LESSONS.length-1?0:state.page+1);
