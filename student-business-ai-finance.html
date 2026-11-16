@@ -376,7 +376,7 @@ function openVocabulary() {
 const practiceModes = ['cards','choice','type','listen'];
 let practiceMode = 'cards';
 const practiceEl = selector => document.querySelector(selector);
-const normalized = text => String(text).trim().toLowerCase().replace(/\\s+/g,' ').replace(/[.!?,;:]+$/,'');
+const normalized = text => String(text).trim().toLowerCase().replace(/\s+/g,' ').replace(/[.!?,;:]+$/,'');
 function speakPracticeWord() {
   if (!window.speechSynthesis || !practiceWords[practiceIndex]) return;
   window.speechSynthesis.cancel();
