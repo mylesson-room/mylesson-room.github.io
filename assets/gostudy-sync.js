@@ -217,7 +217,7 @@
     return refreshInFlight;
   }
 
-  if (document.body.hasAttribute('data-finance-live')) {
+  if (document.body?.hasAttribute('data-finance-live')) {
     window.GoStudyFinanceAuth = {token, request, userId: () => session?.user?.id};
     return;
   }
