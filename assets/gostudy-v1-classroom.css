@@ -1,0 +1,71 @@
+@import url("gostudy-v1-lesson.css?v=1");
+
+body.v1-room-page {
+  --ink: #12253e;
+  --primary: #266b9d;
+  background: #f7fbff;
+  color: var(--ink);
+}
+body.v1-room-page:not(.classroom-authorized) > :is(header,.room,.shell,dialog,#translationPop,#toast) { display:none!important }
+.v1-room-page > header {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  min-height: 54px;
+  height: auto;
+  padding: 7px clamp(12px,3vw,35px);
+  background: #eef7ff;
+  border-bottom: 1px solid #d6e5f3;
+}
+.v1-room-page .v1-room-brand { display:flex; align-items:center; gap:10px; font-weight:800 }
+.v1-room-brand img { display:block; width:30px; height:25px }
+.v1-room-page :is(.room,.shell) {
+  display: grid;
+  grid-template-columns: minmax(245px, 29%) minmax(0, 1fr);
+  grid-template-areas: "sidebar content";
+  align-items: start;
+  width: 100%;
+  max-width: 1500px;
+  gap: clamp(12px,2vw,24px);
+  margin: 18px auto;
+  padding: 0 clamp(10px,2vw,24px) 20px;
+}
+.v1-room-page :is(.room,.shell) > :is(.sheet,main) { grid-area:content; min-width:0; width:100% }
+.v1-room-page :is(.room,.shell) > .side { grid-area:sidebar; min-width:0; width:100%; position:sticky; top:70px; display:block }
+.v1-room-page .side > .panel:has(.call-head) { display:none }
+.v1-room-page :is(.sheet,.shell > main) {
+  background:#fff;
+  border:1px solid #dfebf7;
+  border-radius:22px;
+  padding:clamp(12px,2.6vw,36px);
+  box-shadow:0 7px 26px #214a8010;
+}
+.v1-room-page .sections { max-height:32vh; overflow:auto; margin:12px 0 0; padding:12px; border-radius:15px }
+.v1-room-page .finance-chat { margin:10px 0; }
+.v1-room-video { min-height:136px; display:flex; justify-content:center; align-items:center; flex-direction:column; gap:8px; border:1px solid #daebf7; border-radius:18px; background:#eaf6ff; }
+.v1-room-video a { color:#185b87; text-decoration:underline; font-size:.9rem }
+.v1-room-messages { height:112px; overflow:auto; overflow-wrap:anywhere; margin-bottom:8px }
+.v1-room-page .header-right .glass-lesson-tools { margin:0 }
+.v1-room-page .glass-translation:not([hidden]) { z-index:30 }
+.v1-room-reset { justify-self:end; margin-left:auto; min-width:31px; min-height:31px; border:1px solid #f7cddd; border-radius:9px; background:#fff2f6; color:#a83c61; font-size:21px; line-height:1; }
+.v1-room-page .v1-room-activity { display:flex; justify-content:flex-end; }
+.v1-room-move { border:1px solid #cfe1f1; border-radius:10px; background:#fff; color:#185b87; padding:6px 10px; font-size:.8rem; }
+.v1-room-word { position:fixed; z-index:35; right:20px; bottom:20px; width:min(300px,calc(100% - 40px)); padding:16px; border:1px solid #cde8f9; border-radius:15px; color:#164674; background:#eff9ff; box-shadow:0 10px 30px #214a802a; overflow-wrap:anywhere; }
+.v1-room-salute { position:fixed; inset:0; z-index:45; pointer-events:none; overflow:hidden; }
+.v1-room-salute i { position:absolute; top:55%; width:9px; height:6px; border-radius:2px; animation:v1-room-salute 2.75s var(--delay) ease-out both; }
+.v1-room-salute .left { left:0 }
+.v1-room-salute .right { right:0 }
+@keyframes v1-room-salute { 0% { opacity:1 } 28% { transform:translate(var(--x),var(--y)) rotate(220deg); opacity:1 } 100% { transform:translate(var(--x),60vh) rotate(740deg); opacity:0 } }
+@media (max-width: 800px) {
+  .v1-room-page :is(.room,.shell) { grid-template-columns:minmax(0,1fr); grid-template-areas:"sidebar" "content"; }
+  .v1-room-page :is(.room,.shell) > .side { position:static }
+  .v1-room-page .sections { max-height:17vh }
+  .v1-room-video { min-height:65px }
+  .v1-room-page > header { gap:7px; flex-wrap:wrap }
+}
+
+.v1-room-page .glass-translation { z-index: 31; }
+.v1-room-page .glass-translation:not([hidden]) { top: auto; }
+.v1-room-page .glass-translation .glass-title > button { display:none; }
+.v1-room-page #translationPop #closePop { display:none; }
+.v1-room-page .v1-room-video, .v1-room-page .finance-chat { text-align:left; }

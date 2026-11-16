@@ -219,7 +219,7 @@
 
   if (document.body?.hasAttribute('data-finance-live')) {
     window.GoStudyFinanceAuth = {token, request, userId: () => session?.user?.id, classroomStudent};
-    return;
+    if (!document.body.hasAttribute("data-preserve-workbook-progress")) return;
   }
   async function push(key, accessToken) {
     const current = readRecord(key);
@@ -1161,7 +1161,7 @@
     const financeLesson = 'business-ai-finance-b2-02.html';
     const legacyTeacherCourses = new Set(['art_b1','ielts_reading','sweden_a2']);
     const teacherCatalog = {...classroomCatalog,
-      art_b1:{name:'Art & Mosaics · B1',lessons:[{title:'Small pieces, big ideas',lesson:'art-mosaics-b1.html',homework:'art-b1-homework.html'}]},
+      art_b1:{name:'Art & Mosaics · B1',lessons:[{title:'Small pieces, big ideas',lesson:'art-mosaics-b1.html',homework:'art-b1-homework.html'},{title:'Every picture has a story',lesson:'art-b1-02.html',homework:'art-b1-02-homework.html'}]},
       ielts_reading:{name:'IELTS Reading',lessons:[{title:'IELTS Reading · Lesson 1',lesson:'ielts-reading-01.html',homework:'ielts-reading-01-homework.html'}]},
       sweden_a2:{name:'Sweden · A2',lessons:[{title:'Sweden · Lesson 1',lesson:'sweden-a2.html',homework:'sweden-a2-01-homework.html'}]},
       [generalB2]:{name:'General English B2',lessons:[{title:'The Hidden Cost of Convenience',lesson:'general-english-b2-01.html',homework:'general-english-b2-01.html#homework'}]},
@@ -1491,6 +1491,13 @@
       const tool = document.querySelector(selector);
       if (tool) sections.before(tool);
     }
+  }
+
+  if (document.body?.hasAttribute('data-preserve-workbook-progress')) {
+    window.GoStudyV1Progress = {
+      ready: session && classroomStudent === null ? synchronize().catch(() => {}) : Promise.resolve(),
+    };
+    return;
   }
 
   document.addEventListener('DOMContentLoaded', () => {

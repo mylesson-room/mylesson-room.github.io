@@ -1,4 +1,6 @@
-(() => {
+(async () => {
+  const classroom = window.GoStudyV1Classroom;
+  if (classroom) await window.GoStudyV1Progress.ready;
   const config = JSON.parse(document.getElementById('lesson-data').textContent);
   const ui = window.GoStudyClassroomUI;
   const room = ui.createRoom(document.querySelector('.room'), config.level);
@@ -20,9 +22,52 @@
   const save = () => storage.setItem(config.key,JSON.stringify({...state,page:index}));
   const sections = document.querySelector('.sections');
   const live = window.GoStudyTravelAnswers;
+  let roomSync;
+  if (classroom) {
+    if (live?.viewing) {
+      try { state.answers = await live.read(); } catch { /* The current room still opens when historical progress is unavailable. */ }
+    }
+    roomSync = classroom.mount({
+      sidebar: room.querySelector('.side'),
+      header: document.querySelector('.header-right'),
+      currentPage: () => index,
+      openPage: page => { if (config.steps[page]) go(page,false); },
+      applyAnswer({page,key,value},initial) {
+        const step = config.steps[page];
+        if (!step) return;
+        if (key === step.id && ((step.type === 'write' && typeof value === 'string') ||
+          (step.type === 'order' && Array.isArray(value) && value.length === step.items.length &&
+            value.every(item => Number.isInteger(item) && item >= 0 && item < value.length) && new Set(value).size === value.length))) {
+          state.answers[step.id] = value;
+          if (index === page && !initial) {
+            const draft = sheet.querySelector('textarea');
+            if (draft && typeof value === 'string') draft.value = value;
+            else render();
+          }
+        } else if (key.startsWith(step.id+':') && ['choice','match','gap'].includes(step.type)) {
+          const slot = Number(key.slice(step.id.length+1));
+          if (!Number.isInteger(slot) || !step.items[slot] || (value !== null &&
+            (!Number.isInteger(value) || !step.items[slot][1][value]))) return;
+          const answers = state.answers[step.id] || [];
+          answers[slot] = value;
+          state.answers[step.id] = answers;
+          if (index === page && !initial) render();
+        } else return;
+        if (!initial) save();
+      },
+      clearAnswers(page,initial) {
+        const step = config.steps[page];
+        if (!step) return;
+        delete state.answers[step.id];
+        if (index === page && !initial) render();
+        if (!initial) save();
+      }
+    });
+    document.addEventListener('finance-ready',render);
+  }
   let studentAnswers = {};
   let liveStatus, liveOverview, overviewKey;
-  if (live?.viewing) {
+  if (live?.viewing && !classroom) {
     liveStatus = document.createElement('p');
     liveStatus.className = 'travel-live-status';
     liveStatus.setAttribute('role','status');
@@ -64,7 +109,7 @@
   }
 
   function showStudentAnswers() {
-    if (!live?.viewing) return;
+    if (!live?.viewing || classroom) return;
     const step = config.steps[index];
     const choices = studentAnswers[step.id] ?? studentAnswers[index];
     const orderNote = sheet.querySelector('.gostudy-live-order');
@@ -123,9 +168,10 @@
       setTimeout(pollStudentAnswers,1600);
     }
   }
-  function go(next) {
+  function go(next,sync = true) {
     index = next;
     save();
+    if (sync) roomSync?.page(index);
     render();
     sheet.scrollIntoView({block:'start'});
     sheet.querySelector('h1').focus({preventScroll:true});
@@ -173,12 +219,19 @@
     const audio = step.audio ? '<div class="source"><audio controls preload="metadata" aria-label="Голосовое сообщение" style="width:100%" src="'+escape(step.audio.src)+'"></audio><details><summary>Расшифровка</summary><p>'+escape(step.audio.transcript)+'</p></details></div>' : '';
     const writing = step.type === 'write' ? '<label class="writing">Ваш ответ<textarea rows="6">'+escape(typeof answer==='string'?answer:'')+'</textarea></label><p class="draft-status" role="status"></p>' : '';
     const cover = step.id === 'original-0' && config.cover ? '<img class="lesson-cover" src="'+escape(config.cover)+'" alt="'+escape(config.coverAlt || '')+'">' : '';
-    const teacherNotes = live?.viewing && step.teacherNotes
+    const teacherNotes = (live?.viewing || window.GoStudyFinanceAuth?.classroomStudent) && step.teacherNotes
       ? '<details class="source"><summary>Карточка преподавателя</summary><p>'+escape(step.teacherNotes)+'</p></details>' : '';
-    const studentDraft = live?.viewing && step.type === 'write'
+    const studentDraft = !classroom && live?.viewing && step.type === 'write'
       ? '<blockquote class="gostudy-live-draft source" aria-label="Ответ ученика" hidden></blockquote>' : '';
     frame.content.innerHTML = '<p class="label">'+escape(config.title)+'</p><h1 tabindex="-1">'+escape(step.title)+'</h1><p class="instruction">'+escape(step.instruction)+'</p>'+cover+renderVisual(step.visual)+source+audio+(exercise?'<section class="activity">'+exercise+'<button type="button" class="check cta">Проверить ответы</button><p role="status" class="result"></p></section>':'')+writing+studentDraft+(liveOverview && step.type === 'order' ? '<div class="source gostudy-live-order" hidden></div>' : '')+teacherNotes;
     navigation.innerHTML = '<button type="button" class="back" '+(index===0?'disabled':'')+'>← Назад</button>'+(index+1===config.steps.length?'<a class="cta home-link" href="'+escape(config.cabinet)+'">В личный кабинет</a>':'<button type="button" class="cta next">Далее →</button>');
+    if (classroom && (exercise || writing)) {
+      const controls = document.createElement('div');
+      controls.className = 'v1-room-activity';
+      const page = index;
+      controls.append(classroom.resetButton(() => roomSync.reset(page)));
+      frame.content.prepend(controls);
+    }
     showStudentAnswers();
     sheet.querySelector('.back').onclick = () => go(index-1);
     const next = sheet.querySelector('.next');
@@ -187,6 +240,7 @@
     if (draft) draft.oninput = () => {
       state.answers[step.id] = draft.value;
       save();
+      roomSync?.answer(index,step.id,draft.value,true);
       sheet.querySelector('.draft-status').textContent = 'Ответ сохранён';
     };
     sheet.querySelectorAll('input,select').forEach(input => {
@@ -199,6 +253,8 @@
         row.removeAttribute('data-result');
         row.querySelector('.feedback').textContent = '';
         sheet.querySelector('.result').textContent = '';
+        roomSync?.answer(index,step.id+':'+i,current[i]);
+        if (classroom) grade(true);
       };
     });
     sheet.querySelectorAll('.word-menu').forEach(menu => {
@@ -217,6 +273,8 @@
           row.removeAttribute('data-result');
           row.querySelector('.feedback').textContent = '';
           sheet.querySelector('.result').textContent = '';
+          roomSync?.answer(index,step.id+':'+i,current[i]);
+          if (classroom) grade(true);
         };
       });
     });
@@ -227,12 +285,14 @@
         [order[i],order[i+shift]] = [order[i+shift],order[i]];
         state.answers[step.id] = order;
         save();
+        roomSync?.answer(index,step.id,order);
         render();
+        if (classroom && order.every((value,j) => value === step.order[j])) classroom.celebrate();
         (sheet.querySelector('[data-move="'+(i+shift)+','+shift+'"]:not(:disabled)') || sheet.querySelector('h1')).focus();
       };
     });
     const check = sheet.querySelector('.check');
-    if (check) check.onclick = () => {
+    function grade(animate = false) {
       const order = step.type === 'order';
       const expected = order ? step.order : step.items.map(item => item[2]);
       const actual = order && !current.length ? step.items.map((_,i) => i) : current;
@@ -240,15 +300,31 @@
         const correct = actual[i] === value;
         if (!order) {
           const row = sheet.querySelector('[data-question="'+i+'"]');
-          row.dataset.result = correct?'correct':'retry';
-          row.querySelector('.feedback').textContent = correct ? '✓ '+(step.items[i][3] || 'Correct') : actual[i] == null ? 'Choose an answer.' : 'Try again.';
+          if (classroom && actual[i] == null) {
+            row.removeAttribute('data-result');
+            row.querySelector('.feedback').textContent = '';
+          } else {
+            row.dataset.result = correct?'correct':'retry';
+            row.querySelector('.feedback').textContent = correct ? '✓ '+(step.items[i][3] || 'Correct') : actual[i] == null ? 'Choose an answer.' : 'Try again.';
+          }
         }
         return correct;
       }).length;
       const result = sheet.querySelector('.result');
-      result.textContent = score+' / '+expected.length+' correct. '+(score===expected.length?'Well done!':step.hint || '');
-    };
+      const started = actual.some(value => value != null) && (!order || current.length);
+      result.textContent = !classroom || started ? score+' / '+expected.length+' correct. '+(score===expected.length?'Well done!':step.hint || '') : '';
+      if (animate && score === expected.length) classroom.celebrate();
+    }
+    if (check) {
+      if (classroom) { check.hidden = true; grade(); }
+      else check.onclick = () => grade();
+    }
   }
   render();
-  if (live?.viewing) pollStudentAnswers();
+  if (live?.viewing && !classroom) pollStudentAnswers();
+  if (classroom) {
+    const vocabulary = document.createElement('script');
+    vocabulary.src = document.querySelector('[data-room-vocabulary]').dataset.roomVocabulary;
+    document.head.append(vocabulary);
+  }
 })();

@@ -1,7 +1,36 @@
 <!doctype html>
-<html lang="ru"><head><meta name="gostudy-course" content="business-ai"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Мой кабинет · GoStudy</title>
-<link rel="stylesheet" href="assets/gostudy-sync.css?v=d9356e89a210"><link rel="stylesheet" href="assets/gostudy-cabinet.css?v=3729477e56d0">
-<style>
-*{box-sizing:border-box}body{margin:0;font:16px/1.5 system-ui,sans-serif;color:#102531;background:#fff}.topbar{background:#fff}.brand{color:#102531;text-decoration:none;font-size:22px;font-weight:800;letter-spacing:-.04em}.student-main{max-width:1180px;margin:auto;padding:clamp(18px,4vw,40px)}.intro h1{margin:0 0 18px;font-size:clamp(30px,5vw,49px);line-height:1.12;letter-spacing:-.04em}
-</style><script src="assets/gostudy-sync.js?v=114c8b497efb" defer></script><link rel="stylesheet" href="assets/gostudy-glass-vocabulary.css?v=56adcac829c1"></head>
-<body data-vocab-course="business-ai"><header class="topbar"><a class="brand" href="student-business-ai.html">GoStudy</a></header><main class="student-main"><div class="intro"><h1 lang="en">Hello! Let’s learn.</h1></div><section id="student-home" aria-label="Текущий урок, домашнее задание и словарь"></section><noscript><a href="business-ai-b2c1-02.html?v=vimbox-2">Открыть текущий урок</a></noscript></main><script src="assets/gostudy-current-courses.js?v=ce1df270d0e5" defer></script><script src="assets/gostudy-glass-vocabulary.js?v=9c384a3e224e" defer></script></body></html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Business AI · B2–C1 · Кабинет ученика GoStudy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#ffffff">
+<link rel="stylesheet" href="assets/gostudy-v1-cabinet.css?v=1">
+<meta name="gostudy-course" content="business-ai"></head>
+<body data-finance-live data-preserve-workbook-progress data-vocabulary-sources="gostudy-business-ai-shared-v1 gostudy-business-ai-b2c1-v1 gostudy-business-ai-b2c1-02-v1" data-classroom-course="business-ai" data-classroom-lesson="business-ai-b2c1-02.html" data-vocabulary-key="gostudy-vocabulary-business-ai-v1">
+<script type="application/json" id="cabinet-settings">{"cabinet":"student-business-ai.html","course":"Business AI · B2–C1","title":"From AI Pilot to Rollout","homework":"business-ai-b2c1-homework.html","lesson":"business-ai-b2c1-02.html","student":"Влад","previous":[["business-ai-b2c1.html","AI at Work"]],"duration":null}</script>
+<script src="assets/gostudy-v1-cabinet.js"></script>
+<script src="assets/gostudy-v1-vocabulary.js?v=1"></script>
+<script src="assets/gostudy-sync.js?v=classroom-1"></script><script src="assets/gostudy-finance-live.js?v=classroom-1"></script>
+<script>
+function refreshClassroomVocabulary() {
+  updateVocabularyCount();
+  if (wordsDialog.open) openVocabulary();
+}
+document.addEventListener('finance-ready', event => {
+  const name = event.detail?.student_label;
+  if (name) {
+    document.querySelector('.profile span').textContent = name;
+    document.querySelector('.avatar').textContent = name[0].toUpperCase();
+    document.querySelector('.hello h1').textContent = 'Хев а найс дей, '+name+'!';
+  }
+  refreshClassroomVocabulary();
+});
+document.addEventListener('finance-word', refreshClassroomVocabulary);
+window.GoStudyV1Progress?.ready.then(refreshClassroomVocabulary);
+</script>
+</body>
+</html>

@@ -53,9 +53,12 @@ body.dark #dictionary { background: rgba(26, 45, 66, .92); }
   #dictionary { padding: 18px; }
   #dictionary .dict-actions > button { flex: 1 1 auto; }
 }
-</style></head><body><header><div class="brand">Gostudy</div><div class="header-actions"><a class="small-button cabinet-link" href="student-art-b1.html">← Кабинет</a><button class="small-button" id="dictBtn">My words <span id="wordCount">0</span></button><button class="small-button" id="themeBtn" aria-label="Switch colour theme">◐</button></div></header>
-<div class="shell"><main><div class="lesson-bar"><button class="small-button" id="menuBtn" aria-haspopup="dialog" aria-expanded="false">☰ Задания</button></div><div id="pageLabel" hidden></div><h1 id="title" tabindex="-1"></h1><p class="subtitle" id="goal"></p><div id="content"></div><details class="teacher" hidden><summary>Teacher notes · pacing</summary><p id="teacherTips"></p></details><div class="page-controls"><button id="prev" class="small-button">← Назад</button><span id="counter"></span><button id="next" class="primary">Next →</button></div><footer class="footer">Gostudy · Art · B1 · Lesson 02. Ответы и слова сохраняются в этом браузере.</footer><p class="storage-note" id="storageNote" hidden role="status"></p></main></div>
-<dialog id="lessonMenu" class="menu-dialog"><button class="small-button" id="exportBtn" hidden style="margin-bottom:20px">↓ Download my answers</button><div class="menu-top"><b>Урок</b><button class="small-button" id="closeMenu">Закрыть ✕</button></div><span class="eyebrow">TRAVEL · B2</span><h2>Your feed,<br>your choice?</h2><nav id="nav"></nav></dialog>
+</style><link rel="stylesheet" href="assets/gostudy-v1-classroom.css"></head>
+<body class="v1-room-page" data-finance-live data-classroom-course="art-b1" data-classroom-lesson="art-b1-02.html">
+<p class="classroom-access" role="status">Открываем урок… <a href="login.html">Войти в GoStudy</a></p>
+<header><a class="v1-room-brand" data-room-back href="student-art-b1.html" aria-label="В личный кабинет"><img src="assets/gostudy-emblem.svg" alt="">GoStudy</a><div class="header-actions header-right"><button class="small-button" id="dictBtn">Dictionary <span id="wordCount">0</span></button><button class="small-button" id="themeBtn" aria-label="Switch colour theme">◐</button></div></header>
+<div class="shell"><main><div class="lesson-bar"><button class="small-button" id="menuBtn" aria-haspopup="dialog" aria-expanded="false">☰ Задания</button></div><div id="pageLabel" hidden></div><h1 id="title" tabindex="-1"></h1><p class="subtitle" id="goal"></p><div id="content"></div><details class="teacher" hidden><summary>Teacher notes · pacing</summary><p id="teacherTips"></p></details><div class="page-controls"><button id="prev" class="small-button">← Назад</button><span id="counter"></span><button id="next" class="primary">Next →</button></div><p class="storage-note" id="storageNote" hidden role="status"></p></main><aside class="side gostudy-room-sidebar" aria-label="Инструменты урока"></aside></div>
+<dialog id="lessonMenu" class="menu-dialog"><button class="small-button" id="exportBtn" hidden style="margin-bottom:20px">↓ Download my answers</button><div class="menu-top"><b>Урок</b><button class="small-button" id="closeMenu">Закрыть ✕</button></div><span class="eyebrow">ART · B1</span><h2>Every picture has a story</h2><nav id="nav"></nav></dialog>
 <dialog id="dictionary" class="dictionary" aria-labelledby="dictionaryTitle">
   <div class="menu-top"><h2 id="dictionaryTitle">My vocabulary</h2><button class="small-button" id="closeDict" type="button">Close ✕</button></div>
   <form id="wordForm">
@@ -71,34 +74,103 @@ body.dark #dictionary { background: rgba(26, 45, 66, .92); }
   </form>
   <div id="wordList"></div>
 </dialog>
-<dialog id="trainingDialog" class="dictionary"><div class="menu-top"><h2>Тренировка слов</h2><button class="small-button" id="closeTraining">Закрыть ✕</button></div><div id="trainingBody"></div></dialog><div id="translationPop" class="translation-pop" hidden role="region" aria-label="Перевод выделенного текста"><button class="small-button x" id="closePop" aria-label="Закрыть перевод">✕</button><h3 id="selectedWord"></h3><button type="button" class="small-button" id="speakSelected" aria-label="Озвучить выделенный текст">🔊 Озвучить</button><label class="field-label" for="selectedMeaning">Перевод</label><p id="selectedContext" class="selected-context" hidden></p><div class="translation-entry"><button class="translation-add" id="saveSelected" type="button" aria-label="Добавить в словарь" title="Добавить в словарь">♥</button><textarea id="selectedMeaning" rows="2" maxlength="2000" aria-label="Перевод — можно исправить"></textarea></div><p id="translateStatus" class="audio-note" role="status" hidden></p><div class="dict-actions" hidden><button class="small-button" id="translateOnline" hidden>Другой перевод</button></div></div><div id="toast" role="status"></div>
-<script>
+<dialog id="trainingDialog" class="dictionary"><div class="menu-top"><h2>Тренировка слов</h2><button class="small-button" id="closeTraining">Закрыть ✕</button></div><div id="trainingBody"></div></dialog><div id="translationPop" class="translation-pop" hidden role="region" aria-label="Перевод выделенного текста"><button class="small-button x" id="closePop" aria-label="Закрыть перевод">✕</button><h3 id="selectedWord"></h3><button type="button" class="small-button" id="speakSelected" aria-label="Озвучить выделенный текст">🔊 Озвучить</button><label class="field-label" for="selectedMeaning">Перевод</label><p id="selectedContext" class="selected-context" hidden></p><div class="translation-entry"><button class="translation-add" id="saveSelected" type="button" aria-label="Добавить в словарь" title="Добавить в словарь">+</button><textarea id="selectedMeaning" rows="2" maxlength="2000" aria-label="Перевод — можно исправить"></textarea></div><p id="translateStatus" class="audio-note" role="status" hidden></p><div class="dict-actions" hidden><button class="small-button" id="translateOnline" hidden>Другой перевод</button></div></div><div id="toast" role="status"></div>
+<script src="assets/gostudy-sync.js"></script><script src="assets/gostudy-v1-classroom.js"></script><script>
 'use strict';
 const CLIPS=[{"title":"A quiet afternoon at the country house","lines":[["Nina","Last Sunday, I went to our country house on my own. I wanted to spend the afternoon in the garden, but it started to rain just after I arrived. I put my bag on the porch and went inside. The house was cold, so I found a blanket and made a cup of tea. Then I sat by the window and watched the rain. An hour later, the sky cleared. I put on my boots and went outside. The garden smelled fresh, and for a few minutes, all I could hear were the birds."]],"qs":[["Why did Nina go inside?",["It started to rain.","It was already dark.","She heard birds."],0],["What did Nina do to get warm?",["She put on her boots.","She found a blanket and made tea.","She closed the gate."],1],["What could she hear in the garden?",["Cars.","The rain.","Birds."],2]]},{"qs":[["What did Nina open first?",["The gate","A window","A box"],0],["Why did they move the chairs?",["It started to rain","The chairs were broken","They wanted to paint them"],0],["What did the visitors bring?",["Tools","A cake","A new key"],1]]}];
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const key='gostudy-art-b1-02-v1';let state={page:0,answers:{},words:[],dark:false};let storage=true;
-try{const s=JSON.parse(localStorage.getItem(key)||'null');if(s&&typeof s==='object'){state={...state,...s};state.answers=s.answers&&typeof s.answers==='object'?s.answers:{};state.words=Array.isArray(s.words)?s.words.filter(w=>w&&typeof w.en==='string'&&typeof w.ru==='string'):[];}}catch(e){storage=false;}
+const key='gostudy-art-b1-02-v1';
+const classroom = window.GoStudyV1Classroom;
+const teacher = Boolean(window.GoStudyFinanceAuth.classroomStudent);
+const storageAdapter = teacher ? {getItem:()=>null,setItem:()=>{}} : localStorage;
+let roomSync, replaying = false;
+const answerPages = [[],['v1','v2','v3'],['r1','r2','r3'],['l1','l2','l3'],['g1','g2','g3','g4','feedPicks','explore'],[],[],[]];
+let state={page:0,answers:{},words:[],dark:false};let storage=true;
+try{const s=JSON.parse(storageAdapter.getItem(key)||'null');if(s&&typeof s==='object'){state={...state,...s};state.answers=s.answers&&typeof s.answers==='object'?s.answers:{};state.words=Array.isArray(s.words)?s.words.filter(w=>w&&typeof w.en==='string'&&typeof w.ru==='string'):[];}}catch(e){storage=false;}
 const sharedWordKey="gostudy-art-b1-v1";
 let lastWords = '';
+let previousAnswers = structuredClone(state.answers);
+let previousPage = state.page;
+function updateLiveWords() {
+  const combined = new Map(state.words.map(word => [norm(word.en),word]));
+  for (const word of window.FinanceLive?.words() || []) combined.set(norm(word.en),word);
+  state.words = [...combined.values()];
+  lastWords = JSON.stringify(state.words);
+  $('#wordCount').textContent = state.words.length;
+  if ($('#dictionary').open) renderWords();
+}
 function readSharedWords(){
   try {
-    const shared = JSON.parse(localStorage.getItem(sharedWordKey) || '{}');
+    const shared = JSON.parse(storageAdapter.getItem(sharedWordKey) || '{}');
     if(Array.isArray(shared.words)) state.words = shared.words.filter(w=>w&&typeof w.en==='string'&&typeof w.ru==='string');
   } catch {}
   lastWords = JSON.stringify(state.words);
 }
 readSharedWords();
-window.addEventListener('pageshow',()=>{readSharedWords();$('#wordCount').textContent=state.words.length;if($('#dictionary').open)renderWords();});
-function save(){try{
+window.addEventListener('pageshow',()=>{readSharedWords();updateLiveWords();});
+function save(){
+  if (roomSync && !replaying && previousPage !== state.page) roomSync.page(state.page);
+  previousPage = state.page;
+  for (const [id,value] of Object.entries(state.answers)) {
+    if (!replaying && answerPages[state.page]?.includes(id) && JSON.stringify(previousAnswers[id]) !== JSON.stringify(value)) {
+      roomSync?.answer(state.page,id,value);
+    }
+  }
+  previousAnswers = structuredClone(state.answers);
+  if (replaying) return;
+  try{
   const currentWords = JSON.stringify(state.words);
   if(currentWords!==lastWords){
-    const shared = JSON.parse(localStorage.getItem(sharedWordKey)||'{}');
+    const shared = JSON.parse(storageAdapter.getItem(sharedWordKey)||'{}');
     shared.words=state.words;
-    localStorage.setItem(sharedWordKey,JSON.stringify(shared));
+    storageAdapter.setItem(sharedWordKey,JSON.stringify(shared));
     lastWords=currentWords;
   }
-  localStorage.setItem(key,JSON.stringify(state));}catch(e){storage=false;$('#storageNote').hidden=false;$('#storageNote').textContent='Saving unavailable. Export your answers and vocabulary before closing.';}$('#wordCount').textContent=state.words.length;}
+  storageAdapter.setItem(key,JSON.stringify(state));}catch(e){storage=false;$('#storageNote').hidden=false;$('#storageNote').textContent='Saving unavailable. Export your answers and vocabulary before closing.';}$('#wordCount').textContent=state.words.length;}
+roomSync = classroom.mount({
+  sidebar: $('.side'),
+  header: $('.header-right'),
+  currentPage: () => state.page,
+  openPage(page) {
+    if (!answerPages[page]) return;
+    previousPage = page;
+    go(page);
+  },
+  applyAnswer({page,key,value},initial) {
+    if (!answerPages[page]?.includes(key)) return;
+    state.answers[key] = value;
+    previousAnswers[key] = value;
+    if (!initial && page === state.page) {
+      const field = document.getElementById(key);
+      if (field instanceof HTMLSelectElement) {
+        field.value = value;
+        const filled = Boolean(field.value);
+        const correct = filled && norm(field.value) === norm(field.dataset.gap);
+        field.classList.toggle('correct',correct);
+        field.classList.toggle('incorrect',filled && !correct);
+        $('#fb-'+key).textContent = filled ? correct ? '✓ Верно!' : 'Попробуйте ещё раз.' : '';
+      } else render();
+    }
+    if (!initial) save();
+  },
+  clearAnswers(page,initial) {
+    for (const key of answerPages[page] || []) {
+      delete state.answers[key];
+      delete previousAnswers[key];
+    }
+    if (initial) return;
+    if (page === state.page) render();
+    save();
+  }
+});
+document.addEventListener('finance-ready', () => {
+  replaying = true;
+  render();
+  replaying = false;
+  updateLiveWords();
+});
+document.addEventListener('finance-word', updateLiveWords);
 let toastTimer;function notify(s){$('#toast').textContent=s;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3200);}
 const words=[["a focal point","центр внимания","The red boat is the focal point."],["the foreground","передний план","There are flowers in the foreground."],["the background","задний план; фон","The background is darker."],["contrast","контраст","The contrast makes the shape clear."],["stand out","выделяться","The bright pieces stand out."],["a label","подпись; этикетка","Add a short label beside the picture."],["display","выставлять; показывать","Where should we display the mosaic?"],["feedback","обратная связь","Can you give me some feedback?"],["suggest","предлагать; советовать","I suggest using a lighter colour."],["improve","улучшать","How could I improve the composition?"],["inspired by","вдохновлённый чем-либо","The design was inspired by a garden."],["an exhibition","выставка","Our exhibition opens on Friday."]];
 const glossary={"a focal point":"центр внимания","the foreground":"передний план","the background":"задний план; фон","contrast":"контраст","stand out":"выделяться","a label":"подпись; этикетка","display":"выставлять; показывать","feedback":"обратная связь","suggest":"предлагать; советовать","improve":"улучшать","inspired by":"вдохновлённый чем-либо","an exhibition":"выставка"};
@@ -121,15 +193,22 @@ function feedDebate(){return card("Arrange a mini-gallery","<p>You have three wo
 function feedWriting(){return card("Give it a title","<p>Choose one artwork from the first page. Think of two possible titles: one descriptive and one imaginative. Say both titles aloud and explain which you prefer.</p><p>Then present the work in 45 seconds. Mention the material, colours, focal point and what it reminds you of. Your partner asks two questions.</p><p class='support'>The work shows… · In the background… · The main focus is… · I chose this title because…</p>");}
 function hwChoice(id,answer,options){return '<select id="'+id+'" data-gap="'+answer+'" data-answer="'+id+'" aria-label="Пропуск '+id.replace('hw','')+'"><option value="">Выберите…</option>'+options.map(v=>'<option value="'+esc(v)+'" '+(state.answers[id]===v?'selected':'')+'>'+esc(v)+'</option>').join('')+'</select><span class="feedback" id="fb-'+id+'" role="status"></span>';}
 function feedFinish(){return card("Your artist’s statement","<p>Describe a real or imagined artwork. Give your partner one specific suggestion and explain its effect. Ask what they think before changing the design.</p><p><a href='art-b1-02-homework.html'>Открыть домашнее задание ко второму уроку →</a></p><p><a href='art-mosaics-b1.html'>Вернуться к первому уроку →</a></p>");}
-function installGapChecks(){function check(el){const v=el.value.trim(),ok=norm(v)===norm(el.dataset.gap);el.classList.toggle('correct',!!v&&ok);el.classList.toggle('incorrect',!!v&&!ok);$('#fb-'+el.id).textContent=!v?'':ok?'✓ Верно!':'Попробуйте ещё раз.';}$$('[data-gap]').forEach(el=>{el.addEventListener('blur',()=>check(el));el.addEventListener('change',()=>{state.answers[el.dataset.answer]=el.value;save();check(el);});el.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();check(el);}});el.addEventListener('input',()=>{el.classList.remove('correct','incorrect');$('#fb-'+el.id).textContent='';});if(el.value.trim())check(el);});}
+function installGapChecks(){function check(el,animate=false){const v=el.value.trim(),ok=norm(v)===norm(el.dataset.gap);el.classList.toggle('correct',!!v&&ok);el.classList.toggle('incorrect',!!v&&!ok);$('#fb-'+el.id).textContent=!v?'':ok?'✓ Верно!':'Попробуйте ещё раз.';if(animate && ok && $('[data-gap]').every(field=>norm(field.value)===norm(field.dataset.gap))) classroom.celebrate();}$('[data-gap]').forEach(el=>{el.addEventListener('blur',()=>check(el));el.addEventListener('change',()=>{state.answers[el.dataset.answer]=el.value;save();check(el,true);});el.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();check(el);}});el.addEventListener('input',()=>{el.classList.remove('correct','incorrect');$('#fb-'+el.id).textContent='';});if(el.value.trim())check(el);});}
 function installLesson(){installGapChecks();$$('[data-position]').forEach(b=>b.onclick=()=>{state.answers.position=Number(b.dataset.position);save();render();});$$('[data-feed-pick]').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.feedPick),p=labPicks(),at=p.indexOf(i);if(at>=0)p.splice(at,1);else if(p.length<3)p.push(i);else{notify('Выберите не больше трёх видео. Можно снять выделение с другого.');return;}state.answers.feedPicks=p;save();const y=scrollY;render();scrollTo(0,y);});if($('#toggleExplore'))$('#toggleExplore').onclick=()=>{state.answers.explore=!state.answers.explore;save();const y=scrollY;render();scrollTo(0,y);};if($('#resetFeed'))$('#resetFeed').onclick=()=>{state.answers.feedPicks=[];state.answers.explore=false;save();render();};$('#exportBtn').hidden=true;}
 
 function feedback(ci,qi){const id=`q${ci}-${qi}`,v=state.answers[id];if(v===undefined)return;const ok=Number(v)===CLIPS[ci].qs[qi][2];$('#fb-'+id).textContent=ok?'✓ Верно!':'Попробуйте ещё раз. Вернитесь к тексту или аудио.';$$(`[name="${id}"]`).forEach(el=>{el.closest('label').classList.toggle('correct',el.checked&&ok);el.closest('label').classList.toggle('incorrect',el.checked&&!ok);});}
 function stop(){clearPractice();const a=$('#lessonAudio');if(a)a.pause();}
-function render(){const p=pages[state.page];$('#pageLabel').textContent=`TRAVEL / ${String(state.page+1).padStart(2,'0')} · ≈ ${p[2]} MIN`;$('#title').textContent=p[0];$('#goal').textContent=p[1];$('#teacherTips').textContent=p[3];$('#counter').textContent=`${state.page+1} / ${pages.length}`;$('#prev').disabled=state.page===0;$('#next').textContent=state.page===7?'Итог ✓':'Далее →';$('#content').innerHTML=[feedWelcome,feedWords,feedReading,feedListening,feedLab,feedDebate,feedWriting,feedFinish][state.page]();$('#nav').innerHTML=pages.map((p,i)=>`<button data-page="${i}" class="${i===state.page?'active':''}"><span>${String(i+1).padStart(2,'0')}</span>${esc(p[0])}</button>`).join('');$$('[data-page]').forEach(b=>b.onclick=()=>go(Number(b.dataset.page)));$$('[data-answer]').forEach(el=>el.oninput=()=>{state.answers[el.dataset.answer]=el.value;save();});$$('[data-can]').forEach(el=>el.onchange=()=>{state.answers[el.dataset.can]=el.checked;save();});$$('[data-add]').forEach(b=>b.onclick=()=>{const w=words[Number(b.dataset.add)];addWord(w[0],w[1]);});$$('[data-q]').forEach(el=>{const [ci,qi]=el.dataset.q.split(':').map(Number);el.onchange=()=>{state.answers[`q${ci}-${qi}`]=Number(el.value);save();feedback(ci,qi);};feedback(ci,qi);});if($('#checkGaps'))$('#checkGaps').onclick=()=>$$('[data-gap]').forEach(el=>{const ok=norm(el.value)===norm(el.dataset.gap);el.classList.toggle('correct',ok);el.classList.toggle('incorrect',!ok);$('#fb-'+el.id).textContent=ok?'✓ Correct.':'Попробуйте ещё раз. Можно открыть таблицу-подсказку.';});if($('#speed'))$('#speed').onchange=e=>$('#lessonAudio').playbackRate=Number(e.target.value);if($('#lessonAudio'))$('#lessonAudio').onerror=()=>notify('Audio unavailable. Open the script to practise together.');installLesson();document.body.classList.toggle('dark',!!state.dark);save();}
+function render(){const p=pages[state.page];$('#pageLabel').textContent=`TRAVEL / ${String(state.page+1).padStart(2,'0')} · ≈ ${p[2]} MIN`;$('#title').textContent=p[0];$('#goal').textContent=p[1];$('#teacherTips').textContent=p[3];$('#counter').textContent=`${state.page+1} / ${pages.length}`;$('#prev').disabled=state.page===0;$('#next').textContent=state.page===7?'Итог ✓':'Далее →';$('#content').innerHTML=[feedWelcome,feedWords,feedReading,feedListening,feedLab,feedDebate,feedWriting,feedFinish][state.page]();
+if (answerPages[state.page].length) {
+  const controls = document.createElement('div');
+  controls.className = 'v1-room-activity';
+  controls.append(classroom.resetButton(() => roomSync.reset(state.page)));
+  $('#content').prepend(controls);
+}
+$('#nav').innerHTML=pages.map((p,i)=>`<button data-page="${i}" class="${i===state.page?'active':''}"><span>${String(i+1).padStart(2,'0')}</span>${esc(p[0])}</button>`).join('');$$('[data-page]').forEach(b=>b.onclick=()=>go(Number(b.dataset.page)));$$('[data-answer]').forEach(el=>el.oninput=()=>{state.answers[el.dataset.answer]=el.value;save();});$$('[data-can]').forEach(el=>el.onchange=()=>{state.answers[el.dataset.can]=el.checked;save();});$$('[data-add]').forEach(b=>b.onclick=()=>{const w=words[Number(b.dataset.add)];addWord(w[0],w[1]);});$$('[data-q]').forEach(el=>{const [ci,qi]=el.dataset.q.split(':').map(Number);el.onchange=()=>{state.answers[`q${ci}-${qi}`]=Number(el.value);save();feedback(ci,qi);};feedback(ci,qi);});if($('#checkGaps'))$('#checkGaps').onclick=()=>$$('[data-gap]').forEach(el=>{const ok=norm(el.value)===norm(el.dataset.gap);el.classList.toggle('correct',ok);el.classList.toggle('incorrect',!ok);$('#fb-'+el.id).textContent=ok?'✓ Correct.':'Попробуйте ещё раз. Можно открыть таблицу-подсказку.';});if($('#speed'))$('#speed').onchange=e=>$('#lessonAudio').playbackRate=Number(e.target.value);if($('#lessonAudio'))$('#lessonAudio').onerror=()=>notify('Audio unavailable. Open the script to practise together.');installLesson();document.body.classList.toggle('dark',!!state.dark);save();}
 function go(i){stop();$('#translationPop').hidden=true;if($('#lessonMenu').open)$('#lessonMenu').close();state.page=i;render();$('#title').focus({preventScroll:true});window.scrollTo({top:0,behavior:'smooth'});}
 $('#prev').onclick=()=>go(Math.max(0,state.page-1));$('#next').onclick=()=>state.page<pages.length-1?go(state.page+1):notify('Урок завершён. Можно вернуться к любому разделу.');$('#themeBtn').onclick=()=>{state.dark=!state.dark;document.body.classList.toggle('dark',state.dark);save();};$('#menuBtn').onclick=()=>{$('#lessonMenu').showModal();$('#menuBtn').setAttribute('aria-expanded','true');};$('#closeMenu').onclick=()=>$('#lessonMenu').close();$('#lessonMenu').onclose=()=>$('#menuBtn').setAttribute('aria-expanded','false');
-function addWord(en,ru){en=en.trim();ru=ru.trim();if(/[а-яё]/i.test(en)&&/[a-z]/i.test(ru)&&!/[а-яё]/i.test(ru)){[en,ru]=[ru,en];}if(!en||!ru){notify('Add a word and its translation.');return false;}const old=state.words.find(w=>norm(w.en)===norm(en));if(old)old.ru=ru;else state.words.push({en,ru});save();notify(old?'Translation updated.':'Word saved ✓');return true;}
+function addWord(en,ru){en=en.trim();ru=ru.trim();if(/[а-яё]/i.test(en)&&/[a-z]/i.test(ru)&&!/[а-яё]/i.test(ru)){[en,ru]=[ru,en];}if(!en||!ru){notify('Add a word and its translation.');return false;}if (roomSync.word(en,ru)) return true;const old=state.words.find(w=>norm(w.en)===norm(en));if(old)old.ru=ru;else state.words.push({en,ru});save();notify(old?'Translation updated.':'Word saved ✓');return true;}
 function renderWords(){const list=$('#wordList');list.innerHTML=state.words.length?state.words.map((w,i)=>`<div class="dictrow"><div><strong>${esc(w.en)}</strong><p>${esc(w.ru)}</p></div><div><button type="button" class="small-button" data-speak-word>🔊 Прослушать слово</button> <button class="small-button" data-edit="${i}" aria-label="Edit ${esc(w.en)}">Edit</button> <button class="small-button" data-delete="${i}" aria-label="Delete ${esc(w.en)}">✕</button></div></div>`).join(''):'<p class="muted dict-empty">Пока пусто. Выделите слово в уроке или добавьте его выше.</p>';$$('[data-edit]').forEach(b=>b.onclick=()=>{const w=state.words[Number(b.dataset.edit)];manualVersion++;clearTimeout(manualTimer);manualStatus.textContent='';$('#newWord').value=w.en;$('#newMeaning').value=w.ru;$('#newMeaning').focus();});$$('[data-delete]').forEach(b=>b.onclick=()=>{state.words.splice(Number(b.dataset.delete),1);save();renderWords();});}
 function openDict(){window.getSelection()?.removeAllRanges();$('#translationPop').hidden=true;renderWords();$('#dictionary').showModal();}$('#dictBtn').onclick=openDict;$('#closeDict').onclick=()=>$('#dictionary').close();$('#wordForm').onsubmit=e=>{e.preventDefault();if(addWord($('#newWord').value,$('#newMeaning').value)){e.target.reset();renderWords();}};
 $('#trainWords').onclick=openTraining;$('#closeTraining').onclick=()=>$('#trainingDialog').close();
