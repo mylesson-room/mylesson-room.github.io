@@ -12,6 +12,7 @@
   const shared = window.GoStudyWorkbookWords || window.GoStudyTravelWords;
   const classMode = new URLSearchParams(location.search).has('classStudent');
   let needsClass = !classMode && shared?.teacherWithoutStudent;
+  const inRoom = document.body.classList.contains('v1-room-page');
   let assigned = [];
   const norm = text => String(text).trim().toLowerCase().replace(/\s+/g,' ').replace(/[.!?,;:]+$/,'');
   const russian = /[а-яё]/i;
@@ -110,6 +111,7 @@
       if (word?.en && word?.ru) all.set(norm(word.en),word);
     }
     for (const word of assigned) if (!all.has(norm(word.en))) all.set(norm(word.en),word);
+    if (inRoom) for (const word of window.FinanceLive?.words() || []) all.set(norm(word.en),word);
     const removed = new Set(hiddenWords());
     return [...all.values()].filter(word=>!removed.has(norm(word.en)));
   }
@@ -118,6 +120,10 @@
     if (needsClass) throw Error('Выбери ученицу в кабинете преподавателя и нажми «Войти в класс».');
     if (!a || !b) return false;
     const [en,ru] = russian.test(a) && !russian.test(b) ? [b,a] : [a,b];
+    if (inRoom) {
+      if (!window.FinanceLive?.send('word',{en,ru})) throw Error('Подключаем словарь. Попробуйте ещё раз.');
+      return true;
+    }
     if (classMode) {
       if (!shared?.signedIn) throw Error('Войди в кабинет преподавателя и открой урок через «Войти в класс».');
       await shared.add(en,ru);
@@ -298,6 +304,9 @@
     finally{loading=false;}
   }
   if(shared)setInterval(refreshAssigned,3000);
+  if (inRoom) document.addEventListener('finance-word',() => {
+    if (dictionary.open && tab === 'words') renderWords();
+  });
   if(course==='general-english-b1-stories') {
     document.addEventListener('gostudy-stories-vocabulary-updated',()=>{
       if(dictionary.open && tab==='words')renderWords();
@@ -344,12 +353,14 @@
     toolbar.append(button('Словарь',()=>open('words'),'glass-primary'),button('Тренировать слова',()=>open('cards')));
   }
   const roomSidebar = document.querySelector('.gostudy-room-sidebar');
-  if (roomSidebar) roomSidebar.querySelector('.sections').before(toolbar);
+  if (inRoom) document.querySelector('.header-right').append(toolbar);
+  else if (roomSidebar) roomSidebar.querySelector('.sections').before(toolbar);
   else (side?.querySelector('.panel') || document.querySelector('header') || lesson).after(toolbar);
   translation=document.createElement('section');translation.className='glass-translation';translation.hidden=true;
   translation.setAttribute('aria-label','Перевод выделенного текста');
   translation.innerHTML='<div class="glass-title"><strong></strong><button type="button" aria-label="Закрыть перевод">×</button></div><label>Перевод<textarea rows="2"></textarea></label><p role="status"></p><div class="glass-actions"></div>';
-  toolbar.after(translation);
+  if (inRoom) document.body.append(translation);
+  else toolbar.after(translation);
   function showClassLink() {
     if (toolbar.querySelector('a') || !(needsClass || (classMode && !shared?.signedIn))) return;
     const signIn=document.createElement('a');
@@ -369,7 +380,7 @@
   });
   const translated=by(translation,'textarea'), translationStatus=by(translation,'p');
   by(translation,'.glass-title button').onclick=closeTranslation;
-  by(translation,'.glass-actions').append(icon('🔊','Озвучить',()=>speak(selected)),icon('♥',classMode || needsClass?'Добавить ученику':'В словарь',async event=>{
+  by(translation,'.glass-actions').append(icon('🔊','Озвучить',()=>speak(selected)),icon(inRoom ? '+' : '♥',classMode || needsClass?'Добавить ученику':'В словарь',async event=>{
     const control=event.currentTarget, run=translationRun;
     control.disabled=true;
     try { if(!await add(selected,translated.value)) throw Error('Добавьте перевод, чтобы сохранить слово.'); if(run===translationRun)translationStatus.textContent=classMode?'Слово добавлено ученице.':'Добавлено в словарь.'; }

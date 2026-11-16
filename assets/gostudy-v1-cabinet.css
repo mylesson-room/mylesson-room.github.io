@@ -319,3 +319,8 @@ body[data-classroom-course] .classroom-access{margin:24px auto;max-width:640px;p
 
 body[data-classroom-course] .homework-link .homework-subject{max-width:100%;overflow-wrap:break-word}
 body[data-classroom-course] .lesson-card-link h2{max-width:100%}
+
+.v1-previous { margin: 20px 0; padding: 14px 20px; border: 1px solid #dceaf7; border-radius: 16px; background: #f5faff; color: #194973; }
+.v1-previous summary { cursor: pointer; font-weight: 700; }
+.v1-previous ul { margin-bottom: 4px; }
+.v1-previous a { text-decoration: underline; }

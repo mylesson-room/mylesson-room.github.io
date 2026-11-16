@@ -5,6 +5,24 @@ const practiceDialog = document.querySelector('#practiceDialog');
 let practiceWords = [], practiceIndex = 0;
 
 function loadSavedWords() {
+  const legacy = document.body.dataset.vocabularySources;
+  if (legacy && window.FinanceLive?.connected()) {
+    const combined = new Map();
+    const read = (store,key) => {
+      try {
+        const saved = JSON.parse(store.getItem(key) || '{}');
+        for (const word of Array.isArray(saved) ? saved : saved.words || []) {
+          if (typeof word?.en === 'string' && word.en.trim()) combined.set(word.en.trim().toLowerCase(),word);
+        }
+      } catch {}
+    };
+    for (const key of [...legacy.split(' '), WORDS_STORAGE_KEY]) {
+      read(localStorage,key);
+      if (window.GoStudyStorage) read(window.GoStudyStorage,key);
+    }
+    for (const word of FinanceLive.words()) combined.set(word.en.trim().toLowerCase(),word);
+    return [...combined.values()].map(word => ({en:word.en.trim(),ru:String(word.ru || '').trim()}));
+  }
   if (window.FinanceLive?.connected()) return FinanceLive.words();
   if (document.body.dataset.classroomCourse) return [];
   try {

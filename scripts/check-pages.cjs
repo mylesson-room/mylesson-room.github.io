@@ -86,6 +86,141 @@ async function checkGeneralB2Room(browser, origin) {
   }
 }
 
+
+async function checkMigratedRooms(browser, origin) {
+  const studentId = '33333333-3333-4333-8333-333333333333';
+  const teacherId = '44444444-4444-4444-8444-444444444444';
+  const roomId = '55555555-5555-4555-8555-555555555555';
+  for (const lesson of [
+  {
+    "course": "country-house",
+    "path": "country-house-a2-03.html",
+    "cab": "student-country-house.html",
+    "student": "Ирина",
+    "title": "Before the Rain Comes"
+  },
+  {
+    "course": "art-b1",
+    "path": "art-b1-02.html",
+    "cab": "student-art-b1.html",
+    "student": "Анастасия",
+    "title": "Every picture has a story"
+  },
+  {
+    "course": "business-ai",
+    "path": "business-ai-b2c1-02.html",
+    "cab": "student-business-ai.html",
+    "student": "Влад",
+    "title": "From AI Pilot to Rollout"
+  }
+]) {
+    const events = [];
+    const student = await browser.newContext();
+    const teacher = await browser.newContext();
+    try {
+      for (const [context,id,role] of [[student,studentId,'student'],[teacher,teacherId,'teacher']]) {
+        await context.addInitScript(({id,role}) => {
+          const session = JSON.stringify({user:{id},access_token:'test-'+role,expires_at:Date.now()+3600000});
+          localStorage.setItem('gostudy-'+role+'-session-v1',session);
+          sessionStorage.setItem('gostudy-cloud-session-v1',session);
+          if (role === 'student') localStorage.setItem('gostudy-art-b1-v1',JSON.stringify({words:[{en:'old word',ru:'старое слово'}]}));
+        },{id,role});
+        await context.route('https://*.supabase.co/**',route => {
+          const request = route.request();
+          const url = new URL(request.url());
+          if (url.pathname.endsWith('/gostudy_classroom_rooms')) {
+            if (!url.searchParams.has('lesson_path')) return route.fulfill({json:[]});
+            assert.equal(url.searchParams.get('course'),'eq.'+lesson.course);
+            assert.equal(url.searchParams.get('student_id'),'eq.'+studentId);
+            return route.fulfill({json:[{id:roomId,teacher_id:teacherId,student_id:studentId,student_label:lesson.student}]});
+          }
+          if (url.pathname.endsWith('/gostudy_classroom_events')) {
+            assert.equal(url.searchParams.get('room_id'),'eq.'+roomId);
+            const cursor = Number(url.searchParams.get('seq').slice(3));
+            return route.fulfill({json:events.filter(event=>event.seq>cursor)});
+          }
+          if (url.pathname.endsWith('/gostudy_classroom_send')) {
+            const event = request.postDataJSON();
+            assert.equal(event.p_room,roomId);
+            events.push({actor:id,seq:events.length+1,kind:event.p_kind,payload:event.p_payload});
+            return route.fulfill({json:true});
+          }
+          const action = url.pathname.split('/').at(-1);
+          if (role === 'teacher' && (action === 'gostudy_'+lesson.course.replaceAll('-','_')+'_teacher_view' ||
+            (action === 'gostudy_legacy_teacher_view' && lesson.course === 'art-b1' && request.postDataJSON().p_course === 'art_b1'))) {
+            return route.fulfill({json:[{id:studentId,label:lesson.student,words:[],assigned:[],progress:[]}]});
+          }
+          return route.fulfill({json:[]});
+        });
+      }
+      const sp = await student.newPage();
+      const tp = await teacher.newPage();
+      const cabinet = await student.newPage();
+      const errors = [];
+      for (const [page,label] of [[sp,'student'],[tp,'teacher']]) page.on('pageerror',error=>errors.push(label+': '+error.message));
+      await Promise.all([sp.goto(origin+'/'+lesson.cab),tp.goto(origin+'/gostudy-teacher.html')]);
+      const card = sp.locator('.lesson-card');
+      await card.getByRole('heading',{name:lesson.title}).waitFor();
+      assert.equal(await card.getAttribute('href'),lesson.path);
+      await Promise.all([
+        card.click(),
+        tp.locator('.teacher-student-row').filter({hasText:lesson.student}).getByRole('link',{name:/Войти в класс/}).click(),
+      ]);
+      await tp.waitForURL(url => url.pathname === '/'+lesson.path && url.searchParams.get('classStudent') === studentId);
+      for (const page of [sp,tp]) {
+        await page.getByText('Онлайн · общая комната',{exact:true}).waitFor();
+        const tools = await page.locator('.v1-room-video').boundingBox();
+        const content = await page.locator('.room .sheet,.shell > main').boundingBox();
+        assert.ok(tools.x+tools.width <= content.x+1,'video and chat should be to the left of the lesson');
+        assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth+1),'horizontal overflow');
+      }
+      await sp.getByRole('button',{name:/Далее|Next/}).first().click();
+      if (lesson.course === 'art-b1') {
+        try {
+          await sp.locator('#v1').waitFor({timeout:8000});
+          await tp.locator('#v1').waitFor({timeout:8000});
+        } catch (error) {
+          throw new Error('Art navigation: '+JSON.stringify({errors,events,student:await sp.locator('#title').textContent(),teacher:await tp.locator('#title').textContent()}),{cause:error});
+        }
+        await sp.locator('#v1').selectOption('the focal point');
+        await tp.locator('#v1.correct').waitFor();
+        await tp.getByRole('button',{name:'Сбросить ответы'}).click();
+        await sp.waitForFunction(() => document.querySelector('#v1')?.value === '');
+        await tp.locator('#v1').selectOption('the focal point');
+        await sp.locator('#v1.correct').waitFor();
+        await tp.getByRole('button',{name:'Dictionary'}).click();
+        await tp.locator('#newWord').fill('shared entry');
+        await tp.locator('#newMeaning').fill('общее слово');
+        await tp.getByRole('button',{name:/Save word/}).click();
+      } else {
+        const step = await sp.locator('#lesson-data').evaluate(node => JSON.parse(node.textContent).steps.findIndex(step => step.type === 'choice'));
+        assert.ok(step >= 1);
+        for (let i=1;i<step;i++) await sp.getByRole('button',{name:/Далее/}).first().click();
+        await tp.locator('fieldset .options label').first().waitFor();
+        await sp.locator('fieldset .options label').first().click();
+        await tp.locator('fieldset input[type=radio]:checked').first().waitFor();
+        await tp.getByRole('button',{name:'Сбросить ответы'}).click();
+        await sp.waitForFunction(() => !document.querySelector('fieldset input[type=radio]:checked'));
+        await tp.locator('fieldset .options label').first().click();
+        await sp.locator('fieldset input[type=radio]:checked').first().waitFor();
+        await tp.evaluate(() => window.FinanceLive.send('word',{en:'shared entry',ru:'общее слово'}));
+      }
+      await sp.locator('.v1-room-word').filter({hasText:'shared entry — общее слово'}).waitFor();
+      await cabinet.goto(origin+'/'+lesson.cab);
+      await cabinet.getByRole('button',{name:/Тренировки слов/}).click();
+      const expectedWord = lesson.course === 'art-b1' ? 'old word' : 'shared entry';
+      await cabinet.locator('#practiceQuestion').filter({hasText:expectedWord}).waitFor();
+      await sp.getByRole('textbox',{name:'Сообщение'}).fill('Classroom check');
+      await sp.getByRole('button',{name:'Отправить'}).click();
+      await tp.getByRole('log').getByText(/Classroom check/).waitFor();
+      console.log(lesson.course + ': v1 cabinet, answers, reset, vocabulary and chat verified');
+    } finally {
+      await student.close();
+      await teacher.close();
+    }
+  }
+}
+
 async function checkFinanceRoom(browser, origin) {
   const studentId = '11111111-1111-4111-8111-111111111111';
   const teacherId = '22222222-2222-4222-8222-222222222222';
@@ -236,10 +371,12 @@ async function main() {
     const origin = 'http://127.0.0.1:' + server.address().port;
     await checkFinanceRoom(browser, origin);
     await checkGeneralB2Room(browser, origin);
+    await checkMigratedRooms(browser, origin);
     const source = await readFile('assets/gostudy-sync.js', 'utf8');
     const catalog = runInNewContext('('+source.match(/const classroomCatalog = ([^\n]+);/)[1]+')');
     const studentId = '11111111-1111-4111-8111-111111111111';
     for (const [course, entry] of Object.entries(catalog)) {
+      if (course === 'business_ai' || course === 'country_house') continue; // Checked against the v1 interface above.
       const current = entry.lessons.at(-1);
       const expected = new URL(current.lesson, origin).pathname;
       const student = await browser.newContext();
