@@ -354,12 +354,12 @@ header{height:46px;padding:0 30px;border-bottom:1px solid #e4e8f2;box-shadow:0 2
 #moveStudent:hover{background:#dbe8ff}
 #moveStudent[hidden]{display:none!important}
 @media(max-width:600px){#moveStudent{font-size:12px;padding:8px 10px;line-height:1.3}}
-</style></head><body data-finance-live>
+.dictionary-add-form{display:grid;gap:8px;margin-bottom:15px}.dictionary-add-form input,.selection-translate textarea.selection-target{border:1px solid #cbdcf0;border-radius:10px;background:white;color:var(--ink);font:inherit;outline:0}.dictionary-add-form input{height:43px;width:100%;min-width:0;padding:10px 12px;font-size:14px}.dictionary-translation-row{display:flex;gap:8px}.dictionary-translation-row input{flex:1}.dictionary-translation-row button{width:44px;flex:none;border:0;border-radius:10px;background:#078fea;color:white;font-size:23px;font-weight:800}.selection-translate textarea.selection-target{width:100%;min-height:49px;padding:6px 8px;resize:vertical;font-size:14px;line-height:1.45}.dictionary-add-form input:focus,.selection-translate textarea.selection-target:focus{border-color:#158fdb;box-shadow:0 0 0 3px #159fe91a}</style></head><body data-finance-live>
 <header><a class="brand lesson-brand" href="student-business-ai-finance.html" aria-label="My classroom"><svg viewBox="350 140 835 650" width="55" height="43" aria-hidden="true" focusable="false"><defs><linearGradient id="crownGold" x1="0" y1="1" x2=".72" y2="0" gradientUnits="objectBoundingBox"><stop stop-color="#3a2815"/><stop offset=".36" stop-color="#765019"/><stop offset=".68" stop-color="#e9ad50"/><stop offset=".83" stop-color="#9c621a"/><stop offset="1" stop-color="#d89b3e"/></linearGradient></defs><g fill="url(#crownGold)"><path d="M770 150Q786 246 865 257Q786 269 770 365Q754 269 675 257Q754 246 770 150Z"/><path d="M574 301Q580 341 614 346Q580 352 574 392Q568 352 533 346Q568 341 574 301ZM968 301Q974 341 1008 346Q974 352 968 392Q962 352 928 346Q962 341 968 301Z"/><path d="M360 379C535 516 710 570 770 327C830 570 1005 516 1176 381C1109 478 1065 557 1046 623L1041 619C1046 569 1060 523 1084 474C931 576 806 534 770 365C734 534 609 576 454 474C478 523 492 569 496 619L491 623C472 558 427 478 360 379Z"/><path d="M430 679C571 571 690 599 767 702C679 614 568 614 430 679ZM1108 679C967 571 850 599 773 702C861 614 970 614 1108 679Z"/><path d="M367 747C521 631 663 645 770 738C877 645 1018 631 1171 747C1009 674 868 669 770 782C672 669 530 674 367 747Z"/></g></svg></a><div class="header-right"><button type="button" class="lesson-dictionary-button" id="openLessonDictionary" aria-haspopup="dialog" aria-controls="lessonDictionary"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-3-2-6-2-9-1v13c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1v13"/></svg>Dictionary</button><a class="lesson-home-link" href="student-business-ai-finance.html" aria-label="Student dashboard"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v11h14V9m-9 11v-6h4v6"/></svg></a></div></header>
 <dialog class="lesson-dictionary" id="lessonDictionary" aria-labelledby="lessonDictionaryTitle">
   <div class="lesson-dictionary-heading"><h2 id="lessonDictionaryTitle">My vocabulary <span id="wordCountSidebar">0</span></h2>
   <form method="dialog"><button type="submit" aria-label="Close dictionary" autofocus>×</button></form></div>
-  <div id="myWords"></div>
+  <form id="dictionaryAddForm" class="dictionary-add-form" autocomplete="off"><input id="dictionarySource" maxlength="150" aria-label="Слово или фраза" placeholder="Слово или фраза" required><div class="dictionary-translation-row"><input id="dictionaryTranslation" maxlength="300" aria-label="Перевод" placeholder="Перевод" required><button type="submit" aria-label="Добавить в словарь">+</button></div></form><div id="myWords"></div>
 </dialog>
 <div class="layout"><aside class="sidebar" id="lessonVideo">
 <div class="video-workspace">
@@ -379,7 +379,7 @@ header{height:46px;padding:0 30px;border-bottom:1px solid #e4e8f2;box-shadow:0 2
 <div class="footer">Original lesson material · Fictional Northbridge Retail case.</div></div></main></div><nav class="pager" aria-label="Lesson navigation"><button type="button" class="outline" id="back">← Back</button><button type="button" class="outline move-student-button" id="moveStudent" hidden>Переместить ученика</button><button type="button" class="primary" id="next">Continue</button></nav>
 
 <div class="selection-translate" id="selectionTranslate" role="region" aria-label="Перевод выделенного текста">
-  <div class="selection-target" id="selectionTarget" role="status"></div>
+  <textarea class="selection-target" id="selectionTarget" rows="2" maxlength="300" aria-label="Перевод"></textarea>
   <div class="selection-tools">
     <button id="selectionSave" type="button" aria-label="Добавить в словарь" title="Добавить в словарь" disabled>+</button>
 
@@ -504,6 +504,51 @@ $("#openLessonDictionary").addEventListener("click",()=>{drawWords();$("#lessonD
 function drawWords(){let w=readWords();$("#wordCountSidebar").textContent=w.length;$("#myWords").innerHTML=w.slice().reverse().map(x=>'<small><b>'+esc(x.en)+'</b> — '+esc(x.ru)+'</small>').join("")||'<small>No words saved yet.</small>'}
 window.addWord=i=>{let words=readWords(),w=VOCAB[i];if(window.FinanceLive?.send("word",{en:w[0],ru:w[2]}))return;if(!words.some(x=>x.en.toLowerCase()===w[0].toLowerCase())){words.push({en:w[0],ru:w[2]});try{let obj=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");obj.words=words;localStorage.setItem(WORDS_KEY,JSON.stringify(obj))}catch(e){alert("Vocabulary saving unavailable")}}drawWords()};
 
+
+function makeWord(source,translation){
+ const a=String(source||"").trim(),b=String(translation||"").trim();
+ if(!a||!b)return null;
+ return /[А-Яа-яЁё]/.test(a)?{en:b,ru:a}:{en:a,ru:b};
+}
+function saveVocabulary(word){
+ if(!word)return false;
+ if(window.FinanceLive?.send("word",word))return true;
+ try{
+  const data=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");
+  data.words=Array.isArray(data.words)?data.words:[];
+  const i=data.words.findIndex(w=>String(w.en||"").toLowerCase()===word.en.toLowerCase());
+  if(i<0)data.words.push(word);else data.words[i]=word;
+  localStorage.setItem(WORDS_KEY,JSON.stringify(data));drawWords();return true;
+ }catch(e){console.warn("Word save failed",e);return false}
+}
+async function translateVocabulary(source,signal){
+ const from=/[А-Яа-яЁё]/.test(source)?"ru":"en",to=from==="ru"?"en":"ru";
+ const response=await fetch("https://api.mymemory.translated.net/get?"+new URLSearchParams({q:source,langpair:from+"|"+to}),{signal});
+ if(!response.ok)throw Error("Translation unavailable");
+ const data=await response.json(),value=String(data?.responseData?.translatedText||"").trim();
+ if(!value||Number(data?.responseStatus||0)>=400||/QUERY LENGTH LIMIT|MYMEMORY WARNING/i.test(value))throw Error("Translation unavailable");
+ return value;
+}
+{
+ const source=$("#dictionarySource"),translation=$("#dictionaryTranslation");
+ let seq=0,timer=0,controller=null,edited=false;
+ translation.addEventListener("input",()=>{edited=true});
+ source.addEventListener("input",()=>{
+  clearTimeout(timer);controller?.abort();
+  const text=source.value.trim(),n=++seq;edited=false;translation.value="";
+  if(!text)return;
+  timer=setTimeout(async()=>{
+   controller=new AbortController();
+   try{const result=await translateVocabulary(text,controller.signal);if(n===seq&&!edited)translation.value=result;}
+   catch(e){if(e.name!=="AbortError")console.warn("Dictionary translation unavailable")}
+  },350);
+ });
+ $("#dictionaryAddForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  if(!saveVocabulary(makeWord(source.value,translation.value)))return;
+  source.value="";translation.value="";edited=false;seq++;controller?.abort();clearTimeout(timer);source.focus();
+ });
+}
 const lessonDivider = $("#lessonDivider");
 const layout = $(".layout");
 function changeVideoWidth(percent) {
