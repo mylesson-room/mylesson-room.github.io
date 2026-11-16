@@ -161,6 +161,12 @@ async function main() {
             }));
             assert.ok(await sp.locator('audio').evaluate(audio => audio.duration > 35 && audio.duration < 90));
           }
+          if (course === 'general_english_b1_stories') {
+            const overview = tp.getByRole('navigation',{name:'Ответы ученицы по заданиям'});
+            await sp.locator('.sheet [data-question] label').first().click();
+            await overview.getByRole('button',{name:'What happened? (1)',exact:true}).click();
+            await tp.locator('.travel-student-answer').filter({hasText:'Changed dinner plans'}).waitFor();
+          }
           const option = sp.locator('.sheet [data-question] label').first();
           const label = (await option.innerText()).trim();
           await option.click();

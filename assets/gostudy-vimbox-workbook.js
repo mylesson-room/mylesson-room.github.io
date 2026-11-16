@@ -21,19 +21,67 @@
   const sections = document.querySelector('.sections');
   const live = window.GoStudyTravelAnswers;
   let studentAnswers = {};
-  let liveStatus;
+  let liveStatus, liveOverview, overviewKey;
   if (live?.viewing) {
     liveStatus = document.createElement('p');
     liveStatus.className = 'travel-live-status';
     liveStatus.setAttribute('role','status');
     liveStatus.textContent = 'Загружаем ответы ученицы…';
     room.querySelector('.side .panel').after(liveStatus);
+    if (config.key.startsWith('gostudy-general-english-b1-stories-')) {
+      liveOverview = document.createElement('nav');
+      liveOverview.setAttribute('aria-label','Ответы ученицы по заданиям');
+      liveOverview.hidden = true;
+      liveStatus.after(liveOverview);
+    }
+  }
+
+  function showAnsweredSections() {
+    if (!liveOverview) return;
+    const answered = config.steps.flatMap((step,i) => {
+      const value = studentAnswers[step.id] ?? studentAnswers[i];
+      const count = Array.isArray(value) ? value.filter(Number.isInteger).length : typeof value === 'string' && value.trim() ? 1 : 0;
+      return count ? [{index:i,label:step.title + ' (' + (step.type === 'order' ? 1 : count) + ')'}] : [];
+    });
+    const key = JSON.stringify(answered);
+    if (key === overviewKey) return;
+    overviewKey = key;
+    liveOverview.hidden = answered.length === 0;
+    const heading = document.createElement('strong');
+    heading.textContent = 'Ответы ученицы';
+    const list = document.createElement('ul');
+    for (const entry of answered) {
+      const item = document.createElement('li');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'back';
+      button.textContent = entry.label;
+      button.onclick = () => go(entry.index);
+      item.append(button);
+      list.append(item);
+    }
+    liveOverview.replaceChildren(heading,list);
   }
 
   function showStudentAnswers() {
     if (!live?.viewing) return;
     const step = config.steps[index];
     const choices = studentAnswers[step.id] ?? studentAnswers[index];
+    const orderNote = sheet.querySelector('.gostudy-live-order');
+    if (orderNote) {
+      const order = Array.isArray(choices) ? choices.map(i=>step.items[i]).filter(Boolean) : [];
+      orderNote.hidden = order.length === 0;
+      if (order.length && orderNote.dataset.order !== JSON.stringify(order)) {
+        orderNote.dataset.order = JSON.stringify(order);
+        const list = document.createElement('ol');
+        for (const text of order) {
+          const item = document.createElement('li');
+          item.textContent = text;
+          list.append(item);
+        }
+        orderNote.replaceChildren('Порядок ученицы',list);
+      }
+    }
     const draft = sheet.querySelector('.writing');
     if (draft) {
       const savedDraft = typeof choices === 'string' ? choices : '';
@@ -65,6 +113,7 @@
     try {
       if (!document.hidden) {
         studentAnswers = await live.read();
+        showAnsweredSections();
         showStudentAnswers();
         liveStatus.textContent = '';
       }
@@ -128,7 +177,7 @@
       ? '<details class="source"><summary>Карточка преподавателя</summary><p>'+escape(step.teacherNotes)+'</p></details>' : '';
     const studentDraft = live?.viewing && step.type === 'write'
       ? '<blockquote class="gostudy-live-draft source" aria-label="Ответ ученика" hidden></blockquote>' : '';
-    frame.content.innerHTML = '<p class="label">'+escape(config.title)+'</p><h1 tabindex="-1">'+escape(step.title)+'</h1><p class="instruction">'+escape(step.instruction)+'</p>'+cover+renderVisual(step.visual)+source+audio+(exercise?'<section class="activity">'+exercise+'<button type="button" class="check cta">Проверить ответы</button><p role="status" class="result"></p></section>':'')+writing+studentDraft+teacherNotes;
+    frame.content.innerHTML = '<p class="label">'+escape(config.title)+'</p><h1 tabindex="-1">'+escape(step.title)+'</h1><p class="instruction">'+escape(step.instruction)+'</p>'+cover+renderVisual(step.visual)+source+audio+(exercise?'<section class="activity">'+exercise+'<button type="button" class="check cta">Проверить ответы</button><p role="status" class="result"></p></section>':'')+writing+studentDraft+(liveOverview && step.type === 'order' ? '<div class="source gostudy-live-order" hidden></div>' : '')+teacherNotes;
     navigation.innerHTML = '<button type="button" class="back" '+(index===0?'disabled':'')+'>← Назад</button>'+(index+1===config.steps.length?'<a class="cta home-link" href="'+escape(config.cabinet)+'">В личный кабинет</a>':'<button type="button" class="cta next">Далее →</button>');
     showStudentAnswers();
     sheet.querySelector('.back').onclick = () => go(index-1);
