@@ -294,6 +294,33 @@ header{height:46px;padding:0 30px;border-bottom:1px solid #e4e8f2;box-shadow:0 2
 @media(max-width:800px){.layout,.sidebar,.lesson{height:auto}.lesson{overflow:visible;min-height:calc(100dvh - 46px)}.lesson-content{overflow:visible;padding:12px 18px 20px}.pager{position:sticky;bottom:0;padding:8px 18px max(8px,env(safe-area-inset-bottom))}}
 @media(max-width:540px){.lesson{min-height:calc(100dvh - 41px)}}
 @media print{.lesson,.lesson-content{overflow:visible;height:auto;padding:0}}
+
+:root{--lesson-toolbar-height:46px}
+.layout{height:calc(100dvh - 2 * var(--lesson-toolbar-height));grid-template-columns:var(--video-width,33.333%) 9px minmax(0,1fr)}
+.lesson-divider{height:100%;z-index:2;cursor:col-resize;touch-action:none;background:#e8eef7;display:grid;place-items:center}
+.lesson-divider::after{content:"";width:3px;height:42px;border-radius:4px;background:#9eb2cb}
+.lesson-divider:hover,.lesson-divider:focus-visible,.layout.is-resizing .lesson-divider{background:#c9e6f2}
+.layout.is-resizing{user-select:none}
+.pager{box-sizing:border-box;height:var(--lesson-toolbar-height);padding:0 30px;align-items:center}
+.pager button{min-height:0;height:36px;padding:0 16px;margin:0;line-height:1.2}
+#vocab .term{grid-template-columns:minmax(0,1fr);gap:8px}
+.vocab-term{font-weight:750;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.vocab-term button{color:#087faa;background:#edf7fc;border:0;border-radius:8px;padding:4px 9px;font-size:12px}
+.definition-picker summary{list-style:none;cursor:pointer;padding:11px 34px 11px 13px;border:1px solid #cfdbee;border-radius:12px;background:#f5f9ff;color:#243758;position:relative}
+.definition-picker summary::-webkit-details-marker{display:none}
+.definition-picker summary::after{content:"⌄";position:absolute;right:13px;top:8px;color:#087faa}
+.definition-options{display:grid;gap:6px;padding:8px 0}
+.definition-options button{display:grid;grid-template-columns:24px minmax(0,1fr);gap:8px;align-items:center;text-align:left;padding:7px 10px;border:1px solid #dce6f1;border-radius:9px;background:#fff;color:#233957}
+.definition-options button strong{display:grid;place-items:center;border-radius:6px;background:#eaf4fa;color:#087faa}
+.definition-options button:hover,.definition-options button[aria-pressed="true"]{background:#e3f7fd;border-color:#68c4dc}
+.selection-translate{width:min(340px,calc(100vw - 20px));padding:10px 11px;animation:none}
+.selection-translate.is-visible{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:start;animation:none}
+.selection-translate .selection-target{margin:0;padding:0;background:none;font-size:14px;line-height:1.45;overflow-wrap:anywhere}
+.selection-tools{display:flex;gap:4px}.selection-tools button{width:28px;height:28px;padding:0;border:0;border-radius:7px;background:#e9f5fb;color:#087faa;line-height:1;font-size:18px}
+.selection-tools button:disabled{opacity:.45}
+#selectionGoogle{grid-column:1/-1;color:#087faa;font-size:13px;text-decoration:underline}
+@media(max-width:800px){.layout{height:auto}.lesson-divider{display:none}.lesson{min-height:0}.footer{padding-bottom:var(--lesson-toolbar-height)}.pager{position:fixed;bottom:0;left:0;right:0;z-index:12;padding:0 12px}}
+@media(max-width:540px){:root{--lesson-toolbar-height:41px}.pager button{height:34px}}
 </style></head><body>
 <header><a class="brand lesson-brand" href="student-business-ai-finance.html" aria-label="My classroom"><svg viewBox="350 140 835 650" width="55" height="43" aria-hidden="true" focusable="false"><defs><linearGradient id="crownGold" x1="0" y1="1" x2=".72" y2="0" gradientUnits="objectBoundingBox"><stop stop-color="#3a2815"/><stop offset=".36" stop-color="#765019"/><stop offset=".68" stop-color="#e9ad50"/><stop offset=".83" stop-color="#9c621a"/><stop offset="1" stop-color="#d89b3e"/></linearGradient></defs><g fill="url(#crownGold)"><path d="M770 150Q786 246 865 257Q786 269 770 365Q754 269 675 257Q754 246 770 150Z"/><path d="M574 301Q580 341 614 346Q580 352 574 392Q568 352 533 346Q568 341 574 301ZM968 301Q974 341 1008 346Q974 352 968 392Q962 352 928 346Q962 341 968 301Z"/><path d="M360 379C535 516 710 570 770 327C830 570 1005 516 1176 381C1109 478 1065 557 1046 623L1041 619C1046 569 1060 523 1084 474C931 576 806 534 770 365C734 534 609 576 454 474C478 523 492 569 496 619L491 623C472 558 427 478 360 379Z"/><path d="M430 679C571 571 690 599 767 702C679 614 568 614 430 679ZM1108 679C967 571 850 599 773 702C861 614 970 614 1108 679Z"/><path d="M367 747C521 631 663 645 770 738C877 645 1018 631 1171 747C1009 674 868 669 770 782C672 669 530 674 367 747Z"/></g></svg></a><div class="header-right"><button type="button" class="lesson-dictionary-button" id="openLessonDictionary" aria-haspopup="dialog" aria-controls="lessonDictionary"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-3-2-6-2-9-1v13c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1v13"/></svg>Dictionary</button><a class="lesson-home-link" href="student-business-ai-finance.html" aria-label="Student dashboard"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v11h14V9m-9 11v-6h4v6"/></svg></a></div></header>
 <dialog class="lesson-dictionary" id="lessonDictionary" aria-labelledby="lessonDictionaryTitle">
@@ -301,7 +328,7 @@ header{height:46px;padding:0 30px;border-bottom:1px solid #e4e8f2;box-shadow:0 2
   <form method="dialog"><button type="submit" aria-label="Close dictionary" autofocus>×</button></form></div>
   <div id="myWords"></div>
 </dialog>
-<div class="layout"><aside class="sidebar">
+<div class="layout"><aside class="sidebar" id="lessonVideo">
 <div class="video-workspace">
 <div class="video-top"><span class="live-dot"></span><span>LESSON VIDEO</span><span class="video-state">Not connected</span></div>
 <div class="video-preview" role="group" aria-label="Video classroom, not connected">
@@ -312,16 +339,18 @@ header{height:46px;padding:0 30px;border-bottom:1px solid #e4e8f2;box-shadow:0 2
 <p class="video-help">Место для видео преподавателя и ученика. Живой звонок внутри страницы появится после подключения видеосервиса.</p>
 </div>
 </aside>
+<div class="lesson-divider" id="lessonDivider" role="separator" tabindex="0" aria-label="Resize video and exercises" aria-orientation="vertical" aria-valuemin="22" aria-valuemax="55" aria-valuenow="33" aria-controls="lessonVideo"></div>
 <main class="lesson"><div class="lesson-content"><section class="hero"><h1>Can AI predict a <em>financial crisis</em> before it happens?</h1></section>
 <section id="page-0" class="page active"><div class="panel"><div class="activity-head"><div class="activity-icon">◉</div><div class="activity-titles"><h2>1. Let's talk</h2></div></div><p class="lead">Look at the AI prediction and discuss the questions. Support your opinions with examples.</p><div class="warmup-scene"><div class="scene-top"><span class="scene-badge">✦ NORTHBRIDGE AI REPORT</span><span class="scene-live">● Updated just now</span></div><div class="scene-chart"><div class="scene-copy"><small>Forecasted cash balance</small><strong>€65,000</strong><span>▼ 35% below safety threshold</span></div><svg viewBox="0 0 330 110" role="img" aria-label="Illustrative declining cash forecast"><defs><linearGradient id="cashfade" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#86dce9" stop-opacity=".40"/><stop offset="1" stop-color="#86dce9" stop-opacity="0"/></linearGradient></defs><path d="M0 30 C35 20 44 48 77 41 S137 28 159 58 S216 54 239 76 S302 80 330 99 L330 110 L0 110Z" fill="url(#cashfade)"/><path d="M0 30 C35 20 44 48 77 41 S137 28 159 58 S216 54 239 76 S302 80 330 99" fill="none" stroke="#0ab5cf" stroke-width="4" stroke-linecap="round"/><circle cx="330" cy="99" r="6" fill="#0ab5cf" stroke="white" stroke-width="3"/></svg></div><div class="scene-footer"><span>⚠ Potential liquidity risk in 60 days</span><b>Review forecast ↗</b></div></div><ol class="questions"><li>Would you trust AI to predict your company's financial future?</li><li>Which financial decisions should never be made by AI alone?</li><li>Can AI identify risks that experienced financial analysts might miss?</li><li>Would you invest in a company that relies heavily on AI-generated financial forecasts?</li></ol><div class="tip"><b>Useful language</b><p>I would be reluctant to rely on AI because…<br>One potential advantage is…<br>Human oversight is essential when…</p></div></div></section><section id="page-1" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">Aa</div><div class="activity-titles"><h2>2. Financial vocabulary</h2></div></div><p class="lead">Match the eight financial terms with their definitions. Press <b>Check answers</b> when you finish.</p><div id="vocab"></div><button class="primary" onclick="checkVocab()">Check answers</button><p id="vocabScore" class="feedback" aria-live="polite"></p></div></section><section id="page-2" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">▤</div><div class="activity-titles"><h2>3. Read & analyse</h2></div></div><p class="lead">Read this fictional business case, then answer the questions.</p><div class="reading-layout"><article class="article"><span class="case">CASE STUDY · NORTHBRIDGE RETAIL</span><h3>An AI system predicted a cash shortage. Was it right?</h3><p>Northbridge Retail, a medium-sized European company, had experienced steady revenue growth for three years. However, despite increasing sales, the company regularly struggled with cash flow.</p><p>Its finance department introduced an AI-powered forecasting system. The software analysed historical sales, supplier payments, seasonal trends and customer payment behaviour.</p><p>Within two weeks, the system identified a potential liquidity problem. It predicted that the company's available cash could fall below €100,000 within the next 60 days. Surprisingly, the traditional financial forecast had shown no serious problems.</p><p>The AI model highlighted three early warning signs: several large customers were paying invoices later than usual, inventory costs had increased, and sales growth was slowing in one important market.</p><p>The finance director, Emma Collins, was initially sceptical. She believed the system might be overreacting to temporary changes. Rather than accepting the prediction immediately, her team investigated the data. They discovered that one major customer was experiencing financial difficulties and had delayed several payments.</p><p>Northbridge negotiated new payment terms with suppliers, postponed a non-essential investment and contacted customers with overdue invoices. Six weeks later, the company avoided the predicted cash shortage.</p><p>However, the finance director emphasised an important distinction: the software had identified a risk, but human judgement was responsible for evaluating the evidence and choosing how to respond. The company continued using AI for forecasting, but all major financial decisions still required human approval.</p></article><aside class="case-column"><div class="signal-card"><div class="signal-emoji">📉</div><b>Liquidity alert</b><span>The AI predicts cash will drop below a critical threshold.</span><strong>&lt; €100,000</strong><small>Over the next 60 days</small></div><div class="signal-card"><div class="signal-emoji">◷</div><b>Payment delays</b><span>Major clients are taking longer to settle invoices.</span><strong>Early warning</strong></div><div class="signal-card"><div class="signal-emoji">✓</div><b>Human decision</b><span>Finance teams verify the data and make the final call.</span><strong>Human oversight</strong></div></aside></div><h3 class="question-heading">Answer the questions</h3><div id="reading"></div><button class="primary" onclick="checkReading()">Check answers</button><p id="readingScore" class="feedback" aria-live="polite"></p></div></section><section id="page-3" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">✎</div><div class="activity-titles"><h2>4. Use the language</h2></div></div><p class="lead">Complete the sentences using expressions from the vocabulary section.</p><div id="gaps"></div><button class="primary" onclick="checkGaps()">Check answers</button><p id="gapsScore" class="feedback" aria-live="polite"></p></div></section><section id="page-4" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">▥</div><div class="activity-titles"><h2>5. Financial decision lab</h2></div></div><p class="lead">You are the Finance Director. The company's minimum comfortable cash balance is <b>€100,000</b>.</p><div class="decision-metrics"><div><small>Cash safety target</small><b>€100,000</b><span>Minimum comfortable cash</span></div><div><small>Expected forecast</small><b>€65,000</b><span>Projected in 60 days</span></div><div><small>Potential funding gap</small><b>€35,000</b><span>To restore target balance</span></div></div><div class="chart"><div class="chart-row"><span>Optimistic</span><div class="track"><div style="width:90%;background:#4aaf91"></div></div><b>€180,000</b></div><div class="chart-row"><span>Expected</span><div class="track"><div style="width:32.5%;background:#6971df"></div></div><b>€65,000</b></div><div class="chart-row"><span>Pessimistic</span><div class="track negative"><div style="width:20%;background:#df7c77"></div></div><b>−€40,000</b></div><small>Illustrative cash positions after 60 days. The pessimistic scenario implies a shortfall.</small></div><ol class="questions"><li>Which scenario concerns you most, and why?</li><li>How much additional cash is required to reach the target in the expected scenario?</li><li>Should the company cut spending immediately or investigate further?</li><li>What additional data would you request?</li></ol><h3>Make your decision</h3><div id="decision" class="choices"><label><input type="radio" name="decision" value="cut"> Reduce spending immediately</label><label><input type="radio" name="decision" value="investigate"> Investigate and prepare contingency measures</label><label><input type="radio" name="decision" value="ignore"> Ignore the forecast until the shortage occurs</label></div><p id="decisionAdvice" class="tip" aria-live="polite">Choose a strategy to reveal its possible consequences.</p><label class="field-label" for="decisionNotes">Explain your decision</label><textarea id="decisionNotes" data-save="decisionNotes" placeholder="I would recommend… because…"></textarea></div></section><section id="page-5" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">◎</div><div class="activity-titles"><h2>6. CEO meeting</h2></div></div><p class="lead">The CEO believes the finances are under control. Your task is to secure approval for two preventive measures.</p><div class="role-grid"><div class="role"><div class="role-icon">01</div><h3>Finance Director</h3><p>Explain the risk, present the figures, defend your interpretation and recommend concrete actions.</p></div><div class="role"><div class="role-icon">02</div><h3>CEO</h3><p>Challenge the model's reliability, question the cost and ask what would happen if the forecast is wrong.</p></div></div><div class="tip"><b>Useful expressions</b><p>According to the latest forecast…<br>There is a significant risk that…<br>We should take into account…<br>I would recommend implementing…<br>We should avoid relying solely on…</p></div><label class="field-label" for="roleNotes">Notes from the discussion</label><textarea id="roleNotes" data-save="roleNotes" placeholder="My main argument…"></textarea></div></section><section id="page-6" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">◌</div><div class="activity-titles"><h2>7. Your opinion</h2></div></div><p class="lead">A company follows an AI-generated financial forecast and loses €2 million. The model was supplied by an external provider.</p><div class="tip"><b>Who should be accountable?</b><p>The CFO who approved the decision? The software provider? The analysts who failed to question the forecast? Or should responsibility be shared?</p></div><p>Give a <b>60-second opinion</b> and use at least three new financial expressions.</p><textarea data-save="finalOpinion" aria-label="Your final opinion" placeholder="In my view, responsibility should…"></textarea></div></section><section id="page-7" class="page"><div class="panel"><div class="activity-head"><div class="activity-icon">✉</div><div class="activity-titles"><h2>8. Writing task</h2></div></div><p class="lead">Write a 140–180 word email to your CEO. Describe the potential benefits, two major risks, your implementation recommendation and why human oversight matters.</p><textarea id="homework" data-save="homework" style="min-height:260px" placeholder="Dear CEO,&#10;&#10;I am writing to recommend…"></textarea><div class="homework-tools"><span id="wordCount">0 words · Target: 140–180</span><button class="outline" onclick="copyHomework()">Copy email</button></div><details class="teacher"><summary>Teacher notes & answers</summary><p>Focus on evidence-based hedging, risk assessment and recommendation language. In the expected scenario the target gap is €35,000. A strong student distinguishes model output from verified evidence and explains potential trade-offs.</p></details></div></section>
-<div class="footer">Original lesson material · Fictional Northbridge Retail case. Answers are stored locally in your browser; this page is not a live teacher sync.</div></div><nav class="pager" aria-label="Lesson navigation"><button type="button" class="outline" id="back">← Back</button><button type="button" class="primary" id="next">Continue</button></nav></main></div>
+<div class="footer">Original lesson material · Fictional Northbridge Retail case. Answers are stored locally in your browser; this page is not a live teacher sync.</div></div></main></div><nav class="pager" aria-label="Lesson navigation"><button type="button" class="outline" id="back">← Back</button><button type="button" class="primary" id="next">Continue</button></nav>
 
-<div class="selection-translate" id="selectionTranslate" role="region" aria-label="Перевод выделенного текста" aria-live="polite">
-<div class="selection-top"><span class="selection-title">✦ ПЕРЕВОД · EN ↔ RU</span><button class="selection-close" id="selectionClose" type="button" aria-label="Закрыть">×</button></div>
-<div class="selection-source" id="selectionSource"></div><label class="translation-input-label" for="translationInput">Выделенный текст или введите вручную</label><textarea id="translationInput" class="translation-input" rows="2" placeholder="Select a word or type a sentence"></textarea><div class="translation-action-row"><button type="button" id="translateNow" class="selection-save">Перевести</button><span id="translationDirection">EN → RU</span></div>
-<div class="selection-target" id="selectionTarget">Получаем перевод…</div>
-<div class="selection-hint" id="selectionHint">Предварительный перевод · MyMemory. Google Translate откроется по кнопке.</div>
-<div class="selection-actions"><a id="selectionGoogle" class="selection-google" target="_blank" rel="noopener noreferrer">↗ Google Translate</a><button id="selectionSave" class="selection-save" type="button">＋ В словарь</button></div>
+<div class="selection-translate" id="selectionTranslate" role="region" aria-label="Перевод выделенного текста">
+  <div class="selection-target" id="selectionTarget" role="status"></div>
+  <div class="selection-tools">
+    <button id="selectionSave" type="button" aria-label="Добавить в словарь" title="Добавить в словарь" disabled>+</button>
+    <button id="selectionClose" type="button" aria-label="Закрыть перевод" title="Закрыть перевод">×</button>
+  </div>
+  <a id="selectionGoogle" target="_blank" rel="noopener noreferrer" hidden>Открыть в Google Translate</a>
 </div>
 <script>
 const LESSONS=[{"label":"Warm-up","minutes":5},{"label":"Vocabulary","minutes":10},{"label":"Reading","minutes":10},{"label":"Language practice","minutes":8},{"label":"Decision lab","minutes":10},{"label":"Role-play","minutes":8},{"label":"Final discussion","minutes":4},{"label":"Homework","minutes":15}];
@@ -352,9 +381,62 @@ function go(n){
 }
 $("#back").onclick=()=>go(state.page-1);$("#next").onclick=()=>go(state.page===LESSONS.length-1?0:state.page+1);
 const defs=[VOCAB[5][1],VOCAB[2][1],VOCAB[0][1],VOCAB[7][1],VOCAB[4][1],VOCAB[1][1],VOCAB[6][1],VOCAB[3][1]];
-$("#vocab").innerHTML=VOCAB.map((w,i)=>'<div class="term"><label for="v'+i+'">'+(i+1)+'. '+esc(w[0])+' <button type="button" onclick="addWord('+i+')" title="Save to vocabulary">＋ Save word</button></label><select id="v'+i+'" data-key="v'+i+'"><option value="">Choose a definition…</option>'+defs.map((d,j)=>'<option value="'+j+'">'+String.fromCharCode(65+j)+'. '+esc(d)+'</option>').join("")+'</select><span id="vf'+i+'" class="feedback"></span></div>').join("");
-document.querySelectorAll("#vocab select").forEach((s,i)=>{s.value=getValue("v"+i);s.onchange=()=>setValue("v"+i,s.value)});
-window.checkVocab=()=>{let n=0;VOCAB.forEach((w,i)=>{const v=defs[Number($("#v"+i).value)];const ok=$("#v"+i).value!==""&&v===w[1];n+=ok?1:0;$("#vf"+i).textContent=ok?" ✓ Correct":" Correct: "+w[1];$("#vf"+i).className="feedback "+(ok?"good":"bad")});$("#vocabScore").textContent=n+" / 8 correct"};
+const optionLabel = index => String.fromCharCode(65 + index) + ". " + defs[index];
+$("#vocab").innerHTML = VOCAB.map((word, index) => `
+  <div class="term">
+    <div class="vocab-term" id="term${index}">${index + 1}. ${esc(word[0])}
+      <button type="button" onclick="addWord(${index})" title="Save to vocabulary">＋ Save word</button>
+    </div>
+    <details class="definition-picker">
+      <summary aria-describedby="term${index}"></summary>
+      <div class="definition-options">
+        ${defs.map((_, choice) => `<button type="button" data-choice="${choice}" aria-pressed="false"><strong>${String.fromCharCode(65 + choice)}</strong><span>${esc(defs[choice])}</span></button>`).join("")}
+      </div>
+    </details>
+    <span id="vf${index}" class="feedback"></span>
+  </div>`).join("");
+const definitionPickers = [...document.querySelectorAll(".definition-picker")];
+definitionPickers.forEach((picker, index) => {
+  const key = "v" + index;
+  const summary = picker.querySelector("summary");
+  const options = [...picker.querySelectorAll("[data-choice]")];
+  function showChoice(value) {
+    summary.textContent = value === "" ? "Choose a definition…" : optionLabel(Number(value));
+    options.forEach(option => option.setAttribute("aria-pressed", String(option.dataset.choice === value)));
+  }
+  showChoice(getValue(key));
+  summary.addEventListener("click", () => {
+    definitionPickers.forEach(other => { if (other !== picker) other.open = false; });
+  });
+  options.forEach(option => option.addEventListener("click", () => {
+    setValue(key, option.dataset.choice);
+    showChoice(option.dataset.choice);
+    $("#vf" + index).textContent = "";
+    picker.open = false;
+    summary.focus();
+  }));
+  picker.addEventListener("keydown", event => {
+    if (event.key === "Escape" && picker.open) {
+      picker.open = false;
+      summary.focus();
+    }
+  });
+});
+document.addEventListener("pointerdown", event => {
+  definitionPickers.forEach(picker => { if (!picker.contains(event.target)) picker.open = false; });
+});
+window.checkVocab = () => {
+  let correct = 0;
+  VOCAB.forEach((word, index) => {
+    const value = getValue("v" + index);
+    const ok = value !== "" && defs[Number(value)] === word[1];
+    correct += Number(ok);
+    const feedback = $("#vf" + index);
+    feedback.textContent = ok ? "✓ Correct" : "Correct: " + word[1];
+    feedback.className = "feedback " + (ok ? "good" : "bad");
+  });
+  $("#vocabScore").textContent = correct + " / " + VOCAB.length + " correct";
+};
 $("#reading").innerHTML=READING.map((x,i)=>'<div class="question-item"><strong>'+(i+1)+'. '+esc(x[0])+'</strong>'+x[1].map((s,j)=>'<label><input type="radio" name="read'+i+'" value="'+j+'">'+esc(s)+'</label>').join("")+'<span class="result" id="rf'+i+'"></span></div>').join("");
 document.querySelectorAll("#reading input").forEach(x=>{x.checked=getValue(x.name)===x.value;x.onchange=()=>setValue(x.name,x.value)});
 window.checkReading=()=>{let n=0;READING.forEach((x,i)=>{let ok=getValue("read"+i)===String(x[2]);n+=ok?1:0;$("#rf"+i).className="result "+(ok?"good":"bad");$("#rf"+i).textContent=ok?"✓ Correct":"Answer: "+x[1][x[2]]});$("#readingScore").textContent=n+" / 4 correct"};
@@ -372,17 +454,38 @@ $("#openLessonDictionary").addEventListener("click",()=>{drawWords();$("#lessonD
 function drawWords(){let w=readWords();$("#wordCountSidebar").textContent=w.length;$("#myWords").innerHTML=w.slice().reverse().map(x=>'<small><b>'+esc(x.en)+'</b> — '+esc(x.ru)+'</small>').join("")||'<small>No words saved yet.</small>'}
 window.addWord=i=>{let words=readWords(),w=VOCAB[i];if(!words.some(x=>x.en.toLowerCase()===w[0].toLowerCase())){words.push({en:w[0],ru:w[2]});try{let obj=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");obj.words=words;localStorage.setItem(WORDS_KEY,JSON.stringify(obj))}catch(e){alert("Vocabulary saving unavailable")}}drawWords()};
 
+const lessonDivider = $("#lessonDivider");
+const layout = $(".layout");
+function changeVideoWidth(percent) {
+  const width = Math.max(22, Math.min(55, percent));
+  layout.style.setProperty("--video-width", width + "%");
+  lessonDivider.setAttribute("aria-valuenow", String(Math.round(width)));
+}
+lessonDivider.addEventListener("pointerdown", event => {
+  if (event.button !== 0) return;
+  lessonDivider.setPointerCapture(event.pointerId);
+  layout.classList.add("is-resizing");
+});
+lessonDivider.addEventListener("pointermove", event => {
+  if (!lessonDivider.hasPointerCapture(event.pointerId)) return;
+  const area = layout.getBoundingClientRect();
+  changeVideoWidth((event.clientX - area.left) / area.width * 100);
+});
+lessonDivider.addEventListener("lostpointercapture", () => layout.classList.remove("is-resizing"));
+lessonDivider.addEventListener("keydown", event => {
+  const step = {ArrowLeft: -2, ArrowRight: 2}[event.key];
+  if (!step) return;
+  event.preventDefault();
+  changeVideoWidth(Number(lessonDivider.getAttribute("aria-valuenow")) + step);
+});
 drawWords();go(location.hash === "#homework" ? LESSONS.length - 1 : state.page);
 
 
-/* GoStudy translation: manual launcher always works; text selection works on mouse/touch/keyboard.
-   MyMemory provides optional translation preview. Google Translate opens directly with full text. */
 (function(){
- const byId=id=>document.getElementById(id);
- const pop=byId("selectionTranslate"),source=byId("selectionSource");
- const target=byId("selectionTarget"),hint=byId("selectionHint"),google=byId("selectionGoogle");
- const input=byId("translationInput"),direction=byId("translationDirection"),translateBtn=byId("translateNow");
- const saveBtn=byId("selectionSave"),close=byId("selectionClose");
+ const byId = id => document.getElementById(id);
+ const pop = byId("selectionTranslate"), target = byId("selectionTarget");
+ const google = byId("selectionGoogle"), saveBtn = byId("selectionSave"), close = byId("selectionClose");
+ let range = null;
  let phrase="",translation="",controller=null,request=0,selectionTimer=0;
  let savedText="";
  function clean(t){return String(t||"").replace(/\s+/g," ").trim().slice(0,1500)}
@@ -390,39 +493,39 @@ drawWords();go(location.hash === "#homework" ? LESSONS.length - 1 : state.page);
    const el=n?.nodeType===1?n:n?.parentElement;
    return !!(el&&el.closest(".lesson")&&!el.closest("textarea,input,select,button,a,.selection-translate"));
  }
- function hide(){pop.classList.remove("is-visible");if(controller)controller.abort();request++;controller=null}
- function locate(rect){
-   const w=Math.min(370,innerWidth-24),h=pop.offsetHeight||290;
-   const x=rect?rect.left+(rect.width-w)/2:innerWidth-w-16;
-   const y=rect?(rect.bottom+12):Math.max(14,innerHeight-h-85);
-   const left=Math.max(12,Math.min(innerWidth-w-12,x));
-   let top=rect&&y+h>innerHeight-12?rect.top-h-12:y;
-   top=Math.max(10,Math.min(Math.max(10,innerHeight-h-10),top));
-   pop.style.left=Math.round(left)+"px";pop.style.top=Math.round(top)+"px";
+ function hide(){
+   pop.classList.remove("is-visible");
+   range = null;
+   controller?.abort();
+   request++;
+   controller = null;
  }
- function urlFor(t){
-   const from=/[А-Яа-яЁё]/.test(t)?"ru":"en",to=from==="en"?"ru":"en";
-   direction.textContent=from.toUpperCase()+" → "+to.toUpperCase();
-   google.href="https://translate.google.com/?"+new URLSearchParams({sl:from,tl:to,text:t,op:"translate"});
-   return {from,to}
+ function locate(){
+   if (!range || !pop.classList.contains("is-visible")) return;
+   const rect = range.getBoundingClientRect();
+   const width = pop.offsetWidth;
+   const margin = 10;
+   const gap = 8;
+   const headerBottom = document.querySelector("header").getBoundingClientRect().bottom;
+   const pagerTop = document.querySelector(".pager").getBoundingClientRect().top;
+   const topLimit = Math.max(margin, headerBottom + margin);
+   const bottomLimit = Math.min(innerHeight - margin, pagerTop - margin);
+   const left = Math.max(margin, Math.min(innerWidth - width - margin, rect.left + (rect.width - width) / 2));
+   const below = bottomLimit - rect.bottom - gap;
+   const above = rect.top - gap - topLimit;
+   pop.style.maxHeight = "";
+   const height = pop.offsetHeight;
+   const placeBelow = below >= height || below >= above;
+   const available = placeBelow ? below : above;
+   if (available < 50) { hide(); return; }
+   pop.style.maxHeight = Math.floor(available) + "px";
+   pop.style.left = Math.round(left) + "px";
+   pop.style.top = Math.round(placeBelow ? rect.bottom + gap : rect.top - gap - pop.offsetHeight) + "px";
  }
- function open(t,rect){
-   phrase=clean(t);translation="";
-   source.textContent=phrase||"Введите слово или предложение";
-   input.value=phrase;target.textContent=phrase?"Нажмите «Перевести» или откройте Google Translate.":"Введите текст, затем нажмите «Перевести».";
-   hint.textContent="Google Translate открывается в отдельной вкладке. Предпросмотр внутри урока — MyMemory.";
-   saveBtn.disabled=true;saveBtn.textContent="＋ В словарь";
-   google.href="https://translate.google.com/";
-   if(phrase)urlFor(phrase);
-   pop.classList.add("is-visible");locate(rect);
-   if(phrase)translate(phrase);
- }
- async function translate(value){
-   const t=clean(value);
-   if(!t)return;
-   phrase=t;source.textContent=t;input.value=t;
-   const {from,to}=urlFor(t);
-   saveBtn.disabled=true;target.textContent="Переводим…";hint.textContent="Перевод внутри урока: MyMemory. Для Google нажмите синюю кнопку.";
+ async function translate(t){
+   const from = /[А-Яа-яЁё]/.test(t) ? "ru" : "en";
+   const to = from === "en" ? "ru" : "en";
+   google.href = "https://translate.google.com/?" + new URLSearchParams({sl:from,tl:to,text:t,op:"translate"});
    if(controller)controller.abort();
    const seq=++request;controller=new AbortController();
    const ctrl=controller,timeout=setTimeout(()=>ctrl.abort(),9000);
@@ -433,35 +536,45 @@ drawWords();go(location.hash === "#homework" ? LESSONS.length - 1 : state.page);
      if(request!==seq)return;
      const result=String(data?.responseData?.translatedText||"").trim();
      if(!result||Number(data?.responseStatus||0)>=400||/QUERY LENGTH LIMIT|MYMEMORY WARNING/i.test(result))throw Error("Translation unavailable");
-     translation=result;target.textContent=result;hint.textContent="Перевод MyMemory · для варианта Google нажмите Google Translate.";
+     translation=result;target.textContent=result;
      saveBtn.disabled=false;
    }catch(e){
      if(request!==seq)return;
-     target.textContent="Встроенный перевод сейчас недоступен. Используйте Google Translate ниже.";
-     hint.textContent="Google Translate откроет именно этот текст в новой вкладке.";
+     target.textContent="Перевод недоступен.";
+     google.hidden=false;
    }finally{clearTimeout(timeout)}
-   locate(null);
+   locate();
  }
  function selectionOpen(){
    const selection=window.getSelection();
    if(!selection||selection.isCollapsed||!selection.rangeCount||!isEligible(selection.anchorNode)||!isEligible(selection.focusNode))return;
    const text=clean(selection.toString());
    if(!text)return;
-   let rect=selection.getRangeAt(0).getBoundingClientRect();
-   if(!Number.isFinite(rect.left)||(!rect.width&&!rect.height))rect=null;
-   if(text===savedText&&pop.classList.contains("is-visible"))return;
-   savedText=text;open(text,rect);
+   const selectedRange = selection.getRangeAt(0);
+   if (range && text === savedText && range.compareBoundaryPoints(Range.START_TO_START, selectedRange) === 0 && range.compareBoundaryPoints(Range.END_TO_END, selectedRange) === 0) return;
+   range = selectedRange.cloneRange();
+   savedText = phrase = text;
+   translation = "";
+   saveBtn.disabled = true;
+   saveBtn.textContent = "+";
+   saveBtn.title = "Добавить в словарь";
+   saveBtn.setAttribute("aria-label", saveBtn.title);
+   google.hidden = true;
+   target.textContent = "Переводим…";
+   pop.classList.add("is-visible");
+   locate();
+   if (range) translate(text);
  }
  function schedule(){clearTimeout(selectionTimer);selectionTimer=setTimeout(selectionOpen,100)}
  document.addEventListener("mouseup",e=>{if(!pop.contains(e.target))schedule()});
  document.addEventListener("touchend",e=>{if(!pop.contains(e.target))setTimeout(selectionOpen,250)},{passive:true});
  document.addEventListener("keyup",e=>{if(e.key==="Shift"||e.key.startsWith("Arrow"))schedule()});
 
- translateBtn.addEventListener("click",()=>translate(input.value));
- input.addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.metaKey||e.ctrlKey)){e.preventDefault();translate(input.value)}});
+ document.addEventListener("scroll", locate, true);
+ window.addEventListener("resize", locate);
  close.addEventListener("click",hide);
  document.addEventListener("keydown",e=>{if(e.key==="Escape")hide()});
- document.addEventListener("pointerdown",e=>{if(pop.classList.contains("is-visible")&&!pop.contains(e.target)&&!isEligible(e.target))hide()});
+ document.addEventListener("pointerdown",e=>{if(pop.classList.contains("is-visible")&&!pop.contains(e.target))hide()});
  document.querySelectorAll("#back,#next").forEach(el=>el.addEventListener("click",hide));
  saveBtn.addEventListener("click",()=>{
    if(!phrase||!translation)return;
@@ -471,8 +584,8 @@ drawWords();go(location.hash === "#homework" ? LESSONS.length - 1 : state.page);
     const data=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");
     data.words=Array.isArray(data.words)?data.words:[];
     if(!data.words.some(w=>String(w.en).toLowerCase()===word.en.toLowerCase()))data.words.push(word);
-    localStorage.setItem(WORDS_KEY,JSON.stringify(data));drawWords();saveBtn.textContent="✓ Сохранено";
-   }catch(e){saveBtn.textContent="Не удалось сохранить"}
+    localStorage.setItem(WORDS_KEY,JSON.stringify(data));drawWords();saveBtn.textContent="✓";saveBtn.title="Сохранено";saveBtn.setAttribute("aria-label",saveBtn.title);saveBtn.disabled=true;
+   }catch(e){saveBtn.title="Не удалось сохранить";saveBtn.setAttribute("aria-label",saveBtn.title)}
  });
 })();
 </script></body></html>
