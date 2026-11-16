@@ -71,10 +71,8 @@
         apply(batch, initial);
       } while (batch.length === 500);
       if (!caughtUp) {
-        if (course) {
-          document.body.classList.add("classroom-authorized");
-          if (accessStatus) accessStatus.hidden = true;
-        }
+        if (course) document.body.classList.add("classroom-authorized");
+        if (accessStatus) accessStatus.hidden = true;
         document.dispatchEvent(new CustomEvent("finance-ready",{detail:course ? room : null}));
       }
       caughtUp = true;
