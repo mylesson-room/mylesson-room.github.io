@@ -267,6 +267,27 @@ dialog h2{font-family:'Playfair Display',Georgia,serif}
 .vocab-feature--whole:disabled:hover{transform:none!important;box-shadow:0 5px 22px #5477ab0c}
 .vocab-feature--whole:disabled .vocab-feature__cta--disabled{opacity:.8}
 @media(prefers-reduced-motion:reduce){.vocab-feature--whole:hover{transform:none!important}}
+
+/* Country House inspired 4-mode vocabulary training */
+.practice-dialog{width:min(760px,calc(100vw - 26px));max-height:90dvh;overflow-y:auto;background:linear-gradient(145deg,#fff,#f0f5ff 72%,#e9f0ff)}
+.practice-dialog .dialog-top h2{font-size:29px}
+.practice-modes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:5px;background:#e7effb;border-radius:18px;margin:17px 0 20px}
+.practice-modes button{border:0;background:transparent;color:#405677;border-radius:13px;padding:13px 7px;font:700 13px 'Manrope',sans-serif;cursor:pointer}
+.practice-modes button[aria-pressed=true]{background:white;color:#0676d3;box-shadow:0 2px 12px #3c72ac21}
+.practice-meter{height:7px;border-radius:100px;background:#dce6f5;overflow:hidden}
+.practice-meter span{display:block;height:100%;background:linear-gradient(90deg,#1caffe,#376de9);border-radius:100px;transition:width .15s}
+.practice-dialog .practice-flashcard{min-height:260px;background:#fff;box-shadow:0 6px 24px #4475ad12;gap:13px}
+.practice-flashcard__label{font-weight:700}
+.practice-speak{border:0;border-radius:25px;background:#e9f5ff;color:#1269ae;padding:9px 15px;cursor:pointer;font-weight:700}
+.practice-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;width:100%}
+.practice-options button{border:1px solid #cedef2;border-radius:11px;background:#f4f8ff;padding:13px;cursor:pointer;font:600 14px 'Manrope',sans-serif;color:#244c7d}
+.practice-options button:not(:disabled):hover{background:#e6f1ff}
+#practiceTypeForm{display:grid;gap:10px;width:min(100%,360px)}
+#practiceTypeForm label{font-size:13px;color:#59708a}
+#practiceInput{border:1px solid #bfcfe5;border-radius:10px;padding:12px;font:inherit;min-width:0;width:100%}
+.practice-dialog .practice-flashcard__answer[data-correct=true]{color:#148c5b}
+.practice-dialog .dialog-actions{justify-content:center}
+@media(max-width:650px){.practice-modes{grid-template-columns:repeat(2,minmax(0,1fr))}.practice-modes button{font-size:12px}.practice-dialog{padding:19px}.practice-options{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -308,16 +329,14 @@ dialog h2{font-family:'Playfair Display',Georgia,serif}
   <div class="dialog-actions"><button type="button" class="primary" id="practiceFromWords">Тренировать слова</button></div>
 </dialog>
 <dialog id="practiceDialog" class="vocab-dialog practice-dialog" aria-labelledby="practiceTitle">
-  <div class="dialog-top"><h2 id="practiceTitle">Тренировка слов</h2><form method="dialog"><button aria-label="Закрыть">×</button></form></div>
-  <p class="dialog-description">Вспомните перевод, затем откройте ответ и оцените себя.</p>
-  <p id="practiceProgress" class="dialog-description" aria-live="polite"></p>
-  <div class="practice-flashcard" id="practiceFlashcard">
-    <span class="practice-flashcard__label">Переведите слово</span>
-    <strong id="practiceQuestion"></strong>
-    <span class="practice-flashcard__answer" id="practiceAnswer" hidden></span>
-  </div>
-  <p id="practiceEmpty" class="dialog-description" hidden>Для тренировки нужны слова. Добавьте их в словарь из урока AI in Finance.</p>
-  <div class="dialog-actions"><button class="primary" id="revealWord" type="button">Показать перевод</button><button class="primary" id="nextWord" type="button" hidden>Следующее слово</button><button class="secondary" id="restartPractice" type="button" hidden>Начать заново</button></div>
+<div class="dialog-top"><div><h2 id="practiceTitle">Тренировки слов</h2><p class="dialog-description">AI in Finance · повторение лексики</p></div><form method="dialog"><button aria-label="Закрыть">×</button></form></div>
+<div id="practiceModes" class="practice-modes" role="group" aria-label="Режим тренировки">
+<button type="button" data-mode="cards" aria-pressed="true">Карточки</button><button type="button" data-mode="choice" aria-pressed="false">Выбрать перевод</button><button type="button" data-mode="type" aria-pressed="false">Ввести слово</button><button type="button" data-mode="listen" aria-pressed="false">На слух</button>
+</div>
+<p id="practiceProgress" class="dialog-description" role="status"></p><div class="practice-meter" aria-hidden="true"><span id="practiceMeter"></span></div>
+<div class="practice-flashcard" id="practiceFlashcard"><span class="practice-flashcard__label" id="practicePrompt">Переведите слово</span><strong id="practiceQuestion"></strong><button type="button" id="speakWord" class="practice-speak" aria-label="Прослушать слово">🔊 Озвучить</button><div id="practiceOptions" class="practice-options" hidden></div><form id="practiceTypeForm" hidden><label for="practiceInput">Ваш ответ на английском</label><input id="practiceInput" autocomplete="off" spellcheck="false" required><button type="submit" class="primary">Проверить</button></form><span class="practice-flashcard__answer" id="practiceAnswer" role="status" hidden></span></div>
+<p id="practiceEmpty" class="dialog-description" hidden>Для тренировки нужны слова с переводами. Добавьте их в словарь на уроке AI in Finance.</p>
+<div class="dialog-actions"><button class="primary" id="revealWord" type="button">Показать перевод</button><button class="primary" id="nextWord" type="button" hidden>Следующее слово →</button><button class="secondary" id="restartPractice" type="button" hidden>Начать заново</button></div>
 </dialog>
 <script>
 const WORDS_STORAGE_KEY = 'gostudy-business-ai-shared-v1';
@@ -354,39 +373,81 @@ function openVocabulary() {
   document.querySelector('#practiceFromWords').disabled = words.length === 0;
   wordsDialog.showModal();
 }
+const practiceModes = ['cards','choice','type','listen'];
+let practiceMode = 'cards';
+const practiceEl = selector => document.querySelector(selector);
+const normalized = text => String(text).trim().toLowerCase().replace(/\\s+/g,' ').replace(/[.!?,;:]+$/,'');
+function speakPracticeWord() {
+  if (!window.speechSynthesis || !practiceWords[practiceIndex]) return;
+  window.speechSynthesis.cancel();
+  const utterance=new SpeechSynthesisUtterance(practiceWords[practiceIndex].en);
+  utterance.lang='en-GB';utterance.rate=.87;window.speechSynthesis.speak(utterance);
+}
+function showFeedback(text,correct=false) {
+  const feedback=practiceEl('#practiceAnswer');
+  feedback.textContent=text;feedback.hidden=false;
+  feedback.dataset.correct=correct?'true':'false';
+  if (correct) {practiceEl('#revealWord').hidden=true;practiceEl('#nextWord').hidden=false;}
+}
 function drawPractice() {
-  const isEmpty = practiceWords.length === 0;
-  const finished = !isEmpty && practiceIndex >= practiceWords.length;
-  document.querySelector('#practiceEmpty').hidden = !isEmpty;
-  document.querySelector('#practiceFlashcard').hidden = isEmpty || finished;
-  document.querySelector('#revealWord').hidden = isEmpty || finished;
-  document.querySelector('#nextWord').hidden = true;
-  document.querySelector('#restartPractice').hidden = !finished;
-  document.querySelector('#practiceAnswer').hidden = true;
-  document.querySelector('#practiceProgress').textContent = isEmpty ? '0 слов' : finished ? 'Все слова повторены!' : 'Карточка ' + (practiceIndex+1) + ' из ' + practiceWords.length;
-  if (!isEmpty && !finished) {
-    document.querySelector('#practiceQuestion').textContent = practiceWords[practiceIndex].en;
-    document.querySelector('#practiceAnswer').textContent = practiceWords[practiceIndex].ru || 'Перевод пока не добавлен';
+  const isEmpty=practiceWords.length===0, finished=!isEmpty && practiceIndex>=practiceWords.length;
+  for (const control of practiceEl('#practiceModes').querySelectorAll('button'))control.setAttribute('aria-pressed',String(control.dataset.mode===practiceMode));
+  practiceEl('#practiceFlashcard').hidden=isEmpty||finished;
+  practiceEl('#practiceEmpty').hidden=!isEmpty;
+  practiceEl('#revealWord').hidden=isEmpty||finished;
+  practiceEl('#nextWord').hidden=true;
+  practiceEl('#restartPractice').hidden=!finished;
+  practiceEl('#practiceAnswer').hidden=true;
+  practiceEl('#practiceTypeForm').hidden=true;
+  practiceEl('#practiceOptions').hidden=true;
+  practiceEl('#speakWord').hidden=isEmpty||finished||practiceMode==='type';
+  practiceEl('#practiceQuestion').hidden=isEmpty||finished||practiceMode==='listen';
+  const progress=finished?practiceWords.length:practiceIndex;
+  practiceEl('#practiceMeter').style.width=(isEmpty?0:100*progress/practiceWords.length)+'%';
+  practiceEl('#practiceProgress').textContent=isEmpty?'Сохранённых слов пока нет':finished?'Все слова повторены — '+practiceWords.length+' из '+practiceWords.length:(practiceIndex+1)+' из '+practiceWords.length;
+  if(isEmpty||finished)return;
+  const word=practiceWords[practiceIndex];
+  const labels={cards:'Вспомните русский перевод',choice:'Выберите правильный перевод',type:'Напишите слово по-английски',listen:'Прослушайте и выберите перевод'};
+  practiceEl('#practicePrompt').textContent=labels[practiceMode];
+  practiceEl('#practiceQuestion').textContent=practiceMode==='type'?word.ru:word.en;
+  if (practiceMode==='type') {
+    practiceEl('#practiceTypeForm').hidden=false;
+    practiceEl('#practiceInput').value='';
+  }
+  if (practiceMode==='choice'||practiceMode==='listen') {
+    const container=practiceEl('#practiceOptions');container.replaceChildren();container.hidden=false;
+    const other=[...new Set(practiceWords.filter(w=>normalized(w.ru)!==normalized(word.ru)).map(w=>w.ru))];
+    const options=other.slice(Math.max(0,(practiceIndex*3)%Math.max(1,other.length)),Math.max(0,(practiceIndex*3)%Math.max(1,other.length))+3);
+    for (const fallback of other)if(options.length<3&&!options.includes(fallback))options.push(fallback);
+    options.splice(practiceIndex%(options.length+1),0,word.ru);
+    if(options.length===1){const help=document.createElement('p');help.textContent='Для вариантов ответа добавьте ещё несколько слов. Пока можно открыть перевод.';container.append(help);}
+    for(const option of options){
+      const btn=document.createElement('button');btn.type='button';btn.textContent=option;
+      btn.addEventListener('click',()=>{if(normalized(option)===normalized(word.ru)){showFeedback('Верно! '+word.en+' — '+word.ru,true);container.querySelectorAll('button').forEach(b=>b.disabled=true);}else showFeedback('Попробуйте ещё раз.');});
+      container.append(btn);
+    }
   }
 }
+function setPracticeMode(mode) {
+  if(!practiceModes.includes(mode))return;
+  practiceMode=mode;practiceIndex=0;drawPractice();
+}
 function openPractice() {
-  practiceWords = loadSavedWords().filter(w => w.ru);
-  practiceIndex = 0;
-  drawPractice();
-  if (wordsDialog.open) wordsDialog.close();
-  practiceDialog.showModal();
+  practiceWords=loadSavedWords().filter(w=>w.ru);
+  practiceIndex=0;practiceMode='cards';drawPractice();
+  if(wordsDialog.open)wordsDialog.close();
+  if(!practiceDialog.open)practiceDialog.showModal();
 }
 document.querySelector('#openWords').addEventListener('click',openVocabulary);
 
 document.querySelector('#practiceCard').addEventListener('click',openPractice);
 document.querySelector('#practiceFromWords').addEventListener('click',openPractice);
-document.querySelector('#revealWord').addEventListener('click',() => {
-  document.querySelector('#practiceAnswer').hidden = false;
-  document.querySelector('#revealWord').hidden = true;
-  document.querySelector('#nextWord').hidden = false;
-});
-document.querySelector('#nextWord').addEventListener('click',()=>{practiceIndex++;drawPractice();});
-document.querySelector('#restartPractice').addEventListener('click',openPractice);
+practiceEl('#practiceModes').addEventListener('click',event=>{const mode=event.target.closest('button')?.dataset.mode;if(mode)setPracticeMode(mode);});
+practiceEl('#speakWord').addEventListener('click',speakPracticeWord);
+practiceEl('#practiceTypeForm').addEventListener('submit',event=>{event.preventDefault();const word=practiceWords[practiceIndex];if(normalized(practiceEl('#practiceInput').value)===normalized(word.en))showFeedback('Верно! '+word.en+' — '+word.ru,true);else showFeedback('Попробуйте ещё раз.');});
+practiceEl('#revealWord').addEventListener('click',()=>{const word=practiceWords[practiceIndex];showFeedback(word.en+' — '+word.ru,true);});
+practiceEl('#nextWord').addEventListener('click',()=>{practiceIndex++;drawPractice();});
+practiceEl('#restartPractice').addEventListener('click',()=>{practiceIndex=0;drawPractice();});
 window.addEventListener('pageshow',updateVocabularyCount);
 window.addEventListener('storage',event => {if(event.key === WORDS_STORAGE_KEY)updateVocabularyCount();});
 updateVocabularyCount();
