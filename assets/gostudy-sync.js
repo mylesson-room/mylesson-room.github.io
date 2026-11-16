@@ -1157,7 +1157,12 @@
     const pharmaThreeHomeworkLabels = {"q0-0":"What is the role of AI in the Swedish trial?","q0-1":"What can we say about 44%?","q0-2":"What would a sensible local pilot track?","q1-0":"Which line is suitable for a report?","q1-1":"A patient asks who reviews the scan. Which reply is clearest?"};
     const financeCourse = 'business_ai_finance';
     const financeLesson = 'business-ai-finance-b2-02.html';
-    const teacherCatalog = {...classroomCatalog,[financeCourse]:{
+    const legacyTeacherCourses = new Set(['art_b1','ielts_reading','sweden_a2']);
+    const teacherCatalog = {...classroomCatalog,
+      art_b1:{name:'Art & Mosaics · B1',lessons:[{title:'Small pieces, big ideas',lesson:'art-mosaics-b1.html',homework:'art-b1-homework.html'}]},
+      ielts_reading:{name:'IELTS Reading',lessons:[{title:'IELTS Reading · Lesson 1',lesson:'ielts-reading-01.html',homework:'ielts-reading-01-homework.html'}]},
+      sweden_a2:{name:'Sweden · A2',lessons:[{title:'Sweden · Lesson 1',lesson:'sweden-a2.html',homework:'sweden-a2-01-homework.html'}]},
+      [financeCourse]:{
       name:'AI in Finance · B2',
       lessons:[{title:'AI in Finance · Lesson 2',lesson:financeLesson,homework:financeLesson+'#homework'}],
     }};
@@ -1167,7 +1172,7 @@
     const addStudentStatus = document.getElementById('teacher-add-student-status');
     if (addStudentForm) {
       for (const [id,name] of courses) {
-        if (id === financeCourse || ['travel_b2','country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(id)) continue;
+        if (id === financeCourse || ['country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(id)) continue;
         const option = document.createElement('option');
         option.value = id;
         option.textContent = name;
@@ -1251,7 +1256,7 @@
     function renderStudent() {
       renderStudentList();
       const student = students.find(row => row.selection === studentPicker.value);
-      wordForm.hidden = !student || student.course === financeCourse || ['travel_b2','country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(student.course);
+      wordForm.hidden = !student || student.course === financeCourse || ['travel_b2','art_b1','ielts_reading','sweden_a2','country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(student.course);
       wordItems(studentWords, student?.words);
       wordItems(assignedWords, student?.assigned);
       const classroom = document.getElementById('teacher-classroom');
@@ -1343,7 +1348,9 @@
             })));
             return;
           }
-          const response = await request('/rest/v1/rpc/gostudy_' + course + '_teacher_view', {method:'POST',body:{}}, access);
+          const rpc = legacyTeacherCourses.has(course) ? 'gostudy_legacy_teacher_view' : 'gostudy_' + course + '_teacher_view';
+          const body = legacyTeacherCourses.has(course) ? {p_course:course} : {};
+          const response = await request('/rest/v1/rpc/'+rpc, {method:'POST',body}, access);
           if (!response.ok || !Array.isArray(response.data)) throw new Error(label);
           rosterByCourse.set(course, response.data.map(row => ({...row,course,selection:course+':'+row.id})));
         })]);
