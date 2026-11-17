@@ -555,6 +555,47 @@ async function checkFinanceRoom(browser, origin) {
     });
     await tp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value.startsWith('директор, руководитель'));
     assert.equal(await tp.locator('#selectionContext').count(),0);
+    // The source provider returns "бетон" for isolated concrete. We MUST use
+    // the full sentence to choose the correct sense for the actual context.
+    await tp.unroute('https://api.mymemory.translated.net/**');
+    const contextualRequests=[];
+    const contextualSamples={
+      'I recommend concrete actions.':'Я рекомендую конкретные действия.',
+      'I recommend actions.':'Я рекомендую действия.',
+      'Builders poured concrete into the wall.':'Строители залили бетон в стену.',
+      'Builders poured into the wall.':'Строители залили в стену.',
+      'concrete':'бетон'
+    };
+    await tp.route('https://api.mymemory.translated.net/**',route=>{
+      const q=new URL(route.request().url()).searchParams.get('q');
+      contextualRequests.push(q);
+      return route.fulfill({json:{
+        responseStatus:200,
+        responseData:{translatedText:contextualSamples[q]||'бетон'}
+      }});
+    });
+    const selectContextual=async (sentence,word)=>{
+      await tp.evaluate(({sentence,word})=>{
+        const element=document.createElement('p');element.textContent=sentence;
+        document.querySelector('.lesson').append(element);
+        const text=element.firstChild,pos=text.textContent.indexOf(word),range=document.createRange();
+        range.setStart(text,pos);range.setEnd(text,pos+word.length);
+        window.getSelection().removeAllRanges();window.getSelection().addRange(range);
+        document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
+      },{sentence,word});
+    };
+    await selectContextual('I recommend concrete actions.','concrete');
+    await tp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value==='конкретные');
+    assert.ok(contextualRequests.includes('I recommend concrete actions.'),'Must translate the complete sentence');
+    assert.ok(contextualRequests.includes('I recommend actions.'),'Must compare against sentence without the selected word');
+    assert.ok(!contextualRequests.includes('concrete'),'Do not translate the isolated ambiguous word');
+    await tp.locator('#selectionSave').click();
+    await sp.getByRole('button',{name:'Dictionary',exact:true}).click();
+    await sp.locator('#myWords').getByText('конкретные',{exact:false}).waitFor();
+    await sp.getByRole('button',{name:'Close dictionary'}).click();
+    await selectContextual('Builders poured concrete into the wall.','concrete');
+    await tp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value==='бетон');
+    assert.ok(contextualRequests.includes('Builders poured concrete into the wall.'));
     // Manual bilingual entry also works after automatic translation is edited.
     await tp.getByRole('button',{name:'Dictionary',exact:true}).click();
     await tp.locator('#dictionarySource').fill('cash flow');
