@@ -509,7 +509,15 @@ if (!config.course || workbook) replaying = false;
   const key=cacheId(),cached=cache[key];
   if(cached){if(!edited)target.value=cached.value;contextEl.textContent=cached.context||'';saveBtn.disabled=!target.value.trim();showStatus('Перевод из кеша');clearTimeout(timeout);return;}
   const dictionary=from==='en'?known.get(phrase.toLowerCase()):null;
-  const special=from==='en'&&phrase.toLowerCase()==='statement'&&/\bbank\b/i.test(sentence)?'выписка, заявление, утверждение':null;
+  const polysemy={
+    statement:[[/\b(bank|account|monthly|sent)\b/i,'выписка, заявление, утверждение'],[/.*/,'заявление, утверждение, выписка']],
+    bank:[[/\briver\b/i,'берег, банк'],[/.*/,'банк, берег']],
+    charge:[[/\b(delivery|fee|pay|cost|service)\b/i,'плата, заряд, обвинение'],[/.*/,'заряд, плата, обвинение']],
+    interest:[[/\b(rate|loan|credit|bank)\b/i,'процент, интерес, заинтересованность'],[/.*/,'интерес, процент, заинтересованность']],
+    balance:[[/\b(cash|account|bank|payment)\b/i,'остаток, баланс, равновесие'],[/.*/,'баланс, равновесие, остаток']],
+    capital:[[/\b(investment|financial|raise|business)\b/i,'капитал, столица, заглавная буква'],[/.*/,'столица, капитал, заглавная буква']]
+  };
+  const special=from==='en' ? polysemy[phrase.toLowerCase()]?.find(([pattern])=>pattern.test(sentence))?.[1] : null;
   if(dictionary||special){
    const value=special||dictionary;
    if(!edited)target.value=value;
