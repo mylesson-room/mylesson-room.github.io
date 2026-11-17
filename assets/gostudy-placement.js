@@ -188,8 +188,10 @@
     panel.append(button, score);
   }
 
+  let started = false;
   async function start() {
-    if (!await auth.ready) return;
+    if (started) return;
+    started = true;
     const privateRoom = auth.room();
     if (body.hasAttribute('data-placement-cabinet')) {
       window.GoStudyLesson = {privateRoom};
@@ -248,5 +250,6 @@
   }
 
   document.addEventListener('gostudy-private-signed-out', () => location.assign('login.html'));
-  start();
+  document.addEventListener('gostudy-private-authorized', start, {once:true});
+  auth.ready.then(ok => { if (ok) start(); });
 })();

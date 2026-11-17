@@ -100,8 +100,10 @@ const api=window.GoStudyPrivateAccess={
 form?.addEventListener('submit',async event=>{
  event.preventDefault();
  const button=form.querySelector('[type=submit]');button.disabled=true;text('Проверяем данные…');
+ const password=form.elements.password.value;
+ form.elements.password.value='';
  try{
-  const result=await raw('/auth/v1/token?grant_type=password',{method:'POST',body:{email:form.elements.email.value.trim(),password:form.elements.password.value}});
+  const result=await raw('/auth/v1/token?grant_type=password',{method:'POST',body:{email:form.elements.email.value.trim(),password}});
   if(!result.ok||!result.data?.access_token){show(false);text('Неверный email или пароль.');return;}
   remember(result.data,false);
   if(await verify())form.reset();

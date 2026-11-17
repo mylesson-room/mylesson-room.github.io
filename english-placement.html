@@ -18,7 +18,13 @@
 </script>
 <div id="gostudyAccessGate" role="region" aria-label="Вход в урок">
   <h1>Вход в урок</h1>
-  <p><a href="login.html">Войти через GoStudy</a></p>
+  <form id="gostudyAccessForm">
+    <label for="gsEmail">Email</label>
+    <input id="gsEmail" name="email" type="email" autocomplete="username" required>
+    <label for="gsPassword">Пароль</label>
+    <input id="gsPassword" name="password" type="password" autocomplete="current-password" required>
+    <button type="submit">Войти</button>
+  </form>
   <div id="gostudyAccessMessage" role="status">Проверка доступа…</div>
 </div>
 <p id="placement-loading" role="status" hidden></p>

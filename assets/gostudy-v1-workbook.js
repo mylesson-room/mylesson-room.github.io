@@ -350,7 +350,7 @@ document.addEventListener("finance-connect",()=>{
 });
 document.addEventListener("finance-ready",()=>{
   if(FinanceLive.teacher()) {
-    for (const back of document.querySelectorAll('.lesson-brand,.lesson-home-link')) back.href="gostudy-teacher.html";
+    for (const back of document.querySelectorAll('.lesson-brand,.lesson-home-link')) back.href=config.privateRoom ? config.cabinet : "gostudy-teacher.html";
   }
   if (restoredPage !== null && location.hash !== "#homework") go(restoredPage);
   replaying = false;
