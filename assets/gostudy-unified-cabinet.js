@@ -149,6 +149,8 @@
     if (empty) empty.textContent = 'Общий словарь будет подключён после безопасной миграции сохранённых слов.';
     if (!primary) updateStatus('Пока у вашего аккаунта нет назначенных уроков. Обратитесь к преподавателю.');
     else updateStatus('');
+    const loading = document.querySelector('.classroom-access');
+    if (loading) loading.hidden = true;
     document.body.classList.add('unified-ready');
   }
 
