@@ -340,3 +340,26 @@ body[data-classroom-course] .lesson-card-link h2{max-width:100%}
 [data-unified-cabinet] #assignment[hidden], [data-unified-cabinet] .cards[hidden], [data-unified-cabinet] .classroom-access[hidden] {display:none!important}
 [data-unified-cabinet] .vocab-feature:disabled {opacity:.62;cursor:not-allowed}
 @media(max-width:720px){[data-unified-cabinet] .unified-lesson-grid {grid-template-columns:1fr}}
+
+/* Global homework state shared by every student cabinet. */
+.card.homework--unavailable,
+.card.homework--unavailable:hover {
+  cursor:default;
+  transform:none;
+  opacity:.72;
+  box-shadow:none;
+  filter:none;
+}
+.homework--unavailable .homework-hint {
+  display:block;
+  font-size:14px;
+  line-height:1.5;
+  margin-top:10px;
+}
+.lesson-card-link[aria-disabled="true"],
+.lesson-card-link[aria-disabled="true"]:hover {
+  cursor:default;
+  opacity:.65;
+  transform:none;
+  box-shadow:none;
+}
