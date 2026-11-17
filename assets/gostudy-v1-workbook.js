@@ -450,106 +450,151 @@ if (!config.course || workbook) replaying = false;
 
 (function(){
  const byId = id => document.getElementById(id);
- const pop = byId("selectionTranslate"), target = byId("selectionTarget");
- const google = byId("selectionGoogle"), saveBtn = byId("selectionSave");
- let range = null;
- let phrase="",translation="",controller=null,request=0,selectionTimer=0;
- let savedText="",selectionEdited=false;
- target.addEventListener("input",()=>{selectionEdited=true;translation=target.value.trim();saveBtn.disabled=!translation;});
- function clean(t){return String(t||"").replace(/\s+/g," ").trim().slice(0,1500)}
- function isEligible(n){
-   const el=n?.nodeType===1?n:n?.parentElement;
-   return !!(el&&el.closest(".lesson")&&!el.closest("textarea,input,select,button,a,.selection-translate"));
- }
- function hide(){
-   pop.classList.remove("is-visible");
-   range = null;
-   controller?.abort();
-   request++;
-   controller = null;
- }
+ const pop=byId('selectionTranslate'),target=byId('selectionTarget'),saveBtn=byId('selectionSave'),google=byId('selectionGoogle');
+ if(!pop||!target||!saveBtn)return;
+ const clean=t=>String(t||'').replace(/\s+/g,' ').trim().slice(0,1000);
+ const normalized=s=>clean(s).toLowerCase();
+ const cache=new Map();
+ const lessonWords=new Map((config.vocab||[]).map(row=>[normalized(row[0]),String(row[2]||'')]));
+ const dictionary={
+  statement:{bank:'выписка, заявление, утверждение',default:'заявление, утверждение, выписка'},
+  bank:{river:'берег, банк',default:'банк, берег'},
+  charge:{delivery:'плата, заряд, обвинение',default:'плата, заряд, обвинение'},
+  forecast:{default:'прогноз, предсказание'},
+  cash:{default:'наличные, денежные средства'},
+  outlier:{default:'аномальное значение, выброс'},
+  risk:{default:'риск, опасность'}
+ };
+ const top=document.createElement('div');top.className='context-translate-top';
+ const direction=document.createElement('button');direction.type='button';direction.className='context-direction';direction.textContent='EN → RU';
+ const retry=document.createElement('button');retry.type='button';retry.textContent='Повторить';retry.hidden=true;
+ const status=document.createElement('span');status.className='context-translate-status';status.setAttribute('role','status');
+ top.append(direction,status,retry);pop.prepend(top);
+ const contextLine=document.createElement('p');contextLine.className='context-translate-sentence';
+ const baseLabel=document.createElement('label');baseLabel.className='context-translate-base';baseLabel.textContent='Форма для словаря';
+ const baseInput=document.createElement('input');baseInput.type='text';baseInput.autocomplete='off';baseInput.maxLength=150;baseLabel.append(baseInput);
+ const meaningsLabel=document.createElement('label');meaningsLabel.className='context-translate-meaning';meaningsLabel.textContent='Значения (можно исправить)';
+ const meaningsInput=document.createElement('textarea');meaningsInput.rows=2;meaningsInput.maxLength=400;meaningsLabel.append(meaningsInput);
+ target.after(contextLine,baseLabel,meaningsLabel);
+ const style=document.createElement('style');style.textContent=`
+ .context-translate-top{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+ .context-direction,.context-translate-top button{border:1px solid #bdd4ee;background:#eff6ff;border-radius:9px;padding:5px 8px;font-size:12px;color:#1c5493;cursor:pointer}
+ .context-translate-status{font-size:12px;color:#537496;flex:1}
+ .context-translate-sentence{font-size:12px;line-height:1.35;margin:6px 0;color:#55677a;max-height:55px;overflow:auto}
+ .context-translate-base,.context-translate-meaning{font-size:12px;color:#354c63;display:block;margin-top:7px}
+ .context-translate-base input,.context-translate-meaning textarea{display:block;box-sizing:border-box;width:100%;margin-top:4px;border:1px solid #c5d6e9;border-radius:8px;padding:7px;font:inherit}
+ `;document.head.append(style);
+ let range=null,phrase='',sentence='',translation='',from='en',to='ru',controller=null,seq=0,timer=0,lastSelection='',manual=false;
+ const isEligible=n=>{const el=n?.nodeType===1?n:n?.parentElement;return !!el?.closest('.lesson')&&!el.closest('textarea,input,select,button,a,.selection-translate')};
+ const capPreserving=value=>{
+   const text=clean(value);
+   if(!text||/[A-Z]{2,}/.test(text.slice(1)))return text;
+   if(text===text.toUpperCase()&&text.length>3)return text.charAt(0)+text.slice(1).toLowerCase();
+   return text;
+ };
+ const lemma=value=>{
+   const words=clean(value);if(!/^[a-z]+$/i.test(words))return words;
+   const v=words.toLowerCase();
+   for(const [key] of lessonWords)if(key===v)return key;
+   if(v.endsWith('ies')&&v.length>5)return v.slice(0,-3)+'y';
+   if(v.endsWith('ing')&&v.length>6)return v.slice(0,-3).replace(/(.)\1$/, '$1');
+   if(v.endsWith('ed')&&v.length>4)return v.slice(0,-2);
+   if(v.endsWith('s')&&!v.endsWith('ss')&&v.length>4)return v.slice(0,-1);
+   return v;
+ };
+ function hide(){pop.classList.remove('is-visible');range=null;controller?.abort();seq++;}
  function locate(){
-   if (!range || !pop.classList.contains("is-visible")) return;
-   const rect = range.getBoundingClientRect();
-   const width = pop.offsetWidth;
-   const margin = 10;
-   const gap = 8;
-   const headerBottom = document.querySelector("header").getBoundingClientRect().bottom;
-   const pagerTop = document.querySelector(".pager").getBoundingClientRect().top;
-   const topLimit = Math.max(margin, headerBottom + margin);
-   const bottomLimit = Math.min(innerHeight - margin, pagerTop - margin);
-   const left = Math.max(margin, Math.min(innerWidth - width - margin, rect.left + (rect.width - width) / 2));
-   const below = bottomLimit - rect.bottom - gap;
-   const above = rect.top - gap - topLimit;
-   pop.style.maxHeight = "";
-   const height = pop.offsetHeight;
-   const placeBelow = below >= height || below >= above;
-   const available = placeBelow ? below : above;
-   if (available < 50) { hide(); return; }
-   pop.style.maxHeight = Math.floor(available) + "px";
-   pop.style.left = Math.round(left) + "px";
-   pop.style.top = Math.round(placeBelow ? rect.bottom + gap : rect.top - gap - pop.offsetHeight) + "px";
+   if(!range||!pop.classList.contains('is-visible'))return;
+   const rect=range.getBoundingClientRect(),width=pop.offsetWidth,margin=10,gap=8;
+   const headerBottom=document.querySelector('header')?.getBoundingClientRect().bottom||0;
+   const pagerTop=document.querySelector('.pager')?.getBoundingClientRect().top||innerHeight;
+   const topLimit=Math.max(margin,headerBottom+margin),bottomLimit=Math.min(innerHeight-margin,pagerTop-margin);
+   const left=Math.max(margin,Math.min(innerWidth-width-margin,rect.left+(rect.width-width)/2));
+   const below=bottomLimit-rect.bottom-gap,above=rect.top-gap-topLimit;
+   const height=pop.offsetHeight,placeBelow=below>=height||below>=above,available=placeBelow?below:above;
+   if(available<50){hide();return;}
+   pop.style.maxHeight=Math.floor(available)+'px';
+   pop.style.left=Math.round(left)+'px';
+   pop.style.top=Math.round(placeBelow?rect.bottom+gap:rect.top-gap-pop.offsetHeight)+'px';
  }
- async function translate(t){
-   const from = /[А-Яа-яЁё]/.test(t) ? "ru" : "en";
-   const to = from === "en" ? "ru" : "en";
-   google.href = "https://translate.google.com/?" + new URLSearchParams({sl:from,tl:to,text:t,op:"translate"});
-   if(controller)controller.abort();
-   const seq=++request;controller=new AbortController();
-   const ctrl=controller,timeout=setTimeout(()=>ctrl.abort(),9000);
+ const nearbySentence=sel=>{
+   const anchor=sel.anchorNode?.parentElement?.closest('p,li,h2,h3,legend,label,.gap-prompt,.lead,.article');
+   if(!anchor)return phrase;
+   const text=clean(anchor.textContent);
+   const sentences=text.match(/[^.!?]+[.!?]?/g)||[text];
+   return clean(sentences.find(s=>normalized(s).includes(normalized(phrase)))||text).slice(0,400);
+ };
+ function cachedFallback(t,ctx){
+   const v=normalized(t),direct=lessonWords.get(v);
+   if(from==='en'&&to==='ru'&&direct)return direct;
+   if(from==='ru'&&to==='en'){for(const [term,value]of lessonWords)if(normalized(value).split(',').some(x=>x.trim()===v))return term;}
+   const entry=dictionary[v]||dictionary[lemma(v)];
+   if(!entry||from!=='en')return '';
+   const special=Object.keys(entry).find(k=>k!=='default'&&normalized(ctx).includes(k));
+   return entry[special||'default']||'';
+ }
+ const key=()=>JSON.stringify([from,to,normalized(phrase),normalized(sentence)]);
+ function paint(value,origin){
+   const text=capPreserving(value);
+   if(!manual){target.value=text;meaningsInput.value=text;translation=text;saveBtn.disabled=!text;}
+   status.textContent=origin;retry.hidden=true;locate();
+ }
+ async function requestTranslate(){
+   if(!phrase)return;controller?.abort();const n=++seq,cacheKey=key();
+   manual=false;target.value='';meaningsInput.value='';translation='';saveBtn.disabled=true;
+   direction.textContent=from.toUpperCase()+' → '+to.toUpperCase();
+   google.href='https://translate.google.com/?'+new URLSearchParams({sl:from,tl:to,text:phrase,op:'translate'});google.hidden=false;
+   status.textContent='Переводим…';retry.hidden=true;
+   const result=cache.get(cacheKey)||cachedFallback(phrase,sentence);
+   if(result){cache.set(cacheKey,result);paint(result,'Перевод по контексту · сохранён');return;}
+   controller=new AbortController();
+   const id=setTimeout(()=>controller.abort(),6500);
    try{
-     const resp=await fetch("https://api.mymemory.translated.net/get?"+new URLSearchParams({q:t,langpair:from+"|"+to}),{signal:ctrl.signal});
-     if(!resp.ok)throw Error("HTTP "+resp.status);
+     const resp=await fetch('https://api.mymemory.translated.net/get?'+new URLSearchParams({q:phrase.slice(0,400),langpair:from+'|'+to}),{signal:controller.signal});
+     if(!resp.ok)throw Error('HTTP '+resp.status);
      const data=await resp.json();
-     if(request!==seq)return;
-     const result=String(data?.responseData?.translatedText||"").trim();
-     if(!result||Number(data?.responseStatus||0)>=400||/QUERY LENGTH LIMIT|MYMEMORY WARNING/i.test(result))throw Error("Translation unavailable");
-     if(!selectionEdited){translation=result;target.value=result;saveBtn.disabled=false;}
-   }catch(e){
-     if(request!==seq)return;
-     if(!selectionEdited)target.value="";
-     google.hidden=false;
-   }finally{clearTimeout(timeout)}
-   locate();
+     if(n!==seq)return;
+     const v=clean(data?.responseData?.translatedText);
+     if(!v||Number(data?.responseStatus||0)>=400||/QUERY LENGTH LIMIT|MYMEMORY WARNING/i.test(v))throw Error('Не удалось перевести');
+     cache.set(cacheKey,v);paint(v,'Перевод выделения · проверьте контекст');
+   }catch(err){
+     if(n!==seq)return;status.textContent='Нет связи. Можно ввести перевод вручную.';retry.hidden=false;saveBtn.disabled=!meaningsInput.value.trim();
+   }finally{clearTimeout(id);locate();}
  }
- function selectionOpen(){
+ function open(){
    const selection=window.getSelection();
    if(!selection||selection.isCollapsed||!selection.rangeCount||!isEligible(selection.anchorNode)||!isEligible(selection.focusNode))return;
-   const text=clean(selection.toString());
-   if(!text)return;
-   const selectedRange = selection.getRangeAt(0);
-   if (range && text === savedText && range.compareBoundaryPoints(Range.START_TO_START, selectedRange) === 0 && range.compareBoundaryPoints(Range.END_TO_END, selectedRange) === 0) return;
-   range = selectedRange.cloneRange();
-   savedText = phrase = text;
-   translation = "";
-   selectionEdited=false;
-   saveBtn.disabled = true;
-   saveBtn.textContent = "+";
-   saveBtn.title = "Добавить в словарь";
-   saveBtn.setAttribute("aria-label", saveBtn.title);
-   google.hidden = true;
-   target.value = "";
-   pop.classList.add("is-visible");
-   locate();
-   if (range) translate(text);
+   const txt=clean(selection.toString());if(!txt)return;
+   const selected=selection.getRangeAt(0);
+   if(range&&txt===lastSelection&&range.compareBoundaryPoints(Range.START_TO_START,selected)===0&&range.compareBoundaryPoints(Range.END_TO_END,selected)===0)return;
+   range=selected.cloneRange();lastSelection=phrase=txt;sentence=nearbySentence(selection);
+   from=/[А-Яа-яЁё]/.test(txt)?'ru':'en';to=from==='en'?'ru':'en';
+   baseInput.value=txt.includes(' ')?txt:lemma(txt);
+   contextLine.textContent=sentence&&sentence!==phrase?'В предложении: '+sentence:'Выделение: '+phrase;
+   saveBtn.textContent='+';saveBtn.disabled=true;pop.classList.add('is-visible');
+   locate();requestTranslate();
  }
- function schedule(){clearTimeout(selectionTimer);selectionTimer=setTimeout(selectionOpen,100)}
- document.addEventListener("mouseup",e=>{if(!pop.contains(e.target))schedule()});
- document.addEventListener("touchend",e=>{if(!pop.contains(e.target))setTimeout(selectionOpen,250)},{passive:true});
- document.addEventListener("keyup",e=>{if(e.key==="Shift"||e.key.startsWith("Arrow"))schedule()});
-
- document.addEventListener("scroll", locate, true);
- window.addEventListener("resize", locate);
-
- document.addEventListener("keydown",e=>{if(e.key==="Escape")hide()});
- document.addEventListener("pointerdown",e=>{if(pop.classList.contains("is-visible")&&!pop.contains(e.target))hide()});
- document.querySelectorAll("#back,#next").forEach(el=>el.addEventListener("click",hide));
- saveBtn.addEventListener("click",()=>{
-   const word=makeWord(phrase,target.value.trim());
-   if(saveVocabulary(word)){saveBtn.textContent="✓";saveBtn.disabled=true;}
-
- });
+ function schedule(){clearTimeout(timer);timer=setTimeout(open,90);}
+ direction.onclick=()=>{[from,to]=[to,from];requestTranslate();};
+ retry.onclick=()=>requestTranslate();
+ target.oninput=()=>{manual=true;translation=target.value.trim();meaningsInput.value=translation;saveBtn.disabled=!translation;};
+ meaningsInput.oninput=()=>{manual=true;saveBtn.disabled=!meaningsInput.value.trim();};
+ saveBtn.onclick=()=>{
+   const source=clean(baseInput.value)||phrase;
+   const value=clean(meaningsInput.value||target.value);
+   if(!value)return;
+   const word=from==='en'?{en:source,ru:value}: {en:value,ru:source};
+   if(saveVocabulary(word)){saveBtn.textContent='✓';saveBtn.disabled=true;}
+ };
+ document.addEventListener('mouseup',e=>{if(!pop.contains(e.target))schedule();});
+ document.addEventListener('touchend',e=>{if(!pop.contains(e.target))setTimeout(open,250);},{passive:true});
+ document.addEventListener('keyup',e=>{if(e.key==='Shift'||e.key.startsWith('Arrow'))schedule();});
+ document.addEventListener('scroll',locate,true);window.addEventListener('resize',locate);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')hide();});
+ document.addEventListener('pointerdown',e=>{if(pop.classList.contains('is-visible')&&!pop.contains(e.target))hide();});
+ document.querySelectorAll('#back,#next').forEach(el=>el.addEventListener('click',hide));
 })();
+
 const liveScript = document.createElement('script');
 liveScript.src = document.body.dataset.liveScript;
 document.head.append(liveScript);
