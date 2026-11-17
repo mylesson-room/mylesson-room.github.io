@@ -27,6 +27,8 @@ CREATE TABLE public.gostudy_lesson_catalog (
   lesson_id text PRIMARY KEY,
   course_id text NOT NULL,
   title text NOT NULL,
+  -- NULL = shared school catalog; otherwise teacher-private metadata.
+  owner_teacher_id uuid REFERENCES auth.users(id) ON DELETE RESTRICT,
   lesson_path text NOT NULL UNIQUE,
   homework_path text,
   created_at timestamptz NOT NULL DEFAULT now(),
@@ -142,9 +144,16 @@ GRANT SELECT ON public.gostudy_lesson_catalog TO authenticated;
 CREATE POLICY gostudy_catalog_read ON public.gostudy_lesson_catalog
   FOR SELECT TO authenticated
   USING (
-    EXISTS (SELECT 1 FROM public.gostudy_teacher_students relationship
-      WHERE relationship.teacher_id = (SELECT auth.uid()))
+    (
+      -- Teacher may browse only the school's shared lessons and their own private lessons.
+      (owner_teacher_id = (SELECT auth.uid()) OR owner_teacher_id IS NULL)
+      AND EXISTS (
+        SELECT 1 FROM public.gostudy_teacher_students relationship
+        WHERE relationship.teacher_id = (SELECT auth.uid())
+      )
+    )
     OR EXISTS (
+      -- A learner may see metadata ONLY for their published active assignment.
       SELECT 1 FROM public.gostudy_lesson_assignments assigned
       WHERE assigned.lesson_id = gostudy_lesson_catalog.lesson_id
         AND assigned.student_id = (SELECT auth.uid())
