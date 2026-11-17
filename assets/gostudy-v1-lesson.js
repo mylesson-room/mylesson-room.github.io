@@ -169,7 +169,9 @@
      let range=null,phrase='',sentence='',from='en',to='ru',controller=null,seq=0,timer=0,edited=false;
      saveBtn.hidden=!saveVocabulary;
      const canSave=()=>Boolean(saveVocabulary && target.value.trim() && lemma(phrase));
-     const cacheKey='gostudy-context-translations-v3';
+     // Explicit pilot flag: no changes to other students' translation provider.
+     const googlePilot=document.body.dataset.translateEngine==='google-web-pilot';
+     const cacheKey=googlePilot?'gostudy-google-web-pilot-v1':'gostudy-context-translations-v3';
      let cache={};try{cache=JSON.parse(localStorage.getItem(cacheKey)||'{}')}catch{}
      const clean=x=>String(x||'').replace(/\s+/g,' ').trim().slice(0,1000);
      const cacheId=()=>[from,to,phrase.toLowerCase(),sentence.toLowerCase().slice(0,250)].join('|');
@@ -217,6 +219,19 @@
      function showStatus(t){status.textContent=t;status.hidden=!t;}
      function hide(){pop.classList.remove('is-visible');range=null;controller?.abort();seq++;}
      const fetchTranslation=async(q,signal)=>{
+      if(googlePilot){
+       // Undocumented Google Translate web endpoint: experimental pilot only.
+       // It may reject traffic (429), change its payload or fail CORS.
+       const params=new URLSearchParams({client:'gtx',sl:from,tl:to,dt:'t',q});
+       const response=await fetch('https://translate.googleapis.com/translate_a/single?'+params,{signal});
+       if(!response.ok)throw Error('Google HTTP '+response.status);
+       const data=await response.json();
+       if(!Array.isArray(data?.[0]))throw Error('Invalid Google translation');
+       const output=data[0].map(part=>Array.isArray(part)?part[0]:'').filter(x=>typeof x==='string').join('');
+       const result=natural(output);
+       if(!result)throw Error('Empty Google translation');
+       return result;
+      }
       const response=await fetch('https://api.mymemory.translated.net/get?'+new URLSearchParams({q,langpair:from+'|'+to}),{signal});
       if(!response.ok)throw Error('HTTP '+response.status);
       const data=await response.json(),result=natural(data?.responseData?.translatedText);
@@ -276,7 +291,7 @@
      async function translate(){
       controller?.abort();const id=++seq;controller=new AbortController();
       const active=controller,signal=active.signal,timeout=setTimeout(()=>active.abort(),8000);
-      google.href='https://translate.google.com/?'+new URLSearchParams({sl:from,tl:to,text:phrase,op:'translate'});
+      google.href='https://translate.google.com/?'+new URLSearchParams({sl:from,tl:to,text:googlePilot && sentence?sentence:phrase,op:'translate'});
       google.hidden=true;retry.hidden=true;
       const key=cacheId(),cached=cache[key];
       if(cached){if(!edited)target.value=cached.value;saveBtn.disabled=!canSave();showStatus('');clearTimeout(timeout);return;}
@@ -294,10 +309,16 @@
         board:[[/\b(directors|meeting|chair|company|executive|finance)\b/i,'совет директоров, правление, доска'],[/.*/,'доска, совет директоров, правление']],
         concrete:[[/\b(actions?|steps?|plans?|examples?|recommendations?|measures?|details?|proposals?|results?|goals?|evidence|solutions?)\b/i,'конкретный, определённый, предметный'],[/\b(cement|pour|poured|building|construction|wall|floor|mix|material)\b/i,'бетон, бетонный, конкретный'],[/.*/,'конкретный, определённый, бетон']]
       };
-      const special=from==='en' ? polysemy[phrase.toLowerCase()]?.find(([pattern])=>pattern.test(sentence))?.[1] : null;
+      const pilotSense=googlePilot && from==='en' && /^reach$/i.test(phrase) && /\b(target|goal|objective|milestone|agreement|level|decision|conclusion)\b/i.test(sentence)
+       ? 'достичь, достигать, добиваться' : null;
+      const special=pilotSense || (from==='en' ? polysemy[phrase.toLowerCase()]?.find(([pattern])=>pattern.test(sentence))?.[1] : null);
       showStatus('Переводим…');
       try{
-       let result=special && phrase.toLowerCase()!=='concrete' ? {value:special,confidence:'curated'} : await contextualTranslate(signal);
+       // Google pilot translates the highlighted expression itself; never
+       // align two translated sentences or display a neighboring phrase.
+       let result=googlePilot
+        ? (special||dictionary ? {value:special||dictionary,confidence:'curated'} : {value:await fetchTranslation(phrase,signal),confidence:'google'})
+        : (special && phrase.toLowerCase()!=='concrete' ? {value:special,confidence:'curated'} : await contextualTranslate(signal));
        if(id!==seq)return;
        if(!result){
         const value=special||dictionary||await fetchTranslation(phrase,signal);
@@ -311,7 +332,7 @@
        try{localStorage.setItem(cacheKey,JSON.stringify(cache))}catch{}
       }catch(e){
        if(id!==seq)return;
-       showStatus('Нет ответа от переводчика. Можно ввести перевод вручную.');
+       showStatus(googlePilot?'Google Translate недоступен. Можно исправить перевод вручную или открыть предложение в Google.':'Нет ответа от переводчика. Можно ввести перевод вручную.');
        retry.hidden=false;google.hidden=false;
       }finally{clearTimeout(timeout);locate();}
      }
