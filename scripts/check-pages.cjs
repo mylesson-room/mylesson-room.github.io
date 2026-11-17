@@ -940,6 +940,140 @@ async function checkDariaPrivateRoom(browser,origin) {
   }finally{await Promise.all([context.close(),teacher.close(),outsider.close()]);}
 }
 
+async function checkStudentWithoutCourse(browser, origin) {
+  const teacher = {id:'11111111-1111-4111-8111-111111111111',email:'teacher@example.invalid'};
+  const pupilId = '22222222-2222-4222-8222-222222222222';
+  const pupilEmail = 'new-student@example.invalid';
+  const password = 'test-password';
+  const project = 'https://kawfqlohguwvmmplvrny.supabase.co';
+  const createPath = '/functions/v1/gostudy-add-student';
+  let student, assignedCourse, handler;
+  const fakeAuth = async (url, options) => {
+    const path = new URL(url).pathname;
+    const data = options.body ? JSON.parse(options.body) : null;
+    if (path === '/auth/v1/user') {
+      return Response.json(options.headers.authorization === 'Bearer teacher-token' ? teacher : student);
+    }
+    if (path.endsWith('/gostudy_my_destinations')) {
+      return Response.json(options.headers.authorization === 'Bearer teacher-token' ? [{course:'teacher'}] : []);
+    }
+    assert.equal(options.headers.authorization,'Bearer test-service-key');
+    if (path.endsWith('/gostudy_provision_student')) {
+      assert.equal(data.p_teacher,teacher.id);
+      assert.equal(data.p_email,pupilEmail);
+      if (data.p_enroll) {
+        assert.ok(data.p_course,'An empty course must never call enrollment');
+        assignedCourse = data.p_course;
+      }
+      return Response.json(student?.id || null);
+    }
+    if (path === '/auth/v1/admin/users') {
+      assert.equal(data.email,pupilEmail);
+      assert.equal(data.password,password);
+      student = {id:pupilId,email:data.email,app_metadata:data.app_metadata};
+      return Response.json(student,{status:201});
+    }
+    if (path === '/auth/v1/admin/users/'+pupilId) return Response.json(student);
+    throw new Error('Unexpected endpoint '+path);
+  };
+  const source = await readFile('supabase/functions/gostudy-add-student/index.ts','utf8');
+  runInNewContext(source,{
+    Deno:{serve:callback=>{handler=callback;},env:{get:key=>({
+      SUPABASE_URL:project,SUPABASE_ANON_KEY:'public',SUPABASE_SERVICE_ROLE_KEY:'test-service-key',
+    })[key]}},
+    fetch:fakeAuth,Response,AbortSignal,TextEncoder,
+  });
+
+  const teacherContext = await browser.newContext();
+  const studentContext = await browser.newContext({viewport:{width:390,height:844}});
+  const request = async route => {
+    const input = route.request();
+    const path = new URL(input.url()).pathname;
+    const isTeacher = input.headers().authorization === 'Bearer teacher-token';
+    const payload = () => input.postDataJSON();
+    if (path === createPath) {
+      const result = await handler(new Request(input.url(),{
+        method:'POST',headers:{authorization:input.headers().authorization},body:input.postData(),
+      }));
+      return route.fulfill({status:result.status,json:await result.json()});
+    }
+    if (path === '/auth/v1/token') {
+      const {email,password:submitted} = payload();
+      assert.equal(submitted,password);
+      const user = email === teacher.email ? teacher : student;
+      assert.equal(user?.email,email);
+      return route.fulfill({json:{user,access_token:user === teacher?'teacher-token':'student-token',refresh_token:'test-refresh',expires_in:3600}});
+    }
+    if (path.endsWith('/gostudy_my_destinations')) {
+      return route.fulfill({json:isTeacher ? [{course:'teacher'}] : assignedCourse ? [{course:assignedCourse.replaceAll('_','-')}] : []});
+    }
+    if (path.endsWith('/gostudy_students_without_course')) {
+      assert.ok(isTeacher);
+      return route.fulfill({json:student ? [{id:student.id,email:student.email}] : []});
+    }
+    if (path.endsWith('/gostudy_travel_a2_teacher_view')) {
+      const enrolled = [{id:'33333333-3333-4333-8333-333333333333',label:'Existing student'}];
+      if (assignedCourse) enrolled.push({id:student.id,label:student.email});
+      return route.fulfill({json:enrolled});
+    }
+    return route.fulfill({json:[]});
+  };
+  try {
+    await Promise.all([teacherContext,studentContext].map(context=>context.route(project+'/**',request)));
+    const tp=await teacherContext.newPage();
+    await tp.goto(origin+'/gostudy-teacher.html');
+    await tp.locator('#teacher-email').fill(teacher.email);
+    await tp.locator('#teacher-password').fill(password);
+    await tp.locator('#teacher-login button').click();
+    const form=tp.locator('#teacher-add-student');
+    await form.locator('summary').click();
+    const course=form.locator('select');
+    assert.equal(await course.inputValue(),'');
+    assert.equal(await course.locator('option').first().textContent(),'— Без курса');
+    async function create() {
+      await form.locator('input[type=email]').fill(pupilEmail);
+      await form.locator('input[type=password]').fill(password);
+      await form.getByRole('button',{name:/Создать аккаунт/}).click();
+    }
+    await create();
+    await form.getByRole('status').getByText(/Личный кабинет создан/).waitFor();
+    const roster=tp.locator('.teacher-student-row').filter({hasText:pupilEmail});
+    await roster.getByText('Без курса',{exact:true}).waitFor();
+    assert.equal(await roster.getByRole('link',{name:/Войти в класс/}).count(),0);
+    assert.equal(assignedCourse,undefined);
+    const retry=await handler(new Request(project+createPath,{method:'POST',
+      headers:{authorization:'Bearer teacher-token'},body:JSON.stringify({email:pupilEmail,password,course:null}),
+    }));
+    assert.equal(retry.status,200);
+    const denied=await handler(new Request(project+createPath,{method:'POST',
+      headers:{authorization:'Bearer student-token'},body:JSON.stringify({email:pupilEmail,password,course:null}),
+    }));
+    assert.equal(denied.status,403);
+
+    const sp=await studentContext.newPage();
+    await sp.goto(origin+'/login.html');
+    await sp.locator('#unified-login-email').fill(pupilEmail);
+    await sp.locator('#unified-password').fill(password);
+    await sp.locator('#unified-login button[type=submit]').click();
+    await sp.getByRole('heading',{name:'Личный кабинет',exact:true}).waitFor();
+    await sp.getByText('Преподаватель пока не назначил курс.').waitFor();
+    assert.equal(await sp.locator('#unified-destinations button').count(),0);
+    await sp.reload();
+    await sp.getByRole('heading',{name:'Личный кабинет',exact:true}).waitFor();
+
+    await course.selectOption('travel_a2');
+    await create();
+    await form.getByRole('status').getByText(/Курс назначен/).waitFor();
+    await roster.getByRole('link',{name:/Войти в класс/}).waitFor();
+    assert.equal(await roster.count(),1);
+    await sp.reload();
+    await sp.waitForURL('**/student-travel-a2.html');
+    console.log('No-course onboarding: teacher creation, retry, authorization, mobile empty cabinet, reload and later enrollment verified');
+  } finally {
+    await Promise.all([teacherContext.close(),studentContext.close()]);
+  }
+}
+
 async function main() {
   await checkVictoriaB2Methodology();
   await checkThreeProgressMeLessons();
@@ -949,6 +1083,7 @@ async function main() {
   try {
     const origin = 'http://127.0.0.1:' + server.address().port;
     await checkSharedComponentReversible(browser,origin);
+    await checkStudentWithoutCourse(browser,origin);
     await checkDariaPrivateRoom(browser,origin);
     await checkFinanceRoom(browser, origin);
     await checkFinanceHomework(browser,origin);

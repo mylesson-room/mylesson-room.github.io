@@ -416,6 +416,15 @@
       if (!response.ok || !Array.isArray(response.data)) throw new Error('Не удалось загрузить назначенные курсы. Попробуйте ещё раз.');
       const options = [...new Set(response.data.map(row => row.course))]
         .map(course => destinations.get(course)).filter(Boolean);
+      if (!options.length && session.user.app_metadata?.gostudy_without_course === true) {
+        localStorage.setItem(studentSessionKey,JSON.stringify(session));
+        document.title = 'Личный кабинет · GoStudy';
+        document.getElementById('unified-title').textContent = 'Личный кабинет';
+        document.getElementById('unified-description').textContent = 'Преподаватель пока не назначил курс.';
+        list.replaceChildren();
+        status.textContent = '';
+        return;
+      }
       if (options.length === 1) {
         await open(options[0]);
         return;
@@ -1181,6 +1190,7 @@
       lessons:[{title:'AI in Finance · Lesson 2',lesson:financeLesson,homework:'business-ai-finance-b2-02-homework.html'}],
     }};
     const courses = new Map(Object.entries(teacherCatalog).map(([id,course]) => [id,course.name]));
+    const withoutCourse = 'without_course';
     const addStudent = document.getElementById('teacher-add-student');
     const addStudentForm = addStudent?.querySelector('form');
     const addStudentStatus = document.getElementById('teacher-add-student-status');
@@ -1192,19 +1202,27 @@
         option.textContent = name;
         addStudentForm.elements.course.append(option);
       }
+      const button = addStudentForm.querySelector('button[type="submit"]');
+      const courseSelect = addStudentForm.elements.course;
+      const updateButton = () => {
+        button.textContent = courseSelect.value ? 'Создать аккаунт и назначить курс' : 'Создать аккаунт';
+      };
+      courseSelect.addEventListener('change',updateButton);
       addStudentForm.addEventListener('submit',async event => {
         event.preventDefault();
-        const button = addStudentForm.querySelector('button[type="submit"]');
         const email = addStudentForm.elements.email.value.trim();
         const password = addStudentForm.elements.password.value;
-        const course = addStudentForm.elements.course.value;
+        const course = courseSelect.value || null;
         button.disabled = true;
-        addStudentStatus.textContent = 'Создаём аккаунт и назначаем курс…';
+        addStudentStatus.textContent = course ? 'Создаём аккаунт и назначаем курс…' : 'Создаём личный кабинет…';
         try {
           const result = await request('/functions/v1/gostudy-add-student',{method:'POST',body:{email,password,course}},await token());
           if (!result.ok || result.data?.ok !== true) throw new Error(result.data?.error || 'Не удалось добавить ученика.');
           addStudentForm.reset();
-          addStudentStatus.textContent = 'Курс назначен. Ученику можно отправить общую ссылку на вход.';
+          updateButton();
+          addStudentStatus.textContent = course
+            ? 'Курс назначен. Ученику можно отправить общую ссылку на вход.'
+            : 'Личный кабинет создан. Ученику можно отправить общую ссылку на вход.';
           refresh();
         } catch(error) {
           addStudentStatus.textContent = error.message;
@@ -1227,7 +1245,8 @@
       if (count) count.textContent = 'Количество учеников '+new Set(students.map(student=>student.id)).size;
       for (const student of students) {
         const label = student.email || student.label;
-        const course = teacherCatalog[student.course]?.name || '';
+        const catalog = teacherCatalog[student.course];
+        const course = catalog?.name || 'Без курса';
         if (!(label+' '+(student.label || '')+' '+course).toLowerCase().includes(query)) continue;
         const row = document.createElement('div');
         row.className = 'teacher-student-row';
@@ -1243,10 +1262,14 @@
         const level = document.createElement('small');
         level.textContent = student.email ? course : '';
         info.append(name,subtitle,level);
-        const enter = document.createElement('a');
-        enter.className = 'teacher-enter-class';
-        enter.href = classroomLink(teacherCatalog[student.course].lessons.at(-1).lesson,student.id);
-        enter.textContent = '→ Войти в класс';
+        row.append(avatar,info);
+        if (catalog) {
+          const enter = document.createElement('a');
+          enter.className = 'teacher-enter-class';
+          enter.href = classroomLink(catalog.lessons.at(-1).lesson,student.id);
+          enter.textContent = '→ Войти в класс';
+          row.append(enter);
+        }
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'teacher-student-profile';
@@ -1259,7 +1282,7 @@
           renderStudent();
           panel.scrollIntoView({block:'start'});
         };
-        row.append(avatar,info,enter,button);
+        row.append(button);
         studentList.append(row);
       }
       if (!studentList.childElementCount) studentList.textContent = query ? 'Никого не нашли.' : 'Список пока пуст.';
@@ -1270,7 +1293,7 @@
     function renderStudent() {
       renderStudentList();
       const student = students.find(row => row.selection === studentPicker.value);
-      wordForm.hidden = !student || student.course === financeCourse || student.course === generalB2 || ['travel_b2','art_b1','ielts_reading','sweden_a2','country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(student.course);
+      wordForm.hidden = !student || student.course === withoutCourse || student.course === financeCourse || student.course === generalB2 || ['travel_b2','art_b1','ielts_reading','sweden_a2','country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(student.course);
       wordItems(studentWords, student?.words);
       wordItems(assignedWords, student?.assigned);
       const classroom = document.getElementById('teacher-classroom');
@@ -1336,7 +1359,9 @@
         group.append(title,list);
         answerList.append(group);
       }
-      if (!answerList.childElementCount) answerList.textContent = 'Ответы появятся, когда ученица войдёт и синхронизирует урок.';
+      if (!answerList.childElementCount) answerList.textContent = student?.course === withoutCourse
+        ? 'Курс пока не назначен.'
+        : 'Ответы появятся, когда ученица войдёт и синхронизирует урок.';
     }
     function setSignedIn() {
       login.hidden = !!session;
@@ -1353,7 +1378,14 @@
           if (!response.ok || !Array.isArray(response.data)) throw new Error('Не удалось загрузить почту учеников.');
           studentEmails = new Map(response.data.map(row => [row.id,row.email]));
         };
-        const results = await Promise.allSettled([lookup(),...Array.from(courses, async ([course,label]) => {
+        const lookupWithoutCourse = async () => {
+          const response = await request('/rest/v1/rpc/gostudy_students_without_course',{method:'POST',body:{}},access);
+          if (!response.ok || !Array.isArray(response.data)) throw new Error('Не удалось загрузить учеников без курса.');
+          rosterByCourse.set(withoutCourse,response.data.map(row=>({
+            id:row.id,label:row.email,email:row.email,course:withoutCourse,selection:withoutCourse+':'+row.id,
+          })));
+        };
+        const results = await Promise.allSettled([lookup(),lookupWithoutCourse(),...Array.from(courses, async ([course,label]) => {
           if (course === financeCourse) {
             const response = await request('/rest/v1/gostudy_finance_room?select=student_id&teacher_id=eq.' + encodeURIComponent(session.user.id), {}, access);
             if (!response.ok || !Array.isArray(response.data)) throw new Error(label);
@@ -1378,6 +1410,8 @@
           rosterByCourse.set(course, response.data.map(row => ({...row,course,selection:course+':'+row.id})));
         })]);
         const roster = Array.from(courses.keys()).flatMap(course => (rosterByCourse.get(course) || []).map(row => ({...row,email:row.email || studentEmails.get(row.id)})));
+        const assigned = new Set(roster.map(student=>student.id));
+        roster.push(...(rosterByCourse.get(withoutCourse) || []).filter(student=>!assigned.has(student.id)));
         const next = JSON.stringify(roster);
         if (signature !== next) {
           const selected = studentPicker.value || new URLSearchParams(location.search).get('selected');
@@ -1387,7 +1421,7 @@
           studentPicker.replaceChildren(...students.map(student => {
             const option = document.createElement('option');
             option.value = student.selection;
-            option.textContent = student.email ? student.email+' · '+courses.get(student.course) : student.label;
+            option.textContent = student.email ? student.email+' · '+(courses.get(student.course) || 'Без курса') : student.label;
             return option;
           }));
           if (students.some(student => student.selection === selected)) studentPicker.value = selected;
