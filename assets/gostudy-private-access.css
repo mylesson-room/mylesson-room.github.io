@@ -1,0 +1,18 @@
+/* Shared private-page gate. Keep content hidden until identity is verified. */
+body:not(.gostudy-authorized) main,
+body:not(.gostudy-authorized) .layout,
+body:not(.gostudy-authorized) .pager,
+body:not(.gostudy-authorized) .lesson-dictionary,
+body:not(.gostudy-authorized) .selection-translate {display:none!important}
+body:not(.gostudy-authorized) .classroom-access{display:none!important}
+#gostudyAccessGate[hidden],#gostudyAccessSignout[hidden]{display:none!important}
+#gostudyAccessGate{width:min(460px,calc(100% - 32px));margin:60px auto;padding:30px;border:1px solid #dfe8f3;border-radius:22px;background:#fff;box-shadow:0 15px 42px #204c6d14;font:16px/1.55 system-ui,-apple-system,sans-serif;color:#132c4d}
+#gostudyAccessGate h1{font-size:27px;line-height:1.25;margin:4px 0 12px;letter-spacing:-.65px}
+#gostudyAccessGate p{font-size:14px;color:#66778d;margin:0 0 20px}
+#gostudyAccessGate label{font-size:13px;font-weight:750;display:block;margin:15px 0 6px}
+#gostudyAccessGate input{display:block;width:100%;padding:11px 13px;min-height:45px;border:1px solid #cbdbea;border-radius:11px;background:#f8fbff;color:#132c4d}
+#gostudyAccessGate button{min-height:46px;padding:11px 22px;border:0;border-radius:12px;background:#176dc6;color:#fff;font-weight:750;margin-top:20px;cursor:pointer}
+#gostudyAccessMessage{font-size:13px;color:#61778c;margin-top:14px;min-height:24px}
+#gostudyAccessSignout{border:1px solid #dce6f0;border-radius:10px;background:#fff;color:#176dc6;padding:8px 12px;cursor:pointer;margin:6px}
+body:not(.gostudy-authorized) .top,
+body:not(.gostudy-authorized) header{opacity:.94}
