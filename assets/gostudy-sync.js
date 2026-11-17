@@ -62,6 +62,8 @@
   const currentPage = location.pathname.split('/').pop();
   const countryHouse = ['student-country-house.html','country-house-a2.html','country-house-a2-02.html','country-house-a2-03.html','country-house-a2-04.html','country-house-a2-04-homework.html','country-house-a2-homework.html','country-house-a2-02-homework.html','country-house-a2-03-homework.html'].includes(currentPage);
   const countryHouseKeys = ['gostudy-country-house-a2-03-homework-v1','gostudy-vocabulary-country-house-v1','gostudy-country-house-a2-03-v1','gostudy-country-house-a2-04-v1','gostudy-country-house-a2-04-homework-v1'];
+  const artB1 = ['student-art-b1.html','art-b1-03.html','art-b1-03-homework.html'].includes(currentPage) || document.querySelector('meta[name=gostudy-course]')?.content === 'art-b1';
+  const artB1Keys = ['gostudy-vocabulary-art-b1-v1','gostudy-art-b1-03-v1','gostudy-art-b1-03-homework-v1'];
   const travelB2Cabinet = currentPage === 'student-travel-b2.html';
   const businessAI = ['business-ai-b2c1-02.html','business-ai-b2c1-03.html','business-ai-b2c1-03-homework.html','student-business-ai.html'].includes(location.pathname.split('/').pop());
   const businessAIKeys = ['gostudy-vocabulary-business-ai-v1','gostudy-business-ai-b2c1-02-v1','gostudy-business-ai-b2c1-03-v1','gostudy-business-ai-b2c1-03-homework-v1'];
@@ -73,7 +75,7 @@
   const storiesCabinet = currentPage === 'student-general-english-b1-stories.html';
   const storiesKeys = ['gostudy-vocabulary-general-english-b1-stories-v1','gostudy-general-english-b1-stories-01-v1','gostudy-general-english-b1-stories-01-homework-v1'];
   const storiesLesson = currentPage === 'general-english-b1-stories-01.html' || currentPage === 'general-english-b1-stories-01-homework.html';
-  const keys = new Set(storiesCabinet || storiesLesson ? storiesKeys : generalB1 ? generalB1Keys : tiktokA2 ? tiktokKeys : pharmaC1 ? pharmaKeys : firstSales ? salesKeys : feedB2 ? feedKeys : financeB1 ? financeKeys : travelA2 ? travelA2Keys : businessAI ? businessAIKeys : countryHouse ? countryHouseKeys : travelB2Keys);
+  const keys = new Set(storiesCabinet || storiesLesson ? storiesKeys : generalB1 ? generalB1Keys : tiktokA2 ? tiktokKeys : pharmaC1 ? pharmaKeys : firstSales ? salesKeys : feedB2 ? feedKeys : financeB1 ? financeKeys : travelA2 ? travelA2Keys : businessAI ? businessAIKeys : countryHouse ? countryHouseKeys : artB1 ? artB1Keys : travelB2Keys);
   const courseName = tiktokA2 ? 'TikTok A2' : pharmaC1 ? 'Pharma C1' : firstSales ? 'First Sales C1' : feedB2 ? 'Feed B2' : financeB1 ? 'Finance B1' : travelA2 ? 'Travel A2+' : 'Travel B2';
   const accountPage = 'gostudy-account.html' + (tiktokA2 ? '?course=tiktok-a2' : pharmaC1 ? '?course=pharma-c1' : firstSales ? '?course=first-sales' : feedB2 ? '?course=feed-b2' : financeB1 ? '?course=finance-b1' : travelA2 ? '?course=travel-a2' : '');
   const cabinetPage = tiktokA2 ? 'student-tiktok-a2.html' : pharmaC1 ? 'student-pharma.html' : firstSales ? 'student-first-sales.html' : feedB2 ? 'student-feed-b2.html' : financeB1 ? 'student-finance-b1.html' : travelA2 ? 'student-travel-a2.html' : 'student-travel-b2.html';
@@ -671,6 +673,12 @@
     'general-english-b1-01.html':['general_english_b1',generalB1Keys[1]],
     'general-english-b1-01-homework.html':['general_english_b1',generalB1Keys[2]],
     'business-ai-b2c1-02.html':['business_ai','gostudy-business-ai-b2c1-02-v1'],
+    'business-ai-b2c1-03.html':['business_ai','gostudy-business-ai-b2c1-03-v1'],
+    'business-ai-b2c1-03-homework.html':['business_ai','gostudy-business-ai-b2c1-03-homework-v1'],
+    'art-b1-03.html':['art_b1','gostudy-art-b1-03-v1'],
+    'art-b1-03-homework.html':['art_b1','gostudy-art-b1-03-homework-v1'],
+    'country-house-a2-04.html':['country_house','gostudy-country-house-a2-04-v1'],
+    'country-house-a2-04-homework.html':['country_house','gostudy-country-house-a2-04-homework-v1'],
     'travel-b2-04.html':['travel_b2','gostudy-travel-b2-04-v1'],
     'country-house-a2-03.html':['country_house','gostudy-country-house-a2-03-v1'],
     'country-house-a2-03-homework.html':['country_house','gostudy-country-house-a2-03-homework-v1']
