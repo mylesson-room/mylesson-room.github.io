@@ -44,8 +44,14 @@
         if (typeof word.en !== "string" || typeof word.ru !== "string" || !word.en.trim() || !word.ru.trim()) continue;
         const key = word.en.trim().toLowerCase();
         const added = !words.has(key);
-        words.set(key, word);
+        words.set(key, {...word,learned:words.get(key)?.learned||Boolean(word.learned)});
         document.dispatchEvent(new CustomEvent("finance-word", {detail:{word,notify:added && !initial}}));
+      } else if (event.kind === "word_mastered") {
+        const key=String(event.payload?.en||"").trim().toLowerCase();
+        if(key && words.has(key)){
+          words.set(key,{...words.get(key),learned:true});
+          document.dispatchEvent(new CustomEvent("finance-word",{detail:{word:words.get(key),notify:false}}));
+        }
       } else {
         document.dispatchEvent(new CustomEvent("finance-event", {
           detail:{...event,initial,own:event.actor === auth.userId(),teacher:event.actor === room.teacher_id}
