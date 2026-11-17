@@ -64,7 +64,8 @@ async function run(){
         }
         else {await route.fulfill({status:404,headers,body:'{}'});return;}
         if(u.pathname.startsWith('/rest/v1/')){
-          assert.equal(u.searchParams.get('student_id'),'eq.'+student,'Every query must be student-scoped');
+          const ownerField=u.pathname==='/rest/v1/gostudy_profiles'?'user_id':'student_id';
+          assert.equal(u.searchParams.get(ownerField),'eq.'+student,'Every query must be scoped to the authenticated user');
         }
         await route.fulfill({status:200,headers,contentType:'application/json',body:JSON.stringify(response)});
       });
