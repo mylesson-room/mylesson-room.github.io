@@ -26,6 +26,8 @@ jobs:
         run: node scripts/check-unified-cabinet.cjs
       - name: Verify complete legacy migration inventory
         run: node scripts/check-cabinet-migration-inventory.cjs
+      - name: Validate proposed migration safety contract
+        run: node scripts/check-migration-contract.cjs
       - name: Verify newly introduced student cabinets
         shell: bash
         run: |
