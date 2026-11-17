@@ -139,6 +139,7 @@ async function checkGeneralB2Room(browser, origin) {
         const url = new URL(request.url());
         assert.equal(request.headers().authorization,'Bearer test-'+role);
         if (url.pathname.endsWith('/gostudy_classroom_rooms')) {
+          if (url.searchParams.get('course') === 'eq.english-placement') return route.fulfill({json:[]});
           assert.equal(url.searchParams.get('course'),'eq.general-english-b2');
           return route.fulfill({json:[{id:roomId,teacher_id:teacherId,student_id:studentId,student_label:'Виктория'}]});
         }
