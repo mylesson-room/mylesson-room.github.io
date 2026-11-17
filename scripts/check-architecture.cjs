@@ -9,6 +9,7 @@ const read=path=>fs.readFileSync(path,'utf8');
 const must=(src,needle,reason)=>assert.ok(src.includes(needle),reason+' — missing '+needle);
 const pages=[
  {cabinet:'student-business-ai-finance.html',lesson:'business-ai-finance-b2-02.html'},
+ {cabinet:'student-english-placement.html',lesson:'english-placement.html',private:true,client:'assets/gostudy-placement.js',workbook:true},
  {cabinet:'student-ielts-reading.html',lesson:'ielts-reading-04.html',private:true,client:'assets/gostudy-ielts-reading.js'}
 ];
 for(const p of pages){
@@ -22,8 +23,15 @@ for(const p of pages){
   must(lesson,p.client,p.lesson);
   must(lesson,'data-lesson-script="assets/gostudy-v1-lesson.js',p.lesson);
   must(lesson,'data-live-script="assets/gostudy-finance-live.js',p.lesson);
-  must(client,'loadScript(document.body.dataset.lessonScript)',p.client);
-  must(client,'loadScript(document.body.dataset.liveScript)',p.client);
+  if(p.workbook){
+   must(lesson,'data-workbook-script="assets/gostudy-v1-workbook.js',p.lesson);
+   must(lesson,'data-exercises-script="assets/gostudy-v1-exercises.js',p.lesson);
+   must(client,'await loadScript(body.dataset.lessonScript)',p.client);
+   must(client,'await loadScript(body.dataset.workbookScript)',p.client);
+  }else{
+   must(client,'loadScript(document.body.dataset.lessonScript)',p.client);
+   must(client,'loadScript(document.body.dataset.liveScript)',p.client);
+  }
  }else{
   must(lesson,'assets/gostudy-v1-lesson.js',p.lesson);
  }
@@ -35,7 +43,7 @@ for(const p of pages){
   assert.ok(!lesson.includes('const qs='), 'IELTS answer keys leaked into public HTML.');
  }
 }
-for(const file of ['assets/gostudy-private-access.js','assets/gostudy-ielts-reading.js']){
+for(const file of ['assets/gostudy-private-access.js','assets/gostudy-ielts-reading.js','assets/gostudy-placement.js']){
  cp.execFileSync(process.execPath,['--check',file],{stdio:'pipe'});
  const source=read(file);
  assert.ok(!source.includes('1122334455'),'Plaintext password found in '+file);

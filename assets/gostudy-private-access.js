@@ -14,7 +14,8 @@ const gate=document.getElementById('gostudyAccessGate');
 const form=document.getElementById('gostudyAccessForm');
 const message=document.getElementById('gostudyAccessMessage');
 const logout=document.getElementById('gostudyAccessSignout');
-let session=null,user=null,rememberedKey=null,refreshInFlight=null;
+let session=null,user=null,rememberedKey=null,refreshInFlight=null,room=null;
+const selectedStudent=new URLSearchParams(location.search).get("classStudent");
 let readyResolve;
 const ready=new Promise(resolve=>{readyResolve=resolve;});
 const text=s=>{if(message)message.textContent=s;};
@@ -25,8 +26,8 @@ const show=ok=>{
 };
 function json(raw){try{return JSON.parse(raw||'null');}catch{return null;}}
 function getStored(){
- const teacherEntry=document.body.hasAttribute('data-ielts-private-lesson') &&
-  new URLSearchParams(location.search).get('classStudent')===document.body.dataset.vocabularyOwner;
+ const teacherEntry=(config.room && selectedStudent) ||
+  (document.body.hasAttribute('data-ielts-private-lesson') && selectedStudent===document.body.dataset.vocabularyOwner);
  const teacher=[teacherKey,json(localStorage.getItem(teacherKey))];
  const list=[
   ...(teacherEntry?[teacher]:[]),
@@ -44,7 +45,7 @@ function remember(data,persist=false){
 }
 function clearSession(){
  const uid=session?.user?.id;
- session=null;user=null;sessionStorage.removeItem(sessionKey);
+ session=null;user=null;room=null;sessionStorage.removeItem(sessionKey);
  for(const k of [studentKey,teacherKey]){const v=json(localStorage.getItem(k));if(v?.user?.id===uid)localStorage.removeItem(k);}
 }
 async function raw(path,opts={},bearer){
@@ -74,13 +75,27 @@ async function verify(){
   const u=r.ok?r.data:null;
   if(!u?.id){user=null;show(false);text('Войдите по email и паролю.');return false;}
   if(allowed.size&&!allowed.has(u.id)){user=null;show(false);text('У этого аккаунта нет доступа к данному кабинету.');return false;}
+  if(config.room){
+   const query=new URLSearchParams({
+    select:'student_id,teacher_id',
+    course:'eq.'+config.room.course,
+    lesson_path:'eq.'+config.room.lesson,
+    student_id:'eq.'+(selectedStudent||u.id)
+   });
+   const result=await request('/rest/v1/gostudy_classroom_rooms?'+query);
+   const candidate=Array.isArray(result.data)?result.data[0]:null;
+   if(!result.ok || !candidate || (selectedStudent ? candidate.teacher_id!==u.id : candidate.student_id!==u.id)){
+    user=null;room=null;show(false);text('У этого аккаунта нет доступа к данному кабинету.');return false;
+   }
+   room={...config.room,student:candidate.student_id,teacher:candidate.teacher_id};
+  }
   user=u;show(true);text('');
   document.dispatchEvent(new CustomEvent('gostudy-private-authorized',{detail:{userId:u.id}}));
   return true;
  }catch(error){user=null;show(false);text('Войдите по email и паролю.');return false;}
 }
 const api=window.GoStudyPrivateAccess={
- ready,userId:()=>user?.id||null,token,request,getUser:()=>user
+ ready,room:()=>room,userId:()=>user?.id||null,token,request,getUser:()=>user
 };
 form?.addEventListener('submit',async event=>{
  event.preventDefault();

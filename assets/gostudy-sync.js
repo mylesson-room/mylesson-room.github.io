@@ -347,6 +347,7 @@
       ['travel-b2', {name:'Travel B2',path:'student-travel-b2.html',keys:travelB2Keys}],
       ['art-b1', {name:'Art & Mosaics · B1',path:'student-art-b1.html'}],
       ['ielts-reading', {name:'IELTS Reading',path:'student-ielts-reading.html'}],
+      ['english-placement', {name:'English Placement Test',path:'student-english-placement.html'}],
       ['sweden-a2', {name:'Sweden · A2',path:'student-sweden.html'}],
       ['travel-a2', {name: 'Travel A2+', path: 'student-travel-a2.html', keys: travelA2Keys}],
       ['finance-b1', {name: 'Finance B1', path: 'student-finance-b1.html', keys: financeKeys}],
@@ -1178,12 +1179,14 @@
     const pharmaThreeHomeworkLabels = {"q0-0":"What is the role of AI in the Swedish trial?","q0-1":"What can we say about 44%?","q0-2":"What would a sensible local pilot track?","q1-0":"Which line is suitable for a report?","q1-1":"A patient asks who reviews the scan. Which reply is clearest?"};
     const financeCourse = 'business_ai_finance';
     const generalB2 = 'general_english_b2';
+    const placement = 'english_placement';
     const financeLesson = 'business-ai-finance-b2-02.html';
     const legacyTeacherCourses = new Set(['art_b1','ielts_reading','sweden_a2']);
     const teacherCatalog = {...classroomCatalog,
       art_b1:{name:'Art & Mosaics · B1',lessons:[{title:'Small pieces, big ideas',lesson:'art-mosaics-b1.html',homework:'art-b1-homework.html'},{title:'Every picture has a story',lesson:'art-b1-02.html',homework:'art-b1-02-homework.html'},{title:'The Gallery Makeover',lesson:'art-b1-03.html',lessonKey:'gostudy-art-b1-03-v1',homework:'art-b1-03-homework.html',homeworkKey:'gostudy-art-b1-03-homework-v1'}]},
       ielts_reading:{name:'IELTS Reading',lessons:[{title:'IELTS Reading · Lesson 1',lesson:'ielts-reading-01.html',homework:'ielts-reading-01-homework.html'},{number:4,title:'IELTS Academic Reading 04',lesson:'ielts-reading-04.html'}]},
       sweden_a2:{name:'Sweden · A2',lessons:[{title:'Sweden · Lesson 1',lesson:'sweden-a2.html',homework:'sweden-a2-01-homework.html'}]},
+      [placement]:{name:'English Placement Test',lessons:[{title:'English Placement Test',lesson:'english-placement.html'}]},
       [generalB2]:{name:'General English B2',lessons:[{title:'The Hidden Cost of Convenience',lesson:'general-english-b2-01.html',lessonKey:'gostudy-general-english-b2-01-v2',homework:'general-english-b2-01.html#homework'}]},
       [financeCourse]:{
       name:'AI in Finance · B2',
@@ -1196,7 +1199,7 @@
     const addStudentStatus = document.getElementById('teacher-add-student-status');
     if (addStudentForm) {
       for (const [id,name] of courses) {
-        if (id === financeCourse || id === generalB2 || ['country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(id)) continue;
+        if (id === financeCourse || id === generalB2 || id === placement || ['country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(id)) continue;
         const option = document.createElement('option');
         option.value = id;
         option.textContent = name;
@@ -1293,7 +1296,7 @@
     function renderStudent() {
       renderStudentList();
       const student = students.find(row => row.selection === studentPicker.value);
-      wordForm.hidden = !student || student.course === withoutCourse || student.course === financeCourse || student.course === generalB2 || ['travel_b2','art_b1','ielts_reading','sweden_a2','country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(student.course);
+      wordForm.hidden = !student || student.course === withoutCourse || student.course === financeCourse || student.course === generalB2 || student.course === placement || ['travel_b2','art_b1','ielts_reading','sweden_a2','country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(student.course);
       wordItems(studentWords, student?.words);
       wordItems(assignedWords, student?.assigned);
       const classroom = document.getElementById('teacher-classroom');
@@ -1359,8 +1362,9 @@
         group.append(title,list);
         answerList.append(group);
       }
-      if (!answerList.childElementCount) answerList.textContent = student?.course === withoutCourse
-        ? 'Курс пока не назначен.'
+      if (!answerList.childElementCount) answerList.textContent = student?.course === placement
+        ? 'Ответы доступны в общей комнате урока.'
+        : student?.course === withoutCourse ? 'Курс пока не назначен.'
         : 'Ответы появятся, когда ученица войдёт и синхронизирует урок.';
     }
     function setSignedIn() {
@@ -1373,7 +1377,7 @@
       try {
         const access = await token();
         const lookup = async () => {
-          if (studentEmails.size && students.every(student => student.course === financeCourse || studentEmails.has(student.id))) return;
+          if (studentEmails.size && students.every(student => student.course === financeCourse || student.course === placement || studentEmails.has(student.id))) return;
           const response = await request('/rest/v1/rpc/gostudy_teacher_student_emails',{method:'POST',body:{}},access);
           if (!response.ok || !Array.isArray(response.data)) throw new Error('Не удалось загрузить почту учеников.');
           studentEmails = new Map(response.data.map(row => [row.id,row.email]));
@@ -1394,12 +1398,12 @@
             })));
             return;
           }
-          if (course === generalB2) {
-            const query = new URLSearchParams({select:'student_id,student_label',course:'eq.general-english-b2',teacher_id:'eq.'+session.user.id});
+          if (course === generalB2 || course === placement) {
+            const query = new URLSearchParams({select:'student_id,student_label',course:'eq.'+course.replaceAll('_','-'),teacher_id:'eq.'+session.user.id});
             const response = await request('/rest/v1/gostudy_classroom_rooms?'+query, {}, access);
             if (!response.ok || !Array.isArray(response.data)) throw new Error(label);
             rosterByCourse.set(course,response.data.map(row=>({
-              id:row.student_id,label:row.student_label,course,selection:course+':'+row.student_id,
+              id:row.student_id,label:row.student_label,email:course === placement ? row.student_label : undefined,course,selection:course+':'+row.student_id,
             })));
             return;
           }

@@ -137,6 +137,7 @@
       }
     }
     function grade(page,get,animate) {
+      if (lesson.deferGrading) return false;
       const keys = groups[page];
       if (!keys?.length) return false;
       let allCorrect = true;

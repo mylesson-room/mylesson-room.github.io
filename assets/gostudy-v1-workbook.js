@@ -5,7 +5,9 @@ const LESSONS = config.labels || config.steps;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const workbook = config.steps ? window.GoStudyExercises.render(config,esc) : null;
-const student = window.GoStudyFinanceAuth.classroomStudent;
+const student = config.privateRoom
+  ? window.GoStudyPrivateAccess.userId() === config.privateRoom.teacher ? config.privateRoom.student : null
+  : window.GoStudyFinanceAuth.classroomStudent;
 const answerNamespace = typeof config.answerNamespace === 'string' ? config.answerNamespace : '';
 const stores = window.GoStudyStorage || localStorage;
 let cached = {};
@@ -132,7 +134,7 @@ function readWords(){
     return [...words.values()];
   }
   if(window.FinanceLive?.connected())return FinanceLive.words();
-  if(document.body.dataset.classroomCourse)return [];
+  if(config.privateRoom || document.body.dataset.classroomCourse)return [];
   try{
     const v=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");
     return Array.isArray(v.words)?v.words:[];
@@ -147,7 +149,7 @@ const {makeWord} = window.GoStudyLessonControls;
 function saveVocabulary(word){
  if(!word)return false;
  if(window.FinanceLive?.send("word",word))return true;
- if(document.body.dataset.classroomCourse)return false;
+ if(config.privateRoom || document.body.dataset.classroomCourse)return false;
  try{
   const data=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");
   data.words=Array.isArray(data.words)?data.words:[];
