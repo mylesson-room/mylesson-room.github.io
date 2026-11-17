@@ -10,62 +10,6 @@
     document.head.append(script);
   });
 
-  function addListening(panel, lines) {
-    const controls = document.createElement('div');
-    controls.className = 'placement-tools';
-    const play = document.createElement('button');
-    play.type = 'button';
-    play.className = 'outline';
-    play.textContent = 'Play recording';
-    const status = document.createElement('span');
-    status.setAttribute('role', 'status');
-    controls.append(play, status);
-    panel.querySelector('.lead').after(controls);
-    let run = 0;
-    const stop = () => {
-      run++;
-      window.speechSynthesis.cancel();
-      play.textContent = 'Play recording';
-    };
-    play.onclick = () => {
-      if (play.textContent === 'Stop recording') {
-        stop();
-        return;
-      }
-      if (!window.speechSynthesis) {
-        status.textContent = 'Audio is unavailable in this browser.';
-        return;
-      }
-      status.textContent = '';
-      play.textContent = 'Stop recording';
-      const current = ++run;
-      const voices = speechSynthesis.getVoices().filter(voice => voice.localService && voice.lang.startsWith('en'));
-      const speak = index => {
-        if (run !== current) return;
-        if (index === lines.length) {
-          play.textContent = 'Play recording';
-          return;
-        }
-        const utterance = new SpeechSynthesisUtterance(lines[index]);
-        utterance.lang = 'en-GB';
-        utterance.rate = 0.9;
-        if (voices.length) utterance.voice = voices[index % Math.min(2, voices.length)];
-        utterance.onend = () => speak(index + 1);
-        utterance.onerror = () => {
-          if (run !== current) return;
-          play.textContent = 'Play recording';
-          status.textContent = 'Audio could not play. Check your browser’s speech settings.';
-        };
-        speechSynthesis.speak(utterance);
-      };
-      speak(0);
-    };
-    const watch = new MutationObserver(() => {
-      if (!panel.classList.contains('active') && play.textContent === 'Stop recording') stop();
-    });
-    watch.observe(panel, {attributes:true, attributeFilter:['class']});
-  }
-
   function addTimer(panel, step, key) {
     const tools = document.createElement('div');
     tools.className = 'placement-tools';
@@ -237,7 +181,6 @@
 
       for (const [index, step] of content.steps.entries()) {
         const panel = pages.children[index].querySelector('.panel');
-        if (step.recording) addListening(panel, step.recording);
         if (step.minutes) addTimer(panel, step, 'placement-timer:' + auth.userId() + ':' + step.id);
         if (step.speaking && !teacher) addRecorder(panel, step.speaking);
         if (step.id === 'marking') addScores(panel, content.steps);
