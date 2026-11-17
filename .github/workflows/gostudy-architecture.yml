@@ -22,6 +22,8 @@ jobs:
           node-version: '20'
       - name: Verify GoStudy shared UI contract
         run: node scripts/check-architecture.cjs
+      - name: Verify one canonical cabinet and frozen compatibility URLs
+        run: node scripts/check-unified-cabinet.cjs
       - name: Verify newly introduced student cabinets
         shell: bash
         run: |
