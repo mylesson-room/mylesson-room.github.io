@@ -646,6 +646,98 @@ async function checkFinanceHomework(browser,origin){
  }finally{for(const context of contexts)await context.close();}
 }
 
+
+async function checkDariaPrivateRoom(browser,origin) {
+  const user='6af5764c-487a-448f-a21e-8744dc5a2322';
+  const fixture={
+    title:'After Dark: Who Owns the Night?',duration:50,subtitle:'An IELTS academic reading.',
+    mission:'Which evidence should a city consider?',
+    reading:'<p><b>A.</b> A test passage about artificial lighting and wildlife.</p>',
+    summary:'Street Three dimmed lamps after (9).',
+    questions:[
+      ['1','features','Which paragraph contains the example?','A','Paragraph A gives the example.'],
+      ['5','claims','The writer says all lamps must be removed.','NO','The passage does not propose removing lamps.'],
+      ['9','completion','Lamps were dimmed after ______.','midnight','The description specifies midnight.']
+    ],
+    words:[['migration','миграция'],['glare','блики']]
+  };
+  const saved=new Map();
+  const words=new Map();
+  const context=await browser.newContext();
+  let contentFetches=0,logins=0;
+  await context.route('https://kawfqlohguwvmmplvrny.supabase.co/**',route=>{
+    const req=route.request(),url=new URL(req.url()),path=url.pathname,method=req.method();
+    const token=req.headers()['authorization'];
+    const respond=(status,json)=>route.fulfill({status,contentType:'application/json',body:JSON.stringify(json)});
+    if(path==='/auth/v1/token'&&url.searchParams.get('grant_type')==='password'){
+      const values=req.postDataJSON();assert.equal(values.password,'test-password');
+      logins++;
+      return respond(200,{user:{id:user,email:'daria@example.invalid'},access_token:'test-jwt',refresh_token:'refresh-test',expires_in:3600});
+    }
+    if(path==='/auth/v1/user')return respond(token==='Bearer test-jwt'?200:401,token==='Bearer test-jwt'?{id:user,email:'daria@example.invalid'}:{message:'invalid'});
+    if(token!=='Bearer test-jwt')return respond(401,{message:'invalid'});
+    if(path.endsWith('/gostudy_private_lessons')){
+      contentFetches++;
+      return respond(200,[{lesson_payload:fixture}]);
+    }
+    if(path.endsWith('/gostudy_progress')){
+      if(method==='GET')return respond(200,[...saved.values()]);
+      const record=req.postDataJSON();saved.set(record.lesson_key,record);
+      return respond(201,[]);
+    }
+    if(path.endsWith('/gostudy_vocabulary_items')){
+      if(method==='GET')return respond(200,[...words.values()]);
+      const values=req.postDataJSON();
+      for(const item of (Array.isArray(values)?values:[values]))words.set(item.word_key,item);
+      return respond(201,[]);
+    }
+    return respond(200,[]);
+  });
+  try{
+    const page=await context.newPage();
+    await page.goto(origin+'/student-ielts-reading.html');
+    await page.locator('#gostudyAccessGate:visible').waitFor();
+    assert.equal(await page.locator('main:visible').count(),0,'Private dashboard visible before authentication');
+    assert.equal(await page.locator('.top .brand svg').count(),1,'Shared GoStudy cabinet emblem missing');
+    await page.locator('#gsEmail').fill('daria@example.invalid');
+    await page.locator('#gsPassword').fill('test-password');
+    await page.locator('#gostudyAccessForm button').click();
+    await page.locator('main:visible .lesson-card').waitFor();
+    assert.ok(await page.locator('.vocab-feature--practice').isVisible(),'Shared vocabulary practice missing');
+    await page.locator('.lesson-card').click();
+    await page.waitForURL(/ielts-reading-04.html/);
+    await page.locator('#lessonPages>.page.active').waitFor();
+    assert.ok(await page.locator('.video-workspace').isVisible(),'Shared lesson video shell missing');
+    assert.ok(await page.locator('.lesson-brand').isVisible(),'Shared lesson header missing');
+    assert.equal(await page.locator('.gostudy-ielts-passage').count(),1,'RLS-sourced passage missing');
+    assert.equal(contentFetches,1,'Private content should be requested once after login');
+    await page.locator('#lessonSections [data-page="2"]').click();
+    await page.locator('#reading-answer-1').selectOption('A');
+    await page.waitForTimeout(1600);
+    assert.equal(saved.get('ielts-reading-04')?.state.answers['1'],'A','Cloud answer was not persisted');
+    await page.locator('#lessonSections [data-page="6"]').click();
+    await page.locator('#reading-words .term button').first().click();
+    await page.waitForTimeout(1700);
+    assert.ok(words.has('migration'),'Vocabulary did not synchronize to private cloud');
+    await page.reload();
+    await page.locator('#lessonPages>.page.active').waitFor();
+    await page.locator('#lessonSections [data-page="2"]').click();
+    assert.equal(await page.locator('#reading-answer-1').inputValue(),'A','Saved answer was not restored');
+    assert.ok(logins>=1,'Expected a real login request');
+    const guest=await browser.newContext();
+    try{
+      await guest.route('https://kawfqlohguwvmmplvrny.supabase.co/**',route=>route.fulfill({status:401,contentType:'application/json',body:'{"message":"unauthorized"}'}));
+      const pp=await guest.newPage();
+      await pp.goto(origin+'/ielts-reading-04.html');
+      await pp.locator('#gostudyAccessGate:visible').waitFor();
+      await pp.waitForTimeout(150);
+      assert.equal(await pp.locator('.gostudy-ielts-passage').count(),0,'Private passage exposed to guest');
+      assert.equal(await pp.locator('.layout:visible').count(),0,'Private classroom exposed before login');
+    }finally{await guest.close();}
+    console.log('Daria IELTS: shared components, private content gate, login, cloud answers and vocabulary verified in browser mocks');
+  }finally{await context.close();}
+}
+
 async function main() {
   await checkVictoriaB2Methodology();
   await checkThreeProgressMeLessons();
@@ -655,6 +747,7 @@ async function main() {
   try {
     const origin = 'http://127.0.0.1:' + server.address().port;
     await checkSharedComponentReversible(browser,origin);
+    await checkDariaPrivateRoom(browser,origin);
     await checkFinanceRoom(browser, origin);
     await checkFinanceHomework(browser,origin);
     await checkGeneralB2Room(browser, origin);
