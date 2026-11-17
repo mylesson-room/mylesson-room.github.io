@@ -40,6 +40,16 @@ async function checkThreeProgressMeLessons() {
     assert.ok(lesson.steps.every(step=>!!step.teacherNotes));
     assert.equal(practice.key,lesson.key.replace(/-v(\d+)$/, '-homework-v$1'));
     assert.ok(practice.steps.some(step=>step.type==='write'));
+    if (spec.course === 'business-ai') {
+      assert.equal(lesson.key,'gostudy-business-ai-b2c1-03-v3');
+      assert.equal(practice.key,'gostudy-business-ai-b2c1-03-homework-v3');
+      assert.equal(lesson.steps[3].type,'write','Critical thinking requires original explanations');
+      assert.equal(lesson.steps.filter(x=>x.type==='choice').reduce((n,x)=>n+x.items.length,0),6,'Reduce guessable multiple choice');
+      const keys=lesson.steps[1].items.map(item=>item[2]);
+      assert.deepEqual(new Set(keys),new Set([0,1,2]),'Avoid predictable matching answer position');
+      assert.ok(lesson.steps[1].items.some(item=>item[0]==='forecast range'));
+      assert.ok(!lesson.steps.some(step => /role.play|board pitch|defend your plan/i.test(step.instruction)));
+    }
     assert.ok(cabinet.includes('"lesson":"'+spec.slug+'.html"'));
     assert.ok(cabinet.includes('"homework":"'+spec.slug+'-homework.html"'));
     assert.ok(sync.includes(spec.slug+'.html') && sync.includes(spec.slug+'-homework.html'));
