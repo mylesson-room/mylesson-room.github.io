@@ -1,0 +1,152 @@
+{
+  "version": 1,
+  "created": "2026-11-18",
+  "purpose": "Read-only migration inventory of all existing student cabinet routes. NO STUDENT IDS, EMAILS, OR PRIVATE DATA.",
+  "notice": "Candidate latest lessons come from legacy static/curriculum configuration; they are NOT confirmed student-specific assignments. Homework paths are historical content only, NOT published access grants.",
+  "entries": [
+    {
+      "legacyCabinet": "student-art-b1.html",
+      "legacyCourse": "art_b1",
+      "candidateCurrentLesson": "art-b1-03.html",
+      "legacyHomework": "art-b1-03-homework.html",
+      "source": "cabinet-config",
+      "teacherConfirmed": false
+    },
+    {
+      "legacyCabinet": "student-business-ai-finance.html",
+      "legacyCourse": "business_ai_finance",
+      "candidateCurrentLesson": "business-ai-finance-b2-02.html",
+      "legacyHomework": "business-ai-finance-b2-02-homework.html",
+      "source": "cabinet-config",
+      "teacherConfirmed": false
+    },
+    {
+      "legacyCabinet": "student-business-ai.html",
+      "legacyCourse": "business_ai",
+      "candidateCurrentLesson": "business-ai-b2c1-03.html",
+      "legacyHomework": "business-ai-b2c1-03-homework.html",
+      "source": "cabinet-config",
+      "teacherConfirmed": false
+    },
+    {
+      "legacyCabinet": "student-country-house.html",
+      "legacyCourse": "country_house",
+      "candidateCurrentLesson": "country-house-a2-04.html",
+      "legacyHomework": "country-house-a2-04-homework.html",
+      "source": "cabinet-config",
+      "teacherConfirmed": false
+    },
+    {
+      "legacyCabinet": "student-english-placement.html",
+      "legacyCourse": "english-placement",
+      "candidateCurrentLesson": "english-placement.html",
+      "legacyHomework": null,
+      "source": "cabinet-config",
+      "teacherConfirmed": false
+    },
+    {
+      "legacyCabinet": "student-feed-b2.html",
+      "legacyCourse": "feed_b2",
+      "candidateCurrentLesson": "feed-b2-04.html",
+      "legacyHomework": "feed-b2-04-homework.html",
+      "source": "classroom-catalog",
+      "teacherConfirmed": false
+    },
+    {
+      "legacyCabinet": "student-finance-b1.html",
+      "legacyCourse": "finance_b1",
+      "candidateCurrentLesson": "finance-b1-02.html",
+      "legacyHomework": "finance-b1-02-homework.html",
+      "source": "classroom-catalog",
+      "teacherConfirmed": false
+    },
+    {
+      "legacyCabinet": "student-first-sales.html",
+      "legacyCourse": "first_sales",
+      "candidateCurrentLesson": "first-sales-c1-02.html",
+      "legacyHomework": "first-sales-c1-02-homework.html",
+      "source": "classroom-catalog",
+      "teacherConfirmed": false
+    },
+    {
+      "legacyCabinet": "student-general-english-b1-stories.html",
+      "legacyCourse": "general_english_b1_stories",
+      "candidateCurrentLesson": "general-english-b1-stories-01.html",
+      "legacyHomework": "general-english-b1-stories-01-homework.html",
+      "source": "classroom-catalog",
+      "teacherConfirmed": false
+    },
+    {
+      "legacyCabinet": "student-general-english-b1.html",
+      "legacyCourse": "general_english_b1",
+      "candidateCurrentLesson": "general-english-b1-01.html",
+      "legacyHomework": null,
+      "source": "classroom-catalog",
+      "teacherConfirmed": false
+    },
+    {
+      "legacyCabinet": "student-general-english-b2.html",
+      "legacyCourse": "general_english_b2",
+      "candidateCurrentLesson": "general-english-b2-01.html",
+      "legacyHomework": null,
+      "source": "cabinet-config-homework-embedded",
+      "teacherConfirmed": false
+    },
+    {
+      "legacyCabinet": "student-ielts-reading.html",
+      "legacyCourse": "ielts-reading",
+      "candidateCurrentLesson": "ielts-reading-04.html",
+      "legacyHomework": null,
+      "source": "cabinet-config-anchor-homework",
+      "teacherConfirmed": false
+    },
+    {
+      "legacyCabinet": "student-pharma.html",
+      "legacyCourse": "pharma_c1",
+      "candidateCurrentLesson": "pharma-c1-03.html",
+      "legacyHomework": "pharma-c1-03-homework.html",
+      "source": "classroom-catalog",
+      "teacherConfirmed": false
+    },
+    {
+      "legacyCabinet": "student-sweden.html",
+      "legacyCourse": "sweden-a2",
+      "candidateCurrentLesson": "sweden-a2-02.html",
+      "legacyHomework": "sweden-a2-02-homework.html",
+      "source": "legacy-inline",
+      "teacherConfirmed": false
+    },
+    {
+      "legacyCabinet": "student-tiktok-a2.html",
+      "legacyCourse": "tiktok_a2",
+      "candidateCurrentLesson": "tiktok-a2.html",
+      "legacyHomework": "tiktok-a2-homework.html",
+      "source": "classroom-catalog",
+      "teacherConfirmed": false
+    },
+    {
+      "legacyCabinet": "student-travel-a2.html",
+      "legacyCourse": "travel_a2",
+      "candidateCurrentLesson": "travel-a2-04.html",
+      "legacyHomework": "travel-a2-04-homework.html",
+      "source": "classroom-catalog",
+      "teacherConfirmed": false
+    },
+    {
+      "legacyCabinet": "student-travel-b2.html",
+      "legacyCourse": "travel_b2",
+      "candidateCurrentLesson": "travel-b2-04.html",
+      "legacyHomework": "travel-b2-04-practice.html",
+      "source": "classroom-catalog",
+      "teacherConfirmed": false
+    },
+    {
+      "legacyCabinet": "student-turkey.html",
+      "legacyCourse": "turkey-b1",
+      "candidateCurrentLesson": "turkey-b1.html",
+      "legacyHomework": null,
+      "source": "legacy-inline",
+      "teacherConfirmed": false
+    }
+  ]
+}
