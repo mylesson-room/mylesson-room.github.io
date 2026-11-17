@@ -1,17 +1,18 @@
 (() => {
-  const auth = window.GoStudyFinanceAuth;
+  const privateRoom = window.GoStudyLesson?.privateRoom;
+  const auth = privateRoom ? window.GoStudyPrivateAccess : window.GoStudyFinanceAuth;
   if (!auth) return;
   const status = document.querySelector("#finance-live-status");
   const accessStatus = document.querySelector(".classroom-access");
-  const course = document.body.dataset.classroomCourse;
-  const lesson = document.body.dataset.classroomLesson;
+  const course = privateRoom?.course || document.body.dataset.classroomCourse;
+  const lesson = privateRoom?.lesson || document.body.dataset.classroomLesson;
   const user = auth.userId();
   const selectedStudent = auth.classroomStudent;
   const classroomQuery = course && new URLSearchParams({
     select:"id,teacher_id,student_id,student_label",
     course:"eq."+course,
     lesson_path:"eq."+lesson,
-    student_id:"eq."+(selectedStudent || user),
+    student_id:"eq."+(privateRoom?.student || selectedStudent || user),
   });
   const words = new Map();
   let room;
@@ -22,7 +23,7 @@
   const roomPath = "/rest/v1/gostudy_finance_room?select=teacher_id,student_id";
   const eventPath = "/rest/v1/gostudy_finance_events";
   async function request(path, options) {
-    const response = await auth.request(path, options, await auth.token());
+    const response = privateRoom ? await auth.request(path, options) : await auth.request(path, options, await auth.token());
     if (!response.ok) throw Object.assign(new Error("Связь с уроком прервалась."), {status:response.status});
     return response.data;
   }
@@ -65,7 +66,10 @@
     try {
       if (!room) {
         const list = await request(classroomQuery ? "/rest/v1/gostudy_classroom_rooms?"+classroomQuery : roomPath);
-        room = course ? list.find(row => selectedStudent ? row.teacher_id === user : row.student_id === user) : list[0];
+        room = course ? list.find(row => {
+          if (privateRoom) return row.student_id === user || row.teacher_id === user;
+          return selectedStudent ? row.teacher_id === user : row.student_id === user;
+        }) : list[0];
         if (!room) { show("Для этого аккаунта нет доступа к комнате."); return; }
         document.dispatchEvent(new Event("finance-connect"));
       }
@@ -77,7 +81,7 @@
         apply(batch, initial);
       } while (batch.length === 500);
       if (!caughtUp) {
-        if (course) document.body.classList.add("classroom-authorized");
+        if (course && !privateRoom) document.body.classList.add("classroom-authorized");
         if (accessStatus) accessStatus.hidden = true;
         document.dispatchEvent(new CustomEvent("finance-ready",{detail:course ? room : null}));
       }
