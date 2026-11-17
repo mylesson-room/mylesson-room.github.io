@@ -169,7 +169,7 @@
      let range=null,phrase='',sentence='',from='en',to='ru',controller=null,seq=0,timer=0,edited=false;
      saveBtn.hidden=!saveVocabulary;
      const canSave=()=>Boolean(saveVocabulary && target.value.trim() && lemma(phrase));
-     const cacheKey='gostudy-context-translations-v1';
+     const cacheKey='gostudy-context-translations-v2';
      let cache={};try{cache=JSON.parse(localStorage.getItem(cacheKey)||'{}')}catch{}
      const clean=x=>String(x||'').replace(/\s+/g,' ').trim().slice(0,1000);
      const cacheId=()=>[from,to,phrase.toLowerCase(),sentence.toLowerCase().slice(0,250)].join('|');
