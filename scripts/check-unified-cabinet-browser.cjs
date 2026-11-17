@@ -30,7 +30,7 @@ async function run(){
     const student='11111111-1111-4111-8111-111111111111';
     const other='22222222-2222-4222-8222-222222222222';
 
-    async function scenario({rooms=[],finance=[],published=[],expected,expectEmpty=false,expectAmbiguous=false,expectHomework=false}){
+    async function scenario({rooms=[],finance=[],published=[],profiles=[],expected,expectedName='Ученик',expectEmpty=false,expectAmbiguous=false,expectHomework=false}){
       const page=await browser.newPage();
       const errors=[];
       page.on('pageerror',e=>errors.push(e.message));
@@ -57,6 +57,7 @@ async function run(){
         else if(u.pathname==='/rest/v1/gostudy_classroom_rooms') response=rooms;
         else if(u.pathname==='/rest/v1/gostudy_finance_room') response=finance;
         else if(u.pathname==='/rest/v1/gostudy_homework_published') response=published;
+        else if(u.pathname==='/rest/v1/gostudy_profiles') response=profiles;
         else {await route.fulfill({status:404,headers,body:'{}'});return;}
         if(u.pathname.startsWith('/rest/v1/')){
           assert.equal(u.searchParams.get('student_id'),'eq.'+student,'Every query must be student-scoped');
@@ -68,6 +69,7 @@ async function run(){
       await page.waitForSelector('body.unified-ready',{timeout:15000});
       assert.deepEqual(errors,[],'No frontend runtime errors');
       assert.equal(await page.locator('header.top').count(),1,'Same canonical shared header is used once');
+      assert.equal(await page.locator('.account .profile span').first().textContent(),expectedName,'Name must come from protected profile');
       assert.equal(await page.locator('#assignment').isVisible(),true,'Homework tile must always be visible');
       assert.equal(await page.locator('#assignment').getAttribute('aria-disabled'),expectHomework?null:'true');
       assert.equal(await page.locator('#assignment').getAttribute('href'),expectHomework?'business-ai-finance-b2-02-homework.html':null);
@@ -84,7 +86,8 @@ async function run(){
     }
 
     await scenario({
-      rooms:[{student_id:student,course:'english-placement',lesson_path:'english-placement.html',student_label:'Тестовый ученик'}],
+      rooms:[{student_id:student,course:'english-placement',lesson_path:'english-placement.html',student_label:'Old label must not be displayed'}],
+      profiles:[{display_name:'Алла'}],expectedName:'Алла',
       expected:'english-placement.html'
     });
     await scenario({
