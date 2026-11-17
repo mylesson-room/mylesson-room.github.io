@@ -3,6 +3,7 @@
     const fields = new Map();
     const groups = [];
     const sections = [];
+    const optionPicker = window.GoStudyOptionPicker;
     const normalize = value => String(value ?? '').trim().toLowerCase().replace(/\s+/g,' ');
     const register = (key, page, expected, step, slot) => {
       fields.set(key,{page,expected,step,slot});
@@ -29,10 +30,10 @@
             ).join('')+'</div><p class="result" data-grade></p></fieldset>';
           }
           const [before,after] = prompt.split('___');
-          const select = '<select data-exercise-field="'+escape(key)+'" aria-label="Answer '+(slot+1)+'"><option value="">Choose…</option>'+
-            options.map((item,i)=>'<option value="'+i+'">'+escape(item)+'</option>').join('')+'</select>';
-          return '<div class="gap-item unified-gap" data-answer-row><label>'+escape(before)+
-            (after === undefined ? ' ' : '')+select+escape(after ?? '')+'</label><small class="feedback" data-grade></small></div>';
+          const picker = optionPicker.markup(options.map((label,value)=>({label,value})),'Choose…',prompt)
+            .replace('<details ', '<details data-exercise-field="'+escape(key)+'" ');
+          return '<div class="gap-item unified-gap" data-answer-row><div class="gap-prompt">'+escape(before)+
+            ' '+picker+' '+escape(after ?? '')+'</div><small class="feedback" data-grade></small></div>';
         }).join('');
       }
       if (step.type === 'order') {
@@ -69,9 +70,16 @@
     for (const field of pages.querySelectorAll('select[data-gap]')) {
       const page = Number(field.closest('.page').id.slice(5));
       register(field.id,page,field.dataset.gap,field.id);
-      field.dataset.exerciseField = field.id;
+      const choices = [...field.options].filter(option=>option.value !== '')
+        .map(option=>({label:option.textContent,value:option.value}));
+      const template = document.createElement('template');
+      template.innerHTML = optionPicker.markup(choices,field.options[0]?.textContent || 'Choose…',field.getAttribute('aria-label') || '');
+      const picker = template.content.firstElementChild;
+      picker.id = field.id;
+      picker.dataset.exerciseField = field.id;
       field.parentElement.setAttribute('data-answer-row','');
       field.nextElementSibling?.setAttribute('data-grade','');
+      field.replaceWith(picker);
     }
     const controls = new Map();
     for (const field of pages.querySelectorAll('[data-exercise-field],[data-order]')) {
@@ -123,6 +131,7 @@
     function redraw(key,value,set) {
       for (const control of controls.get(key) || []) {
         if (control.dataset.order) drawOrder(key,control,value,set);
+        else if (control.classList.contains('definition-picker')) optionPicker.show(control,value);
         else if (control.type === 'radio') control.checked = value !== '' && control.value === String(value);
         else if (control.value !== String(value ?? '')) control.value = value ?? '';
       }
@@ -147,7 +156,7 @@
           result.classList.toggle('bad',attempted && !correct);
         }
         row?.classList.toggle('finance-correct',correct);
-        if (control?.matches('select')) control.classList.toggle('correct',correct);
+        if (control?.matches('.definition-picker')) control.classList.toggle('correct',correct);
       }
       const celebrate = animate && allCorrect && !completion.has(page);
       if (allCorrect) completion.add(page); else completion.delete(page);

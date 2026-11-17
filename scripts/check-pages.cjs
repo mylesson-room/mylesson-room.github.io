@@ -182,11 +182,13 @@ async function checkMigratedRooms(browser, origin) {
         } catch (error) {
           throw new Error('Art navigation: '+JSON.stringify({errors,events,student:await sp.locator('.page.active h2').first().textContent(),teacher:await tp.locator('.page.active h2').first().textContent()}),{cause:error});
         }
-        await sp.locator('#v1').selectOption('the focal point');
+        await sp.locator('#v1').locator('summary').click();
+        await sp.locator('#v1').getByRole('button',{name:'the focal point',exact:true}).click();
         await tp.locator('#v1.correct').waitFor();
         await tp.getByRole('button',{name:'Сбросить ответы'}).click();
-        await sp.waitForFunction(() => document.querySelector('#v1')?.value === '');
-        await tp.locator('#v1').selectOption('the focal point');
+        await sp.locator('#v1 summary').filter({hasText:'Выберите'}).waitFor();
+        await tp.locator('#v1').locator('summary').click();
+        await tp.locator('#v1').getByRole('button',{name:'the focal point',exact:true}).click();
         await sp.locator('#v1.correct').waitFor();
         await tp.getByRole('button',{name:'Dictionary'}).click();
         await tp.locator('#dictionarySource').fill('shared entry');
@@ -213,6 +215,26 @@ async function checkMigratedRooms(browser, origin) {
       await sp.getByRole('textbox',{name:'Сообщение'}).fill('Classroom check');
       await sp.getByRole('button',{name:'Отправить'}).click();
       await tp.getByRole('log').getByText(/Classroom check/).waitFor();
+      if (lesson.course === 'business-ai') {
+        const gap = await sp.locator('#lesson-data').evaluate(node => {
+          const lesson = JSON.parse(node.textContent);
+          return lesson.steps.findIndex(step => step.type === 'gap' && step.items.some(item => item[1].includes('suggests')));
+        });
+        assert.ok(gap >= 0);
+        await sp.locator('.lesson-section-menu summary').click();
+        await sp.locator('#lessonSections button').nth(gap).click();
+        const active = '.page.active';
+        const picker = sp.locator(active+' .definition-picker').first();
+        await picker.locator('summary').click();
+        await picker.getByRole('button',{name:'suggests',exact:true}).click();
+        await tp.locator(active+' .definition-picker summary').first().filter({hasText:'suggests'}).waitFor();
+        assert.equal(await sp.locator(active+' select').count(),0);
+        await sp.setViewportSize({width:390,height:844});
+        await picker.locator('summary').click();
+        await picker.getByRole('button',{name:'suggests',exact:true}).waitFor();
+        await picker.locator('summary').press('Escape');
+        assert.equal(await picker.getAttribute('open'),null);
+      }
       await sp.setViewportSize({width:390,height:844});
       const pager = sp.locator('.pager');
       await pager.waitFor();

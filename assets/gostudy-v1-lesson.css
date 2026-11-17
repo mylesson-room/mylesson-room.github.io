@@ -373,8 +373,25 @@ body[data-classroom-course] .grammar-example{margin:0 0 8px}
 .material-card .hero { padding:12px 0; }
 .material-card .word-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr)); gap:10px; }
 .material-card .word { padding:12px; border:1px solid #e0e6ef; border-radius:12px; }
-.material-card select, .unified-gap select { font:inherit; max-width:100%; padding:6px 8px; border-radius:8px; background:#fff; }
-.material-card select.correct, .unified-gap select.correct { border-color:#8abfa7; background:#e8f7ef; color:#17533c; }
+.gap-item.unified-gap { display:block; }
+.unified-gap .feedback { display:block; }
+.gap-prompt { min-width:0; }
+.unified-gap .definition-picker, .material-card [data-exercise-field].definition-picker {
+  display:inline-block;
+  vertical-align:middle;
+  max-width:100%;
+  margin:3px 4px;
+  font:inherit;
+}
+.unified-gap .definition-picker[open], .material-card [data-exercise-field].definition-picker[open] {
+  display:block;
+  width:max-content;
+}
+.definition-picker.correct > summary {
+  background:#e8f7ef;
+  border-color:#8abfa7;
+  color:#17533c;
+}
 .unified-question { min-width:0; border:0; border-bottom:1px solid #e0e6ef; padding:12px 0; display:block; }
 .unified-question legend { font-weight:700; padding:0 8px; max-width:100%; }
 .unified-order ol { padding-left:24px; }

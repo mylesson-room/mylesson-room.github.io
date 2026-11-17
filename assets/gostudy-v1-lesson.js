@@ -46,3 +46,48 @@
   }
   window.GoStudyLesson = lesson;
 })();
+
+(() => {
+  const escape = value => String(value).replace(/[&<>"']/g, char => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;',
+  })[char]);
+  const number = index => String.fromCharCode(65 + index);
+  function markup(choices, placeholder, description = '') {
+    const options = choices.map(({label,value},index) =>
+      '<button type="button" data-choice="'+escape(value)+'" aria-pressed="false"><strong aria-hidden="true">'+number(index)+'</strong><span>'+escape(label)+'</span></button>'
+    ).join('');
+    const hint = description ? ' aria-description="'+escape(description)+'"' : '';
+    return '<details class="definition-picker" data-placeholder="'+escape(placeholder)+'"><summary'+hint+'>'+escape(placeholder)+'</summary><div class="definition-options">'+options+'</div></details>';
+  }
+  function show(picker,value) {
+    const options = [...picker.querySelectorAll('[data-choice]')];
+    const selected = options.find(option => option.dataset.choice === String(value));
+    options.forEach(option => option.setAttribute('aria-pressed',String(option === selected)));
+    picker.querySelector('summary').textContent = selected
+      ? number(options.indexOf(selected)) + '. ' + selected.querySelector('span').textContent
+      : picker.dataset.placeholder;
+  }
+  function bind(picker,onChoice) {
+    const summary = picker.querySelector('summary');
+    picker.addEventListener('click',event => {
+      const option = event.target.closest('[data-choice]');
+      if (!option) return;
+      onChoice(option.dataset.choice);
+      show(picker,option.dataset.choice);
+      picker.open = false;
+      summary.focus();
+    });
+    picker.addEventListener('keydown',event => {
+      if (event.key !== 'Escape' || !picker.open) return;
+      event.preventDefault();
+      picker.open = false;
+      summary.focus();
+    });
+  }
+  document.addEventListener('pointerdown',event => {
+    document.querySelectorAll('.definition-picker[open]').forEach(picker => {
+      if (!picker.contains(event.target)) picker.open = false;
+    });
+  });
+  window.GoStudyOptionPicker = {markup,show,bind};
+})();

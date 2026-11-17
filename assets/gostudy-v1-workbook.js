@@ -77,52 +77,28 @@ $("#moveStudent").onclick=()=>{
   window.FinanceLive.send("page",{action:"move",page:state.page});
 };
 const defs = [5,2,0,7,4,1,6,3].flatMap(index => VOCAB[index] ? [VOCAB[index][1]] : []);
+
 const definitionPickers = [];
-const optionLabel = index => String.fromCharCode(65 + index) + ". " + defs[index];
-if ($("#vocab")) $("#vocab").innerHTML = VOCAB.map((word, index) => `
-  <div class="term">
-    <div class="vocab-term" id="term${index}">${index + 1}. ${esc(word[0])}
-      <button type="button" onclick="addWord(${index})" title="Save to vocabulary">＋ Save word</button>
-    </div>
-    <details class="definition-picker">
-      <summary aria-describedby="term${index}"></summary>
-      <div class="definition-options">
-        ${defs.map((_, choice) => `<button type="button" data-choice="${choice}" aria-pressed="false"><strong>${String.fromCharCode(65 + choice)}</strong><span>${esc(defs[choice])}</span></button>`).join("")}
+const optionPicker = window.GoStudyOptionPicker;
+if ($("#vocab")) {
+  $("#vocab").innerHTML = VOCAB.map((word,index) => `
+    <div class="term">
+      <div class="vocab-term" id="term${index}">${index+1}. ${esc(word[0])}
+        <button type="button" onclick="addWord(${index})" title="Save to vocabulary">＋ Save word</button>
       </div>
-    </details>
-    <span id="vf${index}" class="feedback"></span>
-  </div>`).join("");
-definitionPickers.push(...document.querySelectorAll(".definition-picker"));
-definitionPickers.forEach((picker, index) => {
-  const key = "v" + index;
-  const summary = picker.querySelector("summary");
-  const options = [...picker.querySelectorAll("[data-choice]")];
-  function showChoice(value) {
-    summary.textContent = value === "" ? "Choose a definition…" : optionLabel(Number(value));
-    options.forEach(option => option.setAttribute("aria-pressed", String(option.dataset.choice === value)));
-  }
-  showChoice(getValue(key));
-  picker.addEventListener("finance-redraw", () => showChoice(getValue(key)));
-  summary.addEventListener("click", () => {
-    definitionPickers.forEach(other => { if (other !== picker) other.open = false; });
+      ${optionPicker.markup(defs.map((label,value)=>({label,value})),"Choose a definition…",word[0])}
+      <span id="vf${index}" class="feedback"></span>
+    </div>`).join("");
+  definitionPickers.push(...$("#vocab").querySelectorAll(".definition-picker"));
+  definitionPickers.forEach((picker,index) => {
+    const key = "v"+index;
+    optionPicker.show(picker,getValue(key));
+    optionPicker.bind(picker,value => {
+      setValue(key,value);
+      gradeSection("v",true);
+    });
   });
-  options.forEach(option => option.addEventListener("click", () => {
-    setValue(key, option.dataset.choice);
-    showChoice(option.dataset.choice);
-    gradeSection("v", true);
-    picker.open = false;
-    summary.focus();
-  }));
-  picker.addEventListener("keydown", event => {
-    if (event.key === "Escape" && picker.open) {
-      picker.open = false;
-      summary.focus();
-    }
-  });
-});
-document.addEventListener("pointerdown", event => {
-  definitionPickers.forEach(picker => { if (!picker.contains(event.target)) picker.open = false; });
-});
+}
 
 if ($("#reading")) $("#reading").innerHTML=READING.map((x,i)=>'<div class="question-item"><strong>'+(i+1)+'. '+esc(x[0])+'</strong>'+x[1].map((s,j)=>'<label><input type="radio" name="read'+i+'" value="'+j+'">'+esc(s)+'</label>').join("")+'<span class="result" id="rf'+i+'"></span></div>').join("");
 document.querySelectorAll("#reading input").forEach(x=>{x.checked=getValue(x.name)===x.value;x.onchange=()=>{setValue(x.name,x.value);gradeSection("read", true)}});
@@ -304,7 +280,8 @@ window.addEventListener("pagehide",() => [...pending.keys()].forEach(flushAnswer
 function redrawAnswer(key){
   if (workbook) return workbook.redraw(key,getValue(key),setExerciseValue);
   if(/^v\d+$/.test(key)){
-    definitionPickers[Number(key.slice(1))]?.dispatchEvent(new Event("finance-redraw"));
+    const picker = definitionPickers[Number(key.slice(1))];
+    if (picker) optionPicker.show(picker,getValue(key));
     return;
   }
   document.querySelectorAll("input,textarea").forEach(input => {
@@ -351,6 +328,10 @@ if (workbook) {
     redrawAnswer(key);
     for (const control of controls) {
       if (control.hasAttribute('data-order')) continue;
+      if (control.classList.contains('definition-picker')) {
+        optionPicker.bind(control,value=>setExerciseValue(key,value));
+        continue;
+      }
       const type = control.tagName === 'TEXTAREA' ? 'input' : 'change';
       control.addEventListener(type,()=>setExerciseValue(key,control.value));
     }
