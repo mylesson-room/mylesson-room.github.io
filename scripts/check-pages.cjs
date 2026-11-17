@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const { createServer } = require('node:http');
-const { readFile } = require('node:fs/promises');
+const { readFile, writeFile } = require('node:fs/promises');
 const { runInNewContext } = require('node:vm');
 const { chromium } = require('playwright');
 
@@ -519,6 +519,29 @@ async function checkFinanceRoom(browser, origin) {
   }
 }
 
+
+async function checkSharedComponentReversible(browser,origin){
+  const file='assets/gostudy-v1-lesson.css';
+  const before=await readFile(file,'utf8');
+  const probe='\\n.hero::before{content:"GOSTUDY-SHARED-PROBE" !important;position:absolute;}\\n';
+  const context=await browser.newContext();
+  try {
+    await writeFile(file,before+probe);
+    for(const pageName of ['business-ai-finance-b2-02.html','general-english-b2-01.html']){
+      const page=await context.newPage();
+      await page.goto(origin+'/'+pageName);
+      await page.locator('.hero').waitFor({state:'attached'});
+      const value=await page.locator('.hero').evaluate(el=>getComputedStyle(el,'::before').content);
+      assert.ok(value.includes('GOSTUDY-SHARED-PROBE'),pageName+' did not receive shared component update');
+      await page.close();
+    }
+  } finally {
+    await writeFile(file,before);
+    await context.close();
+  }
+  console.log('Shared style probe: Michael + Victoria received one reversible shared-component change; original CSS restored');
+}
+
 async function main() {
   await checkVictoriaB2Methodology();
   await checkThreeProgressMeLessons();
@@ -527,6 +550,7 @@ async function main() {
   const browser = await chromium.launch(process.env.GOSTUDY_CHROME ? {executablePath: process.env.GOSTUDY_CHROME} : {});
   try {
     const origin = 'http://127.0.0.1:' + server.address().port;
+    await checkSharedComponentReversible(browser,origin);
     await checkFinanceRoom(browser, origin);
     await checkGeneralB2Room(browser, origin);
     await checkMigratedRooms(browser, origin);
