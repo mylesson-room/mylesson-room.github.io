@@ -5,7 +5,7 @@ from pathlib import Path
 from functools import lru_cache
 
 ROOT = Path(__file__).resolve().parent.parent
-ASSET = re.compile(r'(assets/(?:gostudy-[a-z-]+|business-ai-workbook)\.(?:js|css))(?:\?v=[\w-]+)?(?=["\'])')
+ASSET = re.compile(r'(assets/(?:gostudy-(?:[a-z-]+|v1-(?:lesson|workbook))|business-ai-workbook)\.(?:js|css))(?:\?v=[\w-]+)?(?=["\'])')
 @lru_cache
 def digest(url):
     return hashlib.sha256((ROOT / url).read_bytes()).hexdigest()[:12]
