@@ -107,7 +107,7 @@ function addWord(en,ru){
   const p=JSON.parse(localStorage.getItem(WORD_KEY)||'{}')||{};const list=Array.isArray(p.words)?p.words:[];
   if(!list.some(w=>normalize(w.en)===normalize(en)))list.push({en,ru});
   p.words=list;localStorage.setItem(WORD_KEY,JSON.stringify(p));
-  renderWords();return true;
+  renderWords();document.dispatchEvent(new Event('gostudy-vocabulary-updated'));return true;
  }catch{return false;}
 }
 function renderWords(){
@@ -152,6 +152,7 @@ function bind(){
  go(Number.isInteger(state.page)?state.page:0,false);
  if(state.checked)renderFeedback();
  renderWords();
+ document.addEventListener('gostudy-vocabulary-sync',renderWords);
 }
 async function fetchCloud(){
  const local=getLocal(),userId=auth.userId();
