@@ -46,7 +46,7 @@ for(const p of pages){
 for(const file of ['assets/gostudy-private-access.js','assets/gostudy-ielts-reading.js','assets/gostudy-placement.js']){
  cp.execFileSync(process.execPath,['--check',file],{stdio:'pipe'});
  const source=read(file);
- assert.ok(!source.includes('1122334455'),'Plaintext password found in '+file);
+ assert.ok(!/\bpassword\s*:\s*(['"])[^'"]+\1/.test(source),'Hard-coded password found in '+file);
  assert.ok(!source.includes('sb_secret_'),'Supabase secret key found in '+file);
 }
 const changes=process.env.GOSTUDY_CHANGED_FILES?.split('\n').filter(Boolean)||[];
