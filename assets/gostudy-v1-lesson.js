@@ -169,7 +169,7 @@
      let range=null,phrase='',sentence='',from='en',to='ru',controller=null,seq=0,timer=0,edited=false;
      saveBtn.hidden=!saveVocabulary;
      const canSave=()=>Boolean(saveVocabulary && target.value.trim() && lemma(phrase));
-     const cacheKey='gostudy-context-translations-v2';
+     const cacheKey='gostudy-context-translations-v3';
      let cache={};try{cache=JSON.parse(localStorage.getItem(cacheKey)||'{}')}catch{}
      const clean=x=>String(x||'').replace(/\s+/g,' ').trim().slice(0,1000);
      const cacheId=()=>[from,to,phrase.toLowerCase(),sentence.toLowerCase().slice(0,250)].join('|');
@@ -190,10 +190,18 @@
      const isEligible=n=>{const e=n?.nodeType===1?n:n?.parentElement;return !!e?.closest('.lesson')&&!e.closest('textarea,input,select,button,a,.selection-translate')};
      function contextFor(r){
       const e=r.commonAncestorContainer.nodeType===1?r.commonAncestorContainer:r.commonAncestorContainer.parentElement;
-      const t=clean(e?.closest('p,li,article,.term,.question-item,.gap-item')?.textContent||e?.parentElement?.textContent||'');
-      if(t.length<280)return t;
-      const at=t.toLowerCase().indexOf(phrase.toLowerCase());
-      return t.slice(Math.max(0,at-100),Math.max(0,at-100)+260);
+      const container=e?.closest('p,li,article,.term,.question-item,.gap-item,.activity-body')||e?.parentElement;
+      const text=clean(container?.textContent||'');
+      const at=text.toLocaleLowerCase().indexOf(phrase.toLocaleLowerCase());
+      if(at<0)return '';
+      const before=text.slice(0,at),after=text.slice(at+phrase.length);
+      const stop=/[.!?](?=\s|$)/g;
+      let boundary,lastBoundary=0;
+      while((boundary=stop.exec(before)))lastBoundary=boundary.index+1;
+      const next=after.match(/[.!?](?=\s|$)/);
+      const right=next?at+phrase.length+next.index+1:text.length;
+      const full=clean(text.slice(lastBoundary,right));
+      return full.length<=440?full:clean(text.slice(Math.max(0,at-120),at+phrase.length+200));
      }
      function locate(){
       if(!range||!pop.classList.contains('is-visible'))return;
@@ -215,6 +223,56 @@
       if(!result||Number(data?.responseStatus||0)>=400||/QUERY LENGTH LIMIT|MYMEMORY WARNING/i.test(result))throw Error('Translation unavailable');
       return result;
      };
+     // Determine the contextual translation by comparing a full sentence with
+     // the same sentence minus the selected expression. If the model rephrases
+     // too much for safe alignment, translate the neighboring collocation.
+     const words=x=>String(x||'').match(/[\p{L}\p{N}]+(?:['’\-][\p{L}\p{N}]+)*/gu)||[];
+     const comparable=x=>String(x||'').toLocaleLowerCase().replace(/ё/g,'е');
+     function contextualMeaning(complete,without){
+      const original=words(complete),removed=words(without);
+      let left=0,right=0;
+      while(left<original.length&&left<removed.length&&comparable(original[left])===comparable(removed[left]))left++;
+      while(right<original.length-left&&right<removed.length-left &&
+            comparable(original[original.length-1-right])===comparable(removed[removed.length-1-right]))right++;
+      const inserted=original.slice(left,original.length-right);
+      const deleted=removed.slice(left,removed.length-right);
+      if(left+right<1||!inserted.length||inserted.length>5||deleted.length)return null;
+      return inserted.join(' ');
+     }
+     function contextualSentenceWithout(){
+      if(!sentence||sentence.toLocaleLowerCase()===phrase.toLocaleLowerCase())return '';
+      const at=sentence.toLocaleLowerCase().indexOf(phrase.toLocaleLowerCase());
+      if(at<0)return '';
+      const reduced=clean(sentence.slice(0,at)+' '+sentence.slice(at+phrase.length));
+      return reduced.length>=3&&reduced!==sentence?reduced:'';
+     }
+     function contextualCollocation(){
+      if(!sentence||sentence.toLocaleLowerCase()===phrase.toLocaleLowerCase())return phrase;
+      const at=sentence.toLocaleLowerCase().indexOf(phrase.toLocaleLowerCase());
+      if(at<0)return phrase;
+      const following=sentence.slice(at+phrase.length).match(/^\s+([\p{L}\p{N}]+(?:[-'][\p{L}\p{N}]+)?)/u);
+      if(following)return phrase+' '+following[1];
+      const preceding=sentence.slice(0,at).match(/([\p{L}\p{N}]+(?:[-'][\p{L}\p{N}]+)?)\s+$/u);
+      return preceding?preceding[1]+' '+phrase:phrase;
+     }
+     async function contextualTranslate(signal){
+      const without=contextualSentenceWithout();
+      if(!without)return null;
+      const [full,shorter]=await Promise.allSettled([
+        fetchTranslation(sentence,signal),fetchTranslation(without,signal)
+      ]);
+      if(signal.aborted)throw Error('Translation cancelled');
+      if(full.status==='fulfilled'&&shorter.status==='fulfilled'){
+        const selected=contextualMeaning(full.value,shorter.value);
+        if(selected)return {value:selected,confidence:'aligned'};
+      }
+      const expression=contextualCollocation();
+      if(expression!==phrase){
+        const value=await fetchTranslation(expression,signal);
+        return {value,confidence:'phrase'};
+      }
+      return null;
+     }
      async function translate(){
       controller?.abort();const id=++seq;controller=new AbortController();
       const active=controller,signal=active.signal,timeout=setTimeout(()=>active.abort(),8000);
@@ -236,22 +294,18 @@
         board:[[/\b(directors|meeting|chair|company|executive|finance)\b/i,'совет директоров, правление, доска'],[/.*/,'доска, совет директоров, правление']]
       };
       const special=from==='en' ? polysemy[phrase.toLowerCase()]?.find(([pattern])=>pattern.test(sentence))?.[1] : null;
-      if(dictionary||special){
-       const value=special||dictionary;
-       if(!edited)target.value=value;
-       saveBtn.disabled=!canSave();
-       showStatus('');
-       cache[key]={value,context:''};try{localStorage.setItem(cacheKey,JSON.stringify(cache))}catch{}
-       clearTimeout(timeout);return;
-      }
       showStatus('Переводим…');
       try{
-       const value=await fetchTranslation(phrase,signal);
+       let result=await contextualTranslate(signal);
        if(id!==seq)return;
-       if(!edited)target.value=value;
+       if(!result){
+        const value=special||dictionary||await fetchTranslation(phrase,signal);
+        result={value,confidence:sentence&&sentence!==phrase?'fallback':'isolated'};
+       }
+       if(!edited)target.value=result.value;
        saveBtn.disabled=!canSave();
-       showStatus('');
-       cache[key]={value};
+       showStatus(result.confidence==='fallback'?'Проверьте перевод по предложению':'');
+       cache[key]={value:result.value,confidence:result.confidence};
        const entries=Object.entries(cache).slice(-80);cache=Object.fromEntries(entries);
        try{localStorage.setItem(cacheKey,JSON.stringify(cache))}catch{}
       }catch(e){
