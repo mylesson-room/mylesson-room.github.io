@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="assets/gostudy-sync.css?v=d9356e89a210">
 <script src="assets/gostudy-sync.js?v=vika-b2-v2-20261117"></script>
 <script src="assets/gostudy-teacher-profile.js" defer></script>
+<script src="assets/gostudy-teacher-assignments.js" defer></script>
 <style>.teacher-course-links{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px}.teacher-course-links .pharma-lesson-shortcut{display:inline-flex;align-items:center;min-height:40px;padding:0 12px;border-radius:10px;background:#2368b0;color:#fff;text-decoration:none;font-weight:650}.teacher-course-links .pharma-lesson-shortcut:hover{background:#164f8d}</style>
 <link rel="stylesheet" href="assets/gostudy-classroom.css?v=b9085c1b0b36">
 <style>#teacher-add-student{margin-top:16px}#teacher-add-student summary{font-weight:700}#teacher-add-student form{max-width:420px;margin-top:12px}#teacher-add-student select{font:inherit;padding:9px}</style>
@@ -54,6 +55,16 @@
       <p id="teacher-profile-name-status" role="status" aria-live="polite">Имя хранится в защищённом профиле GoStudy.</p>
     </form>
     <p id="teacher-profile-name-placeholder" role="status">Выберите ученика, чтобы изменить его имя.</p>
+    <section class="teacher-assignment-panel teacher-panel" aria-label="Назначение урока">
+      <h3>Текущий урок</h3>
+      <p id="teacher-active-assignment" role="status">Выберите ученика.</p>
+      <form id="teacher-assign-lesson" hidden>
+        <label for="teacher-lesson-select">Назначить другой урок</label>
+        <select id="teacher-lesson-select" required></select>
+        <button type="submit">Назначить урок</button>
+      </form>
+      <p id="teacher-assignment-status" aria-live="polite" role="status"></p>
+    </section>
     <section id="teacher-classroom" class="teacher-panel" hidden>
       <h2 id="teacher-classroom-title">Класс</h2>
       <article class="home-current" id="teacher-current-lesson"></article><details><summary>Все уроки</summary><ul id="teacher-classroom-lessons"></ul></details>
