@@ -448,6 +448,8 @@ async function checkFinanceRoom(browser, origin) {
     }
     await cabinet.locator('#vocabCount').filter({hasText:'2 слова'}).waitFor();
     await cabinet.locator('#practiceCard').click();
+    await cabinet.locator('#words').waitFor({state:'visible'});
+    await cabinet.locator('#practiceFromWords').click();
     await cabinet.locator('#practiceQuestion').filter({hasText:/forecasted|прогнозируемый|stress test|стресс-тест/i}).waitFor();
 
     // Both participants browse independently; only an explicit teacher command moves the student.
