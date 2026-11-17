@@ -59,7 +59,7 @@ async function run(){
         else if(u.pathname==='/rest/v1/gostudy_homework_published') response=published;
         else if(u.pathname==='/rest/v1/gostudy_profiles') response=profiles;
         else if(u.pathname==='/rest/v1/gostudy_lesson_assignments') {
-          if(canonical===null){await route.fulfill({status:404,headers,body:'{}'});return;}
+          if(canonical===null){await route.fulfill({status:404,headers,contentType:'application/json',body:JSON.stringify({code:'PGRST205',message:'Table not found in schema cache'})});return;}
           response=canonical;
         }
         else {await route.fulfill({status:404,headers,body:'{}'});return;}
