@@ -523,7 +523,7 @@ async function checkFinanceRoom(browser, origin) {
 async function checkSharedComponentReversible(browser,origin){
   const file='assets/gostudy-v1-lesson.css';
   const before=await readFile(file,'utf8');
-  const probe='\\n.hero::before{content:"GOSTUDY-SHARED-PROBE" !important;position:absolute;}\\n';
+  const probe=' .hero::before{content:"GOSTUDY-SHARED-PROBE" !important;position:absolute;}';
   const context=await browser.newContext();
   try {
     await writeFile(file,before+probe);
