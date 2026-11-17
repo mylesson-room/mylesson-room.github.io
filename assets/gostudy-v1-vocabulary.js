@@ -179,7 +179,7 @@ function openPractice() {
 }
 document.querySelector('#openWords').addEventListener('click',openVocabulary);
 
-document.querySelector('#practiceCard').addEventListener('click',openPractice);
+document.querySelector('#practiceCard').addEventListener('click',masteryEnabled?()=>{wordTab='learning';openVocabulary();}:openPractice);
 document.querySelector('#practiceFromWords').addEventListener('click',openPractice);
 practiceEl('#practiceModes').addEventListener('click',event=>{const mode=event.target.closest('button')?.dataset.mode;if(mode)setPracticeMode(mode);});
 practiceEl('#speakWord').addEventListener('click',speakPracticeWord);
