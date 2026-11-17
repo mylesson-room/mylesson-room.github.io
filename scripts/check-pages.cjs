@@ -887,7 +887,7 @@ async function checkDariaPrivateRoom(browser,origin) {
       await participant.waitForFunction(()=>document.querySelector('#selectionTarget').value==='искусственное освещение');
     }
     await selectPhrase(page);
-    assert.ok(translationRequests.includes('artificial lighting'));
+    assert.ok(translationRequests.some(q=>q?.includes('artificial lighting')),'Context translation request must include the selected expression');
     await page.locator('#selectionSave').click();
     await page.locator('#selectionSave').getByText('✓').waitFor();
     await page.keyboard.press('Escape');
