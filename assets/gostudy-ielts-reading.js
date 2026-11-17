@@ -3,7 +3,7 @@
 'use strict';
 const SLUG='ielts-reading-04',LOCAL='gostudy-ielts-reading-04-v1',WORD_KEY='gostudy-ielts-reading-01-v1';
 const auth=window.GoStudyPrivateAccess;
-let booted=false,payload=null,state={page:0,answers:{},prediction:'',reflection:'',checked:false},revision=0,timer=null,writing=false,dirty=false;
+let booted=false,payload=null,state={page:0,answers:{},prediction:'',reflection:'',checked:false},revision=0,timer=null,writing=false,dirty=false,retries=0;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const normalize=s=>String(s??'').toLowerCase().trim().replace(/\s+/g,' ');
 const $=s=>document.querySelector(s);
@@ -20,7 +20,7 @@ const pages=[
 ];
 function save(){
   state.updatedAt=Date.now();
-  dirty=true;
+  dirty=true;retries=0;
   try{localStorage.setItem(LOCAL,JSON.stringify(state));}catch(e){console.warn('Local save failed');}
   const status=$('#gostudyLessonSaved');if(status){status.hidden=false;status.textContent='Сохранено в браузере';}
   clearTimeout(timer);timer=setTimeout(saveCloud,700);
@@ -37,10 +37,10 @@ async function saveCloud(){
       body:{user_id:auth.userId(),lesson_key:SLUG,state:current,revision:revision+1}
     });
     if(!result.ok)throw Error('Не удалось синхронизировать прогресс ('+result.status+').');
-    revision++;
+    revision++;retries=0;
     if(status)status.textContent='Сохранено в аккаунте ✓';
-  }catch(e){dirty=true;if(status)status.textContent='Локально сохранено · облако недоступно';}
-  finally{writing=false;if(dirty){clearTimeout(timer);timer=setTimeout(saveCloud,1800);}}
+  }catch(e){dirty=true;retries++;if(status)status.textContent='Локально сохранено · облако недоступно';}
+  finally{writing=false;if(dirty&&retries<3){clearTimeout(timer);timer=setTimeout(saveCloud,2000*Math.pow(2,retries));}}
 }
 function panel(title,body,subtitle=''){
  return '<section class="page panel"><div class="eyebrow">IELTS Academic Reading · '+esc(title)+'</div><h2>'+esc(title)+'</h2>'+(subtitle?'<p class="lead">'+esc(subtitle)+'</p>':'')+body+'</section>';
@@ -196,6 +196,7 @@ async function start(){
   bind();
  }catch(e){booted=false;fail('Не удалось открыть урок: '+e.message+' Проверьте вход и соединение.');}
 }
+window.addEventListener('online',()=>{if(dirty&&auth.userId()){retries=0;saveCloud();}});
 document.addEventListener('gostudy-private-authorized',start);
 auth.ready.then(ok=>{if(ok)start();});
 })();
