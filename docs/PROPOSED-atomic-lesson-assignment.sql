@@ -29,8 +29,9 @@ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM public.gostudy_lesson_catalog lesson
     WHERE lesson.lesson_id=p_lesson_id
+      AND (lesson.owner_teacher_id IS NULL OR lesson.owner_teacher_id=v_teacher)
   ) THEN
-    RAISE EXCEPTION 'Lesson is unavailable' USING ERRCODE='22023';
+    RAISE EXCEPTION 'Lesson is unavailable to this teacher' USING ERRCODE='42501';
   END IF;
 
   -- Transaction-scoped advisory lock serializes assignment changes per student.
@@ -77,5 +78,5 @@ GRANT EXECUTE ON FUNCTION public.gostudy_activate_student_lesson(uuid,text) TO a
 -- (4) no cross-account assignment for anonymous or expired JWT;
 -- (5) two concurrent teacher invocations do not violate the one-active partial index;
 -- (6) missing catalog lesson rolls back without archiving current lesson;
--- (7) retry the exact same assignment; return the same ID with no new rows;\n-- (8) reload the student's cabinet and ensure exactly one published active assignment.
+-- (7) retry the exact same assignment; return the same ID with no new rows;\n-- (8) teacher A cannot assign teacher B's private lesson, even with its known lesson ID;\n-- (9) reload the student's cabinet and ensure exactly one published active assignment.
 -- If student is linked to different teachers, design explicit ownership transfer before using.
