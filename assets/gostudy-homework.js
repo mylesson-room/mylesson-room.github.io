@@ -11,6 +11,7 @@ const api=async (url,options={})=>{
  return res.data;
 };
 const assignmentUrl=(student)=>'/rest/v1/gostudy_homework_assignments?'+new URLSearchParams({select:'*',student_id:'eq.'+student,lesson_path:'eq.'+path});
+const publishedUrl=(student)=>'/rest/v1/gostudy_homework_published?'+new URLSearchParams({select:'*',student_id:'eq.'+student,lesson_path:'eq.'+path});
 const answersUrl=(student)=>'/rest/v1/gostudy_homework_answers?'+new URLSearchParams({select:'exercise_id,answer,updated_at',student_id:'eq.'+student,lesson_path:'eq.'+path});
 const assignmentEditUrl=(student)=>'/rest/v1/gostudy_homework_assignments?'+new URLSearchParams({student_id:'eq.'+student,lesson_path:'eq.'+path});
 const answerEditUrl=(student,id)=>'/rest/v1/gostudy_homework_answers?'+new URLSearchParams({student_id:'eq.'+student,lesson_path:'eq.'+path,exercise_id:'eq.'+id});
@@ -29,7 +30,7 @@ function definitions(config){
    if(!id || result.some(x=>x.id===id))throw Error('Exercise ID missing or duplicate');
    result.push({id,page,kind,prompt,options,answer,element});
  };
- (config.vocab||[]).forEach((v,i)=>push(ids.vocab?.[i],1,'choice','Подберите значение: '+v[0],[v[1]],v[1],document.querySelector('#term'+i)?.closest('.term')));
+ (config.vocab||[]).forEach((v,i)=>push(ids.vocab?.[i],1,'choice','Подберите значение: '+v[0],(config.vocab||[]).map(w=>w[1]),v[1],document.querySelector('#term'+i)?.closest('.term')));
  (config.reading||[]).forEach((v,i)=>push(ids.reading?.[i],2,'choice',v[0],v[1],String(v[2]),document.querySelectorAll('#reading .question-item')[i]));
  (config.gaps||[]).forEach((v,i)=>push(ids.gaps?.[i],3,'gap',v[0],[],v[1],document.querySelectorAll('#gaps .gap-item')[i]));
  const extra=[
@@ -42,6 +43,7 @@ function definitions(config){
  return result;
 }
 async function getAssignment(student){const rows=await api(assignmentUrl(student));return rows[0]||null;}
+async function getPublished(student){const rows=await api(publishedUrl(student));return rows[0]||null;}
 async function saveAssignment(room,record){
  const base={student_id:room.student_id,teacher_id:room.teacher_id,lesson_path:path};
  if(record.exists) return api(assignmentEditUrl(room.student_id),{method:'PATCH',body:{exercise_ids:record.ids,published_at:record.publishedAt,updated_at:new Date().toISOString()}});
@@ -89,6 +91,10 @@ function renderLesson(config){
     const latest=await getAssignment(room.student_id);
     if(!latest?.exercise_ids?.length)throw Error('Сначала добавьте хотя бы одно упражнение.');
     const at=new Date().toISOString();
+    const previous=await getPublished(room.student_id);
+    const body={student_id:room.student_id,teacher_id:room.teacher_id,lesson_path:path,exercise_ids:latest.exercise_ids,published_at:at};
+    if(previous) await api('/rest/v1/gostudy_homework_published?'+new URLSearchParams({student_id:'eq.'+room.student_id,lesson_path:'eq.'+path}),{method:'PATCH',body:{exercise_ids:latest.exercise_ids,published_at:at}});
+    else await api('/rest/v1/gostudy_homework_published',{method:'POST',body});
     await saveAssignment(room,{exists:true,ids:latest.exercise_ids,publishedAt:at});
     record={...latest,published_at:at};status.textContent='Опубликовано для Михаила.';
    }catch(e){status.textContent=e.message;}finally{busy=false;update();}
@@ -99,8 +105,9 @@ function renderLesson(config){
 async function renderHomework(){
  const root=document.querySelector('#homework-root'),status=document.querySelector('#homework-status');
  try{
-  const room=await member(),assignment=await getAssignment(room.student_id);
-  if(!assignment||(!room.teacher&&!assignment.published_at)){
+  const room=await member();
+  const assignment=room.teacher?(await getAssignment(room.student_id)||await getPublished(room.student_id)):await getPublished(room.student_id);
+  if(!assignment){
    status.textContent='Домашнее задание пока не опубликовано. Доступ появится после публикации преподавателем.';return;
   }
   const source=await fetch(path,{cache:'no-store'});
