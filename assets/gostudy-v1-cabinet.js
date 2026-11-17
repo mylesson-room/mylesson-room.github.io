@@ -64,6 +64,18 @@
     HOMEWORK_DURATION:settings.duration ? '<small>'+escape(settings.duration)+'</small>' : '', PREVIOUS:previous,
   };
   document.body.insertAdjacentHTML('afterbegin', markup.replace(/%%([A-Z_]+)%%/g, (_,key) => values[key]));
+  if(document.body.hasAttribute('data-word-mastery')){
+    const navWords=document.querySelector('#openWords');
+    if(navWords)navWords.textContent='Словарь и тренировка слов';
+    const title=document.querySelector('.vocab-feature--practice .vocab-feature__copy strong');
+    if(title)title.textContent='Словарь и тренировка слов';
+    const dialogTitle=document.getElementById('wordsTitle');
+    if(dialogTitle)dialogTitle.textContent='Словарь и тренировка слов';
+    const start=document.getElementById('practiceFromWords');
+    if(start)start.textContent='Тренировать';
+    const card=document.querySelector('#practiceCard');
+    if(card)card.setAttribute('aria-label','Словарь и тренировка слов — открыть список слов');
+  }
   const avatar = document.querySelector('.avatar');
   if (settings.student) avatar.textContent = settings.student[0];
 })();
