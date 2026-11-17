@@ -22,6 +22,8 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: node scripts/check-template-contract.cjs
       - run: node scripts/check-pages.cjs
+      - name: Test shared student route with synthetic Supabase accounts
+        run: node scripts/check-unified-cabinet-browser.cjs
       - name: Prepare static site
         if: github.ref == 'refs/heads/main'
         run: |
