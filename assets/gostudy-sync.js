@@ -1178,7 +1178,7 @@
       [generalB2]:{name:'General English B2',lessons:[{title:'The Hidden Cost of Convenience',lesson:'general-english-b2-01.html',lessonKey:'gostudy-general-english-b2-01-v2',homework:'general-english-b2-01.html#homework'}]},
       [financeCourse]:{
       name:'AI in Finance · B2',
-      lessons:[{title:'AI in Finance · Lesson 2',lesson:financeLesson,homework:financeLesson+'#homework'}],
+      lessons:[{title:'AI in Finance · Lesson 2',lesson:financeLesson,homework:'business-ai-finance-b2-02-homework.html'}],
     }};
     const courses = new Map(Object.entries(teacherCatalog).map(([id,course]) => [id,course.name]));
     const addStudent = document.getElementById('teacher-add-student');
