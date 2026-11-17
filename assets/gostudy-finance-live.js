@@ -67,7 +67,7 @@
       do {
         const path = course ? "/rest/v1/gostudy_classroom_events" : eventPath;
         const filter = course ? "&room_id=eq."+room.id : "";
-        batch = await request(path + "?select=seq,actor,kind,payload&order=seq.asc&limit=500&seq=gt." + cursor + filter);
+        batch = await request(path + "?select="+(course?"seq,actor,kind,payload":"seq,actor,kind,payload,created_at")+"&order=seq.asc&limit=500&seq=gt." + cursor + filter);
         apply(batch, initial);
       } while (batch.length === 500);
       if (!caughtUp) {
