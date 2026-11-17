@@ -132,6 +132,31 @@ async function run(){
       expectEmpty:true
     });
 
+    // Every legacy cabinet must be representable by the SAME canonical dashboard.
+    // Legacy inventory is a migration candidate list, not real student assignments.
+    const inventory = JSON.parse(await readFile(path.join(root,'docs/legacy-cabinet-inventory.json'),'utf8'));
+    assert.equal(inventory.entries.length,18,'Regression coverage must include all legacy cabinets');
+    for (const entry of inventory.entries) {
+      const lesson = {
+        lesson_id: entry.legacyCourse,
+        course_id: entry.legacyCourse,
+        title:'Synthetic lesson for '+entry.legacyCourse,
+        lesson_path:entry.candidateCurrentLesson,
+        homework_path:entry.legacyHomework,
+      };
+      await scenario({
+        canonical:[{student_id:student,status:'active',published_at:'2026-11-18T00:00:00Z',lesson}],
+        published:entry.legacyHomework
+          ? [{lesson_path:entry.candidateCurrentLesson,published_at:'2026-11-18T00:00:00Z'}]
+          : [],
+        expected:entry.candidateCurrentLesson,
+        expectHomework:!!entry.legacyHomework,
+        expectedHomework:entry.legacyHomework || undefined,
+        profiles:[{display_name:'Ученик'}],
+      });
+    }
+    console.log('Universal dashboard: '+inventory.entries.length+' legacy route candidates render through the canonical assignment component');
+
     // Teacher name editor is shared across courses and writes only via authenticated RLS API.
     async function checkTeacherProfileEditor(){
       const page=await browser.newPage();
@@ -166,7 +191,7 @@ async function run(){
     }
     await checkTeacherProfileEditor();
 
-    console.log('Unified cabinet browser smoke: placement, finance, disabled/published homework, ambiguous assignments, canonical assignment priority, foreign-user isolation and teacher name editor PASS');
+    console.log('Unified cabinet browser smoke: placement, finance, disabled/published homework, ambiguous assignments, canonical assignment priority, foreign-user isolation, 18 candidate routes and teacher name editor PASS');
   }finally{
     await browser.close();
     await new Promise(resolve=>server.close(resolve));
