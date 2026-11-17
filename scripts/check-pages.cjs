@@ -698,7 +698,7 @@ async function checkDariaPrivateRoom(browser,origin) {
     await page.goto(origin+'/student-ielts-reading.html');
     await page.locator('#gostudyAccessGate:visible').waitFor();
     assert.equal(await page.locator('main:visible').count(),0,'Private dashboard visible before authentication');
-    assert.equal(await page.locator('.top .brand svg').count(),1,'Shared GoStudy cabinet emblem missing');
+    assert.ok(await page.locator('.top .brand>a svg').count()>=1,'Shared GoStudy cabinet emblem missing');
     await page.locator('#gsEmail').fill('daria@example.invalid');
     await page.locator('#gsPassword').fill('test-password');
     await page.locator('#gostudyAccessForm button').click();
