@@ -511,6 +511,26 @@ async function checkFinanceRoom(browser, origin) {
       await page.locator('#finance-messages').getByText('Сообщение преподавателя',{exact:true}).waitFor();
       assert.equal(await page.locator('#finance-messages .chat-own').count(),1,'Own messages must appear on the right');
     }
+    // Translation popup must survive a failed network request, then retry and reuse cached result.
+    await tp.route('https://api.mymemory.translated.net/**',route=>route.abort());
+    const selectCrisis=async()=>{
+      await tp.locator('.hero h1').evaluate(element=>{
+        const node=element.firstChild,word='financial crisis',start=node.textContent.indexOf(word);
+        if(start<0)throw Error('Translation probe phrase missing');
+        const range=document.createRange();range.setStart(node,start);range.setEnd(node,start+word.length);
+        window.getSelection().removeAllRanges();window.getSelection().addRange(range);
+        document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
+      });
+    };
+    await selectCrisis();
+    await tp.locator('#selectionRetry').waitFor({state:'visible',timeout:12000});
+    await tp.unroute('https://api.mymemory.translated.net/**');
+    await tp.locator('#selectionRetry').click();
+    await tp.locator('#selectionTarget').filter({visible:true}).waitFor();
+    await tp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value.trim().length>0);
+    await tp.keyboard.press('Escape');
+    await selectCrisis();
+    await tp.locator('#selectionStatus').filter({hasText:'кеша'}).waitFor();
     // Manual bilingual entry also works after automatic translation is edited.
     await tp.getByRole('button',{name:'Dictionary',exact:true}).click();
     await tp.locator('#dictionarySource').fill('cash flow');
