@@ -418,3 +418,11 @@ body[data-classroom-course] .grammar-example{margin:0 0 8px}
 #finance-messages li .chat-time{font-size:10px;color:#688096;align-self:flex-end;margin-top:2px}
 #finance-chat-form{display:flex;align-items:center;gap:6px;margin-top:9px}
 #finance-chat-form input{min-width:0;flex:1;font-size:16px}
+
+.selection-heading{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#25559a;gap:10px}
+.selection-heading button{border:1px solid #d3e1f1;border-radius:7px;background:#f5f9ff;padding:3px 10px;cursor:pointer}
+#selectionStatus{font-size:11px;line-height:1.45;color:#506e8f;margin:5px 0}
+.selection-context{font-size:11px;color:#66778e;max-height:58px;overflow-y:auto;line-height:1.45;margin:3px 0}
+.selection-word-label{display:block;font-size:10px;color:#506b89;margin:6px 0 3px}
+#selectionSource{display:block;width:100%;padding:6px 8px;border:1px solid #d1deec;border-radius:7px;background:#fff;color:#1c344f;font:inherit;font-size:12px}
+#selectionRetry{font:inherit;font-size:11px;padding:5px 8px;background:#f2f7ff;border:1px solid #d0e0f3;border-radius:7px;color:#2057a0;cursor:pointer}
