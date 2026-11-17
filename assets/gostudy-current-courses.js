@@ -9,6 +9,7 @@ window.GoStudyCurrentCourses = {
     "gostudy-travel-b2-02-v1",
     "gostudy-travel-b2-03-v1",
     "gostudy-travel-b2-04-v1",
+    "gostudy-travel-b2-04-homework-new-v1",
     "gostudy-travel-b2-profile-v1",
     "gostudy-travel-disruptions-b2-homework-v1",
     "gostudy-travel-disruptions-b2-v1"
