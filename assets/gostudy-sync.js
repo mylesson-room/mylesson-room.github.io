@@ -12,6 +12,7 @@
     'gostudy-travel-b2-02-homework-v1',
     'gostudy-travel-b2-03-v1',
     'gostudy-travel-b2-04-v1',
+    'gostudy-travel-b2-04-homework-new-v1',
     'gostudy-travel-b2-profile-v1',
   ];
   const travelA2Keys = [
