@@ -496,7 +496,7 @@ async function main() {
     const catalog = runInNewContext('('+source.match(/const classroomCatalog = ([^\n]+);/)[1]+')');
     const studentId = '11111111-1111-4111-8111-111111111111';
     for (const [course, entry] of Object.entries(catalog)) {
-      if (course === 'business_ai' || course === 'country_house') continue; // Checked against the v1 interface above.
+      if (['business_ai','country_house','art_b1'].includes(course)) continue; // Covered by the v1 classroom and methodology suites above.
       const current = entry.lessons.at(-1);
       const expected = new URL(current.lesson, origin).pathname;
       const student = await browser.newContext();
