@@ -86,7 +86,7 @@ function renderLesson(config){
    const target=d.element.closest('.term,.question-item,.gap-item')||d.element;
    target.insertAdjacentElement('afterbegin',control);
   }
-  nav?.after(container); // visible only to the authenticated teacher
+  (nav?.closest('details')||nav)?.after(container); // visible only to the authenticated teacher
   publish.addEventListener('click',async()=>{
    if(busy)return;busy=true;update();
    try{
