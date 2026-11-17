@@ -20,7 +20,10 @@ for(const p of pages){
  if(p.client){
   const client=read(p.client);
   must(lesson,p.client,p.lesson);
-  must(client,"loadScript('assets/gostudy-v1-lesson.js')",p.client);
+  must(lesson,'data-lesson-script="assets/gostudy-v1-lesson.js',p.lesson);
+  must(lesson,'data-live-script="assets/gostudy-finance-live.js',p.lesson);
+  must(client,'loadScript(document.body.dataset.lessonScript)',p.client);
+  must(client,'loadScript(document.body.dataset.liveScript)',p.client);
  }else{
   must(lesson,'assets/gostudy-v1-lesson.js',p.lesson);
  }
