@@ -33,11 +33,12 @@ BEGIN
     RAISE EXCEPTION 'Lesson is unavailable' USING ERRCODE='22023';
   END IF;
 
-  -- Lock the student's relationship row to serialize concurrent operations.
-  -- Do not depend on client order or two separate REST calls.
-  PERFORM 1 FROM public.gostudy_teacher_students rel
-  WHERE rel.teacher_id=v_teacher AND rel.student_id=p_student_id
-  FOR UPDATE;
+  -- Transaction-scoped advisory lock serializes assignment changes per student.
+  -- SELECT FOR UPDATE on memberships is intentionally avoided: authenticated
+  -- role has SELECT, not UPDATE, on gostudy_teacher_students.
+  PERFORM pg_catalog.pg_advisory_xact_lock(
+    pg_catalog.hashtextextended(p_student_id::text, 0)
+  );
 
   -- Preserve answers, words and old assignments; never DELETE history.
   UPDATE public.gostudy_lesson_assignments
