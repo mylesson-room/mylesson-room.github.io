@@ -18,7 +18,7 @@ async function checkThreeProgressMeLessons() {
   const specs = [
     {course:'country-house',slug:'country-house-a2-04',title:'A Sunday Picnic Plan',level:'A2',words:6,stages:7},
     {course:'art-b1',slug:'art-b1-03',title:'The Gallery Makeover',level:'B1',words:6,stages:7},
-    {course:'business-ai',slug:'business-ai-b2c1-03',title:'When the AI Rollout Goes Wrong',level:'B2',words:8,stages:8},
+    {course:'business-ai',slug:'business-ai-b2c1-03',title:'The Price of a Bad Decision: AI and Business Choices',level:'B2',words:8,stages:8},
   ];
   const sync=await readFile('./assets/gostudy-sync.js','utf8');
   for (const spec of specs) {
@@ -177,7 +177,7 @@ async function checkMigratedRooms(browser, origin) {
     "path": "business-ai-b2c1-03.html",
     "cab": "student-business-ai.html",
     "student": "Влад",
-    "title": "When the AI Rollout Goes Wrong"
+    "title": "The Price of a Bad Decision: AI and Business Choices"
   }
 ]) {
     const events = [];
@@ -282,7 +282,7 @@ async function checkMigratedRooms(browser, origin) {
       if (lesson.course === 'business-ai') {
         const gap = await sp.locator('#lesson-data').evaluate(node => {
           const lesson = JSON.parse(node.textContent);
-          return lesson.steps.findIndex(step => step.type === 'gap' && step.items.some(item => item[1].includes('unless')));
+          return lesson.steps.findIndex(step => step.type === 'gap' && step.items.some(item => item[1].includes('suggests')));
         });
         assert.ok(gap >= 0);
         await sp.locator('.lesson-section-menu summary').click();
@@ -290,12 +290,12 @@ async function checkMigratedRooms(browser, origin) {
         const active = '.page.active';
         const picker = sp.locator(active+' .definition-picker').first();
         await picker.locator('summary').click();
-        await picker.getByRole('button',{name:'unless',exact:true}).click();
-        await tp.locator(active+' .definition-picker summary').first().filter({hasText:'unless'}).waitFor();
+        await picker.getByRole('button',{name:'suggests',exact:true}).click();
+        await tp.locator(active+' .definition-picker summary').first().filter({hasText:'suggests'}).waitFor();
         assert.equal(await sp.locator(active+' select').count(),0);
         await sp.setViewportSize({width:390,height:844});
         await picker.locator('summary').click();
-        await picker.getByRole('button',{name:'unless',exact:true}).waitFor();
+        await picker.getByRole('button',{name:'suggests',exact:true}).waitFor();
         await picker.locator('summary').press('Escape');
         assert.equal(await picker.getAttribute('open'),null);
       }
