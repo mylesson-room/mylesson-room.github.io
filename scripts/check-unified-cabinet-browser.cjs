@@ -157,6 +157,37 @@ async function run(){
     }
     console.log('Universal dashboard: '+inventory.entries.length+' legacy route candidates render through the canonical assignment component');
 
+    // If a canonical assignment API is reachable but returns an unexpected 404,
+    // do NOT bypass it by reading old room memberships.
+    async function checkUnknownCanonicalErrorFailsClosed(){
+      const page=await browser.newPage();
+      const sid='11111111-1111-4111-8111-111111111111';
+      await page.addInitScript(id=>sessionStorage.setItem('gostudy-cloud-session-v1',JSON.stringify({
+        access_token:'synthetic-test-token',refresh_token:'synthetic-refresh',
+        expires_at:Date.now()+3600000,user:{id}
+      })),sid);
+      await page.route('https://fonts.googleapis.com/**',route=>route.fulfill({status:200,contentType:'text/css',body:''}));
+      await page.route('https://fonts.gstatic.com/**',route=>route.abort());
+      let fallbackRequests=0;
+      await page.route('https://kawfqlohguwvmmplvrny.supabase.co/**',async route=>{
+        const u=new URL(route.request().url());
+        const headers={'access-control-allow-origin':'*','access-control-allow-headers':'authorization,apikey,content-type'};
+        if(route.request().method()==='OPTIONS'){await route.fulfill({status:204,headers});return;}
+        if(u.pathname==='/rest/v1/gostudy_classroom_rooms' || u.pathname==='/rest/v1/gostudy_finance_room')fallbackRequests++;
+        if(u.pathname==='/auth/v1/user'){await route.fulfill({status:200,headers,contentType:'application/json',body:JSON.stringify({id:sid,email:'synthetic@example.invalid'})});return;}
+        if(u.pathname==='/rest/v1/gostudy_lesson_assignments'){
+          await route.fulfill({status:404,headers,contentType:'application/json',body:JSON.stringify({code:'UNEXPECTED_ROUTING_FAILURE'})});return;
+        }
+        await route.fulfill({status:200,headers,contentType:'application/json',body:'[]'});
+      });
+      await page.goto('http://127.0.0.1:'+port+'/student.html',{waitUntil:'domcontentloaded'});
+      await page.waitForFunction(()=>document.getElementById('unified-status')?.textContent.includes('Код: 404'),{timeout:12000});
+      assert.equal(fallbackRequests,0,'Unexpected canonical failure must not trigger legacy fallback');
+      assert.equal(await page.locator('a.lesson-card-link').count(),0,'No lesson should appear after a canonical API error');
+      await page.close();
+    }
+    await checkUnknownCanonicalErrorFailsClosed();
+
     // Teacher name editor is shared across courses and writes only via authenticated RLS API.
     async function checkTeacherProfileEditor(){
       const page=await browser.newPage();
@@ -235,7 +266,7 @@ async function run(){
     await checkTeacherLessonAssignmentEditor();
 
 
-    console.log('Unified cabinet browser smoke: placement, finance, disabled/published homework, ambiguous assignments, canonical assignment priority, foreign-user isolation, 18 candidate routes, teacher name editor and atomic lesson assignment UI PASS');
+    console.log('Unified cabinet browser smoke: placement, finance, disabled/published homework, ambiguous assignments, canonical assignment priority, foreign-user isolation, 18 candidate routes, teacher name editor, atomic lesson assignment UI and canonical fail-closed behavior PASS');
   }finally{
     await browser.close();
     await new Promise(resolve=>server.close(resolve));
