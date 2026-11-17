@@ -307,7 +307,7 @@
         margin:[[/\b(profit|revenue|gross|sales|income|finance|business|cost)\b/i,'маржа, прибыльность, разница'],[/.*/,'поле, край, маржа']],
         return:[[/\b(investment|profit|ROI|fund|capital|annual|stock)\b/i,'доходность, возврат, возвращение'],[/.*/,'возвращение, возврат, доходность']],
         board:[[/\b(directors|meeting|chair|company|executive|finance)\b/i,'совет директоров, правление, доска'],[/.*/,'доска, совет директоров, правление']],
-        concrete:[[/\b(actions?|steps?|plans?|examples?|recommendations?|measures?|details?|proposals?|results?|goals?|evidence|solutions?)\b/i,'конкретный, определённый, предметный'],[/\b(cement|pour|poured|building|construction|wall|floor|mix|material)\b/i,'бетон, бетонный, конкретный'],[/.*/,'конкретный, определённый, бетон']]
+        concrete:[[/\b(actions?|steps?|plans?|examples?|recommendations?|measures?|details?|proposals?|results?|goals?|evidence|solutions?)\b/i,'конкретные, определённые, предметные'],[/\b(cement|pour|poured|building|construction|wall|floor|mix|material)\b/i,'бетон, бетонный, конкретный'],[/.*/,'конкретный, определённый, бетон']]
       };
       const pilotSense=googlePilot && from==='en' && /^reach$/i.test(phrase) && /\b(target|goal|objective|milestone|agreement|level|decision|conclusion)\b/i.test(sentence)
        ? 'достичь, достигать, добиваться' : null;
