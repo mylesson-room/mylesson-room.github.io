@@ -40,6 +40,17 @@ BEGIN
     pg_catalog.hashtextextended(p_student_id::text, 0)
   );
 
+  -- Idempotency: retrying the same teacher/lesson returns the existing active ID.
+  -- This prevents duplicate history and unnecessary notifications on network retries.
+  SELECT assignment_id INTO v_assignment
+    FROM public.gostudy_lesson_assignments
+    WHERE student_id=p_student_id
+      AND teacher_id=v_teacher
+      AND lesson_id=p_lesson_id
+      AND status='active'
+    LIMIT 1;
+  IF v_assignment IS NOT NULL THEN RETURN v_assignment; END IF;
+
   -- Preserve answers, words and old assignments; never DELETE history.
   UPDATE public.gostudy_lesson_assignments
     SET status='archived'
@@ -66,5 +77,5 @@ GRANT EXECUTE ON FUNCTION public.gostudy_activate_student_lesson(uuid,text) TO a
 -- (4) no cross-account assignment for anonymous or expired JWT;
 -- (5) two concurrent teacher invocations do not violate the one-active partial index;
 -- (6) missing catalog lesson rolls back without archiving current lesson;
--- (7) reload the student's cabinet and ensure exactly one published active assignment.
+-- (7) retry the exact same assignment; return the same ID with no new rows;\n-- (8) reload the student's cabinet and ensure exactly one published active assignment.
 -- If student is linked to different teachers, design explicit ownership transfer before using.
