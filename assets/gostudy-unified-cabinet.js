@@ -61,41 +61,15 @@
     return result.data;
   }
 
-  function appendOtherLessons(items) {
-    if (!items.length) return;
-    const main = document.querySelector('main');
-    const section = document.createElement('section');
-    section.className = 'unified-lessons';
-    section.setAttribute('aria-labelledby', 'unifiedLessonsTitle');
-    const title = document.createElement('h2');
-    title.id = 'unifiedLessonsTitle';
-    title.textContent = 'Другие назначенные уроки';
-    const cards = document.createElement('div');
-    cards.className = 'unified-lesson-grid';
-
-    for (const item of items) {
-      const link = document.createElement('a');
-      link.className = 'card lesson-card lesson-card-link';
-      link.href = item.lesson; // Whitelisted same-origin path, never an external URL.
-      const small = document.createElement('small');
-      small.textContent = item.course;
-      const h3 = document.createElement('h3');
-      h3.textContent = item.title;
-      const info = document.createElement('p');
-      info.className = 'unified-hint';
-      info.textContent = 'Перейти к занятию';
-      link.append(small, h3, info);
-      cards.append(link);
-    }
-    section.append(title, cards);
-    main.append(section);
-  }
 
   async function render(data, published) {
-    const primary = data[0];
-    const email = String(auth.getUser()?.email || '');
-    // Display-only name. Never used for authorisation.
-    const displayName = primary?.studentLabel || String(auth.getUser()?.user_metadata?.full_name || '').trim().slice(0, 60) || (email ? email.split('@')[0] : 'Ученик');
+    // A user with multiple legacy rooms needs an explicit teacher-selected CURRENT assignment.
+    // Never guess from table order or expose historical lessons on the dashboard.
+    const primary = data.length === 1 ? data[0] : null;
+    const rawLabel = String(primary?.studentLabel || '').trim();
+    // A legacy student_label may contain an email; an email is NOT the student's name.
+    // The future profile.display_name field will replace this compatibility fallback.
+    const displayName = rawLabel && !rawLabel.includes('@') ? rawLabel : 'Ученик';
     const homework = primary && published.some(row => row.lesson_path === primary.lesson && row.published_at)
       && primary.lesson === 'business-ai-finance-b2-02.html'
       ? 'business-ai-finance-b2-02-homework.html'
@@ -124,11 +98,14 @@
       document.body.append(script);
     });
 
-    const home = document.getElementById('assignment');
-    if (!homework && home) home.hidden = true;
-    const cards = document.querySelector('.cards');
-    if (!primary && cards) cards.hidden = true;
-    appendOtherLessons(data.slice(1));
+    if (!primary) {
+      const lessonLink = document.querySelector('.lesson-card-link');
+      if (lessonLink) {
+        lessonLink.removeAttribute('href');
+        lessonLink.setAttribute('aria-disabled','true');
+        lessonLink.setAttribute('aria-label','Текущий урок не назначен');
+      }
+    }
     const account = document.querySelector('.account');
     if (account && logout) {
       account.append(logout);
@@ -147,7 +124,8 @@
     if (count) count.textContent = 'Словарь пока доступен внутри урока';
     const empty = document.getElementById('wordsEmpty');
     if (empty) empty.textContent = 'Общий словарь будет подключён после безопасной миграции сохранённых слов.';
-    if (!primary) updateStatus('Пока у вашего аккаунта нет назначенных уроков. Обратитесь к преподавателю.');
+    if (data.length > 1) updateStatus('Найдено несколько учебных комнат. Преподавателю необходимо подтвердить один актуальный урок.');
+    else if (!primary) updateStatus('Пока у вашего аккаунта нет назначенных уроков. Обратитесь к преподавателю.');
     else updateStatus('');
     const loading = document.querySelector('.classroom-access');
     if (loading) loading.hidden = true;
