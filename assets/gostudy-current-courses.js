@@ -68,6 +68,8 @@ window.GoStudyCurrentCourses = {
     "gostudy-business-ai-b2c1-03-homework-v1",
     "gostudy-business-ai-b2c1-03-v2",
     "gostudy-business-ai-b2c1-03-homework-v2",
+    "gostudy-business-ai-b2c1-03-v3",
+    "gostudy-business-ai-b2c1-03-homework-v3",
     "gostudy-business-ai-shared-v1"
   ]
 };
