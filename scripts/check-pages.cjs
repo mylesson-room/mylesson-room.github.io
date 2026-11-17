@@ -14,6 +14,35 @@ const server = createServer(async (req, res) => {
   } catch { res.writeHead(404).end(); }
 });
 
+async function checkVictoriaB2Methodology() {
+  const source = await readFile('./general-english-b2-01.html','utf8');
+  const readConfig = html => JSON.parse(html.split('<script type="application/json" id="lesson-data">')[1]?.split('</script>')[0] || '{}');
+  const lesson = readConfig(source);
+  const student = await readFile('./student-general-english-b2.html','utf8');
+  const teacher = await readFile('./assets/gostudy-sync.js','utf8');
+  assert.equal(lesson.title,'The Hidden Cost of Convenience');
+  assert.equal(lesson.cabinet,'student-general-english-b2.html');
+  assert.equal(lesson.key,'gostudy-general-english-b2-01-v2');
+  assert.equal(lesson.answerNamespace,'general-b2-v2:');
+  assert.equal(lesson.labels.length,8);
+  assert.equal(lesson.pages.length,8);
+  assert.equal(lesson.labels.slice(0,7).reduce((sum,part)=>sum+part.minutes,0),50);
+  assert.equal(lesson.labels[7].minutes,15);
+  assert.equal(lesson.vocab.length,8);
+  assert.ok(lesson.vocab.every(word=>word.length===3),'Every expression has meaning and translation');
+  assert.equal(lesson.reading.length,4);
+  assert.equal(lesson.gaps.length,5);
+  assert.ok(lesson.pages[2].includes('get into the habit of') && lesson.pages[2].includes('in the long run') && lesson.pages[2].includes('worth the effort'),'Target expressions must appear in reading');
+  assert.ok(lesson.pages[5].includes('Real-life discussion') && !lesson.pages[5].includes('Resident A'),'Speaking must be an authentic discussion');
+  assert.ok(lesson.pages[6].includes('Wrap-up') && lesson.pages[6].includes('trade-off'),'Check lesson outcomes');
+  for (const selector of ['id="vocab"','id="reading"','id="gaps"','id="decision"','id="homework"','id="roleNotes"']) assert.ok(lesson.pages.some(page=>page.includes(selector)),selector);
+  assert.ok(student.includes('"lesson":"general-english-b2-01.html"'),'Student URL unchanged');
+  assert.ok(student.includes('"homework":"general-english-b2-01.html#homework"'),'Homework URL unchanged');
+  assert.ok(teacher.includes("lesson:'general-english-b2-01.html'"),'Teacher URL unchanged');
+  assert.ok(teacher.includes('gostudy-general-english-b2-01-v2'),'Revision tracked');
+  console.log('Victoria General English B2: revised 50-min lesson, 15-min homework and stable classroom routes verified');
+}
+
 async function checkThreeProgressMeLessons() {
   const specs = [
     {course:'country-house',slug:'country-house-a2-04',title:'A Sunday Picnic Plan',level:'A2',words:6,stages:7},
@@ -491,6 +520,7 @@ async function checkFinanceRoom(browser, origin) {
 }
 
 async function main() {
+  await checkVictoriaB2Methodology();
   await checkThreeProgressMeLessons();
   await checkTravelB2LessonMethodology();
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
