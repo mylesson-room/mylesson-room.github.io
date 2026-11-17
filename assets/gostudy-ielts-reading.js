@@ -3,7 +3,7 @@
 'use strict';
 const SLUG='ielts-reading-04',LOCAL='gostudy-ielts-reading-04-v1',WORD_KEY='gostudy-ielts-reading-01-v1';
 const auth=window.GoStudyPrivateAccess;
-let booted=false,payload=null,state={page:0,answers:{},prediction:'',reflection:'',checked:false},revision=0,timer=null,writing=false;
+let booted=false,payload=null,state={page:0,answers:{},prediction:'',reflection:'',checked:false},revision=0,timer=null,writing=false,dirty=false;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const normalize=s=>String(s??'').toLowerCase().trim().replace(/\s+/g,' ');
 const $=s=>document.querySelector(s);
@@ -19,6 +19,8 @@ const pages=[
  {label:'Vocabulary',minutes:0}
 ];
 function save(){
+  state.updatedAt=Date.now();
+  dirty=true;
   try{localStorage.setItem(LOCAL,JSON.stringify(state));}catch(e){console.warn('Local save failed');}
   const status=$('#gostudyLessonSaved');if(status){status.hidden=false;status.textContent='Сохранено в браузере';}
   clearTimeout(timer);timer=setTimeout(saveCloud,700);
@@ -26,7 +28,8 @@ function save(){
 async function saveCloud(){
   if(!auth?.userId()||writing)return;
   writing=true;
-  const current={page:state.page,answers:{...state.answers},prediction:state.prediction,reflection:state.reflection,checked:state.checked};
+  dirty=false;
+  const current={page:state.page,answers:{...state.answers},prediction:state.prediction,reflection:state.reflection,checked:state.checked,updatedAt:state.updatedAt};
   const status=$('#gostudyLessonSaved');
   try{
     const result=await auth.request('/rest/v1/gostudy_progress?on_conflict=user_id,lesson_key',{
@@ -36,8 +39,8 @@ async function saveCloud(){
     if(!result.ok)throw Error('Не удалось синхронизировать прогресс ('+result.status+').');
     revision++;
     if(status)status.textContent='Сохранено в аккаунте ✓';
-  }catch(e){if(status)status.textContent='Локально сохранено · облако недоступно';}
-  finally{writing=false;}
+  }catch(e){dirty=true;if(status)status.textContent='Локально сохранено · облако недоступно';}
+  finally{writing=false;if(dirty){clearTimeout(timer);timer=setTimeout(saveCloud,1800);}}
 }
 function panel(title,body,subtitle=''){
  return '<section class="page panel"><div class="eyebrow">IELTS Academic Reading · '+esc(title)+'</div><h2>'+esc(title)+'</h2>'+(subtitle?'<p class="lead">'+esc(subtitle)+'</p>':'')+body+'</section>';
@@ -161,7 +164,11 @@ async function fetchCloud(){
   const result=await auth.request('/rest/v1/gostudy_progress?select=state,revision&user_id=eq.'+encodeURIComponent(userId)+'&lesson_key=eq.'+encodeURIComponent(SLUG));
   if(!result.ok)throw Error('Не удалось получить прогресс ('+result.status+').');
   const data=Array.isArray(result.data)?result.data[0]:null;
-  if(data?.state){saved={...local,...data.state,answers:{...(local.answers||{}),...(data.state.answers||{})}};revision=data.revision||0;}
+  if(data?.state){
+    const isLocalNewer=Number(local.updatedAt||0)>Number(data.state.updatedAt||0);
+    saved=isLocalNewer?{...data.state,...local,answers:{...(data.state.answers||{}),...(local.answers||{})}}:{...local,...data.state,answers:{...(local.answers||{}),...(data.state.answers||{})}};
+    revision=data.revision||0;
+  }
  }catch(error){console.warn('Cloud progress unavailable:',error.message);}
  state={page:0,answers:{},prediction:'',reflection:'',checked:false,...saved};
  if(!state.answers||typeof state.answers!=='object')state.answers={};
