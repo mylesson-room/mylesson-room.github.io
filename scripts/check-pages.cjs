@@ -527,12 +527,34 @@ async function checkFinanceRoom(browser, origin) {
     await selectCrisis();
     await tp.locator('#selectionRetry').waitFor({state:'visible',timeout:12000});
     await tp.unroute('https://api.mymemory.translated.net/**');
+    await tp.route('https://api.mymemory.translated.net/**',route=>route.fulfill({
+      json:{responseData:{translatedText:'финансовый кризис'},responseStatus:200}
+    }));
+    assert.equal(await tp.locator('.video-help').count(),0,'Obsolete video-service explanation must not appear');
+    assert.equal(await tp.locator('#selectionSource').count(),0,'Extra lemma field must be removed');
+    assert.equal(await tp.locator('#selectionContext').count(),0,'Technical translated context must be removed');
+    assert.equal(await tp.locator('#selectionDirection').count(),0,'Direction header must not clutter compact popup');
     await tp.locator('#selectionRetry').click();
-    await tp.locator('#selectionTarget').filter({visible:true}).waitFor();
-    await tp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value.trim().length>0);
+    await tp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value==='финансовый кризис' && document.querySelector('#selectionStatus')?.hidden);
     await tp.keyboard.press('Escape');
     await selectCrisis();
-    await tp.locator('#selectionStatus').filter({hasText:'кеша'}).waitFor();
+    await tp.waitForFunction(()=>document.querySelector('#selectionTranslate')?.classList.contains('is-visible') && document.querySelector('#selectionTarget')?.value==='финансовый кризис' && document.querySelector('#selectionStatus')?.hidden);
+    await tp.locator('#selectionSave').click();
+    await sp.getByRole('button',{name:'Dictionary',exact:true}).click();
+    await sp.locator('#myWords').getByText('financial crisis',{exact:false}).waitFor();
+    await sp.getByRole('button',{name:'Close dictionary'}).click();
+    // Business context must be used for ambiguous words, but not displayed in the popup.
+    await tp.evaluate(()=>{
+      const p=document.createElement('p');
+      p.textContent='Our company director approved the finance report.';
+      document.querySelector('.lesson').append(p);
+      const node=p.firstChild,start=node.textContent.indexOf('director'),range=document.createRange();
+      range.setStart(node,start);range.setEnd(node,start+'director'.length);
+      window.getSelection().removeAllRanges();window.getSelection().addRange(range);
+      document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
+    });
+    await tp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value.startsWith('директор, руководитель'));
+    assert.equal(await tp.locator('#selectionContext').count(),0);
     // Manual bilingual entry also works after automatic translation is edited.
     await tp.getByRole('button',{name:'Dictionary',exact:true}).click();
     await tp.locator('#dictionarySource').fill('cash flow');
