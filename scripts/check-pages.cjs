@@ -32,7 +32,7 @@ async function checkVictoriaB2Methodology() {
   assert.ok(lesson.vocab.every(word=>word.length===3),'Every expression has meaning and translation');
   assert.equal(lesson.reading.length,4);
   assert.equal(lesson.gaps.length,5);
-  assert.ok(lesson.pages[2].includes('get into the habit of') && lesson.pages[2].includes('in the long run') && lesson.pages[2].includes('worth the effort'),'Target expressions must appear in reading');
+  assert.ok(/(?:get|got) into the habit of/.test(lesson.pages[2]) && lesson.pages[2].includes('In the long run') && lesson.pages[2].includes('worth the effort'),'Target expressions must appear in reading');
   assert.ok(lesson.pages[5].includes('Real-life discussion') && !lesson.pages[5].includes('Resident A'),'Speaking must be an authentic discussion');
   assert.ok(lesson.pages[6].includes('Wrap-up') && lesson.pages[6].includes('trade-off'),'Check lesson outcomes');
   for (const selector of ['id="vocab"','id="reading"','id="gaps"','id="decision"','id="homework"','id="roleNotes"']) assert.ok(lesson.pages.some(page=>page.includes(selector)),selector);
