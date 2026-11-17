@@ -16,7 +16,7 @@
 <strong>Ready for your class?</strong><span>Your lesson video will appear here</span>
 </div>
 <div class="video-actions"><a class="call-btn" href="https://telemost.yandex.ru/" target="_blank" rel="noopener noreferrer">↗ Open Telemost</a><span>Откроется отдельно</span></div>
-<p class="video-help">Место для видео преподавателя и ученика. Живой звонок внутри страницы появится после подключения видеосервиса.</p>
+
 </div>
 <section class="finance-chat" aria-label="Чат урока"><h2>Чат урока</h2><p id="finance-live-status" role="status">Подключаемся…</p><a href="login.html" class="finance-login">Войти в GoStudy</a><p id="finance-activity" role="status"></p><ol id="finance-messages" role="log" aria-live="polite"></ol><form id="finance-chat-form"><input aria-label="Сообщение" maxlength="1000" placeholder="Сообщение" required disabled><button type="submit" disabled>Отправить</button></form></section>
 <details class="lesson-section-menu"><summary>Разделы урока</summary><nav id="lessonSections" aria-label="Разделы урока"></nav></details>
@@ -27,15 +27,11 @@
 <div class="footer"></div></div></main></div><nav class="pager" aria-label="Lesson navigation"><button type="button" class="outline" id="back">← Back</button><button type="button" class="outline move-student-button" id="moveStudent" hidden>Переместить ученика</button><button type="button" class="primary" id="next">Continue</button></nav>
 
 <div class="selection-translate" id="selectionTranslate" role="region" aria-label="Перевод выделенного текста">
-  <div class="selection-heading"><span id="selectionDirection">EN → RU</span><button id="selectionSwap" type="button" title="Поменять направление">⇄</button></div>
-  <p id="selectionStatus" role="status">Загрузка…</p>
-  <p id="selectionContext" class="selection-context"></p>
-  <label class="selection-word-label" for="selectionSource">Словарная форма (можно изменить)</label><input id="selectionSource" maxlength="150" aria-label="Словарная форма">
-  <textarea class="selection-target" id="selectionTarget" rows="2" maxlength="300" aria-label="Перевод"></textarea>
+  <textarea class="selection-target" id="selectionTarget" rows="2" maxlength="300" aria-label="Перевод" placeholder="Перевод…"></textarea>
+  <p id="selectionStatus" role="status" hidden></p>
   <button id="selectionRetry" type="button" hidden>Повторить перевод</button>
   <div class="selection-tools">
     <button id="selectionSave" type="button" aria-label="Добавить в словарь" title="Добавить в словарь" disabled>+</button>
-
   </div>
   <a id="selectionGoogle" target="_blank" rel="noopener noreferrer" hidden>Открыть в Google Translate</a>
 </div>
@@ -167,12 +163,12 @@
 
   function bindTranslation(config,saveVocabulary) {
      const byId=id=>document.getElementById(id);
-     const pop=byId('selectionTranslate'),target=byId('selectionTarget'),source=byId('selectionSource');
-     const status=byId('selectionStatus'),contextEl=byId('selectionContext'),directionEl=byId('selectionDirection');
-     const swap=byId('selectionSwap'),retry=byId('selectionRetry'),google=byId('selectionGoogle'),saveBtn=byId('selectionSave');
+     const pop=byId('selectionTranslate'),target=byId('selectionTarget');
+     const status=byId('selectionStatus');
+     const retry=byId('selectionRetry'),google=byId('selectionGoogle'),saveBtn=byId('selectionSave');
      let range=null,phrase='',sentence='',from='en',to='ru',controller=null,seq=0,timer=0,edited=false;
      saveBtn.hidden=!saveVocabulary;
-     const canSave=()=>Boolean(saveVocabulary && target.value.trim() && source.value.trim());
+     const canSave=()=>Boolean(saveVocabulary && target.value.trim() && lemma(phrase));
      const cacheKey='gostudy-context-translations-v1';
      let cache={};try{cache=JSON.parse(localStorage.getItem(cacheKey)||'{}')}catch{}
      const clean=x=>String(x||'').replace(/\s+/g,' ').trim().slice(0,1000);
@@ -210,7 +206,7 @@
       const below=pager-rect.bottom-8,above=rect.top-header-8;
       pop.style.top=Math.round(below>pop.offsetHeight||below>=above?rect.bottom+8:Math.max(header+8,rect.top-pop.offsetHeight-8))+'px';
      }
-     function showStatus(t){status.textContent=t;}
+     function showStatus(t){status.textContent=t;status.hidden=!t;}
      function hide(){pop.classList.remove('is-visible');range=null;controller?.abort();seq++;}
      const fetchTranslation=async(q,signal)=>{
       const response=await fetch('https://api.mymemory.translated.net/get?'+new URLSearchParams({q,langpair:from+'|'+to}),{signal});
@@ -222,11 +218,10 @@
      async function translate(){
       controller?.abort();const id=++seq;controller=new AbortController();
       const active=controller,signal=active.signal,timeout=setTimeout(()=>active.abort(),8000);
-      directionEl.textContent=from.toUpperCase()+' → '+to.toUpperCase();
       google.href='https://translate.google.com/?'+new URLSearchParams({sl:from,tl:to,text:phrase,op:'translate'});
       google.hidden=true;retry.hidden=true;
       const key=cacheId(),cached=cache[key];
-      if(cached){if(!edited)target.value=cached.value;contextEl.textContent=cached.context||'';saveBtn.disabled=!canSave();showStatus('Перевод из кеша');clearTimeout(timeout);return;}
+      if(cached){if(!edited)target.value=cached.value;saveBtn.disabled=!canSave();showStatus('');clearTimeout(timeout);return;}
       const dictionary=from==='en'?known.get(phrase.toLowerCase()):null;
       const polysemy={
         statement:[[/\b(bank|account|monthly|sent)\b/i,'выписка, заявление, утверждение'],[/.*/,'заявление, утверждение, выписка']],
@@ -234,28 +229,30 @@
         charge:[[/\b(delivery|fee|pay|cost|service)\b/i,'плата, заряд, обвинение'],[/.*/,'заряд, плата, обвинение']],
         interest:[[/\b(rate|loan|credit|bank)\b/i,'процент, интерес, заинтересованность'],[/.*/,'интерес, процент, заинтересованность']],
         balance:[[/\b(cash|account|bank|payment)\b/i,'остаток, баланс, равновесие'],[/.*/,'баланс, равновесие, остаток']],
-        capital:[[/\b(investment|financial|raise|business)\b/i,'капитал, столица, заглавная буква'],[/.*/,'столица, капитал, заглавная буква']]
+        capital:[[/\b(investment|financial|raise|business|finance|funds|venture)\b/i,'капитал, столица, заглавная буква'],[/.*/,'столица, капитал, заглавная буква']],
+        director:[[/\b(film|movie|cinema|theatre|scene|screenplay)\b/i,'режиссёр, директор, руководитель'],[/\b(company|board|chief|management|executive|finance|business|sales|department|report|appointed|CEO)\b/i,'директор, руководитель, режиссёр'],[/.*/,'директор, режиссёр, руководитель']],
+        margin:[[/\b(profit|revenue|gross|sales|income|finance|business|cost)\b/i,'маржа, прибыльность, разница'],[/.*/,'поле, край, маржа']],
+        return:[[/\b(investment|profit|ROI|fund|capital|annual|stock)\b/i,'доходность, возврат, возвращение'],[/.*/,'возвращение, возврат, доходность']],
+        board:[[/\b(directors|meeting|chair|company|executive|finance)\b/i,'совет директоров, правление, доска'],[/.*/,'доска, совет директоров, правление']]
       };
       const special=from==='en' ? polysemy[phrase.toLowerCase()]?.find(([pattern])=>pattern.test(sentence))?.[1] : null;
       if(dictionary||special){
        const value=special||dictionary;
        if(!edited)target.value=value;
        saveBtn.disabled=!canSave();
-       showStatus('Перевод из словаря урока · учитываем контекст');
+       showStatus('');
        cache[key]={value,context:''};try{localStorage.setItem(cacheKey,JSON.stringify(cache))}catch{}
        clearTimeout(timeout);return;
       }
-      showStatus('Переводим…');contextEl.textContent='';
+      showStatus('Переводим…');
       try{
        const [word,whole]=await Promise.allSettled([fetchTranslation(phrase,signal),sentence&&sentence!==phrase?fetchTranslation(sentence.slice(0,450),signal):Promise.resolve('')]);
        if(id!==seq)return;
        if(word.status!=='fulfilled')throw word.reason;
        if(!edited)target.value=word.value;
-       const translatedContext=whole.status==='fulfilled'&&whole.value?'Контекст: '+whole.value:'';
-       contextEl.textContent=translatedContext;
        saveBtn.disabled=!canSave();
-       showStatus('Перевод выделения · проверьте значение в контексте');
-       cache[key]={value:word.value,context:translatedContext};
+       showStatus('');
+       cache[key]={value:word.value};
        const entries=Object.entries(cache).slice(-80);cache=Object.fromEntries(entries);
        try{localStorage.setItem(cacheKey,JSON.stringify(cache))}catch{}
       }catch(e){
@@ -272,13 +269,11 @@
       if(range&&phrase===selected&&range.compareBoundaryPoints(Range.START_TO_START,r)===0&&range.compareBoundaryPoints(Range.END_TO_END,r)===0)return;
       range=r.cloneRange();phrase=selected;sentence=contextFor(r);
       from=/[А-Яа-яЁё]/.test(phrase)?'ru':'en';to=from==='en'?'ru':'en';
-      saveBtn.textContent='+';source.value=lemma(phrase);target.value='';edited=false;saveBtn.disabled=true;
-      contextEl.textContent='';showStatus('Переводим…');retry.hidden=true;google.hidden=true;
+      saveBtn.textContent='+';target.value='';edited=false;saveBtn.disabled=true;
+      showStatus('Переводим…');retry.hidden=true;google.hidden=true;
       pop.classList.add('is-visible');locate();translate();
      }
      target.addEventListener('input',()=>{edited=true;saveBtn.disabled=!canSave();});
-     source.addEventListener('input',()=>{saveBtn.disabled=!canSave();});
-     swap.addEventListener('click',()=>{[from,to]=[to,from];edited=false;target.value='';translate();});
      retry.addEventListener('click',()=>{edited=false;translate();});
      const schedule=()=>{clearTimeout(timer);timer=setTimeout(selectionOpen,90);};
      document.addEventListener('mouseup',e=>{if(!pop.contains(e.target))schedule()});
@@ -289,7 +284,7 @@
      document.addEventListener('pointerdown',e=>{if(pop.classList.contains('is-visible')&&!pop.contains(e.target))hide()});
      document.querySelectorAll('#back,#next').forEach(el=>el.addEventListener('click',hide));
      saveBtn.addEventListener('click',()=>{
-      const word=makeWord(source.value,target.value.trim());
+      const word=makeWord(lemma(phrase),target.value.trim());
       if(word && saveVocabulary?.(word)){saveBtn.textContent='✓';saveBtn.disabled=true;}
      });
   }
