@@ -41,6 +41,8 @@ async function run(){
         }));
       },student);
 
+      await page.route('https://fonts.googleapis.com/**',route=>route.fulfill({status:200,contentType:'text/css',body:''}));
+      await page.route('https://fonts.gstatic.com/**',route=>route.abort());
       await page.route('https://kawfqlohguwvmmplvrny.supabase.co/**',async route=>{
         const u=new URL(route.request().url());
         const method=route.request().method();
