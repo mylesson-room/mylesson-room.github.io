@@ -72,8 +72,9 @@
       published_at:'not.is.null'
     });
     const response = await auth.request('/rest/v1/gostudy_lesson_assignments?'+query);
-    // The new table is not yet deployed. Legacy read-only bridge remains temporarily active.
-    if(response.status === 404) return null;
+    // Legacy bridge is allowed ONLY when PostgREST explicitly says the table is absent.
+    // A generic 404 may be an authorization/route error; fail closed instead of exposing legacy data.
+    if(response.status === 404 && response.data?.code === 'PGRST205') return null;
     if(!response.ok || !Array.isArray(response.data)) throw Error('Не удалось проверить назначенный урок. Код: '+response.status);
     return assignmentsFromCanonical(response.data, auth.userId());
   }
