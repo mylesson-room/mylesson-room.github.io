@@ -426,3 +426,11 @@ body[data-classroom-course] .grammar-example{margin:0 0 8px}
 .selection-word-label{display:block;font-size:10px;color:#506b89;margin:6px 0 3px}
 #selectionSource{display:block;width:100%;padding:6px 8px;border:1px solid #d1deec;border-radius:7px;background:#fff;color:#1c344f;font:inherit;font-size:12px}
 #selectionRetry{font:inherit;font-size:11px;padding:5px 8px;background:#f2f7ff;border:1px solid #d0e0f3;border-radius:7px;color:#2057a0;cursor:pointer}
+
+/* Context translator uses a single-column layout so Retry is never covered by the save button. */
+.selection-translate.is-visible{display:flex!important;flex-direction:column;gap:7px;align-items:stretch}
+.selection-translate #selectionTarget{display:block;width:100%;min-height:54px;box-sizing:border-box;padding:9px;border:1px solid #d4e2f0;border-radius:8px}
+.selection-translate .selection-tools{display:flex;justify-content:flex-end;align-self:flex-end;position:static}
+.selection-translate #selectionRetry{align-self:flex-start;position:relative;z-index:2}
+.selection-translate #selectionGoogle{display:inline-block;align-self:flex-start}
+.selection-translate #selectionGoogle[hidden],.selection-translate #selectionRetry[hidden]{display:none}
