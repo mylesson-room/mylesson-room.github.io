@@ -246,13 +246,12 @@
       }
       showStatus('Переводим…');
       try{
-       const [word,whole]=await Promise.allSettled([fetchTranslation(phrase,signal),sentence&&sentence!==phrase?fetchTranslation(sentence.slice(0,450),signal):Promise.resolve('')]);
+       const value=await fetchTranslation(phrase,signal);
        if(id!==seq)return;
-       if(word.status!=='fulfilled')throw word.reason;
-       if(!edited)target.value=word.value;
+       if(!edited)target.value=value;
        saveBtn.disabled=!canSave();
        showStatus('');
-       cache[key]={value:word.value};
+       cache[key]={value};
        const entries=Object.entries(cache).slice(-80);cache=Object.fromEntries(entries);
        try{localStorage.setItem(cacheKey,JSON.stringify(cache))}catch{}
       }catch(e){
