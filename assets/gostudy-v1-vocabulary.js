@@ -6,7 +6,7 @@ let practiceWords = [], practiceIndex = 0;
 const masteryEnabled = document.body.hasAttribute('data-word-mastery');
 const mastery = new Map();
 const masteryKey = word => String(word?.en || '').trim().toLocaleLowerCase('en');
-const isLearned = word => masteryEnabled && !!mastery.get(masteryKey(word))?.studied_at;
+const isLearned = word => masteryEnabled && (Boolean(word?.learned) || !!mastery.get(masteryKey(word))?.studied_at);
 const activeWords = () => loadSavedWords().filter(word => !isLearned(word));
 async function masteryRequest(path,options={}) {
   const auth=window.GoStudyFinanceAuth;
@@ -40,6 +40,7 @@ async function markLearned(word) {
       method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:row
     });
     mastery.set(key,row);
+    window.FinanceLive?.send('word_mastered',{en:word.en});
     updateVocabularyCount();
     if(wordsDialog?.open)openVocabulary();
   }catch(e){
