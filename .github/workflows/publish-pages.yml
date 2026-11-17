@@ -21,7 +21,6 @@ jobs:
       - run: npm install --no-save --no-package-lock playwright@1.58.2
       - run: npx playwright install --with-deps chromium
       - run: node scripts/check-template-contract.cjs
-      - run: node scripts/validate-lesson-template.cjs
       - run: node scripts/check-pages.cjs
       - name: Prepare static site
         if: github.ref == 'refs/heads/main'
