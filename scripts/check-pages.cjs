@@ -523,7 +523,7 @@ async function checkFinanceRoom(browser, origin) {
 async function checkSharedComponentReversible(browser,origin){
   const file='assets/gostudy-v1-lesson.css';
   const before=await readFile(file,'utf8');
-  const probe=' .hero::before{content:"GOSTUDY-SHARED-PROBE" !important;position:absolute;}';
+  const probe=String.fromCharCode(10)+':root{--gostudy-shared-probe:GOSTUDY-SHARED-PROBE;}'+String.fromCharCode(10);
   const context=await browser.newContext();
   try {
     await writeFile(file,before+probe);
@@ -531,7 +531,7 @@ async function checkSharedComponentReversible(browser,origin){
       const page=await context.newPage();
       await page.goto(origin+'/'+pageName);
       await page.locator('.hero').waitFor({state:'attached'});
-      const value=await page.locator('.hero').evaluate(el=>getComputedStyle(el,'::before').content);
+      const value=await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--gostudy-shared-probe'));
       assert.ok(value.includes('GOSTUDY-SHARED-PROBE'),pageName+' did not receive shared component update');
       await page.close();
     }
