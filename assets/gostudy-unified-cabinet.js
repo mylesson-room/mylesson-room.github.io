@@ -62,14 +62,14 @@
   }
 
 
-  async function render(data, published) {
+  async function render(data, published, profiles = []) {
     // A user with multiple legacy rooms needs an explicit teacher-selected CURRENT assignment.
     // Never guess from table order or expose historical lessons on the dashboard.
     const primary = data.length === 1 ? data[0] : null;
-    const rawLabel = String(primary?.studentLabel || '').trim();
-    // A legacy student_label may contain an email; an email is NOT the student's name.
-    // The future profile.display_name field will replace this compatibility fallback.
-    const displayName = rawLabel && !rawLabel.includes('@') ? rawLabel : 'Ученик';
+    // The protected profile is the ONLY source for the student's name.
+    // Old labels may contain email or an outdated name and are not trustworthy.
+    const savedName = String(profiles[0]?.display_name || '').trim();
+    const displayName = savedName && !savedName.includes('@') ? savedName.slice(0,60) : 'Ученик';
     const homework = primary && published.some(row => row.lesson_path === primary.lesson && row.published_at)
       && primary.lesson === 'business-ai-finance-b2-02.html'
       ? 'business-ai-finance-b2-02-homework.html'
@@ -138,12 +138,14 @@
     updateStatus('Загружаем ваши занятия…');
     try {
       const id = encodeURIComponent(auth.userId());
-      const [classrooms, finance, published] = await Promise.all([
+      const [classrooms, finance, published, profiles] = await Promise.all([
         readRows('/rest/v1/gostudy_classroom_rooms?select=student_id,course,lesson_path,student_label&student_id=eq.' + id),
         readRows('/rest/v1/gostudy_finance_room?select=student_id&student_id=eq.' + id),
-        readRows('/rest/v1/gostudy_homework_published?select=lesson_path,published_at&student_id=eq.' + id)
+        readRows('/rest/v1/gostudy_homework_published?select=lesson_path,published_at&student_id=eq.' + id),
+        // Profile table is staged in the migration proposal; absent until RLS is deployed.
+        readRows('/rest/v1/gostudy_profiles?select=display_name&user_id=eq.' + id).catch(() => [])
       ]);
-      await render(assignmentsFromRooms(classrooms, finance, auth.userId()), published);
+      await render(assignmentsFromRooms(classrooms, finance, auth.userId()), published, profiles);
     } catch (error) {
       started = false;
       updateStatus(error?.message || 'Не удалось загрузить кабинет. Попробуйте войти ещё раз.');
