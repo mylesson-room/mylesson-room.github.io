@@ -597,7 +597,6 @@ async function checkFinanceHomework(browser,origin){
   await second.getByRole('button',{name:'Добавить в домашнее задание'}).click();
   await teacher.locator('.homework-draft-status').filter({hasText:'В черновике: 1'}).waitFor();
   assert.deepEqual(draft.exercise_ids,['finance2-vocab-02'],'Only the second vocabulary exercise is assigned');
-  await second.locator('.homework-exercise-menu summary').click();
   await second.getByRole('button',{name:/Добавить в домашнее задание|Добавлено/}).click();
   assert.deepEqual(draft.exercise_ids,['finance2-vocab-02'],'Repeated assignment must not duplicate exercise');
   await student.reload();
