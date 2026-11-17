@@ -191,7 +191,51 @@ async function run(){
     }
     await checkTeacherProfileEditor();
 
-    console.log('Unified cabinet browser smoke: placement, finance, disabled/published homework, ambiguous assignments, canonical assignment priority, foreign-user isolation, 18 candidate routes and teacher name editor PASS');
+    // One teacher action -> ONE atomic RPC. No split update/insert from the browser.
+    async function checkTeacherLessonAssignmentEditor(){
+      const page=await browser.newPage();
+      const sid='11111111-1111-4111-8111-111111111111';
+      await page.setContent('<form id="teacher-assign-lesson" hidden><select id="teacher-lesson-select"></select><button type="submit">Назначить урок</button></form><p id="teacher-active-assignment"></p><p id="teacher-assignment-status"></p>');
+      await page.evaluate(()=>{
+        window.__assignmentMutations=[];
+        window.GoStudyAuth={
+          token:async()=> 'synthetic-teacher-token',
+          request:async(url,options,jwt)=>{
+            if(jwt!=='synthetic-teacher-token')return {ok:false,status:401};
+            if(url.includes('gostudy_lesson_catalog'))return {ok:true,status:200,data:[
+              {lesson_id:'placement',course_id:'english-placement',title:'English Placement'},
+              {lesson_id:'finance-02',course_id:'finance_b1',title:'Finance B1 — 02'}
+            ]};
+            if(url.includes('gostudy_lesson_assignments'))return {ok:true,status:200,data:[
+              {lesson_id:'placement',status:'active',published_at:'2026-11-18T00:00:00Z'}
+            ]};
+            if(url.includes('/rpc/gostudy_activate_student_lesson')){
+              window.__assignmentMutations.push({url,body:options.body,method:options.method});
+              return {ok:true,status:200,data:'00000000-0000-4000-8000-000000000000'};
+            }
+            return {ok:false,status:404};
+          }
+        };
+      });
+      await page.addScriptTag({path:path.join(root,'assets/gostudy-teacher-assignments.js')});
+      await page.evaluate(id=>document.dispatchEvent(new CustomEvent('gostudy-teacher-student-selected',{detail:{studentId:id}})),sid);
+      await page.waitForFunction(()=>!document.getElementById('teacher-assign-lesson').hidden);
+      assert.match(await page.locator('#teacher-active-assignment').textContent(),/English Placement/);
+      await page.locator('#teacher-lesson-select').selectOption('finance-02');
+      await page.locator('#teacher-assign-lesson button').click();
+      await page.waitForFunction(()=>document.getElementById('teacher-assignment-status').textContent.includes('Урок назначен'));
+      const mutations=await page.evaluate(()=>window.__assignmentMutations);
+      assert.equal(mutations.length,1,'Only one atomic mutation is sent');
+      assert.equal(mutations[0].method,'POST');
+      assert.equal(mutations[0].body.p_student_id,sid);
+      assert.equal(mutations[0].body.p_lesson_id,'finance-02');
+      assert.match(mutations[0].url,/\/rpc\/gostudy_activate_student_lesson$/);
+      await page.close();
+    }
+    await checkTeacherLessonAssignmentEditor();
+
+
+    console.log('Unified cabinet browser smoke: placement, finance, disabled/published homework, ambiguous assignments, canonical assignment priority, foreign-user isolation, 18 candidate routes, teacher name editor and atomic lesson assignment UI PASS');
   }finally{
     await browser.close();
     await new Promise(resolve=>server.close(resolve));
