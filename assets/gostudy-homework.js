@@ -28,8 +28,9 @@ function definitions(config){
  const result=[];
  const push=(id,page,kind,prompt,options,answer,element)=>{
    if(!id || result.some(x=>x.id===id))throw Error('Exercise ID missing or duplicate');
-   result.push({id,page,kind,prompt,options,answer,element});
+   result.push({id,number:result.length+1,page,kind,prompt,options,answer,element});
  };
+ (config.warmupQuestions||[]).forEach((question,i)=>push(ids.warmup?.[i],0,'write',question,[],null,document.querySelectorAll('#page-0 .questions li')[i]));
  (config.vocab||[]).forEach((v,i)=>push(ids.vocab?.[i],1,'choice','Подберите значение: '+v[0],(config.vocab||[]).map(w=>w[1]),v[1],document.querySelector('#term'+i)?.closest('.term')));
  (config.reading||[]).forEach((v,i)=>push(ids.reading?.[i],2,'choice',v[0],v[1],String(v[2]),document.querySelectorAll('#reading .question-item')[i]));
  (config.gaps||[]).forEach((v,i)=>push(ids.gaps?.[i],3,'gap',v[0],[],v[1],document.querySelectorAll('#gaps .gap-item')[i]));
@@ -37,7 +38,8 @@ function definitions(config){
   ['decision',4,'choice','Выберите подход к финансовому сценарию',Object.keys(config.advice||{}),null,document.querySelector('#decision')],
   ['decisionNotes',4,'write','Объясните финансовое решение',[],null,document.querySelector('#decisionNotes')],
   ['roleNotes',5,'write','Обсудите кейс: ваши заметки',[],null,document.querySelector('#roleNotes')],
-  ['finalOpinion',6,'write','Сформулируйте аргументированное мнение',[],null,document.querySelector('[data-save="finalOpinion"]')]
+  ['finalOpinion',6,'write','Сформулируйте аргументированное мнение',[],null,document.querySelector('[data-save="finalOpinion"]')],
+  ['writing',7,'write',config.homeworkPrompt||'Письменное задание',[],null,document.querySelector('#lessonSections')]
  ];
  for(const [name,page,kind,prompt,options,answer,element] of extra)push(ids[name],page,kind,prompt,options,answer,element);
  return result;
@@ -68,7 +70,7 @@ function renderLesson(config){
    if(!d.element)continue;
    d.element.dataset.exerciseId=d.id;
    const control=document.createElement('details');control.className='homework-exercise-menu';
-   const summary=document.createElement('summary');summary.textContent='⋯';summary.setAttribute('aria-label','Меню упражнения '+d.id);
+   const summary=document.createElement('summary');summary.textContent='⋯ Упражнение '+d.number;summary.setAttribute('aria-label','Меню упражнения '+d.number);
    const button=document.createElement('button');button.type='button';button.textContent='Добавить в домашнее задание';
    button.addEventListener('click',async()=>{
     if(busy)return;busy=true;button.disabled=true;
@@ -108,7 +110,8 @@ async function renderHomework(){
   const room=await member();
   const assignment=room.teacher?(await getAssignment(room.student_id)||await getPublished(room.student_id)):await getPublished(room.student_id);
   if(!assignment){
-   status.textContent='Домашнее задание пока не опубликовано. Доступ появится после публикации преподавателем.';return;
+   if(!room.teacher){status.textContent='Домашнее задание пока не опубликовано. Доступ появится после публикации преподавателем.';return;}
+   status.textContent='Черновик пуст. Назначьте упражнения из урока.';return;
   }
   const source=await fetch(path,{cache:'no-store'});
   if(!source.ok)throw Error('Не удалось загрузить задания урока.');
@@ -121,7 +124,7 @@ async function renderHomework(){
   for(const [index,id] of assignment.exercise_ids.entries()){
    const d=byId.get(id);if(!d)continue;
    const article=document.createElement('article');article.className='homework-task';
-   const title=document.createElement('h2');title.textContent='Упражнение '+(index+1)+' · '+d.prompt;article.append(title);
+   const title=document.createElement('h2');title.textContent='Упражнение '+d.number+' · '+d.prompt;article.append(title);
    let input;
    if(d.kind==='choice'){
     input=document.createElement('select');input.setAttribute('aria-label',d.prompt);
