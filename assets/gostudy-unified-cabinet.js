@@ -42,10 +42,40 @@
     if (financeRooms.some(room => room.student_id === userId)) {
       const lesson = 'business-ai-finance-b2-02.html'; // Bridge to an existing historic course only.
       if (!found.has(lesson)) found.set(lesson, {
-        lesson, course: 'AI in Finance · B2', title: 'AI in Finance — Lesson 2', studentLabel: ''
+        lesson, course: 'AI in Finance · B2', title: 'AI in Finance — Lesson 2', homework:'business-ai-finance-b2-02-homework.html', studentLabel: ''
       });
     }
     return [...found.values()];
+  }
+
+  // Canonical post-migration assignments, when the protected schema is available.
+  function assignmentsFromCanonical(rows, userId) {
+    return rows.filter(row => row.student_id === userId && row.status === 'active' && row.published_at)
+      .map(row => {
+        const lesson = row.lesson;
+        const path = safeLessonPath(lesson?.lesson_path);
+        if (!path) return null;
+        return {
+          lesson: path,
+          course: courseLabel(lesson.course_id),
+          title: String(lesson.title || courseLabel(lesson.course_id)).slice(0,140),
+          homework: safeLessonPath(lesson.homework_path),
+        };
+      }).filter(Boolean);
+  }
+
+  async function readCanonicalAssignments(id) {
+    const query = new URLSearchParams({
+      select:'student_id,status,published_at,lesson:gostudy_lesson_catalog(lesson_id,course_id,title,lesson_path,homework_path)',
+      student_id:'eq.'+id,
+      status:'eq.active',
+      published_at:'not.is.null'
+    });
+    const response = await auth.request('/rest/v1/gostudy_lesson_assignments?'+query);
+    // The new table is not yet deployed. Legacy read-only bridge remains temporarily active.
+    if(response.status === 404) return null;
+    if(!response.ok || !Array.isArray(response.data)) throw Error('Не удалось проверить назначенный урок. Код: '+response.status);
+    return assignmentsFromCanonical(response.data, auth.userId());
   }
 
   function updateStatus(message) {
@@ -70,9 +100,9 @@
     // Old labels may contain email or an outdated name and are not trustworthy.
     const savedName = String(profiles[0]?.display_name || '').trim();
     const displayName = savedName && !savedName.includes('@') ? savedName.slice(0,60) : 'Ученик';
-    const homework = primary && published.some(row => row.lesson_path === primary.lesson && row.published_at)
-      && primary.lesson === 'business-ai-finance-b2-02.html'
-      ? 'business-ai-finance-b2-02-homework.html'
+    const homework = primary && primary.homework
+      && published.some(row => row.lesson_path === primary.lesson && row.published_at)
+      ? primary.homework
       : '';
 
     const config = document.createElement('script');
@@ -138,14 +168,22 @@
     updateStatus('Загружаем ваши занятия…');
     try {
       const id = encodeURIComponent(auth.userId());
-      const [classrooms, finance, published, profiles] = await Promise.all([
-        readRows('/rest/v1/gostudy_classroom_rooms?select=student_id,course,lesson_path,student_label&student_id=eq.' + id),
-        readRows('/rest/v1/gostudy_finance_room?select=student_id&student_id=eq.' + id),
+      const [published, profiles, canonical] = await Promise.all([
         readRows('/rest/v1/gostudy_homework_published?select=lesson_path,published_at&student_id=eq.' + id),
-        // Profile table is staged in the migration proposal; absent until RLS is deployed.
-        readRows('/rest/v1/gostudy_profiles?select=display_name&user_id=eq.' + id).catch(() => [])
+        // Protected profiles are staged until the migration is approved.
+        readRows('/rest/v1/gostudy_profiles?select=display_name&user_id=eq.' + id).catch(() => []),
+        readCanonicalAssignments(id)
       ]);
-      await render(assignmentsFromRooms(classrooms, finance, auth.userId()), published, profiles);
+      // Never bypass a deployed canonical assignment system by falling back to old pages.
+      let assigned = canonical;
+      if (assigned === null) {
+        const [classrooms, finance] = await Promise.all([
+          readRows('/rest/v1/gostudy_classroom_rooms?select=student_id,course,lesson_path,student_label&student_id=eq.' + id),
+          readRows('/rest/v1/gostudy_finance_room?select=student_id&student_id=eq.' + id)
+        ]);
+        assigned = assignmentsFromRooms(classrooms, finance, auth.userId());
+      }
+      await render(assigned, published, profiles);
     } catch (error) {
       started = false;
       updateStatus(error?.message || 'Не удалось загрузить кабинет. Попробуйте войти ещё раз.');
