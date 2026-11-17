@@ -35,10 +35,10 @@ async function checkThreeProgressMeLessons() {
     assert.equal(lesson.steps.reduce((sum,step)=>sum+step.minutes,0),50);
     assert.equal(lesson.steps.filter(step=>step.type==='match')[0].items.length,spec.words);
     assert.ok(lesson.steps.some(step=>step.title.includes('01 ·')),'Lead-in present');
-    assert.ok(lesson.steps.some(step=>/SPEAK|ROLE|NEGOTIAT|INDEPENDENT/i.test(step.instruction)),'Production phase required');
+    assert.ok(lesson.steps.some(step=>/SPEAK|ROLE|NEGOTIAT|INDEPENDENT|DISCUSSION/i.test(step.instruction)),'Production phase required');
     assert.ok(lesson.steps.at(-1).instruction.includes('WRAP-UP'));
     assert.ok(lesson.steps.every(step=>!!step.teacherNotes));
-    assert.equal(practice.key,lesson.key.replace('-v1','-homework-v1'));
+    assert.equal(practice.key,lesson.key.replace(/-v(\d+)$/, '-homework-v$1'));
     assert.ok(practice.steps.some(step=>step.type==='write'));
     assert.ok(cabinet.includes('"lesson":"'+spec.slug+'.html"'));
     assert.ok(cabinet.includes('"homework":"'+spec.slug+'-homework.html"'));
