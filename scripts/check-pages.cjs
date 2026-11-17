@@ -14,6 +14,46 @@ const server = createServer(async (req, res) => {
   } catch { res.writeHead(404).end(); }
 });
 
+async function checkThreeProgressMeLessons() {
+  const specs = [
+    {course:'country-house',slug:'country-house-a2-04',title:'A Sunday Picnic Plan',level:'A2',words:6,stages:7},
+    {course:'art-b1',slug:'art-b1-03',title:'The Gallery Makeover',level:'B1',words:6,stages:7},
+    {course:'business-ai',slug:'business-ai-b2c1-03',title:'When the AI Rollout Goes Wrong',level:'B2',words:8,stages:8},
+  ];
+  const sync=await readFile('./assets/gostudy-sync.js','utf8');
+  for (const spec of specs) {
+    const path='./'+spec.slug+'.html';
+    const source=await readFile(path,'utf8');
+    const homework=await readFile('./'+spec.slug+'-homework.html','utf8');
+    const cabinet=await readFile('./student-'+(spec.course==='country-house'?'country-house':spec.course==='art-b1'?'art-b1':'business-ai')+'.html','utf8');
+    const readConfig = html => JSON.parse(html.split('<script type="application/json" id="lesson-data">')[1]?.split('</script>')[0]||'{}');
+    const lesson=readConfig(source),practice=readConfig(homework);
+    assert.equal(lesson.title,spec.title);
+    assert.equal(lesson.course,spec.course);
+    assert.equal(lesson.durationMinutes,50);
+    assert.equal(lesson.steps.length,spec.stages);
+    assert.equal(lesson.steps.reduce((sum,step)=>sum+step.minutes,0),50);
+    assert.equal(lesson.steps.filter(step=>step.type==='match')[0].items.length,spec.words);
+    assert.ok(lesson.steps.some(step=>step.title.includes('01 ·')),'Lead-in present');
+    assert.ok(lesson.steps.some(step=>/SPEAK|ROLE|NEGOTIAT|INDEPENDENT/i.test(step.instruction)),'Production phase required');
+    assert.ok(lesson.steps.at(-1).instruction.includes('WRAP-UP'));
+    assert.ok(lesson.steps.every(step=>!!step.teacherNotes));
+    assert.equal(practice.key,lesson.key.replace('-v1','-homework-v1'));
+    assert.ok(practice.steps.some(step=>step.type==='write'));
+    assert.ok(cabinet.includes('"lesson":"'+spec.slug+'.html"'));
+    assert.ok(cabinet.includes('"homework":"'+spec.slug+'-homework.html"'));
+    assert.ok(sync.includes(spec.slug+'.html') && sync.includes(spec.slug+'-homework.html'));
+    for (const config of [lesson,practice]) for (const step of config.steps) {
+      if (['choice','gap','match'].includes(step.type)) {
+        for (const q of step.items) assert.ok(Number.isInteger(q[2]) && q[2]>=0 && q[2]<q[1].length,
+          'Invalid answer key: '+spec.slug+' '+step.title);
+      }
+      if (step.type==='order') assert.deepEqual(step.order.slice().sort((a,b)=>a-b),Array.from({length:step.items.length},(_,i)=>i));
+    }
+  }
+  console.log('Three 50-minute ProgressMe-structured follow-up lessons and homework validated');
+}
+
 async function checkTravelB2LessonMethodology() {
   const lessonHtml = await readFile('./travel-b2-04.html','utf8');
   const homeworkHtml = await readFile('./travel-b2-04-practice.html','utf8');
@@ -120,24 +160,24 @@ async function checkMigratedRooms(browser, origin) {
   for (const lesson of [
   {
     "course": "country-house",
-    "path": "country-house-a2-03.html",
+    "path": "country-house-a2-04.html",
     "cab": "student-country-house.html",
     "student": "Ирина",
-    "title": "Before the Rain Comes"
+    "title": "A Sunday Picnic Plan"
   },
   {
     "course": "art-b1",
-    "path": "art-b1-02.html",
+    "path": "art-b1-03.html",
     "cab": "student-art-b1.html",
     "student": "Анастасия",
-    "title": "Every picture has a story"
+    "title": "The Gallery Makeover"
   },
   {
     "course": "business-ai",
-    "path": "business-ai-b2c1-02.html",
+    "path": "business-ai-b2c1-03.html",
     "cab": "student-business-ai.html",
     "student": "Влад",
-    "title": "From AI Pilot to Rollout"
+    "title": "When the AI Rollout Goes Wrong"
   }
 ]) {
     const events = [];
@@ -209,12 +249,12 @@ async function checkMigratedRooms(browser, origin) {
           throw new Error('Art navigation: '+JSON.stringify({errors,events,student:await sp.locator('.page.active h2').first().textContent(),teacher:await tp.locator('.page.active h2').first().textContent()}),{cause:error});
         }
         await sp.locator('#v1').locator('summary').click();
-        await sp.locator('#v1').getByRole('button',{name:'the focal point',exact:true}).click();
+        await sp.locator('#v1').getByRole('button',{name:'show a painting or object publicly',exact:true}).click();
         await tp.locator('#v1.correct').waitFor();
         await tp.getByRole('button',{name:'Сбросить ответы'}).click();
         await sp.locator('#v1 summary').filter({hasText:'Выберите'}).waitFor();
         await tp.locator('#v1').locator('summary').click();
-        await tp.locator('#v1').getByRole('button',{name:'the focal point',exact:true}).click();
+        await tp.locator('#v1').getByRole('button',{name:'show a painting or object publicly',exact:true}).click();
         await sp.locator('#v1.correct').waitFor();
         await tp.getByRole('button',{name:'Dictionary'}).click();
         await tp.locator('#dictionarySource').fill('shared entry');
@@ -244,7 +284,7 @@ async function checkMigratedRooms(browser, origin) {
       if (lesson.course === 'business-ai') {
         const gap = await sp.locator('#lesson-data').evaluate(node => {
           const lesson = JSON.parse(node.textContent);
-          return lesson.steps.findIndex(step => step.type === 'gap' && step.items.some(item => item[1].includes('suggests')));
+          return lesson.steps.findIndex(step => step.type === 'gap' && step.items.some(item => item[1].includes('unless')));
         });
         assert.ok(gap >= 0);
         await sp.locator('.lesson-section-menu summary').click();
@@ -252,12 +292,12 @@ async function checkMigratedRooms(browser, origin) {
         const active = '.page.active';
         const picker = sp.locator(active+' .definition-picker').first();
         await picker.locator('summary').click();
-        await picker.getByRole('button',{name:'suggests',exact:true}).click();
-        await tp.locator(active+' .definition-picker summary').first().filter({hasText:'suggests'}).waitFor();
+        await picker.getByRole('button',{name:'unless',exact:true}).click();
+        await tp.locator(active+' .definition-picker summary').first().filter({hasText:'unless'}).waitFor();
         assert.equal(await sp.locator(active+' select').count(),0);
         await sp.setViewportSize({width:390,height:844});
         await picker.locator('summary').click();
-        await picker.getByRole('button',{name:'suggests',exact:true}).waitFor();
+        await picker.getByRole('button',{name:'unless',exact:true}).waitFor();
         await picker.locator('summary').press('Escape');
         assert.equal(await picker.getAttribute('open'),null);
       }
@@ -443,6 +483,7 @@ async function checkFinanceRoom(browser, origin) {
 }
 
 async function main() {
+  await checkThreeProgressMeLessons();
   await checkTravelB2LessonMethodology();
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const browser = await chromium.launch(process.env.GOSTUDY_CHROME ? {executablePath: process.env.GOSTUDY_CHROME} : {});
