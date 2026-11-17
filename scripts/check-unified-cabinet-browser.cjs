@@ -110,7 +110,42 @@ async function run(){
       finance:[{student_id:other}],
       expectEmpty:true
     });
-    console.log('Unified cabinet browser smoke: placement, finance, disabled/published homework, ambiguous assignments and foreign-user isolation PASS');
+
+    // Teacher name editor is shared across courses and writes only via authenticated RLS API.
+    async function checkTeacherProfileEditor(){
+      const page=await browser.newPage();
+      const studentId='11111111-1111-4111-8111-111111111111';
+      await page.setContent('<form id="teacher-profile-name-form" hidden><input id="teacher-profile-name"><button type="submit">Сохранить</button><p id="teacher-profile-name-status"></p></form><p id="teacher-profile-name-placeholder"></p>');
+      await page.evaluate(id=>{
+        window.__profilePatches=[];
+        window.GoStudyAuth={
+          token:async()=> 'synthetic-teacher-token',
+          request:async(url,options,jwt)=>{
+            if(jwt!=='synthetic-teacher-token')return {ok:false,status:401};
+            if(options?.method==='PATCH'){
+              window.__profilePatches.push({url,body:options.body});
+              return {ok:true,status:200,data:[{user_id:id,display_name:options.body.display_name}]};
+            }
+            return {ok:true,status:200,data:[{user_id:id,display_name:'Ученик'}]};
+          }
+        };
+      },studentId);
+      await page.addScriptTag({path:path.join(root,'assets/gostudy-teacher-profile.js')});
+      await page.evaluate(id=>document.dispatchEvent(new CustomEvent('gostudy-teacher-student-selected',{detail:{studentId:id}})),studentId);
+      await page.waitForFunction(()=>!document.getElementById('teacher-profile-name-form').hidden);
+      assert.equal(await page.locator('#teacher-profile-name').inputValue(),'','Unknown name should be empty input');
+      await page.locator('#teacher-profile-name').fill('Алла');
+      await page.locator('#teacher-profile-name-form button').click();
+      await page.waitForFunction(()=>document.getElementById('teacher-profile-name-status').textContent.includes('Имя сохранено'));
+      const patches=await page.evaluate(()=>window.__profilePatches);
+      assert.equal(patches.length,1,'Exactly one name update');
+      assert.equal(patches[0].body.display_name,'Алла','New name reaches protected profile API');
+      assert.match(patches[0].url,/gostudy_profiles\?user_id=eq\./,'Update uses student-id filter');
+      await page.close();
+    }
+    await checkTeacherProfileEditor();
+
+    console.log('Unified cabinet browser smoke: placement, finance, disabled/published homework, ambiguous assignments and foreign-user isolation + teacher name editor PASS');
   }finally{
     await browser.close();
     await new Promise(resolve=>server.close(resolve));
