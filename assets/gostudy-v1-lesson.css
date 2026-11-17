@@ -398,3 +398,23 @@ body[data-classroom-course] .grammar-example{margin:0 0 8px}
 .unified-order li { padding:6px 0; }
 .unified-order button { margin-left:5px; padding:3px 8px; }
 @media(max-width:800px) { .lesson-section-menu { margin-bottom:0; } }
+
+
+/* Shared homework controls: only rendered for the authenticated teacher. */
+.homework-exercise-menu{position:relative;float:right;margin:0 0 5px 12px;z-index:3}
+.homework-exercise-menu summary{list-style:none;border:1px solid #d5e1f3;border-radius:9px;background:#f7faff;color:#245b9d;font-weight:700;cursor:pointer;padding:2px 10px;font-size:21px}
+.homework-exercise-menu summary::-webkit-details-marker{display:none}
+.homework-exercise-menu button{display:block;white-space:normal;text-align:left;background:#fff;border:1px solid #d7e4f5;border-radius:9px;box-shadow:0 8px 25px #17365722;color:#183b6c;padding:10px;min-width:210px;cursor:pointer}
+.homework-teacher-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0;padding:12px;border:1px solid #d6e4f6;border-radius:12px;background:#f7faff}
+.homework-teacher-actions a,.homework-teacher-actions button{border:1px solid #c9d9f0;border-radius:8px;background:#fff;color:#214e91;text-decoration:none;padding:8px 12px;cursor:pointer;font:inherit;font-size:12px}
+.homework-teacher-actions button{background:#2266c5;color:#fff}
+.homework-teacher-actions button:disabled{opacity:.5;cursor:not-allowed}
+.homework-draft-status{margin:0;font-size:12px;color:#55718e}
+.finance-chat{display:flex;flex-direction:column;min-height:260px}
+#finance-messages{flex:1;min-height:100px;max-height:310px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:12px!important;list-style:none;margin:0;background:#f3f7fc;border-radius:12px}
+#finance-messages li{display:flex;flex-direction:column;align-self:flex-start;max-width:87%;background:white;border-radius:14px 14px 14px 4px;padding:8px 11px;box-shadow:0 1px 3px #1a355014;overflow-wrap:anywhere}
+#finance-messages li.chat-own{align-self:flex-end;background:#d8f4df;border-radius:14px 14px 4px 14px}
+#finance-messages li strong{display:none!important}
+#finance-messages li .chat-time{font-size:10px;color:#688096;align-self:flex-end;margin-top:2px}
+#finance-chat-form{display:flex;align-items:center;gap:6px;margin-top:9px}
+#finance-chat-form input{min-width:0;flex:1;font-size:16px}
