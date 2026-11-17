@@ -222,6 +222,8 @@
     return refreshInFlight;
   }
 
+  // One shared, role-neutral access facade for teacher and student platform components.
+  window.GoStudyAuth = Object.freeze({token, request, userId: () => session?.user?.id || null});
   if (document.body?.hasAttribute('data-finance-live')) {
     window.GoStudyFinanceAuth = {token, request, userId: () => session?.user?.id, classroomStudent};
     if (!document.body.hasAttribute("data-preserve-workbook-progress")) return;
@@ -1296,6 +1298,8 @@
     function renderStudent() {
       renderStudentList();
       const student = students.find(row => row.selection === studentPicker.value);
+      // Shared event: role-specific profile editor never needs course-specific hooks.
+      document.dispatchEvent(new CustomEvent('gostudy-teacher-student-selected',{detail:{studentId:student?.id || null}}));
       wordForm.hidden = !student || student.course === withoutCourse || student.course === financeCourse || student.course === generalB2 || student.course === placement || ['travel_b2','art_b1','ielts_reading','sweden_a2','country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(student.course);
       wordItems(studentWords, student?.words);
       wordItems(assignedWords, student?.assigned);
