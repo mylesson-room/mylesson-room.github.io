@@ -242,20 +242,18 @@ async function checkMigratedRooms(browser, origin) {
       }
       await sp.getByRole('button',{name:'Continue',exact:true}).click();
       if (lesson.course === 'art-b1') {
-        try {
-          await sp.locator('#v1').waitFor({timeout:8000});
-          await tp.locator('#v1').waitFor({timeout:8000});
-        } catch (error) {
-          throw new Error('Art navigation: '+JSON.stringify({errors,events,student:await sp.locator('.page.active h2').first().textContent(),teacher:await tp.locator('.page.active h2').first().textContent()}),{cause:error});
-        }
-        await sp.locator('#v1').locator('summary').click();
-        await sp.locator('#v1').getByRole('button',{name:'show a painting or object publicly',exact:true}).click();
-        await tp.locator('#v1.correct').waitFor();
+        const studentPicker = sp.locator('.page.active .definition-picker').first();
+        const teacherPicker = tp.locator('.page.active .definition-picker').first();
+        await studentPicker.waitFor();
+        await teacherPicker.waitFor();
+        await studentPicker.locator('summary').click();
+        await studentPicker.getByRole('button',{name:'show a painting or object publicly',exact:true}).click();
+        await teacherPicker.locator('summary').filter({hasText:'show a painting or object publicly'}).waitFor();
         await tp.getByRole('button',{name:'Сбросить ответы'}).click();
-        await sp.locator('#v1 summary').filter({hasText:'Выберите'}).waitFor();
-        await tp.locator('#v1').locator('summary').click();
-        await tp.locator('#v1').getByRole('button',{name:'show a painting or object publicly',exact:true}).click();
-        await sp.locator('#v1.correct').waitFor();
+        await studentPicker.locator('summary').filter({hasText:/Choose|Выберите/}).waitFor();
+        await teacherPicker.locator('summary').click();
+        await teacherPicker.getByRole('button',{name:'show a painting or object publicly',exact:true}).click();
+        await studentPicker.locator('summary').filter({hasText:'show a painting or object publicly'}).waitFor();
         await tp.getByRole('button',{name:'Dictionary'}).click();
         await tp.locator('#dictionarySource').fill('shared entry');
         await tp.locator('#dictionaryTranslation').fill('общее слово');
