@@ -20,7 +20,7 @@ const pages=[
 ];
 function save(){
   try{localStorage.setItem(LOCAL,JSON.stringify(state));}catch(e){console.warn('Local save failed');}
-  const status=$('#gostudyLessonSaved');if(status)status.textContent='Сохранено в браузере';
+  const status=$('#gostudyLessonSaved');if(status){status.hidden=false;status.textContent='Сохранено в браузере';}
   clearTimeout(timer);timer=setTimeout(saveCloud,700);
 }
 async function saveCloud(){
@@ -29,11 +29,11 @@ async function saveCloud(){
   const current={page:state.page,answers:{...state.answers},prediction:state.prediction,reflection:state.reflection,checked:state.checked};
   const status=$('#gostudyLessonSaved');
   try{
-    const {error}=await auth.client().from('gostudy_progress').upsert(
-      {user_id:auth.userId(),lesson_key:SLUG,state:current,revision:revision+1},
-      {onConflict:'user_id,lesson_key'}
-    );
-    if(error)throw error;
+    const result=await auth.request('/rest/v1/gostudy_progress?on_conflict=user_id,lesson_key',{
+      method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},
+      body:{user_id:auth.userId(),lesson_key:SLUG,state:current,revision:revision+1}
+    });
+    if(!result.ok)throw Error('Не удалось синхронизировать прогресс ('+result.status+').');
     revision++;
     if(status)status.textContent='Сохранено в аккаунте ✓';
   }catch(e){if(status)status.textContent='Локально сохранено · облако недоступно';}
@@ -157,8 +157,9 @@ async function fetchCloud(){
  const local=getLocal(),userId=auth.userId();
  let saved=local;
  try{
-  const {data,error}=await auth.client().from('gostudy_progress').select('state,revision').eq('user_id',userId).eq('lesson_key',SLUG).maybeSingle();
-  if(error)throw error;
+  const result=await auth.request('/rest/v1/gostudy_progress?select=state,revision&user_id=eq.'+encodeURIComponent(userId)+'&lesson_key=eq.'+encodeURIComponent(SLUG));
+  if(!result.ok)throw Error('Не удалось получить прогресс ('+result.status+').');
+  const data=Array.isArray(result.data)?result.data[0]:null;
   if(data?.state){saved={...local,...data.state,answers:{...(local.answers||{}),...(data.state.answers||{})}};revision=data.revision||0;}
  }catch(error){console.warn('Cloud progress unavailable:',error.message);}
  state={page:0,answers:{},prediction:'',reflection:'',checked:false,...saved};
@@ -171,8 +172,9 @@ async function start(){
  if(booted||!auth.userId())return;booted=true;
  fail('Загружаем Ваш урок…');
  try{
-  const {data,error}=await auth.client().from('gostudy_private_lessons').select('lesson_payload').eq('slug',SLUG).maybeSingle();
-  if(error)throw error;
+  const result=await auth.request('/rest/v1/gostudy_private_lessons?select=lesson_payload&slug=eq.'+encodeURIComponent(SLUG));
+  if(!result.ok)throw Error('Ошибка доступа к материалам ('+result.status+').');
+  const data=Array.isArray(result.data)?result.data[0]:null;
   if(!data?.lesson_payload)throw Error('Нет доступа к материалам урока.');
   payload=data.lesson_payload;
   if(!Array.isArray(payload.questions)||!Array.isArray(payload.words))throw Error('Некорректный формат урока.');
@@ -182,6 +184,7 @@ async function start(){
   await loadScript('assets/gostudy-v1-lesson.js');
   const bar=$('.hero');if(bar)bar.insertAdjacentHTML('beforeend','<p>'+esc(payload.subtitle||'IELTS Reading')+'</p><div class="hero-chips"><span>IELTS Academic</span><span>50 минут</span><span>12 вопросов</span></div>');
   const section=$('#gostudyLessonLoad');if(section)section.hidden=true;
+  const accessLine=$('.classroom-access');if(accessLine)accessLine.hidden=true;
   bind();
  }catch(e){booted=false;fail('Не удалось открыть урок: '+e.message+' Проверьте вход и соединение.');}
 }
