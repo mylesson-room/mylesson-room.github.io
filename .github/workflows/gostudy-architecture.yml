@@ -1,0 +1,29 @@
+name: GoStudy Architecture Guard
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  shared-pages:
+    name: Verify shared components
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Verify GoStudy shared UI contract
+        run: node scripts/check-architecture.cjs
+      - name: Verify newly introduced student cabinets
+        shell: bash
+        run: |
+          git diff --diff-filter=A --name-only HEAD^ HEAD > /tmp/gostudy-added-pages.txt || true
+          GOSTUDY_CHANGED_FILES="$(cat /tmp/gostudy-added-pages.txt)" node scripts/check-architecture.cjs
