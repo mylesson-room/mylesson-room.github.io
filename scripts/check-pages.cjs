@@ -514,89 +514,61 @@ async function checkFinanceRoom(browser, origin) {
       await page.locator('#finance-messages').getByText('Сообщение преподавателя',{exact:true}).waitFor();
       assert.equal(await page.locator('#finance-messages .chat-own').count(),1,'Own messages must appear on the right');
     }
-    // Translation popup must survive a failed network request, then retry and reuse cached result.
-    await tp.route('https://api.mymemory.translated.net/**',route=>route.abort());
-    const selectCrisis=async()=>{
-      await tp.locator('.hero h1').evaluate(element=>{
-        const node=element.firstChild,word='financial crisis',start=node.textContent.indexOf(word);
-        if(start<0)throw Error('Translation probe phrase missing');
-        const range=document.createRange();range.setStart(node,start);range.setEnd(node,start+word.length);
-        window.getSelection().removeAllRanges();window.getSelection().addRange(range);
-        document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
-      });
-    };
-    await selectCrisis();
-    await tp.locator('#selectionRetry').waitFor({state:'visible',timeout:12000});
-    await tp.unroute('https://api.mymemory.translated.net/**');
-    await tp.route('https://api.mymemory.translated.net/**',route=>route.fulfill({
-      json:{responseData:{translatedText:'финансовый кризис'},responseStatus:200}
-    }));
-    assert.equal(await tp.locator('.video-help').count(),0,'Obsolete video-service explanation must not appear');
-    assert.equal(await tp.locator('#selectionSource').count(),0,'Extra lemma field must be removed');
-    assert.equal(await tp.locator('#selectionContext').count(),0,'Technical translated context must be removed');
-    assert.equal(await tp.locator('#selectionDirection').count(),0,'Direction header must not clutter compact popup');
-    await tp.locator('#selectionRetry').click();
-    await tp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value==='финансовый кризис' && document.querySelector('#selectionStatus')?.hidden);
-    await tp.keyboard.press('Escape');
-    await selectCrisis();
-    await tp.waitForFunction(()=>document.querySelector('#selectionTranslate')?.classList.contains('is-visible') && document.querySelector('#selectionTarget')?.value==='финансовый кризис' && document.querySelector('#selectionStatus')?.hidden);
-    await tp.locator('#selectionSave').click();
-    await sp.getByRole('button',{name:'Dictionary',exact:true}).click();
-    await sp.locator('#myWords').getByText('financial crisis',{exact:false}).waitFor();
-    await sp.getByRole('button',{name:'Close dictionary'}).click();
-    // Business context must be used for ambiguous words, but not displayed in the popup.
-    await tp.evaluate(()=>{
-      const p=document.createElement('p');
-      p.textContent='Our company director approved the finance report.';
-      document.querySelector('.lesson').append(p);
-      const node=p.firstChild,start=node.textContent.indexOf('director'),range=document.createRange();
-      range.setStart(node,start);range.setEnd(node,start+'director'.length);
-      window.getSelection().removeAllRanges();window.getSelection().addRange(range);
-      document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
-    });
-    await tp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value.startsWith('директор, руководитель'));
-    assert.equal(await tp.locator('#selectionContext').count(),0);
-    // The source provider returns "бетон" for isolated concrete. We MUST use
-    // the full sentence to choose the correct sense for the actual context.
-    await tp.unroute('https://api.mymemory.translated.net/**');
-    const contextualRequests=[];
-    const contextualSamples={
-      'I recommend concrete actions.':'Я рекомендую конкретные действия.',
-      'I recommend actions.':'Я рекомендую действия.',
-      'Builders poured concrete into the wall.':'Строители залили бетон в стену.',
-      'Builders poured into the wall.':'Строители залили в стену.',
-      'concrete':'бетон'
-    };
-    await tp.route('https://api.mymemory.translated.net/**',route=>{
-      const q=new URL(route.request().url()).searchParams.get('q');
-      contextualRequests.push(q);
-      return route.fulfill({json:{
-        responseStatus:200,
-        responseData:{translatedText:contextualSamples[q]||'бетон'}
-      }});
-    });
-    const selectContextual=async (sentence,word)=>{
+    // Pilot scope: Michael uses Google's web engine, other students stay unchanged.
+    assert.equal(await tp.locator('body').getAttribute('data-translate-engine'),'google-web-pilot');
+    await tp.route('https://translate.googleapis.com/**',route=>route.abort());
+    const selectPhrase=async (sentence,word)=>{
       await tp.evaluate(({sentence,word})=>{
         const element=document.createElement('p');element.textContent=sentence;
         document.querySelector('.lesson').append(element);
-        const text=element.firstChild,pos=text.textContent.indexOf(word),range=document.createRange();
-        range.setStart(text,pos);range.setEnd(text,pos+word.length);
+        const node=element.firstChild,start=node.textContent.indexOf(word),range=document.createRange();
+        range.setStart(node,start);range.setEnd(node,start+word.length);
         window.getSelection().removeAllRanges();window.getSelection().addRange(range);
         document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
       },{sentence,word});
     };
-    await selectContextual('I recommend concrete actions.','concrete');
-    await tp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value==='конкретные');
-    assert.ok(contextualRequests.includes('I recommend concrete actions.'),'Must translate the complete sentence');
-    assert.ok(contextualRequests.includes('I recommend actions.'),'Must compare against sentence without the selected word');
-    assert.ok(!contextualRequests.includes('concrete'),'Do not translate the isolated ambiguous word');
+    await selectPhrase('We should analyze financial crisis patterns.','financial crisis');
+    await tp.locator('#selectionRetry').waitFor({state:'visible',timeout:12000});
+    await tp.unroute('https://translate.googleapis.com/**');
+    const requests=[];
+    await tp.route('https://translate.googleapis.com/**',route=>{
+      const params=new URL(route.request().url()).searchParams;
+      const query=params.get('q');
+      requests.push(query);
+      assert.equal(params.get('client'),'gtx');
+      assert.equal(params.get('sl'),'en');
+      assert.equal(params.get('tl'),'ru');
+      const results={'financial crisis':'финансовый кризис','creative':'творческий'};
+      return route.fulfill({json:[[[results[query]||'перевод',query]],null,'en']});
+    });
+    assert.equal(await tp.locator('.video-help').count(),0);
+    assert.equal(await tp.locator('#selectionSource').count(),0);
+    assert.equal(await tp.locator('#selectionContext').count(),0);
+    await tp.locator('#selectionRetry').click();
+    await tp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value==='финансовый кризис');
+    await tp.keyboard.press('Escape');
+    await selectPhrase('We should analyze financial crisis patterns.','financial crisis');
+    await tp.waitForFunction(()=>document.querySelector('#selectionTranslate')?.classList.contains('is-visible') && document.querySelector('#selectionTarget')?.value==='финансовый кризис');
+    await tp.locator('#selectionSave').click();
+    await sp.getByRole('button',{name:'Dictionary',exact:true}).click();
+    await sp.locator('#myWords').getByText('financial crisis',{exact:false}).waitFor();
+    await sp.getByRole('button',{name:'Close dictionary'}).click();
+    await selectPhrase('Our company director approved the report.','director');
+    await tp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value.startsWith('директор, руководитель'));
+    await selectPhrase('I recommend concrete actions.','concrete');
+    await tp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value.startsWith('конкретные'));
     await tp.locator('#selectionSave').click();
     await sp.getByRole('button',{name:'Dictionary',exact:true}).click();
     await sp.locator('#myWords').getByText('конкретные',{exact:false}).waitFor();
     await sp.getByRole('button',{name:'Close dictionary'}).click();
-    await selectContextual('Builders poured concrete into the wall.','concrete');
-    await tp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value==='бетон');
-    assert.ok(contextualRequests.includes('Builders poured concrete into the wall.'));
+    await selectPhrase('Builders poured concrete into the wall.','concrete');
+    await tp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value.startsWith('бетон'));
+    await selectPhrase('We need to reach the target.','reach');
+    await tp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value.startsWith('достичь'));
+    await selectPhrase('A creative solution can work.','creative');
+    await tp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value==='творческий');
+    assert.ok(requests.includes('creative'),'Google pilot must translate an unknown selected word, not the whole sentence');
+    assert.ok(!requests.includes('We need to reach the target.'),'Google pilot must not translate whole sentences and attempt word diffs');
     // Manual bilingual entry also works after automatic translation is edited.
     await tp.getByRole('button',{name:'Dictionary',exact:true}).click();
     await tp.locator('#dictionarySource').fill('cash flow');
