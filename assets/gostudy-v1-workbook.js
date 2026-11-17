@@ -249,10 +249,10 @@ function gradeSection(key, animate = false){
     completed.add(key);
   }else completed.delete(key);
 }
-const sections = workbook?.sections || [
+const sections = (workbook?.sections || [
   [], checks.v.answers.map((_,i) => "v"+i), checks.read.answers.map((_,i) => "read"+i),
   checks.gap.answers.map((_,i) => "gap"+i), ["decision","decisionNotes"], ["roleNotes"], ["finalOpinion"], ["homework"]
-];
+]).slice(0,LESSONS.length);
 const sectionGrades = workbook ? [] : [null,"v","read","gap"];
 const allowedKeys = new Set(sections.flat());
 const pending = new Map();
