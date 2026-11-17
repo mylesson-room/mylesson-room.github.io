@@ -1173,7 +1173,7 @@
     const legacyTeacherCourses = new Set(['art_b1','ielts_reading','sweden_a2']);
     const teacherCatalog = {...classroomCatalog,
       art_b1:{name:'Art & Mosaics · B1',lessons:[{title:'Small pieces, big ideas',lesson:'art-mosaics-b1.html',homework:'art-b1-homework.html'},{title:'Every picture has a story',lesson:'art-b1-02.html',homework:'art-b1-02-homework.html'},{title:'The Gallery Makeover',lesson:'art-b1-03.html',lessonKey:'gostudy-art-b1-03-v1',homework:'art-b1-03-homework.html',homeworkKey:'gostudy-art-b1-03-homework-v1'}]},
-      ielts_reading:{name:'IELTS Reading',lessons:[{title:'IELTS Reading · Lesson 1',lesson:'ielts-reading-01.html',homework:'ielts-reading-01-homework.html'}]},
+      ielts_reading:{name:'IELTS Reading',lessons:[{title:'IELTS Reading · Lesson 1',lesson:'ielts-reading-01.html',homework:'ielts-reading-01-homework.html'},{number:4,title:'IELTS Academic Reading 04',lesson:'ielts-reading-04.html'}]},
       sweden_a2:{name:'Sweden · A2',lessons:[{title:'Sweden · Lesson 1',lesson:'sweden-a2.html',homework:'sweden-a2-01-homework.html'}]},
       [generalB2]:{name:'General English B2',lessons:[{title:'The Hidden Cost of Convenience',lesson:'general-english-b2-01.html',lessonKey:'gostudy-general-english-b2-01-v2',homework:'general-english-b2-01.html#homework'}]},
       [financeCourse]:{
@@ -1283,7 +1283,7 @@
         const row = document.createElement('li');
         const link = document.createElement('a');
         link.href = classroomLink(lesson.lesson,student.id);
-        link.textContent = 'Урок '+catalog.lessons.length+' · '+lesson.title;
+        link.textContent = 'Урок '+(lesson.number || catalog.lessons.length)+' · '+lesson.title;
         row.append(link);
         if (lesson.homework) {
           const homework = document.createElement('a');

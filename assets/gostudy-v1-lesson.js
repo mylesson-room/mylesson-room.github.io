@@ -96,3 +96,203 @@
   });
   window.GoStudyOptionPicker = {markup,show,bind};
 })();
+
+(() => {
+  function makeWord(source,translation) {
+     const a=String(source||"").trim(),b=String(translation||"").trim();
+     if(!a||!b)return null;
+     return /[А-Яа-яЁё]/.test(a)?{en:b,ru:a}:{en:a,ru:b};
+  }
+
+  function bindDivider() {
+    const lessonDivider = document.querySelector('#lessonDivider');
+    const layout = document.querySelector('.layout');
+    function changeVideoWidth(percent) {
+      const width = Math.max(22, Math.min(55, percent));
+      layout.style.setProperty("--video-width", width + "%");
+      lessonDivider.setAttribute("aria-valuenow", String(Math.round(width)));
+    }
+    lessonDivider.addEventListener("pointerdown", event => {
+      if (event.button !== 0) return;
+      lessonDivider.setPointerCapture(event.pointerId);
+      layout.classList.add("is-resizing");
+    });
+    lessonDivider.addEventListener("pointermove", event => {
+      if (!lessonDivider.hasPointerCapture(event.pointerId)) return;
+      const area = layout.getBoundingClientRect();
+      changeVideoWidth((event.clientX - area.left) / area.width * 100);
+    });
+    lessonDivider.addEventListener("lostpointercapture", () => layout.classList.remove("is-resizing"));
+    lessonDivider.addEventListener("keydown", event => {
+      const step = {ArrowLeft: -2, ArrowRight: 2}[event.key];
+      if (!step) return;
+      event.preventDefault();
+      changeVideoWidth(Number(lessonDivider.getAttribute("aria-valuenow")) + step);
+    });
+  }
+
+  function bindChat() {
+    const $ = selector => document.querySelector(selector);
+    document.addEventListener("finance-ready",()=>{
+      document.querySelectorAll("#finance-chat-form input,#finance-chat-form button").forEach(control=>{control.disabled=false});
+      $(".finance-login").hidden=true;
+    });
+    document.addEventListener("finance-event",event=>{
+      const {kind,payload,own}=event.detail;
+      if(kind==="chat" && typeof payload?.text==="string"){
+        const message=document.createElement("li");
+        if(own)message.classList.add("chat-own");
+        const body=document.createElement("span");
+        body.textContent=payload.text;
+        const time=document.createElement("time");
+        time.className="chat-time";
+        const stamp=event.detail.created_at || payload.sentAt;
+        if(stamp && !Number.isNaN(Date.parse(stamp))){
+          time.dateTime=stamp;
+          time.textContent=new Intl.DateTimeFormat("ru-RU",{hour:"2-digit",minute:"2-digit"}).format(new Date(stamp));
+        }
+        message.append(body,time);
+        const list=$("#finance-messages");
+        list.append(message);
+        list.scrollTop=list.scrollHeight;
+      }
+    });
+    $("#finance-chat-form").addEventListener("submit",event=>{
+      event.preventDefault();
+      const input=event.currentTarget.querySelector("input");
+      const value=input.value.trim();
+      if(value && window.FinanceLive?.send("chat",{text:value,sentAt:new Date().toISOString()}))input.value="";
+    });
+  }
+
+  function bindTranslation(config,saveVocabulary) {
+     const byId=id=>document.getElementById(id);
+     const pop=byId('selectionTranslate'),target=byId('selectionTarget'),source=byId('selectionSource');
+     const status=byId('selectionStatus'),contextEl=byId('selectionContext'),directionEl=byId('selectionDirection');
+     const swap=byId('selectionSwap'),retry=byId('selectionRetry'),google=byId('selectionGoogle'),saveBtn=byId('selectionSave');
+     let range=null,phrase='',sentence='',from='en',to='ru',controller=null,seq=0,timer=0,edited=false;
+     saveBtn.hidden=!saveVocabulary;
+     const canSave=()=>Boolean(saveVocabulary && target.value.trim() && source.value.trim());
+     const cacheKey='gostudy-context-translations-v1';
+     let cache={};try{cache=JSON.parse(localStorage.getItem(cacheKey)||'{}')}catch{}
+     const clean=x=>String(x||'').replace(/\s+/g,' ').trim().slice(0,1000);
+     const cacheId=()=>[from,to,phrase.toLowerCase(),sentence.toLowerCase().slice(0,250)].join('|');
+     const known=new Map((config.vocab||[]).map(x=>[x[0].toLowerCase(),x[2]]));
+     for(const x of config.lessonWords||[])if(x?.en&&x?.ru)known.set(x.en.toLowerCase(),x.ru);
+     const acronym=new Set(['AI','CEO','CFO','EU','UK','USA','ROI','GDP','API','IELTS','B2']);
+     const natural=x=>{
+      const t=clean(x);if(!t)return t;
+      if(t===t.toUpperCase() && /[A-ZА-ЯЁ]/.test(t) && !acronym.has(t) && t.length>4)return t.toLocaleLowerCase();
+      return t;
+     };
+     const lemma=x=>{
+      const w=natural(x);
+      if(/\s/.test(w))return w;
+      const exceptions={forecasted:'forecast',statements:'statement',forecasts:'forecast',payments:'payment',risks:'risk',predictions:'prediction',companies:'company',went:'go',made:'make',took:'take'};
+      return exceptions[w.toLowerCase()]||w;
+     };
+     const isEligible=n=>{const e=n?.nodeType===1?n:n?.parentElement;return !!e?.closest('.lesson')&&!e.closest('textarea,input,select,button,a,.selection-translate')};
+     function contextFor(r){
+      const e=r.commonAncestorContainer.nodeType===1?r.commonAncestorContainer:r.commonAncestorContainer.parentElement;
+      const t=clean(e?.closest('p,li,article,.term,.question-item,.gap-item')?.textContent||e?.parentElement?.textContent||'');
+      if(t.length<280)return t;
+      const at=t.toLowerCase().indexOf(phrase.toLowerCase());
+      return t.slice(Math.max(0,at-100),Math.max(0,at-100)+260);
+     }
+     function locate(){
+      if(!range||!pop.classList.contains('is-visible'))return;
+      const rect=range.getBoundingClientRect(),margin=10;
+      const header=document.querySelector('header')?.getBoundingClientRect().bottom||0;
+      const pager=document.querySelector('.pager')?.getBoundingClientRect().top||innerHeight;
+      const width=pop.offsetWidth;
+      pop.style.left=Math.round(Math.max(margin,Math.min(innerWidth-width-margin,rect.left)))+'px';
+      pop.style.maxHeight=Math.max(150,pager-header-25)+'px';
+      const below=pager-rect.bottom-8,above=rect.top-header-8;
+      pop.style.top=Math.round(below>pop.offsetHeight||below>=above?rect.bottom+8:Math.max(header+8,rect.top-pop.offsetHeight-8))+'px';
+     }
+     function showStatus(t){status.textContent=t;}
+     function hide(){pop.classList.remove('is-visible');range=null;controller?.abort();seq++;}
+     const fetchTranslation=async(q,signal)=>{
+      const response=await fetch('https://api.mymemory.translated.net/get?'+new URLSearchParams({q,langpair:from+'|'+to}),{signal});
+      if(!response.ok)throw Error('HTTP '+response.status);
+      const data=await response.json(),result=natural(data?.responseData?.translatedText);
+      if(!result||Number(data?.responseStatus||0)>=400||/QUERY LENGTH LIMIT|MYMEMORY WARNING/i.test(result))throw Error('Translation unavailable');
+      return result;
+     };
+     async function translate(){
+      controller?.abort();const id=++seq;controller=new AbortController();
+      const active=controller,signal=active.signal,timeout=setTimeout(()=>active.abort(),8000);
+      directionEl.textContent=from.toUpperCase()+' → '+to.toUpperCase();
+      google.href='https://translate.google.com/?'+new URLSearchParams({sl:from,tl:to,text:phrase,op:'translate'});
+      google.hidden=true;retry.hidden=true;
+      const key=cacheId(),cached=cache[key];
+      if(cached){if(!edited)target.value=cached.value;contextEl.textContent=cached.context||'';saveBtn.disabled=!canSave();showStatus('Перевод из кеша');clearTimeout(timeout);return;}
+      const dictionary=from==='en'?known.get(phrase.toLowerCase()):null;
+      const polysemy={
+        statement:[[/\b(bank|account|monthly|sent)\b/i,'выписка, заявление, утверждение'],[/.*/,'заявление, утверждение, выписка']],
+        bank:[[/\briver\b/i,'берег, банк'],[/.*/,'банк, берег']],
+        charge:[[/\b(delivery|fee|pay|cost|service)\b/i,'плата, заряд, обвинение'],[/.*/,'заряд, плата, обвинение']],
+        interest:[[/\b(rate|loan|credit|bank)\b/i,'процент, интерес, заинтересованность'],[/.*/,'интерес, процент, заинтересованность']],
+        balance:[[/\b(cash|account|bank|payment)\b/i,'остаток, баланс, равновесие'],[/.*/,'баланс, равновесие, остаток']],
+        capital:[[/\b(investment|financial|raise|business)\b/i,'капитал, столица, заглавная буква'],[/.*/,'столица, капитал, заглавная буква']]
+      };
+      const special=from==='en' ? polysemy[phrase.toLowerCase()]?.find(([pattern])=>pattern.test(sentence))?.[1] : null;
+      if(dictionary||special){
+       const value=special||dictionary;
+       if(!edited)target.value=value;
+       saveBtn.disabled=!canSave();
+       showStatus('Перевод из словаря урока · учитываем контекст');
+       cache[key]={value,context:''};try{localStorage.setItem(cacheKey,JSON.stringify(cache))}catch{}
+       clearTimeout(timeout);return;
+      }
+      showStatus('Переводим…');contextEl.textContent='';
+      try{
+       const [word,whole]=await Promise.allSettled([fetchTranslation(phrase,signal),sentence&&sentence!==phrase?fetchTranslation(sentence.slice(0,450),signal):Promise.resolve('')]);
+       if(id!==seq)return;
+       if(word.status!=='fulfilled')throw word.reason;
+       if(!edited)target.value=word.value;
+       const translatedContext=whole.status==='fulfilled'&&whole.value?'Контекст: '+whole.value:'';
+       contextEl.textContent=translatedContext;
+       saveBtn.disabled=!canSave();
+       showStatus('Перевод выделения · проверьте значение в контексте');
+       cache[key]={value:word.value,context:translatedContext};
+       const entries=Object.entries(cache).slice(-80);cache=Object.fromEntries(entries);
+       try{localStorage.setItem(cacheKey,JSON.stringify(cache))}catch{}
+      }catch(e){
+       if(id!==seq)return;
+       showStatus('Нет ответа от переводчика. Можно ввести перевод вручную.');
+       retry.hidden=false;google.hidden=false;
+      }finally{clearTimeout(timeout);locate();}
+     }
+     function selectionOpen(){
+      const sel=window.getSelection();
+      if(!sel||sel.isCollapsed||!sel.rangeCount||!isEligible(sel.anchorNode)||!isEligible(sel.focusNode))return;
+      const selected=clean(sel.toString());if(!selected)return;
+      const r=sel.getRangeAt(0);
+      if(range&&phrase===selected&&range.compareBoundaryPoints(Range.START_TO_START,r)===0&&range.compareBoundaryPoints(Range.END_TO_END,r)===0)return;
+      range=r.cloneRange();phrase=selected;sentence=contextFor(r);
+      from=/[А-Яа-яЁё]/.test(phrase)?'ru':'en';to=from==='en'?'ru':'en';
+      saveBtn.textContent='+';source.value=lemma(phrase);target.value='';edited=false;saveBtn.disabled=true;
+      contextEl.textContent='';showStatus('Переводим…');retry.hidden=true;google.hidden=true;
+      pop.classList.add('is-visible');locate();translate();
+     }
+     target.addEventListener('input',()=>{edited=true;saveBtn.disabled=!canSave();});
+     source.addEventListener('input',()=>{saveBtn.disabled=!canSave();});
+     swap.addEventListener('click',()=>{[from,to]=[to,from];edited=false;target.value='';translate();});
+     retry.addEventListener('click',()=>{edited=false;translate();});
+     const schedule=()=>{clearTimeout(timer);timer=setTimeout(selectionOpen,90);};
+     document.addEventListener('mouseup',e=>{if(!pop.contains(e.target))schedule()});
+     document.addEventListener('touchend',e=>{if(!pop.contains(e.target))setTimeout(selectionOpen,230)},{passive:true});
+     document.addEventListener('keyup',e=>{if(e.key==='Shift'||e.key.startsWith('Arrow'))schedule()});
+     document.addEventListener('scroll',locate,true);window.addEventListener('resize',locate);
+     document.addEventListener('keydown',e=>{if(e.key==='Escape')hide()});
+     document.addEventListener('pointerdown',e=>{if(pop.classList.contains('is-visible')&&!pop.contains(e.target))hide()});
+     document.querySelectorAll('#back,#next').forEach(el=>el.addEventListener('click',hide));
+     saveBtn.addEventListener('click',()=>{
+      const word=makeWord(source.value,target.value.trim());
+      if(word && saveVocabulary?.(word)){saveBtn.textContent='✓';saveBtn.disabled=true;}
+     });
+  }
+
+  window.GoStudyLessonControls = {makeWord,bindDivider,bindChat,bindTranslation};
+})();

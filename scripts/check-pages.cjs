@@ -648,7 +648,15 @@ async function checkFinanceHomework(browser,origin){
 
 
 async function checkDariaPrivateRoom(browser,origin) {
-  const user='6af5764c-487a-448f-a21e-8744dc5a2322';
+  const studentId='6af5764c-487a-448f-a21e-8744dc5a2322';
+  const teacherId='acf2f6a1-f38b-45ef-836d-6cc9a9a5a832';
+  const roomId='44444444-4444-4444-8444-444444444444';
+  const users={
+    student:{id:studentId,email:'daria@example.invalid'},
+    teacher:{id:teacherId,email:'teacher@example.invalid'},
+    outsider:{id:'55555555-5555-4555-8555-555555555555',email:'outsider@example.invalid'}
+  };
+  const roleFor=token=>Object.keys(users).find(role=>token==='Bearer test-'+role);
   const fixture={
     title:'After Dark: Who Owns the Night?',duration:50,subtitle:'An IELTS academic reading.',
     mission:'Which evidence should a city consider?',
@@ -663,37 +671,78 @@ async function checkDariaPrivateRoom(browser,origin) {
   };
   const saved=new Map();
   const words=new Map();
-  const context=await browser.newContext();
+  const events=[{seq:1,actor:teacherId,kind:'chat',payload:{text:'Ранее сохранённое сообщение'}}];
+  const translationRequests=[];
+  const context=await browser.newContext({viewport:{width:1360,height:900}});
+  const teacher=await browser.newContext();
+  const outsider=await browser.newContext();
   let contentFetches=0,logins=0;
-  await context.route('https://kawfqlohguwvmmplvrny.supabase.co/**',route=>{
+  const api=route=>{
     const req=route.request(),url=new URL(req.url()),path=url.pathname,method=req.method();
     const token=req.headers()['authorization'];
     const respond=(status,json)=>route.fulfill({status,contentType:'application/json',body:JSON.stringify(json)});
     if(path==='/auth/v1/token'&&url.searchParams.get('grant_type')==='password'){
       const values=req.postDataJSON();assert.equal(values.password,'test-password');
       logins++;
-      return respond(200,{user:{id:user,email:'daria@example.invalid'},access_token:'test-jwt',refresh_token:'refresh-test',expires_in:3600});
+      const role=Object.keys(users).find(role=>users[role].email===values.email);
+      assert.ok(role,'Unexpected login');
+      return respond(200,{user:users[role],access_token:'test-'+role,refresh_token:'refresh-test',expires_in:3600});
     }
-    if(path==='/auth/v1/user')return respond(token==='Bearer test-jwt'?200:401,token==='Bearer test-jwt'?{id:user,email:'daria@example.invalid'}:{message:'invalid'});
-    if(token!=='Bearer test-jwt')return respond(401,{message:'invalid'});
+    const role=roleFor(token),user=users[role];
+    if(!user)return respond(401,{message:'invalid'});
+    if(path==='/auth/v1/user')return respond(200,user);
+    if(path.endsWith('/gostudy_my_destinations'))return respond(200,role==='teacher'?[{course:'teacher'}]:[]);
+    if(path.endsWith('/gostudy_legacy_teacher_view') && req.postDataJSON().p_course==='ielts_reading'){
+      return respond(200,role==='teacher'?[{id:studentId,label:'Дарья'}]:[]);
+    }
     if(path.endsWith('/gostudy_private_lessons')){
       contentFetches++;
-      return respond(200,[{lesson_payload:fixture}]);
+      return respond(200,role==='outsider'?[]:[{lesson_payload:fixture}]);
+    }
+    if(path.endsWith('/gostudy_classroom_rooms')&&url.searchParams.get('course')==='eq.ielts-reading'){
+      assert.equal(url.searchParams.get('student_id'),'eq.'+studentId);
+      assert.equal(url.searchParams.get('lesson_path'),'eq.ielts-reading-04.html');
+      return respond(200,role==='outsider'?[]:[{id:roomId,student_id:studentId,teacher_id:teacherId}]);
+    }
+    if(path.endsWith('/gostudy_classroom_events')){
+      assert.equal(url.searchParams.get('room_id'),'eq.'+roomId);
+      const cursor=Number(url.searchParams.get('seq').slice(3));
+      return respond(200,role==='outsider'?[]:events.filter(event=>event.seq>cursor));
+    }
+    if(path.endsWith('/gostudy_classroom_send')){
+      const {p_room,p_kind,p_payload}=req.postDataJSON();
+      assert.equal(p_room,roomId);
+      assert.equal(p_kind,'chat');
+      if(role==='outsider')return respond(200,false);
+      events.push({seq:events.length+1,actor:user.id,kind:p_kind,payload:p_payload});
+      return respond(200,true);
     }
     if(path.endsWith('/gostudy_progress')){
-      if(method==='GET')return respond(200,[...saved.values()]);
-      const record=req.postDataJSON();saved.set(record.lesson_key,record);
+      if(method==='GET')return respond(200,[saved.get(user.id)].filter(Boolean));
+      const record=req.postDataJSON();
+      assert.equal(record.user_id,user.id);
+      assert.equal(record.lesson_key,'ielts-reading-04');
+      saved.set(user.id,record);
       return respond(201,[]);
     }
     if(path.endsWith('/gostudy_vocabulary_items')){
       if(method==='GET')return respond(200,[...words.values()]);
-      const values=req.postDataJSON();
-      for(const item of (Array.isArray(values)?values:[values]))words.set(item.word_key,item);
+      assert.equal(role,'student','Only the student should save words');
+      for(const item of req.postDataJSON())words.set(item.word_key,item);
       return respond(201,[]);
     }
     return respond(200,[]);
-  });
+  };
   try{
+    for(const session of [context,teacher,outsider]){
+      await session.route('https://kawfqlohguwvmmplvrny.supabase.co/**',api);
+      await session.route('https://api.mymemory.translated.net/**',route=>{
+        const request=new URL(route.request().url());
+        translationRequests.push(request.searchParams.get('q'));
+        assert.equal(request.searchParams.get('langpair'),'en|ru');
+        return route.fulfill({json:{responseStatus:200,responseData:{translatedText:'искусственное освещение'}}});
+      });
+    }
     const page=await context.newPage();
     await page.goto(origin+'/student-ielts-reading.html');
     await page.locator('#gostudyAccessGate:visible').waitFor();
@@ -711,22 +760,109 @@ async function checkDariaPrivateRoom(browser,origin) {
     assert.ok(await page.locator('.lesson-brand').isVisible(),'Shared lesson header missing');
     assert.equal(await page.locator('.gostudy-ielts-passage').count(),1,'RLS-sourced passage missing');
     assert.equal(contentFetches,1,'Private content should be requested once after login');
+    const teacherPage=await teacher.newPage();
+    await teacherPage.goto(origin+'/gostudy-teacher.html');
+    await teacherPage.locator('#teacher-email').fill(users.teacher.email);
+    await teacherPage.locator('#teacher-password').fill('test-password');
+    await teacherPage.locator('#teacher-login button').click();
+    const classroom=teacherPage.locator('.teacher-student-row').filter({hasText:'Дарья'}).getByRole('link',{name:/Войти в класс/});
+    await teacherPage.addInitScript(student=>{
+      if(location.pathname!=='/ielts-reading-04.html')return;
+      sessionStorage.setItem('gostudy-cloud-session-v1',JSON.stringify({
+        user:student,access_token:'test-student',expires_at:Date.now()+3600000
+      }));
+    },users.student);
+    await classroom.click();
+    await teacherPage.waitForURL(origin+'/ielts-reading-04.html?classStudent='+studentId);
+    for(const participant of [page,teacherPage]){
+      await participant.locator('#finance-live-status').getByText('Онлайн · общая комната').waitFor();
+      await participant.locator('#finance-messages').getByText('Ранее сохранённое сообщение').waitFor();
+    }
+    assert.equal(await teacherPage.locator('.lesson-brand').getAttribute('href'),
+      'gostudy-teacher.html?selected='+encodeURIComponent('ielts_reading:'+studentId));
+
+    async function sendMessage(participant,other,message){
+      const form=participant.locator('#finance-chat-form');
+      await form.getByRole('textbox').fill(message);
+      await form.getByRole('button').click();
+      await participant.locator('#finance-messages .chat-own').getByText(message,{exact:true}).waitFor();
+      await other.locator('#finance-messages li:not(.chat-own)').getByText(message,{exact:true}).waitFor();
+    }
+    await sendMessage(page,teacherPage,'Сообщение ученицы');
+    await sendMessage(teacherPage,page,'Ответ преподавателя');
+    assert.deepEqual(events.slice(1).map(event=>event.actor),[studentId,teacherId]);
+
+    const divider=page.locator('#lessonDivider');
+    const box=await divider.boundingBox();
+    const originalWidth=(await page.locator('#lessonVideo').boundingBox()).width;
+    await page.mouse.move(box.x+box.width/2,box.y+100);
+    await page.mouse.down();
+    await page.mouse.move(box.x+box.width/2+130,box.y+100,{steps:5});
+    await page.mouse.up();
+    assert.ok((await page.locator('#lessonVideo').boundingBox()).width>originalWidth+80,'Dragging should resize the video');
+    const dragged=Number(await divider.getAttribute('aria-valuenow'));
+    await divider.press('ArrowLeft');
+    assert.equal(Number(await divider.getAttribute('aria-valuenow')),dragged-2);
+
+    async function selectPhrase(participant,touch=false){
+      await participant.locator('.lesson-section-menu summary').click();
+      await participant.locator('#lessonSections [data-page="1"]').click();
+      const passage=participant.locator('.gostudy-ielts-passage p');
+      await passage.scrollIntoViewIfNeeded();
+      await passage.evaluate((element,touch)=>{
+        const node=element.lastChild;
+        const phrase='artificial lighting';
+        const start=node.textContent.indexOf(phrase);
+        const range=document.createRange();
+        range.setStart(node,start);
+        range.setEnd(node,start+phrase.length);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        element.dispatchEvent(new Event(touch?'touchend':'mouseup',{bubbles:true}));
+      },touch);
+      await participant.locator('#selectionTranslate').waitFor();
+      await participant.waitForFunction(()=>document.querySelector('#selectionTarget').value==='искусственное освещение');
+    }
+    await selectPhrase(page);
+    assert.ok(translationRequests.includes('artificial lighting'));
+    await page.locator('#selectionSave').click();
+    await page.locator('#selectionSave').getByText('✓').waitFor();
+    await page.keyboard.press('Escape');
+    await page.locator('#selectionTranslate').waitFor({state:'hidden'});
+    await teacherPage.setViewportSize({width:390,height:844});
+    assert.equal(await teacherPage.locator('#lessonDivider').isVisible(),false);
+    await selectPhrase(teacherPage,true);
+    assert.equal(await teacherPage.locator('#selectionSave').isVisible(),false);
+
     await page.locator('.lesson-section-menu summary').click();
     await page.locator('#lessonSections [data-page="2"]').click();
     await page.locator('#reading-answer-1').selectOption('A');
     await page.waitForTimeout(1600);
-    assert.equal(saved.get('ielts-reading-04')?.state.answers['1'],'A','Cloud answer was not persisted');
+    assert.equal(saved.get(studentId)?.state.answers['1'],'A','Cloud answer was not persisted');
     await page.locator('.lesson-section-menu summary').click();
     await page.locator('#lessonSections [data-page="6"]').click();
     await page.locator('#reading-words .term button').first().click();
     await page.waitForTimeout(1700);
     assert.ok(words.has('migration'),'Vocabulary did not synchronize to private cloud');
+    assert.equal(words.get('artificial lighting')?.russian,'искусственное освещение');
     await page.reload();
     await page.locator('#lessonPages>.page.active').waitFor();
     await page.locator('.lesson-section-menu summary').click();
     await page.locator('#lessonSections [data-page="2"]').click();
     assert.equal(await page.locator('#reading-answer-1').inputValue(),'A','Saved answer was not restored');
-    assert.ok(logins>=1,'Expected a real login request');
+    await page.locator('#finance-messages').getByText('Ответ преподавателя',{exact:true}).waitFor();
+    await page.locator('#gostudyAccessSignout').click();
+    await page.locator('#gostudyAccessGate:visible').waitFor();
+    assert.equal(await page.locator('#finance-messages').count(),0,'Signing out should remove chat history from the page');
+
+    const unrelated=await outsider.newPage();
+    await unrelated.goto(origin+'/ielts-reading-04.html');
+    await unrelated.locator('#gsEmail').fill(users.outsider.email);
+    await unrelated.locator('#gsPassword').fill('test-password');
+    await unrelated.locator('#gostudyAccessForm button').click();
+    await unrelated.getByText('У этого аккаунта нет доступа к данному кабинету.').waitFor();
+    assert.equal(await unrelated.locator('.layout').count(),0);
+    assert.equal(logins,3);
     const guest=await browser.newContext();
     try{
       await guest.route('https://kawfqlohguwvmmplvrny.supabase.co/**',route=>route.fulfill({status:401,contentType:'application/json',body:'{"message":"unauthorized"}'}));
@@ -737,8 +873,8 @@ async function checkDariaPrivateRoom(browser,origin) {
       assert.equal(await pp.locator('.gostudy-ielts-passage').count(),0,'Private passage exposed to guest');
       assert.equal(await pp.locator('.layout:visible').count(),0,'Private classroom exposed before login');
     }finally{await guest.close();}
-    console.log('Daria IELTS: shared components, private content gate, login, cloud answers and vocabulary verified in browser mocks');
-  }finally{await context.close();}
+    console.log('Daria IELTS: both roles, shared chat, split pane, contextual translation, cloud answers and vocabulary verified in browser mocks');
+  }finally{await Promise.all([context.close(),teacher.close(),outsider.close()]);}
 }
 
 async function main() {

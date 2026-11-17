@@ -3,12 +3,15 @@
 'use strict';
 const SLUG='ielts-reading-04',LOCAL='gostudy-ielts-reading-04-v1',WORD_KEY='gostudy-ielts-reading-01-v1';
 const auth=window.GoStudyPrivateAccess;
+const owner=document.body.dataset.vocabularyOwner;
+const isStudent=()=>auth.userId()===owner;
+const progressKey=()=>isStudent()?LOCAL:LOCAL+':'+auth.userId();
 let booted=false,payload=null,state={page:0,answers:{},prediction:'',reflection:'',checked:false},revision=0,timer=null,writing=false,dirty=false,retries=0;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const normalize=s=>String(s??'').toLowerCase().trim().replace(/\s+/g,' ');
 const $=s=>document.querySelector(s);
 const fail=s=>{const n=$('#gostudyLessonLoad');if(n)n.textContent=s;};
-const getLocal=()=>{try{return JSON.parse(localStorage.getItem(LOCAL)||'{}')||{};}catch{return {};}};
+const getLocal=()=>{try{return JSON.parse(localStorage.getItem(progressKey())||'{}')||{};}catch{return {};}};
 const pages=[
  {label:'Warm-up',minutes:5},
  {label:'Reading',minutes:13},
@@ -21,7 +24,7 @@ const pages=[
 function save(){
   state.updatedAt=Date.now();
   dirty=true;retries=0;
-  try{localStorage.setItem(LOCAL,JSON.stringify(state));}catch(e){console.warn('Local save failed');}
+  try{localStorage.setItem(progressKey(),JSON.stringify(state));}catch(e){console.warn('Local save failed');}
   const status=$('#gostudyLessonSaved');if(status){status.hidden=false;status.textContent='Сохранено в браузере';}
   clearTimeout(timer);timer=setTimeout(saveCloud,700);
 }
@@ -106,6 +109,7 @@ function savedWords(){
  try{const p=JSON.parse(localStorage.getItem(WORD_KEY)||'{}')||{};return Array.isArray(p.words)?p.words:[];}catch{return [];}
 }
 function addWord(en,ru){
+ if(!isStudent())return false;
  try{
   const p=JSON.parse(localStorage.getItem(WORD_KEY)||'{}')||{};const list=Array.isArray(p.words)?p.words:[];
   if(!list.some(w=>normalize(w.en)===normalize(en)))list.push({en,ru});
@@ -123,7 +127,7 @@ function renderWords(){
    const button=document.createElement('button');button.type='button';
    const added=list.some(w=>normalize(w.en)===normalize(en));
    button.textContent=added?'✓ Добавлено':'+ В словарь';button.disabled=added;button.onclick=()=>addWord(en,ru);
-   div.append(b,info,button);container.append(div);
+   div.append(b,info);if(isStudent())div.append(button);container.append(div);
   }
  }
  if(dict){dict.replaceChildren();for(const word of list){const row=document.createElement('div');row.className='term';const strong=document.createElement('strong');strong.textContent=word.en;const p=document.createElement('p');p.textContent=word.ru;row.append(strong,p);dict.append(row);}}
@@ -148,10 +152,16 @@ function bind(){
  const dictBtn=$('#openLessonDictionary'), dialog=$('#lessonDictionary');
  if(dictBtn&&dialog)dictBtn.addEventListener('click',()=>{renderWords();dialog.showModal();});
  const form=$('#dictionaryAddForm');
- if(form)form.addEventListener('submit',e=>{e.preventDefault();const source=$('#dictionarySource').value.trim(),translation=$('#dictionaryTranslation').value.trim();if(source&&translation&&addWord(source,translation))form.reset();});
- const chat=$('.finance-chat');if(chat){chat.querySelector('#finance-live-status').textContent='Чат этого курса пока не подключён';chat.querySelector('.finance-login')?.remove();}
- // The shared lesson shell is reused; keep unsupported controls non-interactive.
- const translate=$('#selectionTranslate');if(translate)translate.hidden=true;
+ form.hidden=!isStudent();
+ if(isStudent())form.addEventListener('submit',e=>{
+  e.preventDefault();
+  const word=window.GoStudyLessonControls.makeWord($('#dictionarySource').value,$('#dictionaryTranslation').value);
+  if(word&&addWord(word.en,word.ru))form.reset();
+ });
+ const controls=window.GoStudyLessonControls;
+ controls.bindDivider();
+ controls.bindChat();
+ controls.bindTranslation(window.GoStudyLesson,isStudent()?word=>addWord(word.en,word.ru):null);
  go(Number.isInteger(state.page)?state.page:0,false);
  if(state.checked)renderFeedback();
  renderWords();
@@ -187,16 +197,25 @@ async function start(){
   payload=data.lesson_payload;
   if(!Array.isArray(payload.questions)||!Array.isArray(payload.words))throw Error('Некорректный формат урока.');
   await fetchCloud();
-  const cfg={title:payload.title,hero:payload.title,cabinet:'student-ielts-reading.html',footer:'GoStudy · Original IELTS-style reading practice',pages:makePages()};
+  const cabinet=isStudent()?'student-ielts-reading.html':'gostudy-teacher.html?selected='+encodeURIComponent('ielts_reading:'+owner);
+  const cfg={
+   title:payload.title,hero:payload.title,cabinet,footer:'GoStudy · Original IELTS-style reading practice',pages:makePages(),
+   lessonWords:payload.words.map(([en,ru])=>({en,ru})),
+   privateRoom:{course:'ielts-reading',lesson:SLUG+'.html',student:owner}
+  };
   const script=document.createElement('script');script.type='application/json';script.id='lesson-data';script.textContent=JSON.stringify(cfg);document.body.append(script);
-  await loadScript('assets/gostudy-v1-lesson.js');
+  await loadScript(document.body.dataset.lessonScript);
   const bar=$('.hero');if(bar)bar.insertAdjacentHTML('beforeend','<p>'+esc(payload.subtitle||'IELTS Reading')+'</p><div class="hero-chips"><span>IELTS Academic</span><span>50 минут</span><span>12 вопросов</span></div>');
   const section=$('#gostudyLessonLoad');if(section)section.hidden=true;
   const accessLine=$('.classroom-access');if(accessLine)accessLine.hidden=true;
   bind();
+  loadScript(document.body.dataset.liveScript).catch(()=>{
+   $('#finance-live-status').textContent='Не удалось подключить чат. Обновите страницу.';
+  });
  }catch(e){booted=false;fail('Не удалось открыть урок: '+e.message+' Проверьте вход и соединение.');}
 }
 window.addEventListener('online',()=>{if(dirty&&auth.userId()){retries=0;saveCloud();}});
 document.addEventListener('gostudy-private-authorized',start);
+document.addEventListener('gostudy-private-signed-out',()=>location.reload());
 auth.ready.then(ok=>{if(ok)start();});
 })();

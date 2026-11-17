@@ -25,10 +25,14 @@ const show=ok=>{
 };
 function json(raw){try{return JSON.parse(raw||'null');}catch{return null;}}
 function getStored(){
+ const teacherEntry=document.body.hasAttribute('data-ielts-private-lesson') &&
+  new URLSearchParams(location.search).get('classStudent')===document.body.dataset.vocabularyOwner;
+ const teacher=[teacherKey,json(localStorage.getItem(teacherKey))];
  const list=[
+  ...(teacherEntry?[teacher]:[]),
   ['session',json(sessionStorage.getItem(sessionKey))],
   [studentKey,json(localStorage.getItem(studentKey))],
-  [teacherKey,json(localStorage.getItem(teacherKey))]
+  ...(!teacherEntry?[teacher]:[])
  ];
  for(const [key,value] of list)if(value?.access_token&&value?.user?.id){rememberedKey=key==='session'?null:key;return value;}
  return null;
@@ -92,7 +96,7 @@ form?.addEventListener('submit',async event=>{
 logout?.addEventListener('click',async()=>{
  logout.disabled=true;
  try{await request('/auth/v1/logout',{method:'POST'}).catch(()=>{});}
- finally{clearSession();show(false);text('Вы вышли из кабинета.');logout.disabled=false;}
+ finally{clearSession();show(false);text('Вы вышли из кабинета.');logout.disabled=false;document.dispatchEvent(new Event('gostudy-private-signed-out'));}
 });
 show(false);
 session=getStored();
