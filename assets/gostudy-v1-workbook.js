@@ -6,6 +6,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const workbook = config.steps ? window.GoStudyExercises.render(config,esc) : null;
 const student = window.GoStudyFinanceAuth.classroomStudent;
+const answerNamespace = typeof config.answerNamespace === 'string' ? config.answerNamespace : '';
 const stores = window.GoStudyStorage || localStorage;
 let cached = {};
 let state={page:0,values:{}};
@@ -259,7 +260,8 @@ function sendAnswer(key,value){
   if (!window.FinanceLive?.connected()) return;
   clearTimeout(pending.get(key)?.timer);
   const field = workbook?.fields.get(key);
-  const payload = field ? {page:field.page,key,value} : {key,value};
+  const wireKey = answerNamespace + key;
+  const payload = field ? {page:field.page,key:wireKey,value} : {key:wireKey,value};
   const typing = field ? workbook.controls.get(key)?.[0]?.tagName === 'TEXTAREA' :
     /^(gap\d+|decisionNotes|roleNotes|finalOpinion|homework)$/.test(key);
   if (!typing) {
@@ -312,7 +314,7 @@ sections.forEach((keys,page)=>{
   button.setAttribute("aria-label",button.title);
   button.addEventListener("click",()=>{
     clearSection(page);
-    window.FinanceLive?.send("reset",{page});
+    window.FinanceLive?.send("reset",{page,namespace:answerNamespace});
   });
   $("#page-"+page+" .activity-head").append(button);
 });
@@ -387,8 +389,9 @@ document.addEventListener("finance-ready",()=>{
 document.addEventListener("finance-event",event=>{
   const {kind,payload,initial,own,teacher}=event.detail;
   const role=teacher?"Преподаватель":"Ученик";
-  if(kind==="answer" && allowedKeys.has(payload.key) && (workbook ? workbook.valid(payload.key,payload.value) : typeof payload.value==="string")){
-    const key=payload.key;
+  const rawKey = typeof payload?.key === "string" ? payload.key : "";
+  const key = answerNamespace && rawKey.startsWith(answerNamespace) ? rawKey.slice(answerNamespace.length) : answerNamespace ? "" : rawKey;
+  if(kind==="answer" && allowedKeys.has(key) && (workbook ? workbook.valid(key,payload.value) : typeof payload.value==="string")){
     if(!pending.has(key)){
       state.values[key]=payload.value;
       redrawAnswer(key);
@@ -399,7 +402,7 @@ document.addEventListener("finance-event",event=>{
     }
     if(!initial && !own) $("#finance-activity").textContent=role+" изменил ответ";
   }
-  if(kind==="reset" && Number.isInteger(payload.page) && sections[payload.page]){
+  if(kind==="reset" && (payload.namespace || "") === answerNamespace && Number.isInteger(payload.page) && sections[payload.page]){
     clearSection(payload.page);
     if(!initial && !own) $("#finance-activity").textContent=role+" сбросил задание";
   }
