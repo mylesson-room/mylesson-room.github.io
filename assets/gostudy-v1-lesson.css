@@ -353,12 +353,13 @@ header{height:46px;padding:0 30px;border-bottom:1px solid #e4e8f2;box-shadow:0 2
 #moveStudent:hover{background:#dbe8ff}
 #moveStudent[hidden]{display:none!important}
 @media(max-width:600px){#moveStudent{font-size:12px;padding:8px 10px;line-height:1.3}}
+.dictionary-add-form[hidden]{display:none}
 .dictionary-add-form{display:grid;gap:8px;margin-bottom:15px}.dictionary-add-form input,.selection-translate textarea.selection-target{border:1px solid #cbdcf0;border-radius:10px;background:white;color:var(--ink);font:inherit;outline:0}.dictionary-add-form input{height:43px;width:100%;min-width:0;padding:10px 12px;font-size:14px}.dictionary-translation-row{display:flex;gap:8px}.dictionary-translation-row input{flex:1}.dictionary-translation-row button{width:44px;flex:none;border:0;border-radius:10px;background:#078fea;color:white;font-size:23px;font-weight:800}.selection-translate textarea.selection-target{width:100%;min-height:49px;padding:6px 8px;resize:vertical;font-size:14px;line-height:1.45}.dictionary-add-form input:focus,.selection-translate textarea.selection-target:focus{border-color:#158fdb;box-shadow:0 0 0 3px #159fe91a}
 
 body[data-classroom-course]:not(.classroom-authorized) > :is(header,.layout,.pager,.top,main,dialog){display:none!important}
 body[data-classroom-course] .classroom-access{margin:24px auto;max-width:640px;padding:0 20px}
 body[data-classroom-course] header .lesson-brand img{width:40px;height:31px;display:block}
-body[data-classroom-course] .finance-chat #finance-live-status{display:block!important}
+body:is([data-classroom-course],[data-ielts-private-lesson]) .finance-chat #finance-live-status{display:block!important}
 body[data-classroom-course] .grammar-example{margin:0 0 8px}
 
 .lesson-section-menu { margin:12px 0 0; padding:10px 12px; border:1px solid #e0e6ef; border-radius:12px; background:#fff; }
