@@ -421,11 +421,17 @@ document.addEventListener("finance-event",event=>{
   }
   if(kind==="chat" && typeof payload.text==="string"){
     const message=document.createElement("li");
-    const author=document.createElement("strong");
-    author.textContent=own?"Вы":role;
+    if(own)message.classList.add("chat-own");
     const body=document.createElement("span");
     body.textContent=payload.text;
-    message.append(author,body);
+    const time=document.createElement("time");
+    time.className="chat-time";
+    const stamp=event.detail.created_at || payload.sentAt;
+    if(stamp && !Number.isNaN(Date.parse(stamp))){
+      time.dateTime=stamp;
+      time.textContent=new Intl.DateTimeFormat("ru-RU",{hour:"2-digit",minute:"2-digit"}).format(new Date(stamp));
+    }
+    message.append(body,time);
     const list=$("#finance-messages");
     list.append(message);
     list.scrollTop=list.scrollHeight;
@@ -435,7 +441,7 @@ $("#finance-chat-form").addEventListener("submit",event=>{
   event.preventDefault();
   const input=event.currentTarget.querySelector("input");
   const value=input.value.trim();
-  if(value && window.FinanceLive?.send("chat",{text:value}))input.value="";
+  if(value && window.FinanceLive?.send("chat",{text:value,sentAt:new Date().toISOString()}))input.value="";
 });
 
 drawWords();go(location.hash === "#homework" ? LESSONS.length - 1 : state.page);
