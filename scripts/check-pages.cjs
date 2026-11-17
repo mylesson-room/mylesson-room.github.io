@@ -542,6 +542,81 @@ async function checkSharedComponentReversible(browser,origin){
   console.log('Shared style probe: Michael + Victoria received one reversible shared-component change; original CSS restored');
 }
 
+
+async function checkFinanceHomework(browser,origin){
+ const studentId='11111111-1111-4111-8111-111111111111',teacherId='22222222-2222-4222-8222-222222222222';
+ const lesson='business-ai-finance-b2-02.html',homework='business-ai-finance-b2-02-homework.html';
+ let draft=null,published=null;const answers=new Map();
+ const contexts=[];
+ const makeContext=async(id,role,mobile=false)=>{
+  const context=await browser.newContext(mobile?{viewport:{width:390,height:844},isMobile:true,hasTouch:true}:{});
+  contexts.push(context);
+  await context.addInitScript(({id,role})=>{
+   const session=JSON.stringify({user:{id},access_token:'test-'+role,expires_at:Date.now()+3600000});
+   sessionStorage.setItem('gostudy-cloud-session-v1',session);
+  },{id,role});
+  await context.route('https://*.supabase.co/**',route=>{
+   const request=route.request(),url=new URL(request.url()),method=request.method();
+   const body=method==='GET'?{}:request.postDataJSON();
+   const isTeacher=id===teacherId;
+   const ok=json=>route.fulfill({status:200,json});
+   if(url.pathname.endsWith('/gostudy_finance_room'))return ok([{teacher_id:teacherId,student_id:studentId}]);
+   if(url.pathname.endsWith('/gostudy_finance_events'))return ok([]);
+   if(url.pathname.endsWith('/gostudy_homework_assignments')){
+    if(method==='GET')return ok(isTeacher&&draft?[draft]:[]);
+    if(!isTeacher)return ok([]);
+    if(method==='POST')draft={...body};
+    if(method==='PATCH')draft={...draft,...body};
+    return ok([draft]);
+   }
+   if(url.pathname.endsWith('/gostudy_homework_published')){
+    if(method==='GET')return ok(published?[published]:[]);
+    if(!isTeacher)return ok([]);
+    if(method==='POST')published={...body};
+    if(method==='PATCH')published={...published,...body};
+    return ok([published]);
+   }
+   if(url.pathname.endsWith('/gostudy_homework_answers')){
+    if(method==='GET')return ok([...answers.entries()].map(([exercise_id,answer])=>({exercise_id,answer})));
+    if(!isTeacher&&method==='POST'){answers.set(body.exercise_id,body.answer);return ok([body]);}
+    return ok([]);
+   }
+   return ok([]);
+  });
+  return context;
+ };
+ try{
+  const tc=await makeContext(teacherId,'teacher'),sc=await makeContext(studentId,'student',true);
+  const teacher=await tc.newPage(),student=await sc.newPage();
+  await Promise.all([teacher.goto(origin+'/'+lesson+'?classStudent='+studentId),student.goto(origin+'/'+homework)]);
+  await student.locator('#homework-status').filter({hasText:'не опубликовано'}).waitFor();
+  await teacher.locator('.homework-teacher-actions').waitFor();
+  await teacher.getByRole('button',{name:'Continue',exact:true}).click();
+  const second=teacher.locator('#vocab .term').nth(1);
+  await second.locator('.homework-exercise-menu summary').click();
+  await second.getByRole('button',{name:'Добавить в домашнее задание'}).click();
+  await teacher.locator('.homework-draft-status').filter({hasText:'В черновике: 1'}).waitFor();
+  assert.deepEqual(draft.exercise_ids,['finance2-vocab-02'],'Only the second vocabulary exercise is assigned');
+  await second.locator('.homework-exercise-menu summary').click();
+  await second.getByRole('button',{name:/Добавить в домашнее задание|Добавлено/}).click();
+  assert.deepEqual(draft.exercise_ids,['finance2-vocab-02'],'Repeated assignment must not duplicate exercise');
+  await student.reload();
+  await student.locator('#homework-status').filter({hasText:'не опубликовано'}).waitFor();
+  await teacher.locator('.homework-publish').click();
+  await teacher.locator('.homework-draft-status').filter({hasText:'опубликовано'}).waitFor();
+  assert.deepEqual(published.exercise_ids,['finance2-vocab-02'],'Publishing must copy the draft');
+  await student.reload();
+  await student.locator('.homework-task').waitFor();
+  assert.equal(await student.locator('.homework-task').count(),1,'Student sees exactly one assigned exercise');
+  await student.locator('.homework-task select').selectOption({index:1});
+  await student.locator('.homework-task small').filter({hasText:'Сохранено'}).waitFor();
+  assert.ok(answers.has('finance2-vocab-02'),'Mobile homework answer persisted');
+  await student.reload();
+  assert.equal(await student.locator('.homework-task select').inputValue(),answers.get('finance2-vocab-02').value);
+  console.log('Finance homework: draft -> one exercise -> idempotent assignment -> student blocked -> publish -> mobile save/reload verified');
+ }finally{for(const context of contexts)await context.close();}
+}
+
 async function main() {
   await checkVictoriaB2Methodology();
   await checkThreeProgressMeLessons();
@@ -552,6 +627,7 @@ async function main() {
     const origin = 'http://127.0.0.1:' + server.address().port;
     await checkSharedComponentReversible(browser,origin);
     await checkFinanceRoom(browser, origin);
+    await checkFinanceHomework(browser,origin);
     await checkGeneralB2Room(browser, origin);
     await checkMigratedRooms(browser, origin);
     const source = await readFile('assets/gostudy-sync.js', 'utf8');
