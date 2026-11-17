@@ -291,12 +291,13 @@
         director:[[/\b(film|movie|cinema|theatre|scene|screenplay)\b/i,'режиссёр, директор, руководитель'],[/\b(company|board|chief|management|executive|finance|business|sales|department|report|appointed|CEO)\b/i,'директор, руководитель, режиссёр'],[/.*/,'директор, режиссёр, руководитель']],
         margin:[[/\b(profit|revenue|gross|sales|income|finance|business|cost)\b/i,'маржа, прибыльность, разница'],[/.*/,'поле, край, маржа']],
         return:[[/\b(investment|profit|ROI|fund|capital|annual|stock)\b/i,'доходность, возврат, возвращение'],[/.*/,'возвращение, возврат, доходность']],
-        board:[[/\b(directors|meeting|chair|company|executive|finance)\b/i,'совет директоров, правление, доска'],[/.*/,'доска, совет директоров, правление']]
+        board:[[/\b(directors|meeting|chair|company|executive|finance)\b/i,'совет директоров, правление, доска'],[/.*/,'доска, совет директоров, правление']],
+        concrete:[[/\b(actions?|steps?|plans?|examples?|recommendations?|measures?|details?|proposals?|results?|goals?|evidence|solutions?)\b/i,'конкретный, определённый, предметный'],[/\b(cement|pour|poured|building|construction|wall|floor|mix|material)\b/i,'бетон, бетонный, конкретный'],[/.*/,'конкретный, определённый, бетон']]
       };
       const special=from==='en' ? polysemy[phrase.toLowerCase()]?.find(([pattern])=>pattern.test(sentence))?.[1] : null;
       showStatus('Переводим…');
       try{
-       let result=await contextualTranslate(signal);
+       let result=special && phrase.toLowerCase()!=='concrete' ? {value:special,confidence:'curated'} : await contextualTranslate(signal);
        if(id!==seq)return;
        if(!result){
         const value=special||dictionary||await fetchTranslation(phrase,signal);
