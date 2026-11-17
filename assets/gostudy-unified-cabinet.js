@@ -26,9 +26,10 @@
   }
 
   // The source list is derived from authenticated room membership, never an HTML-stored student ID.
-  function assignmentsFromRooms(rooms, financeRooms) {
+  function assignmentsFromRooms(rooms, financeRooms, userId) {
     const found = new Map();
     for (const room of rooms) {
+      if (room.student_id !== userId) continue;
       const lesson = safeLessonPath(room.lesson_path);
       if (!lesson || found.has(lesson)) continue;
       found.set(lesson, {
@@ -38,10 +39,10 @@
         studentLabel: typeof room.student_label === 'string' ? room.student_label.trim().slice(0, 60) : ''
       });
     }
-    if (financeRooms.length) {
+    if (financeRooms.some(room => room.student_id === userId)) {
       const lesson = 'business-ai-finance-b2-02.html'; // Bridge to an existing historic course only.
       if (!found.has(lesson)) found.set(lesson, {
-        lesson, course: 'AI in Finance · B2', title: 'AI in Finance — Lesson 2', studentLabel: 'Михаил'
+        lesson, course: 'AI in Finance · B2', title: 'AI in Finance — Lesson 2', studentLabel: ''
       });
     }
     return [...found.values()];
@@ -158,11 +159,11 @@
     try {
       const id = encodeURIComponent(auth.userId());
       const [classrooms, finance, published] = await Promise.all([
-        readRows('/rest/v1/gostudy_classroom_rooms?select=course,lesson_path,student_label&student_id=eq.' + id),
+        readRows('/rest/v1/gostudy_classroom_rooms?select=student_id,course,lesson_path,student_label&student_id=eq.' + id),
         readRows('/rest/v1/gostudy_finance_room?select=student_id&student_id=eq.' + id),
         readRows('/rest/v1/gostudy_homework_published?select=lesson_path,published_at&student_id=eq.' + id)
       ]);
-      await render(assignmentsFromRooms(classrooms, finance), published);
+      await render(assignmentsFromRooms(classrooms, finance, auth.userId()), published);
     } catch (error) {
       started = false;
       updateStatus(error?.message || 'Не удалось загрузить кабинет. Попробуйте войти ещё раз.');
