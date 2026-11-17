@@ -24,6 +24,11 @@ for (const path of ['student-business-ai-finance.html', 'student-english-placeme
   assert.ok(config.lesson && config.title, path+' needs a lesson assignment and title');
   assert.ok(!/<header\b[^>]*class="top"/i.test(html),path+' must not copy the shared header');
 }
+const stylesheet=fs.readFileSync('assets/gostudy-v1-cabinet.css','utf8');
+assert.match(stylesheet, /@import url\('https:\/\/fonts\.googleapis\.com\/css2\?family=Manrope/, 'Canonical Manrope typography must live in shared CSS');
+for (const path of ['student-business-ai-finance.html', 'student-english-placement.html']) {
+  assert.ok(!fs.readFileSync(path, 'utf8').includes('fonts.googleapis.com'), path+' must not define its own font loading');
+}
 const renderer=fs.readFileSync('assets/gostudy-v1-cabinet.js','utf8');
 for(const name of ['id="openWords"','id="practiceCard"','id="assignment"']) {
   assert.ok(renderer.includes(name),'Missing shared element: '+name);
