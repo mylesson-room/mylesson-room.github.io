@@ -3,6 +3,7 @@
 [data-placement-lesson] .lesson-brand img { display: block; width: 55px; height: 43px; object-fit: contain; }
 [data-placement-lesson] .finance-chat #finance-live-status { display: block !important; }
 #placement-loading { margin: 20px auto; max-width: 36rem; padding: 0 1rem; }
-:is([data-placement-cabinet], [data-placement-lesson]) #gostudyAccessSignout { position: fixed; bottom: 12px; right: 12px; z-index: 34; }
+[data-placement-cabinet] #gostudyAccessSignout { position: fixed; bottom: 12px; right: 12px; z-index: 34; }
+[data-placement-lesson] #gostudyAccessSignout { flex: none; margin: 0; }
 .placement-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 18px 0; }
 .placement-tools audio { width: min(300px, 100%); }

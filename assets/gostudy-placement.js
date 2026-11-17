@@ -173,6 +173,7 @@
       });
       body.append(config);
       await loadScript(body.dataset.lessonScript);
+      $('.header-right').append($('#gostudyAccessSignout'));
       await loadScript(body.dataset.exercisesScript);
       const pages = $('#lessonPages');
       pages.inert = true;
