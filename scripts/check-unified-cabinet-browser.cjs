@@ -30,7 +30,7 @@ async function run(){
     const student='11111111-1111-4111-8111-111111111111';
     const other='22222222-2222-4222-8222-222222222222';
 
-    async function scenario({rooms=[],finance=[],published=[],expected,expectEmpty=false}){
+    async function scenario({rooms=[],finance=[],published=[],expected,expectEmpty=false,expectAmbiguous=false,expectHomework=false}){
       const page=await browser.newPage();
       const errors=[];
       page.on('pageerror',e=>errors.push(e.message));
@@ -68,11 +68,15 @@ async function run(){
       await page.waitForSelector('body.unified-ready',{timeout:15000});
       assert.deepEqual(errors,[],'No frontend runtime errors');
       assert.equal(await page.locator('header.top').count(),1,'Same canonical shared header is used once');
-      assert.equal(await page.locator('#assignment').isVisible(),false,'Never expose unpublished homework');
+      assert.equal(await page.locator('#assignment').isVisible(),true,'Homework tile must always be visible');
+      assert.equal(await page.locator('#assignment').getAttribute('aria-disabled'),expectHomework?null:'true');
+      assert.equal(await page.locator('#assignment').getAttribute('href'),expectHomework?'business-ai-finance-b2-02-homework.html':null);
+      assert.equal(await page.locator('.v1-previous').count(),0,'Student home must not show previous lessons');
       assert.equal(await page.locator('#openWords').isDisabled(),true,'Unmigrated local vocabulary must not leak into shared dashboard');
-      if(expectEmpty){
-        assert.equal(await page.locator('.cards').isVisible(),false);
-        assert.match(await page.locator('#unified-status').textContent(),/нет назначенных уроков/);
+      if(expectEmpty || expectAmbiguous) {
+        assert.equal(await page.locator('.lesson-card-link').getAttribute('href'),null);
+        assert.equal(await page.locator('.lesson-card-link').getAttribute('aria-disabled'),'true');
+        assert.match(await page.locator('#unified-status').textContent(),expectAmbiguous?/несколько учебных комнат/:/нет назначенных уроков/);
       } else {
         assert.equal(await page.locator('a.lesson-card-link').first().getAttribute('href'),expected);
       }
@@ -88,11 +92,22 @@ async function run(){
       expected:'business-ai-finance-b2-02.html'
     });
     await scenario({
+      finance:[{student_id:student}],
+      published:[{lesson_path:'business-ai-finance-b2-02.html',published_at:'2026-11-18T00:00:00Z'}],
+      expected:'business-ai-finance-b2-02.html',expectHomework:true
+    });
+    await scenario({
+      rooms:[
+        {student_id:student,course:'english-placement',lesson_path:'english-placement.html'},
+        {student_id:student,course:'ielts-reading',lesson_path:'ielts-reading-04.html'}
+      ],expectAmbiguous:true
+    });
+    await scenario({
       rooms:[{student_id:other,course:'english-placement',lesson_path:'english-placement.html'}],
       finance:[{student_id:other}],
       expectEmpty:true
     });
-    console.log('Unified cabinet browser smoke: placement, finance and foreign-user isolation PASS');
+    console.log('Unified cabinet browser smoke: placement, finance, disabled/published homework, ambiguous assignments and foreign-user isolation PASS');
   }finally{
     await browser.close();
     await new Promise(resolve=>server.close(resolve));
