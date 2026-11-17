@@ -27,7 +27,12 @@
 <div class="footer"></div></div></main></div><nav class="pager" aria-label="Lesson navigation"><button type="button" class="outline" id="back">← Back</button><button type="button" class="outline move-student-button" id="moveStudent" hidden>Переместить ученика</button><button type="button" class="primary" id="next">Continue</button></nav>
 
 <div class="selection-translate" id="selectionTranslate" role="region" aria-label="Перевод выделенного текста">
+  <div class="selection-heading"><span id="selectionDirection">EN → RU</span><button id="selectionSwap" type="button" title="Поменять направление">⇄</button></div>
+  <p id="selectionStatus" role="status">Загрузка…</p>
+  <p id="selectionContext" class="selection-context"></p>
+  <label class="selection-word-label" for="selectionSource">Словарная форма (можно изменить)</label><input id="selectionSource" maxlength="150" aria-label="Словарная форма">
   <textarea class="selection-target" id="selectionTarget" rows="2" maxlength="300" aria-label="Перевод"></textarea>
+  <button id="selectionRetry" type="button" hidden>Повторить перевод</button>
   <div class="selection-tools">
     <button id="selectionSave" type="button" aria-label="Добавить в словарь" title="Добавить в словарь" disabled>+</button>
 
