@@ -17,7 +17,7 @@ const server = createServer(async (req, res) => {
 async function checkTravelB2LessonMethodology() {
   const lessonHtml = await readFile('./travel-b2-04.html','utf8');
   const homeworkHtml = await readFile('./travel-b2-04-practice.html','utf8');
-  const readConfig = html => JSON.parse(html.match(/<script type="application\\/json" id="lesson-data">([\\s\\S]*?)<\\/script>/)?.[1] || '{}');
+  const readConfig = html => JSON.parse(html.split('<script type="application/json" id="lesson-data">')[1]?.split('</script>')[0] || '{}');
   const lesson = readConfig(lessonHtml);
   const homework = readConfig(homeworkHtml);
   assert.equal(lesson.durationMinutes,50,'Travel B2 lesson must fit a 50-minute class');
