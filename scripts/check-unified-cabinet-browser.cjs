@@ -30,7 +30,7 @@ async function run(){
     const student='11111111-1111-4111-8111-111111111111';
     const other='22222222-2222-4222-8222-222222222222';
 
-    async function scenario({rooms=[],finance=[],published=[],profiles=[],expected,expectedName='Ученик',expectEmpty=false,expectAmbiguous=false,expectHomework=false}){
+    async function scenario({rooms=[],finance=[],published=[],profiles=[],canonical=null,expected,expectedName='Ученик',expectEmpty=false,expectAmbiguous=false,expectHomework=false,expectedHomework='business-ai-finance-b2-02-homework.html'}){
       const page=await browser.newPage();
       const errors=[];
       page.on('pageerror',e=>errors.push(e.message));
@@ -58,6 +58,10 @@ async function run(){
         else if(u.pathname==='/rest/v1/gostudy_finance_room') response=finance;
         else if(u.pathname==='/rest/v1/gostudy_homework_published') response=published;
         else if(u.pathname==='/rest/v1/gostudy_profiles') response=profiles;
+        else if(u.pathname==='/rest/v1/gostudy_lesson_assignments') {
+          if(canonical===null){await route.fulfill({status:404,headers,body:'{}'});return;}
+          response=canonical;
+        }
         else {await route.fulfill({status:404,headers,body:'{}'});return;}
         if(u.pathname.startsWith('/rest/v1/')){
           assert.equal(u.searchParams.get('student_id'),'eq.'+student,'Every query must be student-scoped');
@@ -72,7 +76,7 @@ async function run(){
       assert.equal(await page.locator('.account .profile span').first().textContent(),expectedName,'Name must come from protected profile');
       assert.equal(await page.locator('#assignment').isVisible(),true,'Homework tile must always be visible');
       assert.equal(await page.locator('#assignment').getAttribute('aria-disabled'),expectHomework?null:'true');
-      assert.equal(await page.locator('#assignment').getAttribute('href'),expectHomework?'business-ai-finance-b2-02-homework.html':null);
+      assert.equal(await page.locator('#assignment').getAttribute('href'),expectHomework?expectedHomework:null);
       assert.equal(await page.locator('.v1-previous').count(),0,'Student home must not show previous lessons');
       assert.equal(await page.locator('#openWords').isDisabled(),true,'Unmigrated local vocabulary must not leak into shared dashboard');
       if(expectEmpty || expectAmbiguous) {
@@ -104,6 +108,22 @@ async function run(){
         {student_id:student,course:'english-placement',lesson_path:'english-placement.html'},
         {student_id:student,course:'ielts-reading',lesson_path:'ielts-reading-04.html'}
       ],expectAmbiguous:true
+    });
+    await scenario({
+      canonical:[{
+        student_id:student,status:'active',published_at:'2026-11-18T00:00:00Z',
+        lesson:{lesson_id:'finance-b1-02',course_id:'finance_b1',title:'Where did my money go?',
+          lesson_path:'finance-b1-02.html',homework_path:'finance-b1-02-homework.html'}
+      }],
+      rooms:[{student_id:student,course:'english-placement',lesson_path:'english-placement.html'}],
+      published:[{lesson_path:'finance-b1-02.html',published_at:'2026-11-18T00:00:00Z'}],
+      expected:'finance-b1-02.html',expectHomework:true,
+      expectedHomework:'finance-b1-02-homework.html',
+      profiles:[{display_name:'Ирина'}],expectedName:'Ирина'
+    });
+    await scenario({
+      canonical:[],rooms:[{student_id:student,course:'english-placement',lesson_path:'english-placement.html'}],
+      expectEmpty:true
     });
     await scenario({
       rooms:[{student_id:other,course:'english-placement',lesson_path:'english-placement.html'}],
@@ -145,7 +165,7 @@ async function run(){
     }
     await checkTeacherProfileEditor();
 
-    console.log('Unified cabinet browser smoke: placement, finance, disabled/published homework, ambiguous assignments and foreign-user isolation + teacher name editor PASS');
+    console.log('Unified cabinet browser smoke: placement, finance, disabled/published homework, ambiguous assignments, canonical assignment priority, foreign-user isolation and teacher name editor PASS');
   }finally{
     await browser.close();
     await new Promise(resolve=>server.close(resolve));
