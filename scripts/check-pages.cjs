@@ -14,6 +14,32 @@ const server = createServer(async (req, res) => {
   } catch { res.writeHead(404).end(); }
 });
 
+async function checkTravelB2LessonMethodology() {
+  const lessonHtml = await readFile('./travel-b2-04.html','utf8');
+  const homeworkHtml = await readFile('./travel-b2-04-practice.html','utf8');
+  const readConfig = html => JSON.parse(html.match(/<script type="application\\/json" id="lesson-data">([\\s\\S]*?)<\\/script>/)?.[1] || '{}');
+  const lesson = readConfig(lessonHtml);
+  const homework = readConfig(homeworkHtml);
+  assert.equal(lesson.durationMinutes,50,'Travel B2 lesson must fit a 50-minute class');
+  assert.deepEqual(lesson.steps.map(step=>step.type),[null,'choice','match','choice','gap','order',null,'write']);
+  assert.deepEqual(lesson.steps.map(step=>step.id),Array.from({length:8},(_,i)=>'original-'+i),'Keep previous progress keys stable');
+  assert.ok(lesson.steps.every(step=>step.teacherNotes),'Each stage needs teacher guidance');
+  assert.equal(lesson.steps[2].items.length,6,'Six active vocabulary units');
+  assert.equal(lesson.steps[1].items.length+lesson.steps[3].items.length,6,'Avoid excessive multiple choice questions');
+  assert.equal(lesson.steps[6].source.some(x=>x.includes('ROUND 2')),true,'Two-round communicative task');
+  for (const step of lesson.steps.filter(step=>step.type==='choice'||step.type==='match'||step.type==='gap')) {
+    for (const item of step.items) assert.ok(item[2]>=0&&item[2]<item[1].length,'Every answer must have a valid key');
+  }
+  for (const step of lesson.steps.filter(step=>step.type==='order')) {
+    assert.deepEqual(step.order.slice().sort((a,b)=>a-b),Array.from({length:step.items.length},(_,i)=>i));
+  }
+  assert.equal(homework.steps.length,4);
+  assert.ok(homework.steps.some(step=>step.type==='write' && step.instruction.includes('100')));
+  const sync=await readFile('./assets/gostudy-sync.js','utf8');
+  assert.ok(sync.includes('travel-b2-04-practice.html'),'Current student and teacher lesson must link aligned homework');
+  console.log('Travel B2 lesson methodology, answer keys and linked homework validated');
+}
+
 async function checkGeneralB2Room(browser, origin) {
   const studentId = '33333333-3333-4333-8333-333333333333';
   const teacherId = '44444444-4444-4444-8444-444444444444';
@@ -417,6 +443,7 @@ async function checkFinanceRoom(browser, origin) {
 }
 
 async function main() {
+  await checkTravelB2LessonMethodology();
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const browser = await chromium.launch(process.env.GOSTUDY_CHROME ? {executablePath: process.env.GOSTUDY_CHROME} : {});
   try {
