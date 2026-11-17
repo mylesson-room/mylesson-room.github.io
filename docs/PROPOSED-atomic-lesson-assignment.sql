@@ -41,7 +41,7 @@ BEGIN
     pg_catalog.hashtextextended(p_student_id::text, 0)
   );
 
-  -- Idempotency: retrying the same teacher/lesson returns the existing active ID.
+  -- Idempotency: retrying the same already PUBLISHED teacher/lesson returns its ID.
   -- This prevents duplicate history and unnecessary notifications on network retries.
   SELECT assignment_id INTO v_assignment
     FROM public.gostudy_lesson_assignments
@@ -49,6 +49,7 @@ BEGIN
       AND teacher_id=v_teacher
       AND lesson_id=p_lesson_id
       AND status='active'
+      AND published_at IS NOT NULL
     LIMIT 1;
   IF v_assignment IS NOT NULL THEN RETURN v_assignment; END IF;
 
