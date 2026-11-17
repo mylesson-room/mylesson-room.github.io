@@ -498,10 +498,18 @@ async function checkFinanceRoom(browser, origin) {
     await celebration.waitFor({state:'hidden',timeout:4500});
     assert.equal(await sp.getByRole('button',{name:'Check answers'}).count(),0);
 
+    await sp.setViewportSize({width:390,height:844});
     for(const [sender,receiver,note] of [[sp,tp,'Сообщение ученика'],[tp,sp,'Сообщение преподавателя']]){
       await sender.getByRole('textbox',{name:'Сообщение'}).fill(note);
       await sender.getByRole('button',{name:'Отправить'}).click();
       await receiver.locator('#finance-messages').getByText(note,{exact:true}).waitFor();
+    }
+    await Promise.all([sp.reload(),tp.reload()]);
+    await Promise.all([sp,tp].map(page=>page.waitForFunction(expected=>document.querySelector('#finance-live-status')?.textContent===expected,status)));
+    for(const page of [sp,tp]){
+      await page.locator('#finance-messages').getByText('Сообщение ученика',{exact:true}).waitFor();
+      await page.locator('#finance-messages').getByText('Сообщение преподавателя',{exact:true}).waitFor();
+      assert.equal(await page.locator('#finance-messages .chat-own').count(),1,'Own messages must appear on the right');
     }
     // Manual bilingual entry also works after automatic translation is edited.
     await tp.getByRole('button',{name:'Dictionary',exact:true}).click();
