@@ -1252,6 +1252,14 @@ async function main() {
             await page.getByRole('heading',{name:'Korean Wave: Who Influences Whom?'}).first().waitFor();
           }
           assert.equal(await sp.locator('#lessonPages>.page').count(),7);
+          assert.equal(await sp.locator('#lessonPages audio').count(),0);
+          for (const page of [sp,tp]) {
+            await page.waitForFunction(() => {
+              const photos = [...document.querySelectorAll('#page-0 .kw-photos img')];
+              return photos.length === 2 && photos.every(photo => photo.complete && photo.naturalWidth > 0);
+            });
+            assert.match(await page.locator('#page-1 iframe').getAttribute('src'), /UTAKCFPYdOo\?end=180$/);
+          }
           assert.equal(await sp.locator('a.call-btn').getAttribute('href'),'https://telemost.yandex.ru/');
           await sp.locator('#selectionTranslate').waitFor({state:'attached'});
           const outsider = await browser.newContext();
@@ -1272,6 +1280,9 @@ async function main() {
           await tp.locator('#moveStudent').click();
           await sp.locator('#page-0.active').waitFor();
           await sp.locator('#next').click();
+          const videoOpinion = '[data-exercise-field="video-opinion"]';
+          await sp.locator(videoOpinion).fill('I would keep the Korean folklore.');
+          await tp.waitForFunction(selector => document.querySelector(selector)?.value === 'I would keep the Korean folklore.', videoOpinion);
           await sp.locator('#next').click();
           const choice=sp.locator('#page-2 .definition-picker').first();
           await choice.locator('summary').click();
@@ -1289,6 +1300,21 @@ async function main() {
           await sp.reload();
           await sp.locator('#page-2.active .definition-picker').first().waitFor();
           assert.match(await sp.locator('#page-2 .definition-picker summary').first().innerText(),/break into the mainstream/);
+          assert.equal(await sp.locator(videoOpinion).inputValue(),'I would keep the Korean folklore.');
+          await sp.locator('#next').click();
+          const match = sp.locator('#match-folklore');
+          await match.locator('summary').click();
+          await match.getByRole('button',{name:'folklore',exact:true}).click();
+          await match.locator('..').getByText('✓ Correct',{exact:true}).waitFor();
+          await sp.locator('#next').click();
+          await sp.locator('#next').click();
+          await sp.locator('#next').click();
+          const decision = '[data-exercise-field="filmtradeoff"]';
+          await sp.locator(decision).fill('I would keep the scene and add a short introduction.');
+          await tp.waitForFunction(selector => document.querySelector(selector)?.value === 'I would keep the scene and add a short introduction.', decision);
+          await sp.reload();
+          await sp.locator('#page-6.active').waitFor();
+          assert.equal(await sp.locator(decision).inputValue(),'I would keep the scene and add a short introduction.');
           await sp.goto(origin+'/student-feed-b2.html');
           await sp.locator('#openWords').click();
           await sp.locator('#words').getByText('cultural exchange',{exact:true}).waitFor();
@@ -1305,8 +1331,15 @@ async function main() {
           await mobile.locator('.lesson-card-link').click();
           await mobile.locator('#lessonPages>.page.active').waitFor();
           assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),'Feed B2 mobile lesson overflow');
+          await mobile.locator('.lesson-section-menu summary').click();
+          await mobile.locator('#lessonSections button').nth(0).click();
+          await mobile.locator('#page-0.active .kw-photos').waitFor();
+          assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),'Feed B2 mobile photo overflow');
+          await mobile.locator('#next').click();
+          await mobile.locator('#page-1.active .kw-video').waitFor();
+          assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),'Feed B2 mobile video overflow');
           await mobile.close();
-          console.log('feed_b2: canonical cabinet, homework absent, 7 stages, teacher room, reset/navigation, chat, words, mastery, reload and mobile verified');
+          console.log('feed_b2: photos, video discussion, matching, saved choices and writing, shared room, chat, words, mastery, reload and mobile verified');
           continue;
         }
         if (course === 'finance_b1') {
