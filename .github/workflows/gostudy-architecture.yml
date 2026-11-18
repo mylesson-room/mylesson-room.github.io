@@ -22,6 +22,8 @@ jobs:
           node-version: '20'
       - name: Verify GoStudy shared UI contract
         run: node scripts/check-architecture.cjs
+      - name: Test authenticated JaaS video pilot without real student data
+        run: node scripts/check-jaas-video.cjs
       - name: Verify newly introduced student cabinets
         shell: bash
         run: |
