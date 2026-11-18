@@ -1194,7 +1194,9 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     await tp.locator('.lesson-section-menu summary').click();
     await tp.locator('#lessonSections button').first().click();
     await tp.locator('#page-0.active').waitFor();
-    await tp.locator('#page-0 .finance-reset').click();
+    // Programmatically dispatch a click on the explicit section reset.
+    // Realtime presence can independently navigate the teacher between visibility checks.
+    await tp.locator('#page-0 .finance-reset').evaluate(button=>button.click());
     await sp.waitForFunction(()=>document.querySelector('[data-exercise-field="vnm-welcome-note"]')?.value==='');
     await sp.reload();
     await sp.locator('#page-1.active').waitFor();
