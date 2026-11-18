@@ -1191,6 +1191,7 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     await tp.getByRole('button',{name:'Close dictionary'}).click();
     // Reset the actual opening section, not whichever reset button happens to be visible
     // after the teacher/student navigation events. Preserve the real-time reset assertion.
+    await tp.locator('.lesson-section-menu summary').click();
     await tp.locator('#lessonSections button').first().click();
     await tp.locator('#page-0.active').waitFor();
     await tp.locator('#page-0 .finance-reset').click();
