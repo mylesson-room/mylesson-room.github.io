@@ -205,6 +205,40 @@ async function run(){
     }
     await checkUnknownCanonicalErrorFailsClosed();
 
+    // On a shared computer, logout must erase the already mounted student dashboard,
+    // not merely hide the login session while leaving prior content in the DOM.
+    async function checkLogoutClearsStudentContent(){
+      const page=await browser.newPage();
+      const sid='11111111-1111-4111-8111-111111111111';
+      await page.addInitScript(id=>sessionStorage.setItem('gostudy-cloud-session-v1',JSON.stringify({
+        access_token:'synthetic-test-token',refresh_token:'synthetic-refresh',
+        expires_at:Date.now()+3600000,user:{id}
+      })),sid);
+      await page.route('https://fonts.googleapis.com/**',route=>route.fulfill({status:200,contentType:'text/css',body:''}));
+      await page.route('https://fonts.gstatic.com/**',route=>route.abort());
+      await page.route('https://kawfqlohguwvmmplvrny.supabase.co/**',async route=>{
+        const u=new URL(route.request().url());
+        const headers={'access-control-allow-origin':'*','access-control-allow-methods':'GET,POST,OPTIONS','access-control-allow-headers':'authorization,apikey,content-type'};
+        if(route.request().method()==='OPTIONS'){await route.fulfill({status:204,headers});return;}
+        if(u.pathname==='/auth/v1/logout'){await route.fulfill({status:204,headers});return;}
+        const data=u.pathname==='/auth/v1/user' ? {id:sid,email:'synthetic@example.invalid'}
+          :u.pathname==='/rest/v1/gostudy_lesson_assignments' ? [{
+            student_id:sid,status:'active',published_at:'2026-11-18T00:00:00Z',
+            lesson:{lesson_id:'placement',course_id:'english-placement',title:'English Placement',
+              lesson_path:'english-placement.html',homework_path:null}
+          }] : [];
+        await route.fulfill({status:200,headers,contentType:'application/json',body:JSON.stringify(data)});
+      });
+      await page.goto('http://127.0.0.1:'+port+'/student.html',{waitUntil:'domcontentloaded'});
+      await page.waitForSelector('body.unified-ready');
+      assert.equal(await page.locator('a.lesson-card-link').count(),1,'Dashboard must mount before signout');
+      await page.locator('#gostudyAccessSignout').click();
+      await page.waitForFunction(()=>document.querySelector('main')===null && !document.body.classList.contains('gostudy-authorized'),{timeout:15000});
+      assert.equal(await page.locator('a.lesson-card-link').count(),0,'Signed-out user must not see prior student content');
+      await page.close();
+    }
+    await checkLogoutClearsStudentContent();
+
     // Teacher name editor is shared across courses and writes only via authenticated RLS API.
     async function checkTeacherProfileEditor(){
       const page=await browser.newPage();
