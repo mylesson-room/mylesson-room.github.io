@@ -1086,9 +1086,9 @@ async function main() {
             const requestUrl = new URL(url);
             const action = requestUrl.pathname.split('/').at(-1);
             const data = route.request().postDataJSON() || {};
-            if (course === 'finance_b1' || course === 'feed_b2') {
+            if (course === 'finance_b1' || course === 'feed_b2' || course === 'pharma_c1') {
               const actor = role === 'teacher' ? 'teacher' : studentId;
-              if (action === 'gostudy_classroom_rooms' && requestUrl.searchParams.get('course') === 'eq.'+(course === 'feed_b2' ? 'feed-b2' : 'finance-b1')) {
+              if (action === 'gostudy_classroom_rooms' && requestUrl.searchParams.get('course') === 'eq.'+(course === 'feed_b2' ? 'feed-b2' : course === 'pharma_c1' ? 'pharma-c1' : 'finance-b1')) {
                 return route.fulfill({json:[{id:course+'-room',student_id:studentId,teacher_id:'teacher'}]});
               }
               if (action === 'gostudy_classroom_events') {
@@ -1146,6 +1146,95 @@ async function main() {
           await sp.waitForURL(url => url.pathname === '/student-general-english-b1-stories.html');
         } else await sp.goto(origin + (course === 'pharma_c1' ? '/student-pharma.html' : '/student-' + course.replaceAll('_', '-') + '.html'));
         await tp.goto(origin + '/gostudy-teacher.html');
+        if (course === 'pharma_c1') {
+          await sp.locator('#assignment[aria-disabled="true"]').waitFor();
+          assert.equal(await sp.locator('.lesson-card-link').getAttribute('href'),'pharma-ai-evidence-c1-20261118.html');
+          assert.equal(await sp.getByText('Пока не назначено',{exact:true}).count(),1);
+          const guest=await browser.newPage();
+          try {
+            await guest.goto(origin+'/pharma-ai-evidence-c1-20261118.html');
+            await guest.locator('.classroom-access').getByRole('link',{name:'Войти в GoStudy'}).waitFor();
+            assert.equal(await guest.locator('#lessonPages').isVisible(),false);
+          } finally {await guest.close();}
+          await sp.locator('.lesson-card-link').click();
+          await tp.locator('.teacher-student-row').filter({hasText:'Test student'}).getByRole('link',{name:/Войти в класс/}).click();
+          for (const page of [sp,tp]) {
+            await page.waitForURL(url=>url.pathname===expected);
+            await page.locator('#finance-live-status').getByText('Онлайн · общая комната',{exact:true}).waitFor();
+            await page.getByRole('heading',{name:'AI in Medicine: Evidence, Hype & the Marketing Line'}).first().waitFor();
+          }
+          assert.equal(await sp.locator('#lessonPages>.page').count(),7);
+          assert.equal(await sp.locator('a.call-btn').getAttribute('href'),'https://telemost.yandex.ru/');
+          assert.equal(await sp.locator('#selectionTranslate').count(),1);
+          const lesson=await sp.locator('#lesson-data').evaluate(node=>JSON.parse(node.textContent));
+          assert.equal(lesson.durationMinutes,50);
+          assert.equal(lesson.steps.reduce((sum,step)=>sum+step.minutes,0),50);
+          assert.equal(lesson.lessonWords.length,8);
+          assert.equal(lesson.steps.find(step=>step.type==='choice').items[0][2],1);
+          const outsider=await browser.newContext();
+          try {
+            await outsider.addInitScript(()=>sessionStorage.setItem('gostudy-cloud-session-v1',JSON.stringify({user:{id:'outsider'},access_token:'test-outsider',refresh_token:'test',expires_at:Date.now()+3600000})));
+            await outsider.route('https://*.supabase.co/**',route=>route.fulfill({json:[]}));
+            const outsiderPage=await outsider.newPage();
+            await outsiderPage.goto(origin+'/pharma-ai-evidence-c1-20261118.html');
+            await outsiderPage.locator('.classroom-access').getByText('Для этого аккаунта нет доступа к комнате.').waitFor();
+            assert.equal(await outsiderPage.locator('#lessonPages').isVisible(),false);
+          } finally {await outsider.close();}
+          await sp.locator('[data-exercise-field="lead1"]').fill('The patient outcomes are not established.');
+          await tp.waitForFunction(()=>document.querySelector('[data-exercise-field="lead1"]')?.value==='The patient outcomes are not established.');
+          await sp.locator('#next').click();
+          await tp.locator('#moveStudent').waitFor();
+          await tp.locator('#moveStudent').click();
+          await sp.locator('#page-0.active').waitFor();
+          await sp.locator('#next').click();
+          await sp.locator('#page-1 [data-lesson-word="0"]').click();
+          await tp.locator('#finance-toast').filter({hasText:'clinical validation'}).waitFor();
+          await sp.locator('#page-1 .vocab article b').first().evaluate(node=>{
+            const r=document.createRange();r.selectNodeContents(node);
+            const selection=window.getSelection();selection.removeAllRanges();selection.addRange(r);
+            document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
+          });
+          await sp.locator('#selectionTranslate.is-visible').waitFor();
+          await sp.locator('#selectionTarget').filter({hasText:'клиническая валидация'}).waitFor();
+          await sp.locator('#next').click();
+          await sp.locator('#next').click();
+          await sp.locator('#page-3.active').waitFor();
+          await sp.locator('#page-3 [data-exercise-field="interpret:0"]').nth(1).check();
+          await sp.locator('#page-3 .result').first().filter({hasText:'Correct'}).waitFor();
+          await sp.locator('#finance-chat-form input').fill('Pharma C1 evidence review test');
+          await sp.locator('#finance-chat-form button').click();
+          await tp.locator('#finance-messages').getByText('Pharma C1 evidence review test',{exact:true}).waitFor();
+          await tp.getByRole('button',{name:'Dictionary',exact:true}).click();
+          await tp.locator('#dictionarySource').fill('post-market surveillance');
+          await tp.locator('#dictionaryTranslation').fill('пострегистрационный мониторинг');
+          await tp.locator('#dictionaryAddForm button').click();
+          await sp.getByRole('button',{name:'Dictionary',exact:true}).click();
+          await sp.locator('#myWords').getByText('пострегистрационный мониторинг',{exact:false}).waitFor();
+          await tp.getByRole('button',{name:'Сбросить ответы'}).first().click();
+          await sp.reload();
+          await sp.locator('#page-3.active').waitFor();
+          assert.equal(await sp.locator('#page-3 [data-exercise-field="interpret:0"]:checked').count(),1,'Other page answer should survive reset and reload');
+          await sp.goto(origin+'/student-pharma.html');
+          await sp.locator('#openWords').click();
+          await sp.locator('#words').getByText('clinical validation',{exact:true}).waitFor();
+          await sp.locator('#practiceFromWords').click();
+          await sp.locator('[data-mode="type"]').click();
+          await sp.locator('#practiceInput').fill('clinical validation');
+          await sp.locator('#practiceTypeForm button').click();
+          await sp.locator('#practiceAnswer[data-correct="true"]').waitFor();
+          assert.equal(mastery[0]?.word_key,'clinical validation');
+          const mobile=await student.newPage();
+          await mobile.setViewportSize({width:390,height:844});
+          await mobile.goto(origin+'/student-pharma.html');
+          await mobile.locator('.lesson-card-link').waitFor();
+          assert.ok(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Pharma mobile cabinet overflow');
+          await mobile.locator('.lesson-card-link').click();
+          await mobile.locator('#lessonPages>.page.active').waitFor();
+          assert.ok(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Pharma mobile lesson overflow');
+          await mobile.close();
+          console.log('pharma_c1: canonical cabinet, evidence claims, no homework, teacher/learner live room, answers, grading, translation, save word, chat, reset, persistence, mastery, outsider and mobile verified');
+          continue;
+        }
         if (course === 'feed_b2') {
           await sp.locator('#assignment[aria-disabled="true"]').waitFor();
           assert.equal(await sp.locator('.lesson-card-link').getAttribute('href'),'korean-wave-b2-20261118.html');
