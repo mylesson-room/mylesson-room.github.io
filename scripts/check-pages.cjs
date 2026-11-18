@@ -1195,7 +1195,7 @@ async function main() {
           await mobile.goto(origin+'/student-feed-b2.html');
           assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),'Feed B2 mobile cabinet overflow');
           await mobile.locator('.lesson-card-link').click();
-          await mobile.locator('#lessonPages>.page').first().waitFor();
+          await mobile.locator('#lessonPages>.page.active').waitFor();
           assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),'Feed B2 mobile lesson overflow');
           await mobile.close();
           console.log('feed_b2: canonical cabinet, homework absent, 7 stages, teacher room, reset/navigation, chat, words, mastery, reload and mobile verified');
