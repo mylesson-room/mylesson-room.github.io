@@ -1157,6 +1157,19 @@ async function main() {
             await page.getByRole('heading',{name:'Korean Wave: Who Influences Whom?'}).first().waitFor();
           }
           assert.equal(await sp.locator('#lessonPages>.page').count(),7);
+          assert.equal(await sp.locator('a.call-btn').getAttribute('href'),'https://telemost.yandex.ru/');
+          await sp.locator('#selectionTranslate').waitFor({state:'attached'});
+          const outsider = await browser.newContext();
+          try {
+            await outsider.addInitScript(() => {
+              sessionStorage.setItem('gostudy-cloud-session-v1',JSON.stringify({user:{id:'outsider'},access_token:'test-outsider',refresh_token:'test',expires_at:Date.now()+3600000}));
+            });
+            await outsider.route('https://*.supabase.co/**',route=>route.fulfill({json:[]}));
+            const outsiderPage=await outsider.newPage();
+            await outsiderPage.goto(origin+'/korean-wave-b2-20261118.html');
+            await outsiderPage.locator('.classroom-access').getByText('Для этого аккаунта нет доступа к комнате.').waitFor();
+            assert.equal(await outsiderPage.locator('#lessonPages').isVisible(),false,'Unrelated user must not see classroom data');
+          } finally { await outsider.close(); }
           await sp.locator('[data-exercise-field="warm1"]').fill('Music crosses language barriers.');
           await tp.waitForFunction(() => document.querySelector('[data-exercise-field="warm1"]')?.value === 'Music crosses language barriers.');
           await sp.locator('#next').click();
