@@ -4,7 +4,7 @@
   if (!auth) return;
   const status = document.querySelector("#finance-live-status");
   const accessStatus = document.querySelector(".classroom-access");
-  const course = privateRoom?.course || document.body.dataset.classroomCourse;
+  const course = privateRoom?.course || document.body.dataset.classroomCourse || document.body.dataset.liveCourse;
   const lesson = privateRoom?.lesson || document.body.dataset.classroomLesson;
   const user = auth.userId();
   const selectedStudent = auth.classroomStudent;

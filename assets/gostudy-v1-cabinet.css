@@ -315,7 +315,7 @@ dialog h2{font-family:'Playfair Display',Georgia,serif}
 
 
 body[data-classroom-course]:not(.classroom-authorized) > :is(.top,main,dialog){display:none!important}
-body[data-classroom-course] .classroom-access{margin:24px auto;max-width:640px;padding:0 20px}
+body:is([data-classroom-course],[data-live-course]) .classroom-access{margin:24px auto;max-width:640px;padding:0 20px}
 
 body[data-classroom-course] .homework-link .homework-subject{max-width:100%;overflow-wrap:break-word}
 body[data-classroom-course] .lesson-card-link h2{max-width:100%}

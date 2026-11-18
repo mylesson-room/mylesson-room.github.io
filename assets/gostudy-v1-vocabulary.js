@@ -72,7 +72,7 @@ function loadSavedWords() {
     return [...combined.values()].map(word => ({en:word.en.trim(),ru:String(word.ru || '').trim()}));
   }
   if (window.FinanceLive?.connected()) return FinanceLive.words();
-  if (document.body.dataset.classroomCourse) return [];
+  if (document.body.dataset.classroomCourse || document.body.dataset.liveCourse) return [];
   // For historic course dashboards, the same canonical vocabulary UI reads
   // all previously used lesson keys without changing or deleting their data.
   const keys = [...new Set([...(legacy ? legacy.split(/\s+/).filter(Boolean) : []), storageKey])];

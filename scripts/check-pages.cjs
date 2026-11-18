@@ -1147,6 +1147,15 @@ async function main() {
         } else await sp.goto(origin + (course === 'pharma_c1' ? '/student-pharma.html' : '/student-' + course.replaceAll('_', '-') + '.html'));
         await tp.goto(origin + '/gostudy-teacher.html');
         if (course === 'finance_b1') {
+          const guest = await browser.newPage();
+          try {
+            await guest.goto(origin+'/student-finance-b1.html');
+            await guest.getByRole('link',{name:'Открыть урок',exact:true}).click();
+            await guest.locator('.classroom-access').getByRole('link',{name:'Войти в GoStudy'}).waitFor();
+            assert.equal(await guest.locator('#lessonPages').isVisible(),false);
+          } finally {
+            await guest.close();
+          }
           await sp.locator('#assignment[aria-disabled="true"]').waitFor();
           await sp.locator('.lesson-card-link').click();
           await tp.locator('.teacher-enter-class').click();
