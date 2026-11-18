@@ -470,6 +470,31 @@ async function run(){
 
 
 
+    // Visual acceptance: computed button colors must match across the Michael
+    // canonical CSS and the historical route adapter; a link tag is not proof.
+    async function verifySharedActionColor(mode) {
+      const page=await browser.newPage();
+      const base='http://127.0.0.1:'+port+'/';
+      await page.route('https://fonts.googleapis.com/**',route=>route.fulfill({status:200,contentType:'text/css',body:''}));
+      await page.route('https://fonts.gstatic.com/**',route=>route.abort());
+      const canonical=mode==='Michael';
+      const css=canonical?'assets/gostudy-v1-cabinet.css':'assets/gostudy-shared-visual.css';
+      const markup=canonical
+        ? '<button class="primary">Открыть урок</button>'
+        : '<button class="btn">Открыть урок</button><a class="cta">К уроку</a><button class="button primary">Сохранить</button>';
+      await page.setContent('<!doctype html><html><head><base href="'+base+'"><link rel="stylesheet" href="'+css+'"></head><body'+(canonical?'':' data-gostudy-legacy-visual')+'>'+markup+'</body></html>',{waitUntil:'load'});
+      const before=await page.evaluate(()=>[...document.querySelectorAll('button,a')].map(el=>getComputedStyle(el).backgroundColor));
+      assert.deepEqual(before,Array(before.length).fill('rgb(0, 169, 239)'),
+        mode+' shared blue did not reach every primary action: '+JSON.stringify(before));
+      await page.evaluate(()=>document.documentElement.style.setProperty('--gostudy-action-bg','#e0144b'));
+      const after=await page.evaluate(()=>[...document.querySelectorAll('button,a')].map(el=>getComputedStyle(el).backgroundColor));
+      assert.deepEqual(after,Array(after.length).fill('rgb(224, 20, 75)'),
+        mode+' must change every primary button from ONE shared CSS variable: '+JSON.stringify(after));
+      await page.close();
+    }
+    await verifySharedActionColor('Michael');
+    await verifySharedActionColor('Legacy');
+
     console.log('Unified cabinet browser smoke: placement, finance, disabled/published homework, ambiguous assignments, canonical assignment priority, foreign-user isolation, 18 candidate routes, teacher name editor, atomic lesson assignment UI and canonical fail-closed behavior PASS');
   }finally{
     await browser.close();

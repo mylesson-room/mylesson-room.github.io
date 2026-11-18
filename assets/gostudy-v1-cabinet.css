@@ -63,7 +63,7 @@ main{width:min(77%,1120px)}
 .card h2{font-family:'Playfair Display',Georgia,serif;font-weight:700;line-height:1.14;letter-spacing:-.02em;color:#0d1d34}
 .homework h2{max-width:66%}
 .card p{font-weight:700;color:#52657f}
-.primary{border-radius:11px;background:linear-gradient(180deg,#08a8f8,#0079dc);padding:12px 24px;color:white;box-shadow:0 4px 10px #028feb26;font-weight:800;transition:transform .15s,filter .15s}
+.primary{border-radius:var(--gostudy-action-radius);background:var(--gostudy-action-bg);padding:12px 24px;color:var(--gostudy-action-fg);box-shadow:0 4px 10px #028feb26;font-weight:800;transition:transform .15s,filter .15s}
 .primary:hover{filter:brightness(1.04);transform:translateY(-1px)}
 .primary:disabled,.primary[aria-disabled="true"]{opacity:.45;cursor:not-allowed;pointer-events:none}
 .illustration{background:transparent;border-radius:0;display:flex;align-items:center;justify-content:center;width:37%;height:74%;top:15%;right:2%;aspect-ratio:auto;font-size:initial}

@@ -39,6 +39,7 @@ for(const name of ['id="openWords"','id="practiceCard"','id="assignment"']) {
 const tokenCss = fs.readFileSync('assets/gostudy-shared-visual.css','utf8');
 assert.match(tokenCss, /--gostudy-action-bg\s*:/, 'One primary-action color token is required');
 assert.match(stylesheet, /gostudy-shared-visual\.css/, 'Michael must consume the shared tokens');
+assert.match(stylesheet, /\.primary\{border-radius:var\(--gostudy-action-radius\);background:var\(--gostudy-action-bg\)/, 'Michael premium button CSS must use the shared token instead of a hardcoded gradient');
 for (const path of tracked) {
   const html = fs.readFileSync(path,'utf8');
   if (html.includes('assets/gostudy-v1-cabinet.css')) continue;
