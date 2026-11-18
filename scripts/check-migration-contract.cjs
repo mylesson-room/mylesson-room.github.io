@@ -9,7 +9,7 @@ const rpc=read('docs/PROPOSED-atomic-lesson-assignment.sql');
 const student=read('assets/gostudy-unified-cabinet.js');
 const teacher=read('assets/gostudy-teacher-assignments.js');
 const migration=read('docs/backup-and-reconciliation-gate.md');
-for(const table of ['gostudy_teacher_students','gostudy_profiles','gostudy_lesson_catalog','gostudy_lesson_assignments']){
+for(const table of ['gostudy_teacher_students','gostudy_profiles','gostudy_lesson_catalog','gostudy_lesson_assignments','gostudy_homework_plans']){
   assert.match(schema,new RegExp('CREATE TABLE public\\.'+table+'\\b'),'Missing canonical table '+table);
   assert.match(schema,new RegExp('ALTER TABLE public\\.'+table+' ENABLE ROW LEVEL SECURITY'),'Missing mandatory RLS for '+table);
 }
@@ -18,6 +18,9 @@ assert.match(schema,/WHERE status = 'active'/);
 assert.match(schema,/gostudy_profiles_teacher_update/);
 assert.match(schema,/WITH CHECK/);
 assert.match(schema,/gostudy_assignments_teacher_insert/);
+assert.match(schema,/gostudy_homework_student_published_read/);
+assert.match(schema,/gostudy_homework_teacher_insert/);
+assert.match(schema,/gostudy_homework_no_empty_publication/);
 assert.match(schema,/owner_teacher_id uuid REFERENCES auth\.users/);
 assert.match(schema,/owner_teacher_id = \(SELECT auth\.uid\(\)\) OR owner_teacher_id IS NULL/);
 assert.match(rpc,/lesson\.owner_teacher_id IS NULL OR lesson\.owner_teacher_id=v_teacher/);
@@ -31,6 +34,8 @@ assert.match(teacher,/rpc\/gostudy_activate_student_lesson/);
 assert.doesNotMatch(teacher,/\/rest\/v1\/gostudy_lesson_assignments\?.*method:\s*'PATCH'/);
 assert.match(student,/response\.data\?\.code === 'PGRST205'/);
 assert.match(student,/data\.length === 1/);
+assert.match(student,/gostudy_homework_plans/);
+assert.match(student,/row\.assignment_id === primary\.assignmentId/);
 assert.match(migration,/restor/i);
 assert.match(migration,/localStorage/);
 for(const [filename,sql] of [['schema',schema],['rpc',rpc]]){

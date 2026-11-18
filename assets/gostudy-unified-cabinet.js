@@ -58,6 +58,7 @@
         if (!path) return null;
         return {
           lesson: path,
+          assignmentId: row.assignment_id || null,
           course: courseLabel(lesson.course_id),
           title: String(lesson.title || courseLabel(lesson.course_id)).slice(0,140),
           homework: safeLessonPath(lesson.homework_path),
@@ -67,7 +68,7 @@
 
   async function readCanonicalAssignments(id) {
     const query = new URLSearchParams({
-      select:'student_id,status,published_at,lesson:gostudy_lesson_catalog(lesson_id,course_id,title,lesson_path,homework_path)',
+      select:'assignment_id,student_id,status,published_at,lesson:gostudy_lesson_catalog(lesson_id,course_id,title,lesson_path,homework_path)',
       student_id:'eq.'+id,
       status:'eq.active',
       published_at:'not.is.null'
@@ -78,6 +79,24 @@
     if(response.status === 404 && response.data?.code === 'PGRST205') return null;
     if(!response.ok || !Array.isArray(response.data)) throw Error('Не удалось проверить назначенный урок. Код: '+response.status);
     return assignmentsFromCanonical(response.data, auth.userId());
+  }
+
+  // Canonical homework is tied to one assignment ID; a same-named lesson
+  // published for someone else must never unlock this student's homework.
+  async function readCanonicalHomework(assignmentId) {
+    const query = new URLSearchParams({
+      select:'assignment_id,published_at',
+      assignment_id:'eq.'+assignmentId,
+      published_at:'not.is.null'
+    });
+    const response = await auth.request('/rest/v1/gostudy_homework_plans?'+query);
+    // A partial staged rollout must fail closed: homework stays disabled until
+    // the canonical table is available. Unexpected API failures are surfaced.
+    if (response.status === 404 && response.data?.code === 'PGRST205') return [];
+    if (!response.ok || !Array.isArray(response.data)) {
+      throw Error('Не удалось проверить публикацию домашнего задания. Код: '+response.status);
+    }
+    return response.data;
   }
 
   function updateStatus(message) {
@@ -102,10 +121,10 @@
     // Old labels may contain email or an outdated name and are not trustworthy.
     const savedName = String(profiles[0]?.display_name || '').trim();
     const displayName = savedName && !savedName.includes('@') ? savedName.slice(0,60) : 'Ученик';
-    const homework = primary && primary.homework
-      && published.some(row => row.student_id === ownerId && row.lesson_path === primary.lesson && row.published_at)
-      ? primary.homework
-      : '';
+    const publishedForStudent = primary?.assignmentId
+      ? published.some(row => row.assignment_id === primary.assignmentId && row.published_at)
+      : published.some(row => row.student_id === ownerId && row.lesson_path === primary?.lesson && row.published_at);
+    const homework = primary?.homework && publishedForStudent ? primary.homework : '';
 
     const config = document.createElement('script');
     config.type = 'application/json';
@@ -172,20 +191,25 @@
     updateStatus('Загружаем ваши занятия…');
     try {
       const id = encodeURIComponent(auth.userId());
-      const [published, profiles, canonical] = await Promise.all([
-        readRows('/rest/v1/gostudy_homework_published?select=student_id,lesson_path,published_at&student_id=eq.' + id),
+      const [profiles, canonical] = await Promise.all([
         // Protected profiles are staged until the migration is approved.
         readRows('/rest/v1/gostudy_profiles?select=display_name&user_id=eq.' + id).catch(() => []),
         readCanonicalAssignments(id)
       ]);
-      // Never bypass a deployed canonical assignment system by falling back to old pages.
+      // Never mix legacy homework publication with a deployed canonical
+      // assignment, even when two users happen to study the same HTML lesson.
       let assigned = canonical;
+      let published = [];
       if (assigned === null) {
-        const [classrooms, finance] = await Promise.all([
+        const [classrooms, finance, legacyPublished] = await Promise.all([
           readRows('/rest/v1/gostudy_classroom_rooms?select=student_id,course,lesson_path,student_label&student_id=eq.' + id),
-          readRows('/rest/v1/gostudy_finance_room?select=student_id&student_id=eq.' + id)
+          readRows('/rest/v1/gostudy_finance_room?select=student_id&student_id=eq.' + id),
+          readRows('/rest/v1/gostudy_homework_published?select=student_id,lesson_path,published_at&student_id=eq.' + id)
         ]);
         assigned = assignmentsFromRooms(classrooms, finance, auth.userId());
+        published = legacyPublished;
+      } else if (assigned.length === 1 && assigned[0].assignmentId && assigned[0].homework) {
+        published = await readCanonicalHomework(assigned[0].assignmentId);
       }
       // A logout or account switch during the request must never render stale student data.
       if (sessionEpoch !== currentEpoch || auth.userId() !== currentUserId) return;

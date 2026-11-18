@@ -162,6 +162,85 @@ CREATE POLICY gostudy_catalog_read ON public.gostudy_lesson_catalog
     )
   );
 
+-- Drafts belong to the exact canonical lesson assignment, NOT to a course-wide
+-- HTML path. The existing legacy Finance homework tables remain untouched.
+-- A student must NEVER be allowed to SELECT an unpublished draft.
+CREATE TABLE public.gostudy_homework_plans (
+  assignment_id uuid PRIMARY KEY REFERENCES public.gostudy_lesson_assignments(assignment_id) ON DELETE RESTRICT,
+  exercise_ids jsonb NOT NULL DEFAULT '[]'::jsonb,
+  published_at timestamptz,
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT gostudy_homework_exercises_array CHECK (
+    jsonb_typeof(exercise_ids) = 'array' AND jsonb_array_length(exercise_ids) <= 100
+  ),
+  CONSTRAINT gostudy_homework_no_empty_publication CHECK (
+    published_at IS NULL OR jsonb_array_length(exercise_ids) > 0
+  )
+);
+ALTER TABLE public.gostudy_homework_plans ENABLE ROW LEVEL SECURITY;
+GRANT SELECT,INSERT,UPDATE ON public.gostudy_homework_plans TO authenticated;
+
+-- Teachers access only plans of their own authorized students, including drafts.
+CREATE POLICY gostudy_homework_teacher_read ON public.gostudy_homework_plans
+  FOR SELECT TO authenticated
+  USING (EXISTS (
+    SELECT 1 FROM public.gostudy_lesson_assignments assignment
+    WHERE assignment.assignment_id = gostudy_homework_plans.assignment_id
+      AND assignment.teacher_id = (SELECT auth.uid())
+      AND EXISTS (
+        SELECT 1 FROM public.gostudy_teacher_students rel
+        WHERE rel.teacher_id = assignment.teacher_id AND rel.student_id = assignment.student_id
+      )
+  ));
+CREATE POLICY gostudy_homework_teacher_insert ON public.gostudy_homework_plans
+  FOR INSERT TO authenticated WITH CHECK (EXISTS (
+    SELECT 1 FROM public.gostudy_lesson_assignments assignment
+    WHERE assignment.assignment_id = gostudy_homework_plans.assignment_id
+      AND assignment.teacher_id = (SELECT auth.uid())
+      AND EXISTS (
+        SELECT 1 FROM public.gostudy_teacher_students rel
+        WHERE rel.teacher_id = assignment.teacher_id AND rel.student_id = assignment.student_id
+      )
+  ));
+CREATE POLICY gostudy_homework_teacher_update ON public.gostudy_homework_plans
+  FOR UPDATE TO authenticated
+  USING (EXISTS (
+    SELECT 1 FROM public.gostudy_lesson_assignments assignment
+    WHERE assignment.assignment_id = gostudy_homework_plans.assignment_id
+      AND assignment.teacher_id = (SELECT auth.uid())
+      AND EXISTS (
+        SELECT 1 FROM public.gostudy_teacher_students rel
+        WHERE rel.teacher_id = assignment.teacher_id AND rel.student_id = assignment.student_id
+      )
+  ))
+  WITH CHECK (EXISTS (
+    SELECT 1 FROM public.gostudy_lesson_assignments assignment
+    WHERE assignment.assignment_id = gostudy_homework_plans.assignment_id
+      AND assignment.teacher_id = (SELECT auth.uid())
+      AND EXISTS (
+        SELECT 1 FROM public.gostudy_teacher_students rel
+        WHERE rel.teacher_id = assignment.teacher_id AND rel.student_id = assignment.student_id
+      )
+  ));
+
+-- Student may see homework ONLY for their current published lesson and
+-- AFTER the teacher explicitly publishes this assignment's exercises.
+CREATE POLICY gostudy_homework_student_published_read ON public.gostudy_homework_plans
+  FOR SELECT TO authenticated
+  USING (
+    published_at IS NOT NULL AND EXISTS (
+      SELECT 1 FROM public.gostudy_lesson_assignments assignment
+      WHERE assignment.assignment_id = gostudy_homework_plans.assignment_id
+        AND assignment.student_id = (SELECT auth.uid())
+        AND assignment.status = 'active'
+        AND assignment.published_at IS NOT NULL
+    )
+  );
+
+-- Publishing UI and the editor must be separately validated against this new
+-- RLS contract in STAGING. No direct DELETE is granted. Legacy tables retain history.
+-- This proposal does NOT authorize a production migration.
+
 -- Intentionally NO client INSERT/DELETE on profiles, teacher_students or lesson_catalog.
 -- Seed memberships with independently verified relationships through admin-controlled migration.
 -- NEVER auto-map legacy HTML to an auth user based on a coincidental label or email.

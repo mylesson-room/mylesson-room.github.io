@@ -29,8 +29,9 @@ async function run(){
   try {
     const student='11111111-1111-4111-8111-111111111111';
     const other='22222222-2222-4222-8222-222222222222';
+    const canonicalAssignment='33333333-3333-4333-8333-333333333333';
 
-    async function scenario({rooms=[],finance=[],published=[],profiles=[],canonical=null,expected,expectedName='Ученик',expectEmpty=false,expectAmbiguous=false,expectHomework=false,expectedHomework='business-ai-finance-b2-02-homework.html',mobile=false}){
+    async function scenario({rooms=[],finance=[],published=[],canonicalHomework=[],profiles=[],canonical=null,expected,expectedName='Ученик',expectEmpty=false,expectAmbiguous=false,expectHomework=false,expectedHomework='business-ai-finance-b2-02-homework.html',mobile=false}){
       const page=await browser.newPage(mobile?{viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true}:{});
       const errors=[];
       page.on('pageerror',e=>errors.push(e.message));
@@ -58,14 +59,21 @@ async function run(){
         else if(u.pathname==='/rest/v1/gostudy_finance_room') response=finance;
         else if(u.pathname==='/rest/v1/gostudy_homework_published') response=published;
         else if(u.pathname==='/rest/v1/gostudy_profiles') response=profiles;
+        else if(u.pathname==='/rest/v1/gostudy_homework_plans') response=canonicalHomework;
         else if(u.pathname==='/rest/v1/gostudy_lesson_assignments') {
           if(canonical===null){await route.fulfill({status:404,headers,contentType:'application/json',body:JSON.stringify({code:'PGRST205',message:'Table not found in schema cache'})});return;}
           response=canonical;
         }
         else {await route.fulfill({status:404,headers,body:'{}'});return;}
         if(u.pathname.startsWith('/rest/v1/')){
-          const ownerField=u.pathname==='/rest/v1/gostudy_profiles'?'user_id':'student_id';
-          assert.equal(u.searchParams.get(ownerField),'eq.'+student,'Every query must be scoped to the authenticated user');
+          if(u.pathname==='/rest/v1/gostudy_homework_plans') {
+            assert.equal(u.searchParams.get('assignment_id'),'eq.'+canonicalAssignment,
+              'Canonical homework query must use ONLY this lesson assignment ID');
+            assert.equal(u.searchParams.get('published_at'),'not.is.null');
+          } else {
+            const ownerField=u.pathname==='/rest/v1/gostudy_profiles'?'user_id':'student_id';
+            assert.equal(u.searchParams.get(ownerField),'eq.'+student,'Every query must be scoped to the authenticated user');
+          }
         }
         await route.fulfill({status:200,headers,contentType:'application/json',body:JSON.stringify(response)});
       });
@@ -116,12 +124,13 @@ async function run(){
     });
     await scenario({
       canonical:[{
-        student_id:student,status:'active',published_at:'2026-11-18T00:00:00Z',
+        assignment_id:canonicalAssignment,student_id:student,status:'active',published_at:'2026-11-18T00:00:00Z',
         lesson:{lesson_id:'finance-b1-02',course_id:'finance_b1',title:'Where did my money go?',
           lesson_path:'finance-b1-02.html',homework_path:'finance-b1-02-homework.html'}
       }],
       rooms:[{student_id:student,course:'english-placement',lesson_path:'english-placement.html'}],
       published:[{student_id:student,lesson_path:'finance-b1-02.html',published_at:'2026-11-18T00:00:00Z'}],
+      canonicalHomework:[{assignment_id:canonicalAssignment,published_at:'2026-11-18T00:00:00Z'}],
       expected:'finance-b1-02.html',expectHomework:true,
       expectedHomework:'finance-b1-02-homework.html',
       profiles:[{display_name:'Ирина'}],expectedName:'Ирина'
@@ -130,11 +139,21 @@ async function run(){
     // even if a course reuses exactly the same lesson path.
     await scenario({
       canonical:[{
-        student_id:student,status:'active',published_at:'2026-11-18T00:00:00Z',
+        assignment_id:canonicalAssignment,student_id:student,status:'active',published_at:'2026-11-18T00:00:00Z',
         lesson:{lesson_id:'finance-b1-02',course_id:'finance_b1',title:'Finance B1 — 02',
           lesson_path:'finance-b1-02.html',homework_path:'finance-b1-02-homework.html'}
       }],
       published:[{student_id:other,lesson_path:'finance-b1-02.html',published_at:'2026-11-18T00:00:00Z'}],
+      canonicalHomework:[{assignment_id:'44444444-4444-4444-8444-444444444444',published_at:'2026-11-18T00:00:00Z'}],
+      expected:'finance-b1-02.html',expectHomework:false
+    });
+    // The canonical homework endpoint takes precedence over any old, unrelated publication.
+    await scenario({
+      canonical:[{assignment_id:canonicalAssignment,student_id:student,status:'active',published_at:'2026-11-18T00:00:00Z',
+        lesson:{lesson_id:'finance-b1-02',course_id:'finance_b1',title:'B1',
+          lesson_path:'finance-b1-02.html',homework_path:'finance-b1-02-homework.html'}}],
+      published:[{student_id:student,lesson_path:'finance-b1-02.html',published_at:'2026-11-18T00:00:00Z'}],
+      canonicalHomework:[],
       expected:'finance-b1-02.html',expectHomework:false
     });
     // The canonical dashboard itself is NOT a lesson and cannot recursively link to itself.
@@ -166,20 +185,22 @@ async function run(){
         homework_path:entry.legacyHomework,
       };
       await scenario({
-        canonical:[{student_id:student,status:'active',published_at:'2026-11-18T00:00:00Z',lesson}],
-        published:entry.legacyHomework
-          ? [{student_id:student,lesson_path:entry.candidateCurrentLesson,published_at:'2026-11-18T00:00:00Z'}]
+        canonical:[{assignment_id:canonicalAssignment,student_id:student,status:'active',published_at:'2026-11-18T00:00:00Z',lesson}],
+        canonicalHomework:entry.legacyHomework
+          ? [{assignment_id:canonicalAssignment,published_at:'2026-11-18T00:00:00Z'}]
           : [],
+        published:[],
         expected:entry.candidateCurrentLesson,
         expectHomework:!!entry.legacyHomework,
         expectedHomework:entry.legacyHomework || undefined,
         profiles:[{display_name:'Ученик'}],
       });
       await scenario({
-        canonical:[{student_id:student,status:'active',published_at:'2026-11-18T00:00:00Z',lesson}],
-        published:entry.legacyHomework
-          ? [{student_id:student,lesson_path:entry.candidateCurrentLesson,published_at:'2026-11-18T00:00:00Z'}]
+        canonical:[{assignment_id:canonicalAssignment,student_id:student,status:'active',published_at:'2026-11-18T00:00:00Z',lesson}],
+        canonicalHomework:entry.legacyHomework
+          ? [{assignment_id:canonicalAssignment,published_at:'2026-11-18T00:00:00Z'}]
           : [],
+        published:[],
         expected:entry.candidateCurrentLesson,
         expectHomework:!!entry.legacyHomework,
         expectedHomework:entry.legacyHomework || undefined,
