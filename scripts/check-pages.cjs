@@ -1195,7 +1195,7 @@ async function main() {
             document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
           });
           await sp.locator('#selectionTranslate.is-visible').waitFor();
-          await sp.locator('#selectionTarget').filter({hasText:'клиническая валидация'}).waitFor();
+          await sp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value.includes('клиническая валидация'));
           await sp.locator('#next').click();
           await sp.locator('#next').click();
           await sp.locator('#page-3.active').waitFor();
@@ -1214,6 +1214,11 @@ async function main() {
           await sp.reload();
           await sp.locator('#page-3.active').waitFor();
           assert.equal(await sp.locator('#page-3 [data-exercise-field="interpret:0"]:checked').count(),1,'Other page answer should survive reset and reload');
+          await sp.locator('#back').click();
+          await sp.locator('#back').click();
+          await sp.locator('#back').click();
+          await sp.locator('#page-0.active [data-exercise-field="lead1"]').waitFor();
+          assert.equal(await sp.locator('[data-exercise-field="lead1"]').inputValue(),'','Teacher reset must propagate to learner');
           await sp.goto(origin+'/student-pharma.html');
           await sp.locator('#openWords').click();
           await sp.locator('#words').getByText('clinical validation',{exact:true}).waitFor();
