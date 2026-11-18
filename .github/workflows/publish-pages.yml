@@ -24,6 +24,8 @@ jobs:
       - run: node scripts/check-pages.cjs
       - name: Test shared student route with synthetic Supabase accounts
         run: node scripts/check-unified-cabinet-browser.cjs
+      - name: Test historical cabinets preserve per-course words and answers
+        run: node scripts/check-shared-legacy-cabinet-browser.cjs
       - name: Prepare static site
         if: github.ref == 'refs/heads/main'
         run: |
