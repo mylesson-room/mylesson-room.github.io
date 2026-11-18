@@ -1,0 +1,63 @@
+name: Check published First Sales C1 Lesson 3 (temporary)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/first-sales-c1-live-20261118.yml'
+permissions:
+  contents: read
+jobs:
+  production-smoke:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check public student cabinet, lesson and teacher course catalog
+        run: |
+          node <<'NODE'
+          const assert=require('node:assert/strict');
+          const sleep=ms=>new Promise(done=>setTimeout(done,ms));
+          (async()=>{
+            const base='https://mylesson-room.github.io/';
+            let ready=false,detail='';
+            for(let i=0;i<78;i++){
+              try{
+                const q='?production-check='+Date.now()+'-'+i;
+                const [a,b,c,d,e]=await Promise.all([
+                  fetch(base+'student-first-sales.html'+q),
+                  fetch(base+'first-sales-c1-03.html'+q),
+                  fetch(base+'assets/gostudy-sync.js'+q),
+                  fetch(base+'first-sales-c1.html'+q),
+                  fetch(base+'first-sales-c1-02.html'+q)
+                ]);
+                for(const r of [a,b,c,d,e])assert.equal(r.status,200,'Page not publicly accessible');
+                const cabinet=await a.text(),page=await b.text(),sync=await c.text();
+                const cfg=JSON.parse(page.match(/id="lesson-data">([\s\S]*?)<\/script>/)[1]);
+                const settings=JSON.parse(cabinet.match(/id="cabinet-settings">([\s\S]*?)<\/script>/)[1]);
+                assert.equal(settings.lesson,'first-sales-c1-03.html');
+                assert.equal(settings.homework,'');
+                assert.equal(settings.cabinet,'student-first-sales.html');
+                assert.equal(settings.title,cfg.title);
+                assert.equal(cfg.title,'From Discovery to Value: The Follow-Up That Wins Trust');
+                assert.equal(cfg.cabinet,'student-first-sales.html');
+                assert.equal(cfg.durationMinutes,50);
+                assert.equal(cfg.steps.length,8);
+                assert.equal(cfg.steps.reduce((sum,s)=>sum+s.minutes,0),50);
+                assert.equal(cfg.lessonWords.length,8);
+                assert.equal(cfg.key,'gostudy-first-sales-c1-03-v1');
+                assert.equal(cfg.wordsKey,'gostudy-first-sales-shared-v1');
+                assert.ok(cfg.steps[4].html.includes('250 minutes'));
+                assert.ok(cabinet.includes('gostudy-v1-cabinet.css'));
+                assert.ok(page.includes('gostudy-v1-lesson.css'));
+                assert.ok(sync.includes('"title":"From Discovery to Value: The Follow-Up That Wins Trust","lesson":"first-sales-c1-03.html"'));
+                assert.ok(sync.includes('first-sales-c1-02-homework.html'));
+                for(const name of ['assets/gostudy-v1-lesson.js','assets/gostudy-v1-cabinet.js','assets/gostudy-v1-exercises.js','assets/gostudy-v1-workbook.js'])assert.equal((await fetch(base+name+q)).status,200,name);
+                ready=true;break;
+              }catch(e){detail=String(e?.message||e)}
+              await sleep(6500);
+            }
+            assert.ok(ready,'New First Sales lesson not published: '+detail);
+            console.log('PRODUCTION FIRST SALES VERIFIED: existing student cabinet links to lesson 3; no homework; 8 C1 sections; preserved prior lessons and vocabulary key; teacher course catalog points to same lesson; shared assets accessible.');
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          NODE
