@@ -8,6 +8,12 @@ Observed on 2026-11-18. This is an audit of existing grants and Advisor findings
 - **Six legacy functions** are `SECURITY DEFINER` and executable by authenticated users: `gostudy_finance_b1_assign_word(uuid,text,text)`, `gostudy_finance_b1_my_words()`, `gostudy_finance_b1_teacher_view()`, `gostudy_travel_a2_assign_word(uuid,text,text)`, `gostudy_travel_a2_my_words()`, `gostudy_travel_a2_teacher_view()`. They must enforce teacher/student ownership inside the function because the definer context can bypass table RLS depending on ownership and privileges.
 - Supabase Security Advisor also warns that leaked-password protection is disabled. This is an account configuration matter, not a reason to mutate auth settings without a reviewed plan.
 
+## Function-body inspection completed (read-only)
+- Both `gostudy_*_assign_word` functions select the target student from their respective private membership table with `teacher_id = auth.uid()` AND `student_id = p_student` before writing. They use explicit empty `search_path`. This is a good ownership check in the code, but actual cross-teacher denial must still be tested with different JWTs.
+- Both `gostudy_*_teacher_view` functions query only membership rows with `s.teacher_id = auth.uid()`; progress and word subqueries are scoped to each selected member. No obvious unscoped all-student result was found in the inspected definition.
+- Both `gostudy_*_my_words()` functions filter `student_id = auth.uid()`; no cross-account list in their inspected SQL definitions.
+- These are code-review observations, **not validated RLS penetration tests**. Do not remove existing membership tables or SECURITY DEFINER functions until replacement endpoints are proven correct and historical vocabulary is preserved.
+
 ## Required staging checks before release
 1. Review `pg_get_functiondef`, `proowner`, `proacl`, and `has_function_privilege` for each privileged function; trace all callers in the legacy JS. Confirm explicit equality with `auth.uid()`, proper membership lookup and safe `search_path`; do not expose another student's dictionary/answers.
 2. On isolated restore with synthetic users A/B and teacher A/B, call each read and write RPC with forged student IDs. Require foreign read/write DENIAL, not merely a hidden UI.
