@@ -1,7 +1,9 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="gostudy-course" content="finance-b1"><title>AI & Your Money · GoStudy B1</title>
-<link rel="stylesheet" href="assets/gostudy-sync.css"><script src="assets/gostudy-sync.js" defer></script>
+<meta name="gostudy-current-lesson"><link rel="stylesheet" href="assets/gostudy-sync.css">
+<link rel="stylesheet" href="assets/gostudy-lesson-header.css"><link rel="stylesheet" href="assets/gostudy-glass-vocabulary.css">
+<script src="assets/gostudy-classroom-ui.js"></script><script src="assets/gostudy-sync.js" defer></script>
 <style>
 :root{--ink:#1d3556;--muted:#657f9a;--blue:#287bd4;--line:#dce9f6;--bg:#f2f7fe;--card:#fff;--good:#e3f5e8;--bad:#fff0e9}*{box-sizing:border-box}
 body{margin:0;background:var(--bg);font:16px/1.65 system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink)}
@@ -23,9 +25,9 @@ button.primary,button.secondary{cursor:pointer;font:inherit;border:0;border-radi
 footer{display:flex;justify-content:space-between;gap:10px;margin-top:25px}.page{display:none}.page.active{display:block}
 .timer{margin:8px 0;color:var(--muted);font-size:13px}.split{display:grid;grid-template-columns:1fr 1fr;gap:12px}.scenario{background:#eef5ff;padding:16px;border-radius:12px}.tiny{font-size:12px;color:var(--muted)}
 @media(max-width:800px){.wrap{grid-template-columns:1fr;margin:14px auto;padding:0 12px}aside{position:static}aside nav{display:flex;overflow:auto}aside button{white-space:nowrap;font-size:13px}.panel,.page{padding:19px}header{position:static}.vocab,.split{grid-template-columns:1fr}}
-</style></head><body>
+ .wrap{display:block;max-width:none;margin:0;padding:0}.wrap>aside.panel{display:none}.wrap main{max-width:none;padding:0}.page{box-shadow:none;border:0;border-radius:0}.page.active{display:block}.page:not(.active){display:none} </style></head><body data-vocab-course="finance-b1">
 <header><div class="brand">GoStudy <span class="tag">/ General English B1</span></div><div><a href="student-finance-b1.html">← К кабинету</a> <span class="pill">50 min</span></div></header>
-<div class="wrap"><aside class="panel"><span class="eyebrow">Live lesson</span><h2>AI & Your Money</h2><p class="muted">Who should make financial decisions: humans or machines?</p><nav id="nav" aria-label="Sections"></nav><p class="tiny" id="save">Your answers are synced to your account when signed in.</p></aside>
+<div class="wrap shell"><aside class="panel" id="lessonMenu"><span class="eyebrow">Live lesson</span><h2>AI & Your Money</h2><p class="muted">Who should make financial decisions: humans or machines?</p><nav id="nav" aria-label="Sections"></nav><p class="tiny" id="save">Your answers are synced to your account when signed in.</p></aside>
 <main id="content">
 <section class="page active" data-title="Let's talk" data-time="7 min">
 <span class="eyebrow">01 · Warm-up</span><h1>Would you trust AI with your money?</h1><div class="hero"><h2>Imagine this.</h2><p>Your bank app says: “Our AI can save you $150 every month.” Would you let it decide how to spend your money?</p></div>
@@ -82,4 +84,4 @@ for(const key of Object.keys(quiz)){document.querySelector('#'+key+'Qs').innerHT
 function checkQuiz(key){let score=0;quiz[key].forEach((q,i)=>{const selected=document.querySelector('input[name="'+key+i+'"]:checked');if(selected&&Number(selected.value)===q[2])score++;document.querySelectorAll('input[name="'+key+i+'"]').forEach(el=>{el.closest('label').classList.toggle('correct',Number(el.value)===q[2]);el.closest('label').classList.toggle('wrong',el.checked&&Number(el.value)!==q[2])})});document.querySelector('#'+key+'Feedback').textContent=score+' / '+quiz[key].length+' correct';}
 document.querySelectorAll('[data-id]').forEach(el=>{el.dataset.answer=el.dataset.id;const id=el.dataset.id;if(saved[id]!==undefined){if(el.type==='checkbox'||el.type==='radio')el.checked=!!saved[id];else el.value=saved[id];}el.addEventListener('change',()=>{saved[id]=el.type==='checkbox'||el.type==='radio'?el.checked:el.value;persist();});el.addEventListener('input',()=>{if(el.type!=='checkbox'&&el.type!=='radio'){saved[id]=el.value;persist();}});});showPage(saved.page||0,false);
 window.addEventListener('gostudy-sync-ready',()=>{const fresh=cloud().getItem(storageKey);if(!fresh)return;try{const next=JSON.parse(fresh);if(next&&typeof next==='object'){saved={...next};document.querySelectorAll('[data-id]').forEach(el=>{const v=saved[el.dataset.id];if(v===undefined)return;if(el.type==='checkbox'||el.type==='radio')el.checked=!!v;else el.value=v;});showPage(saved.page||0,false);}}catch{}});
-</script></body></html>
+</script><script src="assets/gostudy-current-courses.js" defer></script><script src="assets/gostudy-glass-vocabulary.js" defer></script></body></html>
