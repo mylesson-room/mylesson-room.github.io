@@ -47,6 +47,27 @@ for(const p of pages){
   assert.ok(!lesson.includes('const qs='), 'IELTS answer keys leaked into public HTML.');
  }
 }
+// The student's existing English Placement cabinet now publishes a new A2 lesson and its homework
+// through the same private, role-gated canonical shell. The diagnostic page stays intact.
+const vietnamCabinet=read('student-english-placement.html');
+must(vietnamCabinet,'my-trip-to-vietnam-a2.html','Vietnam A2 current lesson');
+must(vietnamCabinet,'my-trip-to-vietnam-a2-homework.html','Vietnam A2 assigned homework');
+must(vietnamCabinet,'gostudy-v1-cabinet.css','Vietnam A2 shared cabinet');
+for(const path of ['my-trip-to-vietnam-a2.html','my-trip-to-vietnam-a2-homework.html']){
+ const html=read(path);
+ for(const dependency of ['assets/gostudy-v1-lesson.css','assets/gostudy-private-access.js','assets/gostudy-vietnam-a2.js','data-lesson-script="assets/gostudy-v1-lesson.js','data-exercises-script="assets/gostudy-v1-exercises.js','data-workbook-script="assets/gostudy-v1-workbook.js'])
+  must(html,dependency,path);
+}
+cp.execFileSync(process.execPath,['--check','assets/gostudy-vietnam-a2.js'],{stdio:'pipe'});
+const vietnam=JSON.parse(read('my-trip-to-vietnam-a2.html').split('id="vietnam-content">')[1].split('</script>')[0]);
+const vietnamHomework=JSON.parse(read('my-trip-to-vietnam-a2-homework.html').split('id="vietnam-content">')[1].split('</script>')[0]);
+assert.equal(vietnam.steps.length,7);
+assert.equal(vietnam.steps.reduce((a,v)=>a+v.minutes,0),60);
+assert.equal(vietnamHomework.steps.length,3);
+assert.notEqual(vietnam.key,vietnamHomework.key);
+assert.equal(vietnam.wordsKey,vietnamHomework.wordsKey);
+assert.equal(vietnam.cabinet,'student-english-placement.html');
+assert.ok(read('english-placement.html').includes('gostudy-placement.js'),'Old diagnostic lesson must remain');
 for(const file of ['assets/gostudy-private-access.js','assets/gostudy-ielts-reading.js','assets/gostudy-placement.js']){
  cp.execFileSync(process.execPath,['--check',file],{stdio:'pipe'});
  const source=read(file);
