@@ -1149,6 +1149,9 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     await sp.locator('#lessonPages>.page.active').waitFor();
     await sp.waitForFunction(()=>document.querySelector('#finance-live-status')?.textContent?.trim()==='Онлайн · общая комната');
     assert.equal(await sp.locator('#lessonPages>.page').count(),7);
+    const desktopListeningText=await sp.locator('#page-3').textContent();
+    assert.ok(!/Your teacher reads the conversation twice|No audio file is included in the original PDF/.test(desktopListeningText),'Desktop Vietnam lesson must not render the removed Important notice');
+    assert.equal(await sp.locator('#page-3').getByText('Important',{exact:true}).count(),0,'Desktop listening page must have no Important banner');
     assert.equal(await sp.locator('a.call-btn').getAttribute('href'),'https://telemost.yandex.ru/');
     assert.equal(await sp.locator('#selectionTranslate').count(),1);
     await sp.locator('[data-exercise-field="vnm-welcome-note"]').fill('I prefer travelling with family.');
@@ -1186,7 +1189,11 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     });
     await sp.locator('#selectionTranslate.is-visible').waitFor();
     await tp.getByRole('button',{name:'Close dictionary'}).click();
-    await tp.getByRole('button',{name:'Сбросить ответы'}).first().click();
+    // Reset the actual opening section, not whichever reset button happens to be visible
+    // after the teacher/student navigation events. Preserve the real-time reset assertion.
+    await tp.locator('#lessonSections button').first().click();
+    await tp.locator('#page-0.active').waitFor();
+    await tp.locator('#page-0 .finance-reset').click();
     await sp.waitForFunction(()=>document.querySelector('[data-exercise-field="vnm-welcome-note"]')?.value==='');
     await sp.reload();
     await sp.locator('#page-1.active').waitFor();
@@ -1221,6 +1228,11 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     assert.ok(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Vietnam cabinet mobile overflow');
     await mobile.locator('.lesson-card-link').click();
     await mobile.locator('#lessonPages>.page.active').waitFor();
+    for(let i=0;i<3;i++)await mobile.locator('#next').click();
+    await mobile.locator('#page-3.active').waitFor();
+    const mobileListeningText=await mobile.locator('#page-3.active').innerText();
+    assert.ok(!/Your teacher reads the conversation twice|No audio file is included in the original PDF/.test(mobileListeningText),'Mobile Vietnam listening page must not show the removed Important notice');
+    assert.equal(await mobile.locator('#page-3.active').getByText('Important',{exact:true}).count(),0,'Mobile listening page must have no Important banner');
     assert.ok(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Vietnam lesson mobile overflow');
     await mobile.close();
     console.log('VIETNAM A2: private cabinet, lesson & homework, auto-grading, answer restore, teacher sync, chat, dictionary, move student, outsider and mobile verified');
