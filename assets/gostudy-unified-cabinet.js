@@ -1,0 +1,240 @@
+/* GoStudy unified cabinet: READ-ONLY adapter for current Supabase classroom memberships.
+   No migration, no legacy localStorage access, no teacher or student data writes. */
+(() => {
+  'use strict';
+
+  const auth = window.GoStudyPrivateAccess;
+  const status = document.getElementById('unified-status');
+  const logout = document.getElementById('gostudyAccessSignout');
+  const courseNames = Object.freeze({
+    'english-placement': 'English Placement Test',
+    'general_english_b1': 'General English · B1',
+    'general_english_b2': 'General English · B2',
+    'business-ai-finance': 'AI in Finance · B2',
+    'ielts-reading': 'IELTS Reading'
+  });
+  let started = false;
+  let sessionEpoch = 0;
+
+  function safeLessonPath(value) {
+    const path = String(value || '').trim();
+    return path !== 'student.html' && /^[a-z][a-z0-9_-]*\.html$/i.test(path) ? path : null;
+  }
+
+  function courseLabel(value) {
+    const course = String(value || '').trim();
+    return courseNames[course] || course.replace(/[_-]+/g, ' ').trim() || 'Урок английского';
+  }
+
+  // The source list is derived from authenticated room membership, never an HTML-stored student ID.
+  function assignmentsFromRooms(rooms, financeRooms, userId) {
+    const found = new Map();
+    for (const room of rooms) {
+      if (room.student_id !== userId) continue;
+      const lesson = safeLessonPath(room.lesson_path);
+      if (!lesson || found.has(lesson)) continue;
+      found.set(lesson, {
+        lesson,
+        course: courseLabel(room.course),
+        title: courseLabel(room.course),
+        studentLabel: typeof room.student_label === 'string' ? room.student_label.trim().slice(0, 60) : ''
+      });
+    }
+    if (financeRooms.some(room => room.student_id === userId)) {
+      const lesson = 'business-ai-finance-b2-02.html'; // Bridge to an existing historic course only.
+      if (!found.has(lesson)) found.set(lesson, {
+        lesson, course: 'AI in Finance · B2', title: 'AI in Finance — Lesson 2', homework:'business-ai-finance-b2-02-homework.html', studentLabel: ''
+      });
+    }
+    return [...found.values()];
+  }
+
+  // Canonical post-migration assignments, when the protected schema is available.
+  function assignmentsFromCanonical(rows, userId) {
+    return rows.filter(row => row.student_id === userId && row.status === 'active' && row.published_at)
+      .map(row => {
+        const lesson = row.lesson;
+        const path = safeLessonPath(lesson?.lesson_path);
+        if (!path) return null;
+        return {
+          lesson: path,
+          assignmentId: row.assignment_id || null,
+          course: courseLabel(lesson.course_id),
+          title: String(lesson.title || courseLabel(lesson.course_id)).slice(0,140),
+          homework: safeLessonPath(lesson.homework_path),
+        };
+      }).filter(Boolean);
+  }
+
+  async function readCanonicalAssignments(id) {
+    const query = new URLSearchParams({
+      select:'assignment_id,student_id,status,published_at,lesson:gostudy_lesson_catalog(lesson_id,course_id,title,lesson_path,homework_path)',
+      student_id:'eq.'+id,
+      status:'eq.active',
+      published_at:'not.is.null'
+    });
+    const response = await auth.request('/rest/v1/gostudy_lesson_assignments?'+query);
+    // Legacy bridge is allowed ONLY when PostgREST explicitly says the table is absent.
+    // A generic 404 may be an authorization/route error; fail closed instead of exposing legacy data.
+    if(response.status === 404 && response.data?.code === 'PGRST205') return null;
+    if(!response.ok || !Array.isArray(response.data)) throw Error('Не удалось проверить назначенный урок. Код: '+response.status);
+    return assignmentsFromCanonical(response.data, auth.userId());
+  }
+
+  // Canonical homework is tied to one assignment ID; a same-named lesson
+  // published for someone else must never unlock this student's homework.
+  async function readCanonicalHomework(assignmentId) {
+    const query = new URLSearchParams({
+      select:'assignment_id,published_at',
+      assignment_id:'eq.'+assignmentId,
+      published_at:'not.is.null'
+    });
+    const response = await auth.request('/rest/v1/gostudy_homework_plans?'+query);
+    // A partial staged rollout must fail closed: homework stays disabled until
+    // the canonical table is available. Unexpected API failures are surfaced.
+    if (response.status === 404 && response.data?.code === 'PGRST205') return [];
+    if (!response.ok || !Array.isArray(response.data)) {
+      throw Error('Не удалось проверить публикацию домашнего задания. Код: '+response.status);
+    }
+    return response.data;
+  }
+
+  function updateStatus(message) {
+    status.textContent = message;
+    status.hidden = !message;
+  }
+
+  async function readRows(endpoint) {
+    const result = await auth.request(endpoint);
+    if (!result.ok || !Array.isArray(result.data)) {
+      throw new Error('Не удалось загрузить назначения. Код ответа: ' + result.status);
+    }
+    return result.data;
+  }
+
+
+  async function render(data, published, profiles = [], ownerId) {
+    // A user with multiple legacy rooms needs an explicit teacher-selected CURRENT assignment.
+    // Never guess from table order or expose historical lessons on the dashboard.
+    const primary = data.length === 1 ? data[0] : null;
+    // The protected profile is the ONLY source for the student's name.
+    // Old labels may contain email or an outdated name and are not trustworthy.
+    const savedName = String(profiles[0]?.display_name || '').trim();
+    const displayName = savedName && !savedName.includes('@') ? savedName.slice(0,60) : 'Ученик';
+    const publishedForStudent = primary?.assignmentId
+      ? published.some(row => row.assignment_id === primary.assignmentId && row.published_at)
+      : published.some(row => row.student_id === ownerId && row.lesson_path === primary?.lesson && row.published_at);
+    const homework = primary?.homework && publishedForStudent ? primary.homework : '';
+
+    const config = document.createElement('script');
+    config.type = 'application/json';
+    config.id = 'cabinet-settings';
+    config.textContent = JSON.stringify({
+      cabinet: 'student.html',
+      course: primary?.course || 'GoStudy',
+      title: primary?.title || 'Назначенных уроков пока нет',
+      lesson: primary?.lesson || 'student.html',
+      homework,
+      student: displayName,
+      schedule: 'Ваше занятие',
+      lessonLabel: 'Открыть назначенный урок',
+      importWords: false
+    });
+    document.body.append(config);
+    await new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'assets/gostudy-v1-cabinet.js';
+      script.onload = resolve;
+      script.onerror = () => reject(new Error('Не удалось загрузить общий интерфейс GoStudy.'));
+      document.body.append(script);
+    });
+
+    if (!primary) {
+      const lessonLink = document.querySelector('.lesson-card-link');
+      if (lessonLink) {
+        lessonLink.removeAttribute('href');
+        lessonLink.setAttribute('aria-disabled','true');
+        lessonLink.setAttribute('aria-label','Текущий урок не назначен');
+      }
+    }
+    const account = document.querySelector('.account');
+    if (account && logout) {
+      account.append(logout);
+      logout.hidden = false;
+    }
+
+    // Legacy vocabulary uses a course-local browser key. Never mount it on a shared route:
+    // doing so risks showing another student's words on a shared computer.
+    const openWords = document.getElementById('openWords');
+    const practiceCard = document.getElementById('practiceCard');
+    const practiceFromWords = document.getElementById('practiceFromWords');
+    if (openWords) openWords.disabled = true;
+    if (practiceCard) practiceCard.disabled = true;
+    if (practiceFromWords) practiceFromWords.disabled = true;
+    const count = document.getElementById('vocabCount');
+    if (count) count.textContent = 'Словарь пока доступен внутри урока';
+    const empty = document.getElementById('wordsEmpty');
+    if (empty) empty.textContent = 'Общий словарь будет подключён после безопасной миграции сохранённых слов.';
+    if (data.length > 1) updateStatus('Найдено несколько учебных комнат. Преподавателю необходимо подтвердить один актуальный урок.');
+    else if (!primary) updateStatus('Пока у вашего аккаунта нет назначенных уроков. Обратитесь к преподавателю.');
+    else updateStatus('');
+    const loading = document.querySelector('.classroom-access');
+    if (loading) loading.hidden = true;
+    document.body.classList.add('unified-ready');
+  }
+
+  async function start() {
+    if (started || !auth.userId()) return;
+    started = true;
+    const currentEpoch = ++sessionEpoch;
+    const currentUserId = auth.userId();
+    updateStatus('Загружаем ваши занятия…');
+    try {
+      const id = encodeURIComponent(auth.userId());
+      const [profiles, canonical] = await Promise.all([
+        // Protected profiles are staged until the migration is approved.
+        readRows('/rest/v1/gostudy_profiles?select=display_name&user_id=eq.' + id).catch(() => []),
+        readCanonicalAssignments(id)
+      ]);
+      // Never mix legacy homework publication with a deployed canonical
+      // assignment, even when two users happen to study the same HTML lesson.
+      let assigned = canonical;
+      let published = [];
+      if (assigned === null) {
+        const [classrooms, finance, legacyPublished] = await Promise.all([
+          readRows('/rest/v1/gostudy_classroom_rooms?select=student_id,course,lesson_path,student_label&student_id=eq.' + id),
+          readRows('/rest/v1/gostudy_finance_room?select=student_id&student_id=eq.' + id),
+          readRows('/rest/v1/gostudy_homework_published?select=student_id,lesson_path,published_at&student_id=eq.' + id)
+        ]);
+        assigned = assignmentsFromRooms(classrooms, finance, auth.userId());
+        published = legacyPublished;
+      } else if (assigned.length === 1 && assigned[0].assignmentId && assigned[0].homework) {
+        published = await readCanonicalHomework(assigned[0].assignmentId);
+      }
+      // A logout or account switch during the request must never render stale student data.
+      if (sessionEpoch !== currentEpoch || auth.userId() !== currentUserId) return;
+      await render(assigned, published, profiles, currentUserId);
+    } catch (error) {
+      if (sessionEpoch !== currentEpoch || auth.userId() !== currentUserId) return;
+      started = false;
+      updateStatus(error?.message || 'Не удалось загрузить кабинет. Попробуйте войти ещё раз.');
+    }
+  }
+
+  // Logout must destroy mounted student data immediately, even on a shared computer
+  // where navigating/reloading may be slow or fail.
+  document.addEventListener('gostudy-private-signed-out', () => {
+    sessionEpoch++;
+    started = false;
+    document.querySelector('main')?.remove();
+    document.getElementById('cabinet-settings')?.remove();
+    updateStatus('');
+    // A fresh document also discards stale shared-renderer event handlers.
+    window.location.reload();
+  });
+
+  if (auth) {
+    document.addEventListener('gostudy-private-authorized', start);
+    auth.ready.then(ok => { if (ok) start(); });
+  } else updateStatus('Не удалось загрузить систему входа.');
+})();

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<title>Мои уроки · GoStudy</title>
+<link rel="stylesheet" href="assets/gostudy-v1-cabinet.css">
+<link rel="stylesheet" href="assets/gostudy-private-access.css">
+
+</head>
+<body data-unified-cabinet>
+<div id="gostudyAccessGate" role="region" aria-label="Вход в GoStudy">
+<h1>Вход в GoStudy</h1>
+<form id="gostudyAccessForm">
+<label for="gsEmail">Электронная почта</label><input id="gsEmail" name="email" type="email" autocomplete="username" required>
+<label for="gsPassword">Пароль</label><input id="gsPassword" name="password" type="password" autocomplete="current-password" required>
+<button type="submit">Войти</button>
+</form>
+<p id="gostudyAccessMessage" role="status">Проверяем доступ…</p>
+</div>
+<button id="gostudyAccessSignout" type="button" hidden>Выйти</button>
+<p id="unified-status" class="unified-status" role="status" hidden></p>
+<script src="assets/gostudy-private-access.js" defer></script>
+<script src="assets/gostudy-unified-cabinet.js" defer></script>
+</body>
+</html>

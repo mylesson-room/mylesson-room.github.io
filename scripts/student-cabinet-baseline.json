@@ -1,0 +1,24 @@
+{
+  "description": "Frozen pre-unification compatibility URLs. New student identities must not create a separate HTML file.",
+  "frozen_on": "2026-11-18",
+  "pages": [
+    "student-art-b1.html",
+    "student-business-ai-finance.html",
+    "student-business-ai.html",
+    "student-country-house.html",
+    "student-english-placement.html",
+    "student-feed-b2.html",
+    "student-finance-b1.html",
+    "student-first-sales.html",
+    "student-general-english-b1-stories.html",
+    "student-general-english-b1.html",
+    "student-general-english-b2.html",
+    "student-ielts-reading.html",
+    "student-pharma.html",
+    "student-sweden.html",
+    "student-tiktok-a2.html",
+    "student-travel-a2.html",
+    "student-travel-b2.html",
+    "student-turkey.html"
+  ]
+}

@@ -980,6 +980,10 @@ async function checkStudentWithoutCourse(browser, origin) {
     if (path.endsWith('/gostudy_my_destinations')) {
       return route.fulfill({json:isTeacher ? [{course:'teacher'}] : assignedCourse ? [{course:assignedCourse.replaceAll('_','-')}] : []});
     }
+    if (path.endsWith('/gostudy_teacher_student_emails')) {
+      assert.ok(isTeacher);
+      return route.fulfill({json:student ? [{id:student.id,email:student.email}] : []});
+    }
     if (path.endsWith('/gostudy_students_without_course')) {
       assert.ok(isTeacher);
       return route.fulfill({json:student ? [{id:student.id,email:student.email}] : []});
@@ -1034,6 +1038,9 @@ async function checkStudentWithoutCourse(browser, origin) {
     await sp.reload();
     await sp.getByRole('heading',{name:'Личный кабинет',exact:true}).waitFor();
 
+    // Real teacher reactivation: hidden tabs intentionally skip roster polling.
+    await tp.bringToFront();
+    await tp.waitForFunction(() => !document.hidden);
     await course.selectOption('travel_a2');
     await create();
     await form.getByRole('status').getByText(/Курс назначен/).waitFor();
@@ -1125,13 +1132,24 @@ async function main() {
           await sp.waitForURL(url => url.pathname === '/student-general-english-b1-stories.html');
         } else await sp.goto(origin + (course === 'pharma_c1' ? '/student-pharma.html' : '/student-' + course.replaceAll('_', '-') + '.html'));
         await tp.goto(origin + '/gostudy-teacher.html');
-        const studentLink = sp.locator('.home-open-lesson');
+        // Travel A2 now uses Michael's canonical cabinet renderer.
+        // Other course home screens still use the legacy shared home widget.
+        const canonicalCabinet = course === 'travel_a2';
+        const studentLink = canonicalCabinet
+          ? sp.locator('.lesson-card-link')
+          : sp.locator('.home-open-lesson');
         const teacherLink = tp.locator('.teacher-enter-class');
         await studentLink.waitFor();
-        const cabinetHeading = sp.locator('#student-home .home-lesson h2');
-        await sp.evaluate(() => document.documentElement.style.setProperty('--gostudy-ui-heading-size','29px'));
-        assert.equal(await cabinetHeading.evaluate(node => getComputedStyle(node).fontSize),'29px');
-        await sp.evaluate(() => document.documentElement.style.removeProperty('--gostudy-ui-heading-size'));
+        if (canonicalCabinet) {
+          assert.equal(await sp.locator('.lesson-card-link').getAttribute('href'),'positive-thinking-a2.html');
+          await sp.getByRole('button',{name:'Словарь',exact:true}).waitFor();
+          await sp.getByText('Positive Thinking').first().waitFor();
+        } else {
+          const cabinetHeading = sp.locator('#student-home .home-lesson h2');
+          await sp.evaluate(() => document.documentElement.style.setProperty('--gostudy-ui-heading-size','29px'));
+          assert.equal(await cabinetHeading.evaluate(node => getComputedStyle(node).fontSize),'29px');
+          await sp.evaluate(() => document.documentElement.style.removeProperty('--gostudy-ui-heading-size'));
+        }
         await teacherLink.waitFor();
         if (course === 'general_english_b1') {
           assert.equal(await sp.locator('.home-homework-link').count(),0);

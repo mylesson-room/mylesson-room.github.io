@@ -22,6 +22,16 @@ jobs:
           node-version: '20'
       - name: Verify GoStudy shared UI contract
         run: node scripts/check-architecture.cjs
+      - name: Verify one canonical cabinet and frozen compatibility URLs
+        run: node scripts/check-unified-cabinet.cjs
+      - name: Verify complete legacy migration inventory
+        run: node scripts/check-cabinet-migration-inventory.cjs
+      - name: Verify shared legacy cabinet controllers preserve browser storage
+        run: node scripts/check-shared-legacy-cabinet-controller.cjs
+      - name: Reject unsafe legacy migration inventory mutations
+        run: node scripts/test-cabinet-migration-inventory-negative.cjs
+      - name: Validate proposed migration safety contract
+        run: node scripts/check-migration-contract.cjs
       - name: Verify newly introduced student cabinets
         shell: bash
         run: |

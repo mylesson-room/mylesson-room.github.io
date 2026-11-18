@@ -8,7 +8,7 @@ permissions:
   contents: read
 concurrency:
   group: gostudy-pages-${{ github.event_name == 'pull_request' && github.ref || 'production' }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   verify:
     runs-on: ubuntu-24.04
@@ -21,7 +21,12 @@ jobs:
       - run: npm install --no-save --no-package-lock playwright@1.58.2
       - run: npx playwright install --with-deps chromium
       - run: node scripts/check-template-contract.cjs
+      - run: node scripts/check-positive-thinking-lesson.cjs
       - run: node scripts/check-pages.cjs
+      - name: Test shared student route with synthetic Supabase accounts
+        run: node scripts/check-unified-cabinet-browser.cjs
+      - name: Test historical cabinets preserve per-course words and answers
+        run: node scripts/check-shared-legacy-cabinet-browser.cjs
       - name: Prepare static site
         if: github.ref == 'refs/heads/main'
         run: |
