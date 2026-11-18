@@ -1252,6 +1252,18 @@ async function main() {
             await page.getByRole('heading',{name:'Korean Wave: Who Influences Whom?'}).first().waitFor();
           }
           assert.equal(await sp.locator('#lessonPages>.page').count(),7);
+          const kwData=JSON.parse(await sp.locator('#lesson-data').textContent());
+          assert.equal(kwData.durationMinutes,50);
+          assert.equal(kwData.steps.reduce((n,s)=>n+s.minutes,0),50);
+          assert.equal(kwData.lessonWords.length,8);
+          assert.ok(kwData.steps[0].html.includes('Photo credits &amp; licences'),'Photo licensing must appear on screen');
+          assert.ok(kwData.steps[3].html.includes('1.5 million media reports'),'Reading must use grounded 2026 report');
+          assert.equal(kwData.steps[5].type,'gap','B2 language practice must auto-grade');
+          assert.equal(await sp.locator('#page-0 img').count(),3,'Visual warmup needs three images');
+          assert.equal(await sp.locator('#page-0 img[alt]').count(),3,'Photos need alt text');
+          for (const photo of await sp.locator('#page-0 img').all()) {
+            assert.match(await photo.getAttribute('src'),/^https:\/\/upload\.wikimedia\.org\//,'Images must be licensed Commons photographs');
+          }
           assert.equal(await sp.locator('a.call-btn').getAttribute('href'),'https://telemost.yandex.ru/');
           await sp.locator('#selectionTranslate').waitFor({state:'attached'});
           const outsider = await browser.newContext();
@@ -1268,6 +1280,12 @@ async function main() {
           await sp.locator('[data-exercise-field="warm1"]').fill('Music crosses language barriers.');
           await tp.waitForFunction(() => document.querySelector('[data-exercise-field="warm1"]')?.value === 'Music crosses language barriers.');
           await sp.locator('#next').click();
+          await sp.locator('#page-1.active iframe').waitFor({state:'attached'});
+          assert.match(await sp.locator('#page-1 iframe').getAttribute('src'),/youtube-nocookie\.com\/embed\/s48XhclvQBs/);
+          assert.ok((await sp.locator('#page-1 .kw-prompt-list li').count())>=3,'Video must lead to open discussion');
+          assert.equal(await sp.locator('#page-1 input[type=radio]').count(),0,'No audio quiz requested');
+          await sp.locator('[data-exercise-field="video1"]').fill('The exhibition shows culture is shared in many directions.');
+          await tp.waitForFunction(()=>document.querySelector('[data-exercise-field="video1"]')?.value==='The exhibition shows culture is shared in many directions.');
           await tp.locator('#moveStudent').waitFor();
           await tp.locator('#moveStudent').click();
           await sp.locator('#page-0.active').waitFor();
@@ -1277,6 +1295,19 @@ async function main() {
           await choice.locator('summary').click();
           await choice.getByRole('button',{name:/break into the mainstream/}).click();
           await sp.locator('#page-2 .feedback').first().filter({hasText:'Correct'}).waitFor();
+          assert.equal(await sp.locator('#page-2 [data-lesson-word]').count(),8);
+          await sp.locator('#next').click();
+          await sp.locator('#page-3.active .kw-case-article').waitFor();
+          assert.match(await sp.locator('#page-3 .kw-fact-strip').innerText(),/30 countries/);
+          await sp.locator('#next').click();
+          await sp.locator('#page-4.active input[type=radio]').first().waitFor();
+          await sp.locator('#next').click();
+          await sp.locator('#page-5.active .definition-picker').first().waitFor();
+          await sp.locator('#page-5 .definition-picker').first().locator('summary').click();
+          await sp.locator('#page-5 .definition-picker').first().getByRole('button',{name:/Although/}).click();
+          await sp.locator('#page-5 .feedback').first().filter({hasText:'Correct'}).waitFor();
+          for(let i=0;i<3;i++) await sp.locator('#back').click();
+          await sp.locator('#page-2.active .definition-picker').first().waitFor();
           await sp.locator('#finance-chat-form input').fill('Korean Wave classroom test');
           await sp.locator('#finance-chat-form button').click();
           await tp.locator('#finance-messages').getByText('Korean Wave classroom test',{exact:true}).waitFor();
@@ -1305,8 +1336,10 @@ async function main() {
           await mobile.locator('.lesson-card-link').click();
           await mobile.locator('#lessonPages>.page.active').waitFor();
           assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),'Feed B2 mobile lesson overflow');
+          assert.equal(await mobile.locator('#page-0 img').count(),3);
+          assert.ok(await mobile.locator('#page-0 .kw-gallery').evaluate(el=>el.scrollWidth<=el.clientWidth+1),'Mobile image cards must fit screen');
           await mobile.close();
-          console.log('feed_b2: canonical cabinet, homework absent, 7 stages, teacher room, reset/navigation, chat, words, mastery, reload and mobile verified');
+          console.log('feed_b2: visual Korean Wave B2 50-min lesson, photos, PBS video discussion, B2 reading, vocabulary, grammar, teacher room, chat, reload, mastery, outsider and mobile verified');
           continue;
         }
         if (course === 'finance_b1') {
