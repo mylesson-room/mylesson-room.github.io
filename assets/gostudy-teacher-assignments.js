@@ -8,7 +8,8 @@
   const current=document.getElementById('teacher-active-assignment');
   const status=document.getElementById('teacher-assignment-status');
   if(!form||!selection||!current||!status)return;
-  let studentId=null,version=0,catalog=[];
+  let studentId=null,version=0,catalog=[],pendingMutation=false;
+  const button=form.querySelector('button[type=submit]');
   const uuid=v=>/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(String(v||''));
   function say(message){status.textContent=message;}
   async function api(path,options={}){
@@ -26,7 +27,11 @@
   async function choose(id){
     studentId=uuid(id)?id:null;
     const requestId=++version;
+    // Invalidate selections immediately so a previously loaded student's lesson
+    // cannot be submitted while the new student's permissions are loading.
+    catalog=[];
     form.hidden=true;
+    if(button)button.disabled=pendingMutation;
     selection.replaceChildren();
     current.textContent=studentId?'Загружаем актуальный урок…':'Выберите ученика.';
     say('');
@@ -53,6 +58,7 @@
         selection.value=rows[0].lesson_id;
       }else current.textContent='Актуальный урок ещё не назначен.';
       form.hidden=false;
+      if(button)button.disabled=pendingMutation;
     }catch(error){
       if(requestId!==version)return;
       current.textContent=error.message||'Не удалось загрузить назначения.';
@@ -62,19 +68,29 @@
   form.addEventListener('submit',async event=>{
     event.preventDefault();
     const target=studentId,chosen=selection.value;
+    if(pendingMutation)return;
     if(!uuid(target)||!catalog.some(x=>x.lesson_id===chosen)){say('Выберите ученика и урок.');return;}
-    const button=form.querySelector('button[type=submit]');
-    button.disabled=true;say('Назначаем урок…');
+    const submissionVersion=version;
+    pendingMutation=true;
+    if(button)button.disabled=true;
+    say('Назначаем урок…');
     try{
       // A single invoker RPC archives the old assignment and publishes the new one
       // in one transaction, with a per-student lock. Never use two independent REST writes.
       await api('/rest/v1/rpc/gostudy_activate_student_lesson',{
         method:'POST',body:{p_student_id:target,p_lesson_id:chosen}
       });
-      if(studentId!==target)return;
+      if(studentId!==target || version!==submissionVersion)return;
       await choose(target);
-      say('Урок назначен. Он появится в кабинете ученика.');
-    }catch(error){say(error.message||'Не удалось назначить урок.');}
-    finally{button.disabled=false;}
+      if(studentId===target && version===submissionVersion+1)
+        say('Урок назначен. Он появится в кабинете ученика.');
+    }catch(error){
+      // A late failure belongs to the ORIGINAL student, not the newly selected one.
+      if(studentId===target && version===submissionVersion)
+        say(error.message||'Не удалось назначить урок.');
+    }finally{
+      pendingMutation=false;
+      if(button)button.disabled=false;
+    }
   });
 })();
