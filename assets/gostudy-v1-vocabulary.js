@@ -51,7 +51,9 @@ async function markLearned(word) {
 
 
 function loadSavedWords() {
+  // Authenticated Finance lessons keep their original real-time source.
   const legacy = document.body.dataset.vocabularySources;
+  const storageKey = document.body.dataset.vocabularyKey || WORDS_STORAGE_KEY;
   if (legacy && window.FinanceLive?.connected()) {
     const combined = new Map();
     const read = (store,key) => {
@@ -62,7 +64,7 @@ function loadSavedWords() {
         }
       } catch {}
     };
-    for (const key of [...legacy.split(' '), WORDS_STORAGE_KEY]) {
+    for (const key of [...legacy.split(' '), storageKey]) {
       read(localStorage,key);
       if (window.GoStudyStorage) read(window.GoStudyStorage,key);
     }
@@ -71,12 +73,24 @@ function loadSavedWords() {
   }
   if (window.FinanceLive?.connected()) return FinanceLive.words();
   if (document.body.dataset.classroomCourse) return [];
-  try {
-    const saved = JSON.parse(localStorage.getItem(WORDS_STORAGE_KEY) || '{}');
-    if (!Array.isArray(saved.words)) return [];
-    return saved.words.filter(w => w && typeof w.en === 'string' && w.en.trim())
-      .map(w => ({en:w.en.trim(),ru:String(w.ru || '').trim()}));
-  } catch (error) { console.warn('Vocabulary could not be loaded:', error); return []; }
+  // For historic course dashboards, the same canonical vocabulary UI reads
+  // all previously used lesson keys without changing or deleting their data.
+  const keys = [...new Set([...(legacy ? legacy.split(/\s+/).filter(Boolean) : []), storageKey])];
+  const combined = new Map();
+  for (const key of keys) {
+    for (const store of [localStorage, window.GoStudyStorage].filter(Boolean)) {
+      try {
+        const saved=JSON.parse(store.getItem(key)||'{}');
+        const words=Array.isArray(saved) ? saved : saved.words||[];
+        for (const word of words) {
+          if (typeof word?.en !== 'string' || !word.en.trim()) continue;
+          const en=word.en.trim(),ru=String(word.ru||'').trim();
+          combined.set(en.toLowerCase(),{en,ru});
+        }
+      }catch{}
+    }
+  }
+  return [...combined.values()];
 }
 function updateVocabularyCount() {
   const count = masteryEnabled ? activeWords().length : loadSavedWords().length;

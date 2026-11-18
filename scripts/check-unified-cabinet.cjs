@@ -47,4 +47,15 @@ for (const path of tracked) {
   assert.match(html, /data-gostudy-legacy-visual/, path+' must scope legacy visual normalization');
 }
 
+
+// The Travel A2 course is the urgent pilot: it must use the exact Michael UI
+// and preserve prior lesson links (the authenticated user mapping is external).
+const naya=fs.readFileSync('student-travel-a2.html','utf8');
+assert.match(naya,/assets\/gostudy-v1-cabinet\.js/, 'Travel A2 must share Michael cabinet renderer');
+assert.match(naya,/assets\/gostudy-v1-cabinet\.css/, 'Travel A2 must share Michael CSS');
+assert.match(naya,/data-vocabulary-sources="[^"]*gostudy-travel-a2plus-v1/, 'Travel A2 must use historical vocabulary keys');
+assert.match(naya,/travel-a2-04\.html/, 'Keep Travel A2 lesson 4');
+assert.match(naya,/travel-a2-04-homework\.html/, 'Keep Travel A2 lesson 4 homework');
+assert.ok(!/data-gostudy-legacy-visual/.test(naya), 'Travel A2 must not retain legacy shell');
+
 console.log('Unified cabinet guard: '+tracked.length+' frozen legacy routes; Michael = canonical UI; Placement = second test scenario.');
