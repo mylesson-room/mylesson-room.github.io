@@ -1144,7 +1144,7 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     await sp.locator('.lesson-card-link').click();
     await sp.waitForURL(/my-trip-to-vietnam-a2.html/);
     await sp.locator('#lessonPages>.page.active').waitFor();
-    await sp.locator('#finance-live-status').getByText('Онлайн · общая комната',{exact:true}).waitFor();
+    await sp.waitForFunction(()=>document.querySelector('#finance-live-status')?.textContent?.trim()==='Онлайн · общая комната');
     assert.equal(await sp.locator('#lessonPages>.page').count(),7);
     assert.equal(await sp.locator('a.call-btn').getAttribute('href'),'https://telemost.yandex.ru/');
     assert.equal(await sp.locator('#selectionTranslate').count(),1);
@@ -1160,7 +1160,7 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     assert.equal(await sp.locator('[data-exercise-field="vnm-g1-0"]').inputValue(),'get up');
     const tp=await teacher.newPage();
     await tp.goto(origin+'/my-trip-to-vietnam-a2.html?classStudent='+studentId);
-    await tp.locator('#finance-live-status').getByText('Онлайн · общая комната',{exact:true}).waitFor();
+    await tp.waitForFunction(()=>document.querySelector('#finance-live-status')?.textContent?.trim()==='Онлайн · общая комната');
     await tp.locator('#moveStudent').waitFor();
     await tp.locator('#moveStudent').click();
     await sp.locator('#page-0.active').waitFor();
