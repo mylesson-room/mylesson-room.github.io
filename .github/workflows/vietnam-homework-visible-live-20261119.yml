@@ -1,0 +1,54 @@
+name: Verify public Vietnam A2 homework card CSS (temporary)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/vietnam-homework-visible-live-20261119.yml'
+permissions:
+  contents: read
+jobs:
+  live:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check published cabinet and CSS
+        run: |
+          node <<'NODE'
+          const assert=require('node:assert/strict');
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          const base='https://mylesson-room.github.io/';
+          (async()=>{
+            let result=false,error='';
+            for(let n=0;n<85;n++){
+              try{
+                const q='?homework-visible-check='+Date.now()+'-'+n;
+                const [a,b,c]=await Promise.all([
+                  fetch(base+'student-english-placement.html'+q,{headers:{'cache-control':'no-cache'}}),
+                  fetch(base+'assets/gostudy-placement.css'+q,{headers:{'cache-control':'no-cache'}}),
+                  fetch(base+'my-trip-to-vietnam-a2-homework.html'+q,{headers:{'cache-control':'no-cache'}})
+                ]);
+                assert.equal(a.status,200);
+                assert.equal(b.status,200);
+                assert.equal(c.status,200);
+                const [html,css,homework]=await Promise.all([a.text(),b.text(),c.text()]);
+                assert.match(html,/"homework":"my-trip-to-vietnam-a2-homework.html"/);
+                assert.match(html,/"lesson":"my-trip-to-vietnam-a2.html"/);
+                assert.match(html,/gostudy-v1-cabinet.css/);
+                assert.doesNotMatch(css,/\[data-placement-cabinet\]\s*:is\(#assignment[^}]+display:\s*none/);
+                assert.doesNotMatch(css,/\[data-placement-cabinet\]\s*\.cards\s*\{\s*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+                assert.match(homework,/vnm-hw-writing/);
+                const canonical=await fetch(base+'assets/gostudy-v1-cabinet.js'+q);
+                assert.equal(canonical.status,200);
+                const js=await canonical.text();
+                assert.match(js,/id="assignment"/);
+                assert.match(js,/homeworkAvailable/);
+                console.log('LIVE VISIBLE HOMEWORK VERIFIED: assigned cabinet tile no longer hidden by placement CSS; PDF homework page and canonical card remain public.');
+                result=true;break;
+              }catch(e){error=String(e.message||e)}
+              await sleep(4500);
+            }
+            assert.ok(result,'Public homework card not confirmed: '+error);
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          NODE
