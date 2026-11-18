@@ -1069,7 +1069,7 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
   ];
   for(const [path,pages,mins,key] of configs){
     const html=await readFile(path,'utf8');
-    const config=JSON.parse(html.match(/id="vietnam-content">([\\s\\S]*?)<\\/script>/)[1]);
+    const config=JSON.parse(html.split('id="vietnam-content">')[1].split('</script>')[0]);
     assert.equal(config.steps.length,pages);
     assert.equal(config.steps.reduce((n,s)=>n+s.minutes,0),mins);
     assert.equal(config.key,key);
