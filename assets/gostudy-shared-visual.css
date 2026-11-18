@@ -1,0 +1,18 @@
+/* Shared GoStudy visual tokens, used by the Michael renderer and legacy route adapters.
+   Presentation only: do not override authorization, navigation, homework visibility
+   or historical data stores. Change --gostudy-action-bg once for all connected cabinets. */
+:root {
+  --gostudy-action-bg: #00a9ef;
+  --gostudy-action-fg: #062535;
+  --gostudy-action-radius: 6px;
+}
+body[data-gostudy-legacy-visual] :is(a.btn,button.btn,a.cta,button.cta,a.primary,button.primary,a.home-primary,button.home-primary,a.button.primary,button.button.primary) {
+  background:var(--gostudy-action-bg) !important;
+  color:var(--gostudy-action-fg) !important;
+  border-radius:var(--gostudy-action-radius) !important;
+}
+body[data-gostudy-legacy-visual] :is(a.btn,button.btn,a.cta,button.cta,a.primary,button.primary,a.home-primary,button.home-primary,a.button.primary,button.button.primary):disabled,
+body[data-gostudy-legacy-visual] :is(a.btn,button.btn,a.cta,button.cta,a.primary,button.primary,a.home-primary,button.home-primary,a.button.primary,button.button.primary)[aria-disabled="true"] {
+  opacity:.55;
+  cursor:not-allowed;
+}
