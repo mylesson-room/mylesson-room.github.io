@@ -1,0 +1,22 @@
+{
+  "pilot": "travel-a2-positive-thinking",
+  "status": "staging-only-blocked",
+  "legacyCabinet": "student-travel-a2.html",
+  "canonicalCabinet": "student.html",
+  "lesson": "positive-thinking-a2.html",
+  "lessonKey": "gostudy-positive-thinking-a2-v1",
+  "homework": {
+    "source": "positive-thinking-a2-homework.html",
+    "published": false
+  },
+  "requiredChecks": [
+    "verified-full-backup",
+    "isolated-restore-rehearsal",
+    "teacher-verified-auth-and-legacy-mapping",
+    "legacy-progress-and-vocabulary-reconciliation",
+    "cross-account-rls-negative-tests",
+    "teacher-student-authenticated-e2e",
+    "customer-acceptance"
+  ],
+  "note": "Public lesson metadata only. Does not identify student or authorize assignment or migration. Never seed an Auth identity from this manifest."
+}
