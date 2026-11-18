@@ -8,7 +8,7 @@ permissions:
   contents: read
 concurrency:
   group: gostudy-pages-${{ github.event_name == 'pull_request' && github.ref || 'production' }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 jobs:
   verify:
     runs-on: ubuntu-24.04
@@ -19,10 +19,13 @@ jobs:
           node-version: 22
       - run: python3 scripts/update-shared-assets.py
       - run: npm install --no-save --no-package-lock playwright@1.58.2
-      - run: npx playwright install --with-deps chromium
       - run: node scripts/check-template-contract.cjs
       - run: node scripts/check-positive-thinking-lesson.cjs
-      - run: node scripts/check-pages.cjs
+      - name: Check GoStudy in the runner's Chrome
+        run: |
+          GOSTUDY_CHROME="$(command -v google-chrome)"
+          export GOSTUDY_CHROME
+          node scripts/check-pages.cjs
       - name: Prepare static site
         if: github.ref == 'refs/heads/main'
         run: |
