@@ -17,6 +17,101 @@
 #lessonPages .vnm-dialogue,#lessonPages .vnm-optional{border:1px solid #d8e5ee;border-radius:12px;padding:14px;margin:16px 0}
 #lessonPages .vnm-dialogue summary,#lessonPages .vnm-optional summary{cursor:pointer;font-weight:650}
 @media(max-width:700px){#lessonPages .vnm-grammar{grid-template-columns:1fr}}
+
+/* Vietnam A2: decorative illustrations and reading layout only; lesson content is unchanged. */
+#lessonPages #page-0 .panel::before,
+#lessonPages #page-5 .panel::before{
+  content:"";display:block;height:140px;margin:0 0 18px;border-radius:18px;
+  background:#c6eef6 url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201000%20190%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22sky%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23d6f6ff%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23b7e9f6%22%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%22sea%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%2350bfd3%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%231687aa%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%221000%22%20height%3D%22190%22%20fill%3D%22url(%23sky)%22%2F%3E%3Ccircle%20cx%3D%22820%22%20cy%3D%2239%22%20r%3D%2228%22%20fill%3D%22%23ffe49b%22%2F%3E%3Cpath%20d%3D%22M0%20120%20Q80%20105%20145%20119%20L183%2052%20Q208%2033%20221%2063%20L261%20120%20L310%20119%20352%2073%20Q367%2062%20377%2078%20L417%20121%20478%20120%20526%2054%20Q549%2031%20565%2056%20L617%20121%20688%20122%20734%2084%20Q754%2066%20767%2090%20L807%20120%201000%20120%201000%20190%200%20190Z%22%20fill%3D%22%234fb69d%22%2F%3E%3Cpath%20d%3D%22M0%20131%20Q220%20118%20380%20131%20T690%20130%20T1000%20129%20L1000%20190%20L0%20190Z%22%20fill%3D%22url(%23sea)%22%2F%3E%3Cpath%20d%3D%22M0%20157%20Q100%20149%20200%20157%20T400%20157%20T600%20157%20T800%20157%20T1000%20157%22%20stroke%3D%22%23dcfbff%22%20stroke-width%3D%223%22%20fill%3D%22none%22%20opacity%3D%22.7%22%2F%3E%3Cpath%20d%3D%22M405%20149%20L450%20149%20L442%20162%20L416%20162Z%22%20fill%3D%22%232d526b%22%2F%3E%3Cpath%20d%3D%22M426%20148%20V116%20M426%20118%20L448%20146%20H426Z%22%20stroke%3D%22%232d526b%22%20stroke-width%3D%222%22%20fill%3D%22%23fff4d7%22%2F%3E%3Cpath%20d%3D%22M78%2032%20q12%20-11%2024%200%20q12%20-11%2024%200%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%227%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.9%22%2F%3E%3Cpath%20d%3D%22M665%2040%20q12%20-10%2024%200%20q12%20-10%2024%200%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%227%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.85%22%2F%3E%3C%2Fsvg%3E") center/cover no-repeat;
+  border:1px solid #bde4e9;
+}
+#lessonPages .page .activity-head{
+  display:flex;align-items:center;gap:15px;padding:17px 19px;margin:0 0 18px;
+  border:1px solid #d7eaf4;border-radius:18px;
+  background:linear-gradient(110deg,#e9f8ff,#fff9ec);
+}
+#lessonPages .page .activity-head::before{
+  content:"✈️";display:grid;place-items:center;flex:0 0 54px;
+  width:54px;height:54px;font-size:29px;line-height:1;
+  background:#fff;border:1px solid #e0edf5;border-radius:15px;
+  box-shadow:0 4px 12px #285a7710;
+}
+#lessonPages #page-1 .activity-head::before{content:"🛫"}
+#lessonPages #page-2 .activity-head::before{content:"📘"}
+#lessonPages #page-3 .activity-head::before{content:"🎧"}
+#lessonPages #page-4 .activity-head::before{content:"🌞"}
+#lessonPages #page-5 .activity-head::before{content:"🌴"}
+#lessonPages #page-6 .activity-head::before{content:"🎤"}
+#lessonPages .page .activity-titles h2{margin:0;color:#1c3954}
+#lessonPages .page .vnm-eyebrow{
+  display:inline-block;border-radius:999px;padding:7px 12px;
+  background:#eaf8fd;color:#166f8c;letter-spacing:.055em;
+}
+#lessonPages .page .tip{border-left:4px solid #74c8d9}
+#lessonPages #page-0 .vnm-card-grid .material-card{
+  margin:0;border-color:#d6e9f4;border-radius:16px;
+  background:linear-gradient(160deg,#f0faff,#fff);
+  box-shadow:0 5px 16px #297a9e0a;
+}
+#lessonPages #page-0 .vnm-card-grid .material-card:nth-child(even){
+  background:linear-gradient(160deg,#fff8ed,#fff);
+}
+/* Vocabulary · About me: exactly one card per row. */
+#lessonPages #page-1 .vnm-card-grid{
+  display:grid;grid-template-columns:minmax(0,1fr);
+  max-width:780px;gap:9px;
+}
+#lessonPages #page-1 .vnm-card-grid .material-card{
+  display:grid;grid-template-columns:56px minmax(0,1fr);
+  grid-template-rows:auto auto;align-content:center;column-gap:14px;
+  min-height:73px;margin:0;padding:12px 16px;
+  border:1px solid #d8e8f3;border-radius:15px;background:#f9fcff;
+}
+#lessonPages #page-1 .vnm-card-grid .material-card:nth-child(even){background:#fffaf1}
+#lessonPages #page-1 .vnm-card-grid .material-card::before{
+  content:"🏠";grid-column:1;grid-row:1 / span 2;
+  display:grid;place-items:center;align-self:center;
+  width:48px;height:48px;border-radius:14px;background:#e7f4ff;font-size:25px;
+}
+#lessonPages #page-1 .vnm-card-grid .material-card:nth-child(2)::before{content:"💼"}
+#lessonPages #page-1 .vnm-card-grid .material-card:nth-child(3)::before{content:"❤️"}
+#lessonPages #page-1 .vnm-card-grid .material-card:nth-child(4)::before{content:"⏰"}
+#lessonPages #page-1 .vnm-card-grid .material-card:nth-child(5)::before{content:"✈️"}
+#lessonPages #page-1 .vnm-card-grid .material-card:nth-child(6)::before{content:"🤝"}
+#lessonPages #page-1 .vnm-card-grid .material-card:nth-child(7)::before{content:"👨‍👩‍👧"}
+#lessonPages #page-1 .vnm-card-grid .material-card:nth-child(8)::before{content:"🎨"}
+#lessonPages #page-1 .vnm-card-grid .material-card:nth-child(9)::before{content:"🌟"}
+#lessonPages #page-1 .vnm-card-grid .material-card strong{
+  grid-column:2;grid-row:1;font-size:1.03rem;line-height:1.35;
+  color:#172942;
+}
+#lessonPages #page-1 .vnm-card-grid .material-card p{
+  grid-column:2;grid-row:2;margin:2px 0 0;font-size:.98rem;line-height:1.5;
+  color:#47536b;
+}
+/* Useful phrases: vertical list and larger, bold text. */
+#lessonPages #page-1 .vnm-phrase-list{
+  display:grid;grid-template-columns:minmax(0,1fr);max-width:780px;gap:9px;
+}
+#lessonPages #page-1 .vnm-phrase-list span{
+  display:flex;align-items:center;gap:12px;min-height:54px;
+  border:1px solid #d8e8f3;border-radius:13px;
+  padding:13px 16px;background:#eef8fd;color:#163650;
+  font-size:1.1rem;font-weight:750;line-height:1.4;
+}
+#lessonPages #page-1 .vnm-phrase-list span:nth-child(even){background:#fff8ec}
+#lessonPages #page-1 .vnm-phrase-list span::before{
+  content:"💬";flex:none;font-size:23px;line-height:1;
+}
+@media(max-width:600px){
+  #lessonPages #page-0 .panel::before,
+  #lessonPages #page-5 .panel::before{height:100px}
+  #lessonPages .page .activity-head{gap:10px;padding:13px}
+  #lessonPages .page .activity-head::before{width:42px;height:42px;flex-basis:42px;font-size:23px}
+  #lessonPages #page-1 .vnm-card-grid .material-card{grid-template-columns:45px minmax(0,1fr);column-gap:11px;padding:11px}
+  #lessonPages #page-1 .vnm-card-grid .material-card::before{width:40px;height:40px;font-size:22px}
+  #lessonPages #page-1 .vnm-phrase-list span{font-size:1.03rem;padding:12px}
+}
 </style></head>
 <body data-finance-live data-vietnam-lesson data-translate-engine="google-web-pilot" data-live-script="assets/gostudy-finance-live.js" data-lesson-script="assets/gostudy-v1-lesson.js" data-exercises-script="assets/gostudy-v1-exercises.js" data-workbook-script="assets/gostudy-v1-workbook.js">
 <script type="application/json" id="private-access-config">{"room":{"course":"vietnam-a2","lesson":"my-trip-to-vietnam-a2.html"}}</script>
