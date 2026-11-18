@@ -293,6 +293,60 @@ async function run(){
     }
     await checkTeacherProfileEditor();
 
+    // Late profile PATCH responses must update the original student's roster entry
+    // without showing success/error, or overwriting the form, for a different student.
+    async function checkTeacherProfileSwitchDuringSave(success){
+      const page=await browser.newPage();
+      const sid='11111111-1111-4111-8111-111111111111';
+      const otherId='22222222-2222-4222-8222-222222222222';
+      await page.setContent('<form id="teacher-profile-name-form" hidden><input id="teacher-profile-name"><button type="submit">Сохранить имя</button><p id="teacher-profile-name-status"></p></form><p id="teacher-profile-name-placeholder"></p>');
+      await page.evaluate(ids=>{
+        window.__profilePatches=[];window.__finishPatch=null;window.__profileUpdates=[];
+        document.addEventListener('gostudy-profile-updated',e=>window.__profileUpdates.push(e.detail));
+        window.GoStudyAuth={
+          token:async()=> 'synthetic-teacher-token',
+          request:async(url,options,jwt)=>{
+            if(jwt!=='synthetic-teacher-token')return {ok:false,status:401};
+            if(options?.method==='PATCH'){
+              window.__profilePatches.push({url,body:options.body});
+              return await new Promise(resolve=>{window.__finishPatch=result=>resolve(result);});
+            }
+            const userId=url.includes(ids.otherId)?ids.otherId:ids.sid;
+            return {ok:true,status:200,data:[{user_id:userId,
+              display_name:userId===ids.otherId?'Борис':'Александр'}]};
+          }
+        };
+      },{sid,otherId});
+      await page.addScriptTag({path:path.join(root,'assets/gostudy-teacher-profile.js')});
+      await page.evaluate(id=>document.dispatchEvent(new CustomEvent('gostudy-teacher-student-selected',{detail:{studentId:id}})),sid);
+      await page.waitForFunction(()=>!document.getElementById('teacher-profile-name-form').hidden);
+      await page.locator('#teacher-profile-name').fill('Мария');
+      await page.locator('#teacher-profile-name-form button').click();
+      await page.waitForFunction(()=>window.__finishPatch!==null);
+      await page.evaluate(id=>document.dispatchEvent(new CustomEvent('gostudy-teacher-student-selected',{detail:{studentId:id}})),otherId);
+      await page.waitForFunction(()=>document.getElementById('teacher-profile-name').value==='Борис');
+      assert.equal(await page.locator('#teacher-profile-name-form button').isDisabled(),true,
+        'While saving student A, teacher must not start another profile write for B');
+      await page.locator('#teacher-profile-name-form').evaluate(el=>el.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})));
+      assert.equal((await page.evaluate(()=>window.__profilePatches)).length,1);
+      await page.evaluate(({ok,id})=>window.__finishPatch(ok
+        ?{ok:true,status:200,data:[{user_id:id,display_name:'Мария'}]}
+        :{ok:false,status:403}),{ok:success,id:sid});
+      await page.waitForFunction(()=>!document.querySelector('#teacher-profile-name-form button').disabled);
+      assert.equal(await page.locator('#teacher-profile-name').inputValue(),'Борис',
+        'Late PATCH must never overwrite the newly selected student form');
+      assert.doesNotMatch(await page.locator('#teacher-profile-name-status').textContent(),/Имя сохранено|Нет прав/,
+        'Previous student write must not show success/failure in another student card');
+      const updates=await page.evaluate(()=>window.__profileUpdates);
+      assert.equal(updates.length,success?1:0);
+      if(success)assert.deepEqual(updates[0],{studentId:sid,displayName:'Мария'},
+        'Successful late update must notify roster for the actual saved student');
+      await page.close();
+    }
+    await checkTeacherProfileSwitchDuringSave(true);
+    await checkTeacherProfileSwitchDuringSave(false);
+
+
     // One teacher action -> ONE atomic RPC. No split update/insert from the browser.
     async function checkTeacherLessonAssignmentEditor(){
       const page=await browser.newPage();
