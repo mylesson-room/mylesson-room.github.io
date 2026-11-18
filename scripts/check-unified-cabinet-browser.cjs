@@ -210,10 +210,15 @@ async function run(){
     async function checkLogoutClearsStudentContent(){
       const page=await browser.newPage();
       const sid='11111111-1111-4111-8111-111111111111';
-      await page.addInitScript(id=>sessionStorage.setItem('gostudy-cloud-session-v1',JSON.stringify({
-        access_token:'synthetic-test-token',refresh_token:'synthetic-refresh',
-        expires_at:Date.now()+3600000,user:{id}
-      })),sid);
+      await page.addInitScript(id=>{
+        // Page reload after logout must NOT recreate the synthetic test session.
+        if(sessionStorage.getItem('synthetic-seeded'))return;
+        sessionStorage.setItem('synthetic-seeded','1');
+        sessionStorage.setItem('gostudy-cloud-session-v1',JSON.stringify({
+          access_token:'synthetic-test-token',refresh_token:'synthetic-refresh',
+          expires_at:Date.now()+3600000,user:{id}
+        }));
+      },sid);
       await page.route('https://fonts.googleapis.com/**',route=>route.fulfill({status:200,contentType:'text/css',body:''}));
       await page.route('https://fonts.gstatic.com/**',route=>route.abort());
       await page.route('https://kawfqlohguwvmmplvrny.supabase.co/**',async route=>{
