@@ -42,6 +42,15 @@ for(const required of ['grid-template-columns:minmax(265px,32%) minmax(0,1fr)','
 assert.ok(html.includes('assets/gostudy-sync.js'),'Realtime sync script must not be removed');
 assert.ok(html.includes('assets/gostudy-glass-vocabulary.js'),'Original vocabulary integration must remain');
 assert.ok(html.includes('assets/gostudy-classroom-ui.js'),'Original classroom rendering must remain');
+assert.ok(html.includes('data-finance-live') && html.includes('data-preserve-workbook-progress'),'Shared room must preserve existing cloud progress');
+assert.ok(html.includes('data-classroom-course="travel_a2"'),'Shared room must use explicit course scope');
+assert.ok(html.includes('data-classroom-lesson="positive-thinking-a2.html"'),'Shared room must use explicit lesson scope');
+assert.ok(html.includes('assets/gostudy-approved-lesson-tools.js'),'Chat and Telemost shared tools must load');
+assert.ok(html.includes('assets/gostudy-finance-live.js'),'Existing RLS-guarded room transport must load');
+const tools=fs.readFileSync('assets/gostudy-approved-lesson-tools.js','utf8');
+for(const required of ['finance-ready','finance-event','FinanceLive.send','FinanceLive?.connected()','telemost.yandex.ru/']) assert.ok(tools.includes(required),'Shared tools missing '+required);
+assert.ok(!tools.includes('localStorage.setItem'),'Shared tools must not overwrite progress or vocabulary');
+
 
 assert.ok(homework.html.includes('assets/gostudy-vimbox-workbook.js'));
 console.log('Positive Thinking A2+: 50 min, 7 steps, 29 checkable items, video, 15-min homework; old storage intact.');
