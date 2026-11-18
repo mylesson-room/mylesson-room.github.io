@@ -26,6 +26,8 @@ jobs:
         run: node scripts/check-unified-cabinet.cjs
       - name: Verify complete legacy migration inventory
         run: node scripts/check-cabinet-migration-inventory.cjs
+      - name: Verify complete Positive Thinking pilot without publishing student data
+        run: node scripts/check-positive-thinking-migration-pilot.cjs
       - name: Audit public lesson links against unconfirmed legacy candidates
         run: node scripts/check-public-release-drift.cjs
       - name: Verify shared legacy cabinet controllers preserve browser storage
