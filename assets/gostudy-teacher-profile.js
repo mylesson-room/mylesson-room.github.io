@@ -10,7 +10,8 @@
   if (!form || !input || !status || !placeholder) return;
 
   const auth = window.GoStudyAuth;
-  let selected = null, version = 0;
+  let selected = null, version = 0, pendingSave = false;
+  const saveButton = form.querySelector('button[type="submit"]');
   const validId = value => /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(String(value || ''));
   function message(text) { status.textContent = text; }
 
@@ -30,6 +31,7 @@
     selected = validId(id) ? id : null;
     const current = ++version;
     form.hidden = true;
+    if (saveButton) saveButton.disabled = pendingSave;
     input.value = '';
     placeholder.hidden = !selected;
     placeholder.textContent = selected ? 'Загружаем профиль ученика…' : 'Выберите ученика, чтобы изменить его имя.';
@@ -40,6 +42,7 @@
       if (!Array.isArray(rows) || rows.length !== 1) throw Error('Для этого ученика пока не создан единый профиль.');
       input.value = rows[0].display_name === 'Ученик' ? '' : String(rows[0].display_name || '').slice(0,60);
       form.hidden = false;
+      if (saveButton) saveButton.disabled = pendingSave;
       placeholder.hidden = true;
       message('Имя редактирует преподаватель. Если имя неизвестно, в кабинете указано «Ученик».');
     } catch(error) {
@@ -55,15 +58,17 @@
 
   form.addEventListener('submit', async event => {
     event.preventDefault();
+    if (pendingSave) return;
     const studentId = selected;
+    const submissionVersion = version;
     if (!studentId || !validId(studentId)) return;
     const displayName = input.value.trim().replace(/\s+/g,' ');
     if (!displayName || displayName.length > 60 || /[<>@]/.test(displayName)) {
       message('Введите имя от 1 до 60 символов без email и HTML.');
       return;
     }
-    const button = form.querySelector('button[type="submit"]');
-    button.disabled = true;
+    pendingSave = true;
+    if (saveButton) saveButton.disabled = true;
     message('Сохраняем имя…');
     try {
       const updated = await api('/rest/v1/gostudy_profiles?user_id=eq.' + encodeURIComponent(studentId)+'&select=user_id,display_name',{
@@ -74,13 +79,18 @@
       if (!Array.isArray(updated) || updated.length !== 1 || updated[0].user_id !== studentId) {
         throw Error('Имя не сохранено. Проверьте права преподавателя и наличие профиля.');
       }
-      if (selected !== studentId) return;
+      if (selected !== studentId || version !== submissionVersion) return;
       input.value = updated[0].display_name;
       message('Имя сохранено в GoStudy. Оно будет показано ученику после обновления кабинета.');
       document.dispatchEvent(new CustomEvent('gostudy-profile-updated',{
         detail:{studentId, displayName:updated[0].display_name}
       }));
-    } catch(error) {message(error?.message || 'Не удалось сохранить имя.');}
-    finally {button.disabled = false;}
+    } catch(error) {
+      if (selected === studentId && version === submissionVersion)
+        message(error?.message || 'Не удалось сохранить имя.');
+    } finally {
+      pendingSave = false;
+      if (saveButton) saveButton.disabled = false;
+    }
   });
 })();
