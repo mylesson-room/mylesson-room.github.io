@@ -1210,6 +1210,7 @@ async function main() {
           await tp.locator('#dictionaryAddForm button').click();
           await sp.getByRole('button',{name:'Dictionary',exact:true}).click();
           await sp.locator('#myWords').getByText('пострегистрационный мониторинг',{exact:false}).waitFor();
+          await tp.getByRole('button',{name:'Close dictionary'}).click();
           await tp.getByRole('button',{name:'Сбросить ответы'}).first().click();
           await sp.reload();
           await sp.locator('#page-3.active').waitFor();
