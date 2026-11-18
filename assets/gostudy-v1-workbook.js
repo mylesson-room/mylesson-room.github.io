@@ -237,7 +237,7 @@ function sendAnswer(key,value){
   const field = workbook?.fields.get(key);
   const wireKey = answerNamespace + key;
   const payload = field ? {page:field.page,key:wireKey,value} : {key:wireKey,value};
-  const typing = field ? workbook.controls.get(key)?.[0]?.tagName === 'TEXTAREA' :
+  const typing = field ? workbook.controls.get(key)?.[0]?.matches('textarea,input[type=text]') :
     /^(gap\d+|decisionNotes|roleNotes|finalOpinion|homework)$/.test(key);
   if (!typing) {
     FinanceLive.send("answer",payload);
@@ -309,11 +309,19 @@ if (workbook) {
         optionPicker.bind(control,value=>setExerciseValue(key,value));
         continue;
       }
-      const type = control.tagName === 'TEXTAREA' ? 'input' : 'change';
-      control.addEventListener(type,()=>setExerciseValue(key,control.value));
+      const type = control.matches('textarea,input[type=text]') ? 'input' : 'change';
+      control.addEventListener(type,()=> {
+        const value = control.type === 'checkbox' ? (control.checked ? 'true' : '') : control.value;
+        setExerciseValue(key,value);
+      });
     }
   }
-  sections.forEach((_,page)=>workbook.grade(page,getValue,false));
+  sections.forEach((_,page)=> {
+    workbook.grade(page,getValue,false);
+    $('#page-'+page+' [data-check-section]')?.addEventListener('click',()=> {
+      if (workbook.grade(page,getValue,true)) celebrate();
+    });
+  });
 }
 document.querySelectorAll('[data-lesson-word]').forEach(button => button.addEventListener('click', () => {
   saveVocabulary(config.lessonWords?.[Number(button.dataset.lessonWord)]);
@@ -381,7 +389,7 @@ document.addEventListener("finance-event",event=>{
   }
   if(kind==="page" && Number.isInteger(payload.page) && LESSONS[payload.page]){
     if (own && initial && (payload.action === "presence" || !payload.action)) restoredPage = payload.page;
-    if (workbook && !own && !initial && !teacher && FinanceLive.teacher() && payload.action !== 'move') go(payload.page);
+    if (workbook && config.followStudent !== false && !own && !initial && !teacher && FinanceLive.teacher() && payload.action !== 'move') go(payload.page);
     if (payload.moveStudent && teacher && !own && !initial && !FinanceLive.teacher()) go(payload.page);
     if(payload.action==="presence" && !teacher && FinanceLive.teacher()){
       latestStudentPage=payload.page;

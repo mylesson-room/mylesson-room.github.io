@@ -206,3 +206,27 @@ document.addEventListener('finance-ready',loadMastery);
 document.addEventListener('finance-word',()=>{updateVocabularyCount();if(wordsDialog.open)openVocabulary();});
 window.addEventListener('storage',event => {if(event.key === WORDS_STORAGE_KEY)updateVocabularyCount();});
 updateVocabularyCount();
+if (document.getElementById("importFinanceWords")) {
+  const importButton = document.querySelector("#importFinanceWords");
+  const importStatus = document.querySelector("#financeImportStatus");
+  function refreshFinanceVocabulary() {
+    updateVocabularyCount();
+    const missing = window.FinanceLive?.missingLocalWords() || [];
+    importButton.hidden = missing.length === 0;
+    if (!missing.length && importButton.disabled) importStatus.textContent = "Старые слова теперь доступны на других устройствах.";
+    if (wordsDialog.open) openVocabulary();
+  }
+  importButton.addEventListener("click", () => {
+    const words = window.FinanceLive?.missingLocalWords() || [];
+    if (!words.length) return;
+    importButton.disabled = true;
+    importStatus.textContent = "Переносим слова в ваш аккаунт…";
+    for (const word of words) FinanceLive.send("word",word);
+    setTimeout(() => {
+      importButton.disabled = false;
+      if (window.FinanceLive?.missingLocalWords().length) importStatus.textContent = "Часть слов ещё не перенеслась. Можно повторить.";
+    },12000);
+  });
+  document.addEventListener("finance-ready", refreshFinanceVocabulary);
+  document.addEventListener("finance-word", refreshFinanceVocabulary);
+}

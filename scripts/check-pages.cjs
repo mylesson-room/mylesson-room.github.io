@@ -1073,6 +1073,8 @@ async function main() {
       const teacher = await browser.newContext();
       const assigned = [];
       const progress = new Map();
+      const roomEvents = [];
+      const mastery = [];
       try {
         for (const [context, role] of [[student, 'student'], [teacher, 'teacher']]) {
           await context.addInitScript(({ id }) => {
@@ -1084,6 +1086,25 @@ async function main() {
             const requestUrl = new URL(url);
             const action = requestUrl.pathname.split('/').at(-1);
             const data = route.request().postDataJSON() || {};
+            if (course === 'finance_b1') {
+              const actor = role === 'teacher' ? 'teacher' : studentId;
+              if (action === 'gostudy_classroom_rooms' && requestUrl.searchParams.get('course') === 'eq.finance-b1') {
+                return route.fulfill({json:[{id:'finance-b1-room',student_id:studentId,teacher_id:'teacher'}]});
+              }
+              if (action === 'gostudy_classroom_events') {
+                const cursor = Number(requestUrl.searchParams.get('seq').slice(3));
+                return route.fulfill({json:roomEvents.filter(event => event.seq > cursor)});
+              }
+              if (action === 'gostudy_classroom_send') {
+                assert.equal(data.p_room,'finance-b1-room');
+                roomEvents.push({seq:roomEvents.length+1,actor,kind:data.p_kind,payload:data.p_payload});
+                return route.fulfill({json:true});
+              }
+              if (action === 'gostudy_finance_word_progress') {
+                if (route.request().method() === 'POST') mastery.push(data);
+                return route.fulfill({json:mastery});
+              }
+            }
             if (action === 'gostudy_progress') {
               if (route.request().method() === 'GET') return route.fulfill({json:[...progress.values()]});
               assert.equal(role, 'student');
@@ -1125,6 +1146,53 @@ async function main() {
           await sp.waitForURL(url => url.pathname === '/student-general-english-b1-stories.html');
         } else await sp.goto(origin + (course === 'pharma_c1' ? '/student-pharma.html' : '/student-' + course.replaceAll('_', '-') + '.html'));
         await tp.goto(origin + '/gostudy-teacher.html');
+        if (course === 'finance_b1') {
+          await sp.locator('#assignment[aria-disabled="true"]').waitFor();
+          await sp.locator('.lesson-card-link').click();
+          await tp.locator('.teacher-enter-class').click();
+          for (const page of [sp,tp]) {
+            await page.waitForURL(url => url.pathname === expected);
+            await page.locator('header .lesson-brand').waitFor();
+            await page.locator('#finance-live-status').getByText('Онлайн · общая комната',{exact:true}).waitFor();
+          }
+          assert.equal(await sp.locator('#lessonPages>.page').count(),6);
+          await sp.locator('[data-exercise-field="warm1"]').fill('I check my balance.');
+          await sp.locator('[data-exercise-field="warm2a"]').check();
+          await tp.waitForFunction(() => document.querySelector('[data-exercise-field="warm1"]')?.value === 'I check my balance.'
+            && document.querySelector('[data-exercise-field="warm2a"]')?.checked);
+          await sp.locator('#next').click();
+          await tp.locator('#moveStudent').waitFor();
+          await tp.locator('#moveStudent').click();
+          await sp.locator('#page-0.active').waitFor();
+          await sp.locator('#next').click();
+          await sp.locator('[data-exercise-field="gap0"]').fill('fraud');
+          await sp.getByRole('button',{name:'Check answers'}).click();
+          await sp.getByText('1 / 6 correct',{exact:true}).waitFor();
+          await sp.locator('#finance-chat-form input').fill('Finance B1 test chat');
+          await sp.locator('#finance-chat-form button').click();
+          await tp.locator('#finance-messages').getByText('Finance B1 test chat',{exact:true}).waitFor();
+          await tp.getByRole('button',{name:'Dictionary',exact:true}).click();
+          await tp.locator('#dictionarySource').fill('fraud');
+          await tp.locator('#dictionaryTranslation').fill('мошенничество');
+          await tp.locator('#dictionaryAddForm button').click();
+          await sp.getByRole('button',{name:'Dictionary',exact:true}).click();
+          await sp.locator('#myWords').getByText('мошенничество',{exact:false}).waitFor();
+          await sp.reload();
+          await sp.locator('#page-1.active [data-exercise-field="gap0"]').waitFor();
+          assert.equal(await sp.locator('[data-exercise-field="gap0"]').inputValue(),'fraud');
+          await sp.goto(origin+'/student-finance-b1.html');
+          await sp.locator('#openWords').click();
+          await sp.locator('#words').getByText('fraud',{exact:true}).waitFor();
+          await sp.locator('#practiceFromWords').click();
+          await sp.locator('[data-mode="type"]').click();
+          await sp.locator('#practiceInput').fill('fraud');
+          await sp.locator('#practiceTypeForm button').click();
+          await sp.locator('#practiceAnswer[data-correct="true"]').waitFor();
+          await sp.waitForFunction(() => window.FinanceLive.words().some(word => word.en === 'fraud' && word.learned));
+          assert.equal(mastery[0]?.word_key,'fraud');
+          console.log('finance_b1: canonical cabinets, lesson tools, answers, chat, reload and vocabulary mastery verified');
+          continue;
+        }
         const canonicalCabinet = course === 'travel_a2';
         const studentLink = canonicalCabinet ? sp.locator('.lesson-card-link') : sp.locator('.home-open-lesson');
         const teacherLink = tp.locator('.teacher-enter-class');

@@ -16,28 +16,6 @@
 <script src="assets/gostudy-v1-vocabulary.js?v=word-mastery-20261117"></script>
 <script src="assets/gostudy-sync.js?v=finance-roster-2"></script>
 <script>
-const importButton = document.querySelector("#importFinanceWords");
-const importStatus = document.querySelector("#financeImportStatus");
-function refreshFinanceVocabulary() {
-  updateVocabularyCount();
-  const missing = window.FinanceLive?.missingLocalWords() || [];
-  importButton.hidden = missing.length === 0;
-  if (!missing.length && importButton.disabled) importStatus.textContent = "Старые слова теперь доступны на других устройствах.";
-  if (wordsDialog.open) openVocabulary();
-}
-importButton.addEventListener("click", () => {
-  const words = window.FinanceLive?.missingLocalWords() || [];
-  if (!words.length) return;
-  importButton.disabled = true;
-  importStatus.textContent = "Переносим слова в ваш аккаунт…";
-  for (const word of words) FinanceLive.send("word",word);
-  setTimeout(() => {
-    importButton.disabled = false;
-    if (window.FinanceLive?.missingLocalWords().length) importStatus.textContent = "Часть слов ещё не перенеслась. Можно повторить.";
-  },12000);
-});
-document.addEventListener("finance-ready", refreshFinanceVocabulary);
-document.addEventListener("finance-word", refreshFinanceVocabulary);
 const liveScript = document.createElement("script");
 liveScript.src = "assets/gostudy-finance-live.js?v=classroom-1";
 document.head.append(liveScript);

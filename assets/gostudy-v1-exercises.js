@@ -81,6 +81,10 @@
       field.nextElementSibling?.setAttribute('data-grade','');
       field.replaceWith(picker);
     }
+    for (const field of pages.querySelectorAll('[data-exercise-field]')) {
+      const key = field.dataset.exerciseField;
+      if (!fields.has(key)) register(key, Number(field.closest('.page').id.slice(5)), field.dataset.expected, key);
+    }
     const controls = new Map();
     for (const field of pages.querySelectorAll('[data-exercise-field],[data-order]')) {
       const key = field.dataset.exerciseField || field.dataset.order;
@@ -132,6 +136,7 @@
       for (const control of controls.get(key) || []) {
         if (control.dataset.order) drawOrder(key,control,value,set);
         else if (control.classList.contains('definition-picker')) optionPicker.show(control,value);
+        else if (control.type === 'checkbox') control.checked = value === 'true';
         else if (control.type === 'radio') control.checked = value !== '' && control.value === String(value);
         else if (control.value !== String(value ?? '')) control.value = value ?? '';
       }
@@ -140,14 +145,14 @@
       if (lesson.deferGrading) return false;
       const keys = groups[page];
       if (!keys?.length) return false;
-      let allCorrect = true;
+      let points = 0;
       for (const key of keys) {
         const value = get(key);
         const expected = fields.get(key).expected;
         const attempted = value !== '' && value != null;
         const correct = attempted && (Array.isArray(expected) ?
           JSON.stringify(expected) === JSON.stringify(value) : normalize(value) === normalize(expected));
-        allCorrect &&= correct;
+        if (correct) points++;
         const control = controls.get(key)?.[0];
         const row = control?.closest('[data-answer-row]');
         const result = row?.querySelector('[data-grade]');
@@ -159,6 +164,9 @@
         row?.classList.toggle('finance-correct',correct);
         if (control?.matches('.definition-picker')) control.classList.toggle('correct',correct);
       }
+      const score = pages.children[page].querySelector('[data-section-score]');
+      if (score && (animate || score.textContent)) score.textContent = points + ' / ' + keys.length + ' correct';
+      const allCorrect = points === keys.length;
       const celebrate = animate && allCorrect && !completion.has(page);
       if (allCorrect) completion.add(page); else completion.delete(page);
       return celebrate;
@@ -168,7 +176,13 @@
       if (!saved || typeof saved!=='object') return values;
       for (const [key,{step,slot}] of fields) {
         const answer = saved[step] ?? (/^original-\d+$/.test(step) ? saved[step.slice(9)] : undefined);
-        const value = slot === undefined ? answer : answer?.[slot];
+        let value = slot === undefined ? answer : answer?.[slot];
+        const options = controls.get(key) || [];
+        if (options[0]?.type === 'checkbox' && typeof value === 'boolean') value = value ? 'true' : '';
+        if (value === undefined) {
+          const previous = options.find(input => input.dataset.legacyKey && saved[input.dataset.legacyKey] === true);
+          if (previous) value = previous.value;
+        }
         if (value != null && valid(key,value)) values[key] = value;
       }
       return values;
@@ -178,6 +192,9 @@
       for (const step of new Set([...fields.values()].map(field=>field.step))) {
         delete answers[step];
         if (/^original-\d+$/.test(step)) delete answers[step.slice(9)];
+      }
+      for (const fields of controls.values()) {
+        for (const input of fields) if (input.dataset.legacyKey) delete answers[input.dataset.legacyKey];
       }
       for (const [key,{step,slot}] of fields) {
         const value = values[key];

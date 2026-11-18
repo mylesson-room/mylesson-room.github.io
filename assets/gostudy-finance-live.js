@@ -94,13 +94,19 @@
     }
   }
   function localWords() {
-    if (course) return [];
-    try {
-      const snapshot = JSON.parse(localStorage.getItem("gostudy-business-ai-shared-v1") || "{}");
-      if (!Array.isArray(snapshot.words)) return [];
-      return snapshot.words.filter(word => typeof word?.en === "string" && word.en.trim())
-        .map(word => ({en:word.en.trim(),ru:typeof word.ru === "string" ? word.ru.trim() : ""}));
-    } catch { return []; }
+    const sources = document.body.dataset.vocabularyImportSources?.split(/\s+/).filter(Boolean)
+      || (course ? [] : ['gostudy-business-ai-shared-v1']);
+    const available = new Map();
+    for (const key of sources) {
+      try {
+        const snapshot = JSON.parse(localStorage.getItem(key) || '{}');
+        for (const word of Array.isArray(snapshot.words) ? snapshot.words : []) {
+          const en = typeof word?.en === 'string' ? word.en.trim() : '';
+          if (en) available.set(en.toLowerCase(),{en,ru:typeof word.ru === 'string' ? word.ru.trim() : ''});
+        }
+      } catch {}
+    }
+    return [...available.values()];
   }
   function missingLocalWords() {
     if (room?.student_id !== auth.userId() || !room) return [];

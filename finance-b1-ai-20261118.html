@@ -1,87 +1,95 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="gostudy-course" content="finance-b1"><title>AI & Your Money · GoStudy B1</title>
-<meta name="gostudy-current-lesson"><link rel="stylesheet" href="assets/gostudy-sync.css">
-<link rel="stylesheet" href="assets/gostudy-lesson-header.css"><link rel="stylesheet" href="assets/gostudy-glass-vocabulary.css">
-<script src="assets/gostudy-classroom-ui.js"></script><script src="assets/gostudy-sync.js" defer></script>
-<style>
-:root{--ink:#1d3556;--muted:#657f9a;--blue:#287bd4;--line:#dce9f6;--bg:#f2f7fe;--card:#fff;--good:#e3f5e8;--bad:#fff0e9}*{box-sizing:border-box}
-body{margin:0;background:var(--bg);font:16px/1.65 system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink)}
-header{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line);padding:12px max(4vw,20px);display:flex;align-items:center;justify-content:space-between;gap:12px}
-a{color:var(--blue)}.brand{font-size:23px;font-weight:800;letter-spacing:-1px}.tag{color:var(--muted);font-size:12px}
-.wrap{max-width:1240px;margin:28px auto;display:grid;grid-template-columns:280px minmax(0,1fr);gap:22px;padding:0 20px}
-aside{align-self:start;position:sticky;top:92px}.panel,.page{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px;box-shadow:0 8px 30px #3165a00b}
-aside nav{display:grid;gap:5px;margin-top:17px}aside button{background:transparent;text-align:left;color:var(--ink);border:0;border-radius:12px;padding:12px;font:inherit;cursor:pointer}
-aside button[aria-current=true]{background:#e7f2ff;color:#176bbb;font-weight:750}
-h1{font-size:clamp(29px,4vw,44px);line-height:1.15;margin:8px 0 13px}h2{font-size:25px;line-height:1.2;margin:8px 0 15px}h3{font-size:18px;margin:12px 0}p{margin:10px 0 15px}.muted{color:var(--muted)}.eyebrow{text-transform:uppercase;letter-spacing:.13em;font-weight:800;color:var(--blue);font-size:11px}
-.hero{border-radius:15px;padding:24px;background:linear-gradient(125deg,#173b73,#277dc5);color:white}.hero p{color:#e6f2ff}.pill{display:inline-block;border-radius:40px;background:#e9f3ff;color:#316da9;padding:4px 10px;font-size:12px;font-weight:700}
-.question,.activity{border-top:1px solid var(--line);padding:17px 0}.question:first-child{border:0}.question strong{display:block;margin-bottom:9px}
-textarea,input[type=text],select{width:100%;background:#f8fbff;border:1px solid #cddff1;border-radius:10px;padding:12px;font:inherit;color:var(--ink)}textarea{min-height:90px;resize:vertical}
-button.primary,button.secondary{cursor:pointer;font:inherit;border:0;border-radius:11px;padding:10px 17px;font-weight:700}.primary{background:var(--blue);color:white}.secondary{background:#e9f3ff;color:#1c67aa}
-.options{display:grid;gap:8px}.options label{display:block;background:#f5f9fe;border:1px solid var(--line);border-radius:10px;padding:10px;cursor:pointer}.options label:has(input:checked){border-color:#3185d3;background:#e7f3ff}
-.feedback{font-weight:700;min-height:24px;font-size:13px}.correct{background:var(--good)!important;border-color:#72b98c!important}.wrong{background:var(--bad)!important;border-color:#d69b7d!important}
-.vocab{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.vocab article{background:#f4f9ff;border:1px solid var(--line);border-radius:12px;padding:13px}
-.news{background:#f5f9ff;padding:20px;border:1px solid var(--line);border-radius:14px;margin:16px 0}
-footer{display:flex;justify-content:space-between;gap:10px;margin-top:25px}.page{display:none}.page.active{display:block}
-.timer{margin:8px 0;color:var(--muted);font-size:13px}.split{display:grid;grid-template-columns:1fr 1fr;gap:12px}.scenario{background:#eef5ff;padding:16px;border-radius:12px}.tiny{font-size:12px;color:var(--muted)}
-@media(max-width:800px){.wrap{grid-template-columns:1fr;margin:14px auto;padding:0 12px}aside{position:static}aside nav{display:flex;overflow:auto}aside button{white-space:nowrap;font-size:13px}.panel,.page{padding:19px}header{position:static}.vocab,.split{grid-template-columns:1fr}}
- .wrap{display:block;max-width:none;margin:0;padding:0}.wrap>aside.panel{display:none}.wrap main{max-width:none;padding:0}.page{box-shadow:none;border:0;border-radius:0}.page.active{display:block}.page:not(.active){display:none} </style></head><body data-vocab-course="finance-b1">
-<header><div class="brand">GoStudy <span class="tag">/ General English B1</span></div><div><a href="student-finance-b1.html">← К кабинету</a> <span class="pill">50 min</span></div></header>
-<div class="wrap shell"><aside class="panel" id="lessonMenu"><span class="eyebrow">Live lesson</span><h2>AI & Your Money</h2><p class="muted">Who should make financial decisions: humans or machines?</p><nav id="nav" aria-label="Sections"></nav><p class="tiny" id="save">Your answers are synced to your account when signed in.</p></aside>
-<main id="content">
-<section class="page active" data-title="Let's talk" data-time="7 min">
-<span class="eyebrow">01 · Warm-up</span><h1>Would you trust AI with your money?</h1><div class="hero"><h2>Imagine this.</h2><p>Your bank app says: “Our AI can save you $150 every month.” Would you let it decide how to spend your money?</p></div>
-<div class="question"><strong>1. What do you usually use your banking app for?</strong><textarea data-id="warm1" placeholder="I normally use it to…"></textarea></div>
-<div class="question"><strong>2. Which financial decisions would you let AI make?</strong><div class="options"><label><input type="checkbox" data-id="warm2a"> Find expensive subscriptions</label><label><input type="checkbox" data-id="warm2b"> Recommend a savings plan</label><label><input type="checkbox" data-id="warm2c"> Decide whether I get a loan</label><label><input type="checkbox" data-id="warm2d"> Invest all my savings</label></div></div>
-<div class="question"><strong>3. Why is it sometimes difficult to trust technology?</strong><textarea data-id="warm3" placeholder="I think… because…"></textarea></div>
-</section>
-<section class="page" data-title="Useful words" data-time="8 min">
-<span class="eyebrow">02 · Vocabulary</span><h1>Money words that matter</h1><p>Learn six useful expressions. Then use them to talk about your own experience.</p>
-<div class="vocab"><article><b>savings</b><p>money you keep for the future</p><span class="tiny">I put 10% of my salary into savings.</span></article><article><b>fraud</b><p>a crime in which someone tricks you to take your money</p><span class="tiny">The bank stopped a fraud attempt.</span></article><article><b>investment</b><p>money used to try to earn more money</p><span class="tiny">Every investment has a risk.</span></article><article><b>loan</b><p>money you borrow and usually pay back with interest</p><span class="tiny">She applied for a car loan.</span></article><article><b>risk</b><p>the possibility of something bad happening</p><span class="tiny">AI can reduce some risks but create others.</span></article><article><b>reliable</b><p>someone or something you can trust</p><span class="tiny">Is an AI chatbot a reliable financial adviser?</span></article></div>
-<div class="activity"><h3>Fill in the gaps</h3><p>Use: savings · fraud · investment · loan · risk · reliable</p><div id="gaps"></div><button class="primary" onclick="checkGaps()">Check answers</button><p class="feedback" id="gapFeedback" aria-live="polite"></p></div>
-<div class="question"><strong>Personalise it: Which two new words describe your financial life best?</strong><textarea data-id="wordsPersonal" placeholder="For me, …"></textarea></div>
-</section>
-<section class="page" data-title="Read & think" data-time="10 min">
-<span class="eyebrow">03 · Reading</span><h1>Your bank has a new colleague. It isn't human.</h1>
-<div class="news"><p>Many banks now use artificial intelligence to study payments, find unusual activity and answer simple questions. For example, an AI system can notice a payment that looks different from a customer's normal spending. It can then warn the bank or ask the customer to check it.</p><p>AI can also help people understand their spending and plan their savings. However, the technology can make mistakes. An AI system might block a normal payment or give advice that does not fit someone's situation. A bank still needs people to explain important decisions and solve problems.</p><p>In 2026, financial regulators continued to study both the benefits and the risks of AI in banking. Their main question is not simply “Can AI do it?” but “How can people use AI safely?”</p><p class="tiny">Adapted educational text based on the Bank of England and FCA 2026 AI survey. <a href="https://www.bankofengland.co.uk/report/2026/artificial-intelligence-in-uk-financial-services-2026" target="_blank" rel="noopener noreferrer">Original research ↗</a></p></div>
-<div id="readingQs"></div><button class="primary" onclick="checkQuiz('reading')">Check reading</button><p class="feedback" id="readingFeedback" aria-live="polite"></p>
-<div class="question"><strong>Discussion: Should a bank explain when AI makes a decision about you?</strong><textarea data-id="readExplain" placeholder="Yes, because… / No, because…"></textarea></div>
-</section>
-<section class="page" data-title="2026 news" data-time="10 min">
-<span class="eyebrow">04 · Newsroom</span><h1>Two real stories. One big question.</h1>
-<div class="news"><span class="pill">News 1 · 2026</span><h3>Banks are using more third-party AI</h3><p>In a 2026 Bank of England and FCA survey, outside companies provided <b>39%</b> of reported AI systems, compared with <b>33%</b> in 2024. This means banks increasingly depend on technology made by other companies.</p><p class="tiny"><a target="_blank" rel="noopener noreferrer" href="https://www.bankofengland.co.uk/report/2026/artificial-intelligence-in-uk-financial-services-2026">Read the original research ↗</a></p></div>
-<div class="news"><span class="pill">News 2 · 16 November 2026</span><h3>US regulator warns about AI in finance</h3><p>Federal Reserve Governor Michael Barr warned that AI may create problems for cybersecurity, trading and consumer protection. He said AI could bring risks as well as opportunities.</p><p class="tiny"><a target="_blank" rel="noopener noreferrer" href="https://www.reuters.com/world/feds-barr-warns-ai-risks-financial-system-2026-11-16/">Read Reuters reporting ↗</a></p></div>
-<div class="question"><strong>1. What is the biggest advantage of AI for banks?</strong><textarea data-id="newsBenefit" placeholder="One advantage is…"></textarea></div>
-<div class="question"><strong>2. What could go wrong when several banks use similar AI systems?</strong><textarea data-id="newsRisk" placeholder="If…"></textarea></div>
-<div class="question"><strong>3. Which headline is more important for ordinary customers? Explain.</strong><textarea data-id="newsCompare" placeholder="In my opinion…"></textarea></div>
-</section>
-<section class="page" data-title="If AI…" data-time="7 min">
-<span class="eyebrow">05 · Grammar in action</span><h1>If AI makes a mistake, what will happen?</h1>
-<div class="scenario"><b>First Conditional</b><p>If + present simple, will + base verb.</p><p><b>If the bank detects fraud, it will send an alert.</b></p><p class="tiny">Use it for a real possible future result. Avoid “If AI will make…” in the if-clause.</p></div>
-<div id="grammarQs"></div><button class="primary" onclick="checkQuiz('grammar')">Check grammar</button><p class="feedback" id="grammarFeedback" aria-live="polite"></p>
-<div class="question"><strong>Make two predictions about AI and money using IF and WILL.</strong><textarea data-id="predictions" placeholder="If banks use more AI, …"></textarea></div>
-</section>
-<section class="page" data-title="Your decision" data-time="8 min">
-<span class="eyebrow">06 · Final mission</span><h1>You're the head of a digital bank.</h1><p>Your team has $1 million to invest in ONE AI tool. You must choose an option, defend it and explain how to protect customers.</p>
-<div class="split"><div class="scenario"><h3>A · Fraud detector</h3><p>Finds suspicious payments quickly. Sometimes it might stop real purchases.</p></div><div class="scenario"><h3>B · AI money coach</h3><p>Helps customers save. Sometimes its advice may be wrong.</p></div><div class="scenario"><h3>C · AI loan assistant</h3><p>Reviews loan applications faster. Some decisions may be unfair.</p></div><div class="scenario"><h3>D · AI investment assistant</h3><p>Suggests investments. Customers could lose money.</p></div></div>
-<div class="question"><strong>1. Choose your tool. Why is it the best choice?</strong><select data-id="finalChoice"><option value="">Choose an option</option><option value="A">A — Fraud detector</option><option value="B">B — Money coach</option><option value="C">C — Loan assistant</option><option value="D">D — Investment assistant</option></select><textarea data-id="finalWhy" placeholder="We should choose… because…" style="margin-top:10px"></textarea></div>
-<div class="question"><strong>2. What TWO rules will protect your customers?</strong><textarea data-id="finalRules" placeholder="First, a human must… Second, if AI…"></textarea></div>
-<div class="question"><strong>3. Pitch your idea in 60 seconds. Then answer your teacher's questions.</strong><p class="muted">Useful phrases: Our main goal is… / The biggest risk is… / If we use this tool, we will… / We shouldn't let AI…</p></div>
-<div class="news"><h3>Exit ticket</h3><p>Complete the sentence: “AI should help people with money, but it should never…”</p><textarea data-id="exit" placeholder="AI should never…"></textarea></div>
-</section>
-<footer><button class="secondary" id="prev" type="button">← Previous</button><span class="tag" id="counter"></span><button class="primary" id="next" type="button">Next →</button></footer>
-</main></div>
-<script>
-const pages=[...document.querySelectorAll('.page')],nav=document.querySelector('#nav');let current=0;const storageKey='gostudy-finance-b1-ai-20261118-v1';let saved={};const cloud=()=>window.GoStudyStorage||localStorage;try{saved=JSON.parse(cloud().getItem(storageKey)||'{}')||{}}catch{}
-function persist(){saved.answers=Object.fromEntries(Object.entries(saved).filter(([k,v])=>k!=='answers'&&k!=='page'&&v!==null&&v!==undefined&&v!==''));try{cloud().setItem(storageKey,JSON.stringify(saved));document.querySelector('#save').textContent='✓ Saved';}catch{document.querySelector('#save').textContent='Unable to save changes';}}
-function showPage(n,save=true){current=Math.min(Math.max(0,n),pages.length-1);pages.forEach((p,i)=>p.classList.toggle('active',i===current));[...nav.children].forEach((b,i)=>b.setAttribute('aria-current',String(i===current)));document.querySelector('#counter').textContent=(current+1)+' / '+pages.length;document.querySelector('#prev').disabled=current===0;document.querySelector('#next').textContent=current===pages.length-1?'Back to start ↺':'Next →';if(save){saved.page=current;persist();}window.scrollTo({top:0,behavior:'smooth'});}
-pages.forEach((p,i)=>{const b=document.createElement('button');b.textContent=(i+1)+'. '+p.dataset.title+' · '+p.dataset.time;b.onclick=()=>showPage(i);nav.append(b);});document.querySelector('#prev').onclick=()=>showPage(current-1);document.querySelector('#next').onclick=()=>showPage(current===pages.length-1?0:current+1);
-const gapData=[['The bank stopped a possible ___ attempt.','fraud'],['She puts some of her salary into ___.','savings'],['He took out a ___ to buy a car.','loan'],['Every ___ can lose value.','investment'],['There is always some ___ when we invest money.','risk'],['I need a ___ source before I trust financial advice.','reliable']];
-document.querySelector('#gaps').innerHTML=gapData.map((g,i)=>'<div class="question"><label>'+(i+1)+'. '+g[0].replace('___','<input type="text" data-id="gap'+i+'" aria-label="Gap '+(i+1)+'" style="max-width:210px">')+'</label></div>').join('');
-function checkGaps(){let score=0;gapData.forEach((g,i)=>{let el=document.querySelector('[data-id="gap'+i+'"]');const ok=el.value.trim().toLowerCase()===g[1];el.classList.toggle('correct',ok);el.classList.toggle('wrong',!ok);if(ok)score++});document.querySelector('#gapFeedback').textContent=score+' / '+gapData.length+' correct. Discuss any mistakes with your teacher.';}
-const quiz={reading:[['What can AI notice?',['Payments that are different from normal spending','Only payments over $1,000','What a person is thinking'],0],['Why are humans still important?',['They type faster than AI','They explain important decisions and fix problems','AI never makes mistakes'],1],['The text says AI is…',['always safe','never useful','useful but not perfect'],2]],grammar:[['If AI ___ a strange payment, it will warn the bank.',['will find','finds','finding'],1],['If a chatbot gives bad advice, customers ___ trust.',['may lose','lose will','losing'],0],['If I ___ more money, I will save part of it.',['will earn','earning','earn'],2]]};
-for(const key of Object.keys(quiz)){document.querySelector('#'+key+'Qs').innerHTML=quiz[key].map((q,i)=>'<div class="question"><strong>'+(i+1)+'. '+q[0]+'</strong><div class="options">'+q[1].map((o,j)=>'<label><input type="radio" name="'+key+i+'" value="'+j+'" data-id="'+key+i+'-'+j+'"> '+o+'</label>').join('')+'</div></div>').join('');}
-function checkQuiz(key){let score=0;quiz[key].forEach((q,i)=>{const selected=document.querySelector('input[name="'+key+i+'"]:checked');if(selected&&Number(selected.value)===q[2])score++;document.querySelectorAll('input[name="'+key+i+'"]').forEach(el=>{el.closest('label').classList.toggle('correct',Number(el.value)===q[2]);el.closest('label').classList.toggle('wrong',el.checked&&Number(el.value)!==q[2])})});document.querySelector('#'+key+'Feedback').textContent=score+' / '+quiz[key].length+' correct';}
-document.querySelectorAll('[data-id]').forEach(el=>{el.dataset.answer=el.dataset.id;const id=el.dataset.id;if(saved[id]!==undefined){if(el.type==='checkbox'||el.type==='radio')el.checked=!!saved[id];else el.value=saved[id];}el.addEventListener('change',()=>{saved[id]=el.type==='checkbox'||el.type==='radio'?el.checked:el.value;persist();});el.addEventListener('input',()=>{if(el.type!=='checkbox'&&el.type!=='radio'){saved[id]=el.value;persist();}});});showPage(saved.page||0,false);
-window.addEventListener('gostudy-sync-ready',()=>{const fresh=cloud().getItem(storageKey);if(!fresh)return;try{const next=JSON.parse(fresh);if(next&&typeof next==='object'){saved={...next};document.querySelectorAll('[data-id]').forEach(el=>{const v=saved[el.dataset.id];if(v===undefined)return;if(el.type==='checkbox'||el.type==='radio')el.checked=!!v;else el.value=v;});showPage(saved.page||0,false);}}catch{}});
-</script><script src="assets/gostudy-current-courses.js" defer></script><script src="assets/gostudy-glass-vocabulary.js" defer></script></body></html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f5f7ff">
+<meta name="gostudy-course" content="finance-b1">
+<title>AI &amp; Your Money · GoStudy B1</title>
+<link rel="stylesheet" href="assets/gostudy-v1-lesson.css">
+</head>
+<body data-finance-live data-preserve-workbook-progress data-classroom-course="finance-b1"
+  data-vocabulary-import-sources="gostudy-finance-b1-v1 gostudy-finance-b1-homework-v1 gostudy-finance-b1-02-v1 gostudy-finance-b1-02-homework-v1 gostudy-vocabulary-finance-b1-v1"
+  data-classroom-lesson="finance-b1-ai-20261118.html" data-translate-engine="google-web-pilot"
+  data-live-script="assets/gostudy-finance-live.js">
+<script type="application/json" id="lesson-data">
+{
+  "title": "AI & Your Money: Who Can We Trust?",
+  "cabinet": "student-finance-b1.html",
+  "footer": "GoStudy · Finance B1 · 50 minutes",
+  "key": "gostudy-finance-b1-ai-20261118-v1",
+  "wordsKey": "gostudy-vocabulary-finance-b1-v1",
+  "preserve": "cloud",
+  "followStudent": false,
+  "lessonWords": [
+    {
+      "en": "savings",
+      "ru": "сбережения"
+    },
+    {
+      "en": "fraud",
+      "ru": "мошенничество"
+    },
+    {
+      "en": "investment",
+      "ru": "инвестиция"
+    },
+    {
+      "en": "loan",
+      "ru": "кредит"
+    },
+    {
+      "en": "risk",
+      "ru": "риск"
+    },
+    {
+      "en": "reliable",
+      "ru": "надёжный"
+    }
+  ],
+  "steps": [
+    {
+      "id": "warm-up",
+      "title": "Would you trust AI with your money?",
+      "label": "Let's talk · 7 min",
+      "html": "<div class=\"tip\"><h2>Imagine this.</h2><p>Your bank app says: “Our AI can save you $150 every month.” Would you let it decide how to spend your money?</p></div>\n<div class=\"question-item\"><strong>1. What do you usually use your banking app for?</strong><textarea maxlength=\"3500\" data-exercise-field=\"warm1\" placeholder=\"I normally use it to…\"></textarea></div>\n<div class=\"question-item\"><strong>2. Which financial decisions would you let AI make?</strong><div class=\"options\"><label><input type=\"checkbox\" data-exercise-field=\"warm2a\"> Find expensive subscriptions</label><label><input type=\"checkbox\" data-exercise-field=\"warm2b\"> Recommend a savings plan</label><label><input type=\"checkbox\" data-exercise-field=\"warm2c\"> Decide whether I get a loan</label><label><input type=\"checkbox\" data-exercise-field=\"warm2d\"> Invest all my savings</label></div></div>\n<div class=\"question-item\"><strong>3. Why is it sometimes difficult to trust technology?</strong><textarea maxlength=\"3500\" data-exercise-field=\"warm3\" placeholder=\"I think… because…\"></textarea></div>"
+    },
+    {
+      "id": "vocabulary",
+      "title": "Money words that matter",
+      "label": "Useful words · 8 min",
+      "html": "<p>Learn six useful expressions. Then use them to talk about your own experience.</p>\n<div class=\"vocab\"><article><b>savings</b><p>money you keep for the future</p><span class=\"tiny\">I put 10% of my salary into savings.</span></article><article><b>fraud</b><p>a crime in which someone tricks you to take your money</p><span class=\"tiny\">The bank stopped a fraud attempt.</span></article><article><b>investment</b><p>money used to try to earn more money</p><span class=\"tiny\">Every investment has a risk.</span></article><article><b>loan</b><p>money you borrow and usually pay back with interest</p><span class=\"tiny\">She applied for a car loan.</span></article><article><b>risk</b><p>the possibility of something bad happening</p><span class=\"tiny\">AI can reduce some risks but create others.</span></article><article><b>reliable</b><p>someone or something you can trust</p><span class=\"tiny\">Is an AI chatbot a reliable financial adviser?</span></article></div>\n<div class=\"activity\"><h3>Fill in the gaps</h3><p>Use: savings · fraud · investment · loan · risk · reliable</p><div class=\"gap-item\" data-answer-row><label>1. The bank stopped a possible <input type=\"text\" data-exercise-field=\"gap0\" data-expected=\"fraud\" aria-label=\"Gap 1\" autocomplete=\"off\"> attempt.</label><p class=\"feedback\" data-grade></p></div>\n<div class=\"gap-item\" data-answer-row><label>2. She puts some of her salary into <input type=\"text\" data-exercise-field=\"gap1\" data-expected=\"savings\" aria-label=\"Gap 2\" autocomplete=\"off\">.</label><p class=\"feedback\" data-grade></p></div>\n<div class=\"gap-item\" data-answer-row><label>3. He took out a <input type=\"text\" data-exercise-field=\"gap2\" data-expected=\"loan\" aria-label=\"Gap 3\" autocomplete=\"off\"> to buy a car.</label><p class=\"feedback\" data-grade></p></div>\n<div class=\"gap-item\" data-answer-row><label>4. Every <input type=\"text\" data-exercise-field=\"gap3\" data-expected=\"investment\" aria-label=\"Gap 4\" autocomplete=\"off\"> can lose value.</label><p class=\"feedback\" data-grade></p></div>\n<div class=\"gap-item\" data-answer-row><label>5. There is always some <input type=\"text\" data-exercise-field=\"gap4\" data-expected=\"risk\" aria-label=\"Gap 5\" autocomplete=\"off\"> when we invest money.</label><p class=\"feedback\" data-grade></p></div>\n<div class=\"gap-item\" data-answer-row><label>6. I need a <input type=\"text\" data-exercise-field=\"gap5\" data-expected=\"reliable\" aria-label=\"Gap 6\" autocomplete=\"off\"> source before I trust financial advice.</label><p class=\"feedback\" data-grade></p></div><button type=\"button\" class=\"outline\" data-check-section>Check answers</button><p class=\"feedback\" data-section-score aria-live=\"polite\"></p></div>\n<div class=\"question-item\"><strong>Personalise it: Which two new words describe your financial life best?</strong><textarea maxlength=\"3500\" data-exercise-field=\"wordsPersonal\" placeholder=\"For me, …\"></textarea></div>"
+    },
+    {
+      "id": "reading",
+      "title": "Your bank has a new colleague. It isn't human.",
+      "label": "Read & think · 10 min",
+      "html": "\n<div class=\"article\"><p>Many banks now use artificial intelligence to study payments, find unusual activity and answer simple questions. For example, an AI system can notice a payment that looks different from a customer's normal spending. It can then warn the bank or ask the customer to check it.</p><p>AI can also help people understand their spending and plan their savings. However, the technology can make mistakes. An AI system might block a normal payment or give advice that does not fit someone's situation. A bank still needs people to explain important decisions and solve problems.</p><p>In 2026, financial regulators continued to study both the benefits and the risks of AI in banking. Their main question is not simply “Can AI do it?” but “How can people use AI safely?”</p><p class=\"tiny\">Adapted educational text based on the Bank of England and FCA 2026 AI survey. <a href=\"https://www.bankofengland.co.uk/report/2026/artificial-intelligence-in-uk-financial-services-2026\" target=\"_blank\" rel=\"noopener noreferrer\">Original research ↗</a></p></div>\n<fieldset class=\"question-item unified-question\" data-answer-row><legend>What can AI notice?</legend><div class=\"options\"><label><input type=\"radio\" name=\"reading0\" value=\"0\" data-exercise-field=\"reading0\" data-legacy-key=\"reading0-0\" data-expected=\"0\"> Payments that are different from normal spending</label><label><input type=\"radio\" name=\"reading0\" value=\"1\" data-exercise-field=\"reading0\" data-legacy-key=\"reading0-1\"> Only payments over $1,000</label><label><input type=\"radio\" name=\"reading0\" value=\"2\" data-exercise-field=\"reading0\" data-legacy-key=\"reading0-2\"> What a person is thinking</label></div><p class=\"result\" data-grade></p></fieldset>\n<fieldset class=\"question-item unified-question\" data-answer-row><legend>Why are humans still important?</legend><div class=\"options\"><label><input type=\"radio\" name=\"reading1\" value=\"0\" data-exercise-field=\"reading1\" data-legacy-key=\"reading1-0\" data-expected=\"1\"> They type faster than AI</label><label><input type=\"radio\" name=\"reading1\" value=\"1\" data-exercise-field=\"reading1\" data-legacy-key=\"reading1-1\"> They explain important decisions and fix problems</label><label><input type=\"radio\" name=\"reading1\" value=\"2\" data-exercise-field=\"reading1\" data-legacy-key=\"reading1-2\"> AI never makes mistakes</label></div><p class=\"result\" data-grade></p></fieldset>\n<fieldset class=\"question-item unified-question\" data-answer-row><legend>The text says AI is…</legend><div class=\"options\"><label><input type=\"radio\" name=\"reading2\" value=\"0\" data-exercise-field=\"reading2\" data-legacy-key=\"reading2-0\" data-expected=\"2\"> always safe</label><label><input type=\"radio\" name=\"reading2\" value=\"1\" data-exercise-field=\"reading2\" data-legacy-key=\"reading2-1\"> never useful</label><label><input type=\"radio\" name=\"reading2\" value=\"2\" data-exercise-field=\"reading2\" data-legacy-key=\"reading2-2\"> useful but not perfect</label></div><p class=\"result\" data-grade></p></fieldset><button type=\"button\" class=\"outline\" data-check-section>Check reading</button><p class=\"feedback\" data-section-score aria-live=\"polite\"></p>\n<div class=\"question-item\"><strong>Discussion: Should a bank explain when AI makes a decision about you?</strong><textarea maxlength=\"3500\" data-exercise-field=\"readExplain\" placeholder=\"Yes, because… / No, because…\"></textarea></div>"
+    },
+    {
+      "id": "newsroom",
+      "title": "Two real stories. One big question.",
+      "label": "2026 news · 10 min",
+      "html": "\n<div class=\"article\"><span class=\"pill\">News 1 · 2026</span><h3>Banks are using more third-party AI</h3><p>In a 2026 Bank of England and FCA survey, outside companies provided <b>39%</b> of reported AI systems, compared with <b>33%</b> in 2024. This means banks increasingly depend on technology made by other companies.</p><p class=\"tiny\"><a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://www.bankofengland.co.uk/report/2026/artificial-intelligence-in-uk-financial-services-2026\">Read the original research ↗</a></p></div>\n<div class=\"article\"><span class=\"pill\">News 2 · 16 November 2026</span><h3>US regulator warns about AI in finance</h3><p>Federal Reserve Governor Michael Barr warned that AI may create problems for cybersecurity, trading and consumer protection. He said AI could bring risks as well as opportunities.</p><p class=\"tiny\"><a target=\"_blank\" rel=\"noopener noreferrer\" href=\"https://www.reuters.com/world/feds-barr-warns-ai-risks-financial-system-2026-11-16/\">Read Reuters reporting ↗</a></p></div>\n<div class=\"question-item\"><strong>1. What is the biggest advantage of AI for banks?</strong><textarea maxlength=\"3500\" data-exercise-field=\"newsBenefit\" placeholder=\"One advantage is…\"></textarea></div>\n<div class=\"question-item\"><strong>2. What could go wrong when several banks use similar AI systems?</strong><textarea maxlength=\"3500\" data-exercise-field=\"newsRisk\" placeholder=\"If…\"></textarea></div>\n<div class=\"question-item\"><strong>3. Which headline is more important for ordinary customers? Explain.</strong><textarea maxlength=\"3500\" data-exercise-field=\"newsCompare\" placeholder=\"In my opinion…\"></textarea></div>"
+    },
+    {
+      "id": "grammar",
+      "title": "If AI makes a mistake, what will happen?",
+      "label": "If AI… · 7 min",
+      "html": "\n<div class=\"tip\"><b>First Conditional</b><p>If + present simple, will + base verb.</p><p><b>If the bank detects fraud, it will send an alert.</b></p><p class=\"tiny\">Use it for a real possible future result. Avoid “If AI will make…” in the if-clause.</p></div>\n<fieldset class=\"question-item unified-question\" data-answer-row><legend>If AI ___ a strange payment, it will warn the bank.</legend><div class=\"options\"><label><input type=\"radio\" name=\"grammar0\" value=\"0\" data-exercise-field=\"grammar0\" data-legacy-key=\"grammar0-0\" data-expected=\"1\"> will find</label><label><input type=\"radio\" name=\"grammar0\" value=\"1\" data-exercise-field=\"grammar0\" data-legacy-key=\"grammar0-1\"> finds</label><label><input type=\"radio\" name=\"grammar0\" value=\"2\" data-exercise-field=\"grammar0\" data-legacy-key=\"grammar0-2\"> finding</label></div><p class=\"result\" data-grade></p></fieldset>\n<fieldset class=\"question-item unified-question\" data-answer-row><legend>If a chatbot gives bad advice, customers ___ trust.</legend><div class=\"options\"><label><input type=\"radio\" name=\"grammar1\" value=\"0\" data-exercise-field=\"grammar1\" data-legacy-key=\"grammar1-0\" data-expected=\"0\"> may lose</label><label><input type=\"radio\" name=\"grammar1\" value=\"1\" data-exercise-field=\"grammar1\" data-legacy-key=\"grammar1-1\"> lose will</label><label><input type=\"radio\" name=\"grammar1\" value=\"2\" data-exercise-field=\"grammar1\" data-legacy-key=\"grammar1-2\"> losing</label></div><p class=\"result\" data-grade></p></fieldset>\n<fieldset class=\"question-item unified-question\" data-answer-row><legend>If I ___ more money, I will save part of it.</legend><div class=\"options\"><label><input type=\"radio\" name=\"grammar2\" value=\"0\" data-exercise-field=\"grammar2\" data-legacy-key=\"grammar2-0\" data-expected=\"2\"> will earn</label><label><input type=\"radio\" name=\"grammar2\" value=\"1\" data-exercise-field=\"grammar2\" data-legacy-key=\"grammar2-1\"> earning</label><label><input type=\"radio\" name=\"grammar2\" value=\"2\" data-exercise-field=\"grammar2\" data-legacy-key=\"grammar2-2\"> earn</label></div><p class=\"result\" data-grade></p></fieldset><button type=\"button\" class=\"outline\" data-check-section>Check grammar</button><p class=\"feedback\" data-section-score aria-live=\"polite\"></p>\n<div class=\"question-item\"><strong>Make two predictions about AI and money using IF and WILL.</strong><textarea maxlength=\"3500\" data-exercise-field=\"predictions\" placeholder=\"If banks use more AI, …\"></textarea></div>"
+    },
+    {
+      "id": "decision",
+      "title": "You're the head of a digital bank.",
+      "label": "Your decision · 8 min",
+      "html": "<p>Your team has $1 million to invest in ONE AI tool. You must choose an option, defend it and explain how to protect customers.</p>\n<div class=\"split\"><div class=\"tip\"><h3>A · Fraud detector</h3><p>Finds suspicious payments quickly. Sometimes it might stop real purchases.</p></div><div class=\"tip\"><h3>B · AI money coach</h3><p>Helps customers save. Sometimes its advice may be wrong.</p></div><div class=\"tip\"><h3>C · AI loan assistant</h3><p>Reviews loan applications faster. Some decisions may be unfair.</p></div><div class=\"tip\"><h3>D · AI investment assistant</h3><p>Suggests investments. Customers could lose money.</p></div></div>\n<div class=\"question-item\"><strong>1. Choose your tool. Why is it the best choice?</strong><select data-exercise-field=\"finalChoice\"><option value=\"\">Choose an option</option><option value=\"A\">A — Fraud detector</option><option value=\"B\">B — Money coach</option><option value=\"C\">C — Loan assistant</option><option value=\"D\">D — Investment assistant</option></select><textarea maxlength=\"3500\" data-exercise-field=\"finalWhy\" placeholder=\"We should choose… because…\" style=\"margin-top:10px\"></textarea></div>\n<div class=\"question-item\"><strong>2. What TWO rules will protect your customers?</strong><textarea maxlength=\"3500\" data-exercise-field=\"finalRules\" placeholder=\"First, a human must… Second, if AI…\"></textarea></div>\n<div class=\"question-item\"><strong>3. Pitch your idea in 60 seconds. Then answer your teacher's questions.</strong><p class=\"muted\">Useful phrases: Our main goal is… / The biggest risk is… / If we use this tool, we will… / We shouldn't let AI…</p></div>\n<div class=\"article\"><h3>Exit ticket</h3><p>Complete the sentence: “AI should help people with money, but it should never…”</p><textarea maxlength=\"3500\" data-exercise-field=\"exit\" placeholder=\"AI should never…\"></textarea></div>"
+    }
+  ]
+}
+</script>
+<script src="assets/gostudy-v1-lesson.js"></script>
+<script src="assets/gostudy-sync.js"></script>
+<script src="assets/gostudy-v1-exercises.js"></script>
+<script src="assets/gostudy-v1-workbook.js"></script>
+</body>
+</html>

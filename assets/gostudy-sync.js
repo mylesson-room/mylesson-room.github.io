@@ -690,6 +690,7 @@
   }
 
   const liveLesson = {
+    'finance-b1-ai-20261118.html':['finance_b1','gostudy-finance-b1-ai-20261118-v1'],
     'positive-thinking-a2.html':['travel_a2','gostudy-positive-thinking-a2-v1'],
     'positive-thinking-a2-homework.html':['travel_a2','gostudy-positive-thinking-a2-homework-v1'],
     'general-english-b1-stories-01.html':['general_english_b1_stories',storiesKeys[1]],
