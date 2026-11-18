@@ -336,6 +336,64 @@ async function run(){
     }
     await checkTeacherLessonAssignmentEditor();
 
+    // Selecting student B while student A's assignment RPC is still pending must
+    // not show stale success/failure on B or allow a second simultaneous write.
+    async function checkTeacherAssignmentSwitchDuringMutation(success){
+      const page=await browser.newPage();
+      const sid='11111111-1111-4111-8111-111111111111';
+      const otherId='22222222-2222-4222-8222-222222222222';
+      await page.setContent('<form id="teacher-assign-lesson" hidden><select id="teacher-lesson-select"></select><button type="submit">Назначить урок</button></form><p id="teacher-active-assignment"></p><p id="teacher-assignment-status"></p>');
+      await page.evaluate(()=>{
+        window.__writes=[];window.__releaseAssignment=null;
+        window.GoStudyAuth={
+          token:async()=> 'synthetic-teacher-token',
+          request:async(url,options,jwt)=>{
+            if(jwt!=='synthetic-teacher-token')return {ok:false,status:401};
+            if(url.includes('gostudy_lesson_catalog'))return {ok:true,status:200,data:[
+              {lesson_id:'lesson-a',course_id:'general_b1',title:'Lesson A'},
+              {lesson_id:'lesson-b',course_id:'general_b1',title:'Lesson B'}
+            ]};
+            if(url.includes('gostudy_lesson_assignments'))return {
+              ok:true,status:200,data:[{lesson_id:url.includes('22222222-')?'lesson-b':'lesson-a',
+                status:'active',published_at:'2026-11-18T00:00:00Z'}]
+            };
+            if(url.includes('/rpc/gostudy_activate_student_lesson')){
+              window.__writes.push(options.body);
+              return await new Promise(resolve=>{
+                window.__releaseAssignment=(result)=>resolve(result);
+              });
+            }
+            return {ok:false,status:404};
+          }
+        };
+      });
+      await page.addScriptTag({path:path.join(root,'assets/gostudy-teacher-assignments.js')});
+      await page.evaluate(id=>document.dispatchEvent(new CustomEvent('gostudy-teacher-student-selected',{detail:{studentId:id}})),sid);
+      await page.waitForFunction(()=>!document.getElementById('teacher-assign-lesson').hidden);
+      await page.locator('#teacher-lesson-select').selectOption('lesson-b');
+      await page.locator('#teacher-assign-lesson button').click();
+      await page.waitForFunction(()=>window.__releaseAssignment!==null);
+      await page.evaluate(id=>document.dispatchEvent(new CustomEvent('gostudy-teacher-student-selected',{detail:{studentId:id}})),otherId);
+      await page.waitForFunction(()=>document.getElementById('teacher-active-assignment').textContent.includes('Lesson B'));
+      assert.equal(await page.locator('#teacher-assign-lesson button').isDisabled(),true,
+        'New student cannot start a second assignment while first RPC is in flight');
+      // Even an artificial form submit must not enqueue another mutation.
+      await page.locator('#teacher-assign-lesson').evaluate(node=>node.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})));
+      assert.equal((await page.evaluate(()=>window.__writes)).length,1,'Exactly one RPC during an in-flight mutation');
+      await page.evaluate(isOk=>window.__releaseAssignment(isOk
+        ? {ok:true,status:200,data:'00000000-0000-4000-8000-000000000000'}
+        : {ok:false,status:403}),success);
+      await page.waitForFunction(()=>!document.querySelector('#teacher-assign-lesson button').disabled);
+      assert.match(await page.locator('#teacher-active-assignment').textContent(),/Lesson B/);
+      assert.equal(await page.locator('#teacher-assignment-status').textContent(),'',
+        'Old RPC result must never be presented in the newly selected student card');
+      assert.equal((await page.evaluate(()=>window.__writes)).length,1);
+      await page.close();
+    }
+    await checkTeacherAssignmentSwitchDuringMutation(true);
+    await checkTeacherAssignmentSwitchDuringMutation(false);
+
+
 
     console.log('Unified cabinet browser smoke: placement, finance, disabled/published homework, ambiguous assignments, canonical assignment priority, foreign-user isolation, 18 candidate routes, teacher name editor, atomic lesson assignment UI and canonical fail-closed behavior PASS');
   }finally{
