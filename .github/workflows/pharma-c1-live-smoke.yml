@@ -1,0 +1,90 @@
+name: Verify published Pharma C1 (temporary)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/pharma-c1-live-smoke.yml'
+permissions:
+  contents: read
+jobs:
+  production-smoke:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-save --no-package-lock playwright@1.58.2
+      - name: Confirm real GitHub Pages student and teacher routes
+        env:
+          GOSTUDY_CHROME: /usr/bin/google-chrome
+        run: |
+          node <<'NODE'
+          const assert=require('node:assert/strict');
+          const {chromium}=require('playwright');
+          (async()=>{
+            const browser=await chromium.launch({executablePath:process.env.GOSTUDY_CHROME,headless:true});
+            try {
+              const base='https://mylesson-room.github.io/';
+              const student=await browser.newContext({viewport:{width:390,height:844}});
+              const sp=await student.newPage();
+              let published=false;
+              for(let i=0;i<48;i++){
+                const response=await sp.goto(base+'student-pharma.html?pharma-live='+i,{waitUntil:'domcontentloaded',timeout:25000}).catch(()=>null);
+                if(response?.ok()){
+                  const link=sp.locator('a.lesson-card-link');
+                  await link.waitFor({timeout:5000}).catch(()=>{});
+                  published=(await link.getAttribute('href').catch(()=>''))==='pharma-ai-evidence-c1-20261118.html';
+                }
+                if(published)break;
+                await new Promise(resolve=>setTimeout(resolve,8000));
+              }
+              assert.ok(published,'Published Pharma student card must link to new AI evidence lesson');
+              await sp.locator('#assignment[aria-disabled="true"]').waitFor();
+              await sp.getByText('Пока не назначено',{exact:true}).waitFor();
+              assert.ok(await sp.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Mobile cabinet should not overflow');
+              const lessonHref=await sp.locator('a.lesson-card-link').getAttribute('href');
+              const response=await sp.goto(base+lessonHref+'?pharma-live=1',{waitUntil:'domcontentloaded'});
+              assert.equal(response.status(),200);
+              const config=await sp.locator('#lesson-data').evaluate(node=>JSON.parse(node.textContent));
+              assert.equal(config.title,'AI in Medicine: Evidence, Hype & the Marketing Line');
+              assert.equal(config.steps.length,7);
+              assert.equal(config.steps.reduce((n,step)=>n+step.minutes,0),50);
+              assert.equal(config.lessonWords.length,8);
+              assert.equal(config.sources.length,3);
+              assert.equal(config.cabinet,'student-pharma.html');
+              assert.equal(config.key,'gostudy-pharma-c1-ai-evidence-20261118-v1');
+              const assets=['assets/gostudy-v1-lesson.js','assets/gostudy-v1-cabinet.js','assets/gostudy-v1-exercises.js','assets/gostudy-v1-workbook.js'];
+              for(const path of assets) assert.equal((await sp.request.get(base+path)).status(),200,path);
+              const studentId='11111111-1111-4111-8111-111111111111';
+              const teacherId='22222222-2222-4222-8222-222222222222';
+              const roomId='33333333-3333-4333-8333-333333333333';
+              const teacher=await browser.newContext();
+              await teacher.addInitScript(({teacherId})=>{
+                const session=JSON.stringify({user:{id:teacherId},access_token:'production-smoke',refresh_token:'production-smoke',expires_at:Date.now()+3600000});
+                sessionStorage.setItem('gostudy-cloud-session-v1',session);
+                localStorage.setItem('gostudy-teacher-session-v1',session);
+              },{teacherId});
+              await teacher.route('https://*.supabase.co/**',route=>{
+                const u=new URL(route.request().url());
+                const action=u.pathname.split('/').at(-1);
+                if(action==='gostudy_pharma_c1_teacher_view')return route.fulfill({json:[{id:studentId,label:'Test student',words:[],assigned:[],progress:[]}]});
+                if(action==='gostudy_teacher_student_emails')return route.fulfill({json:[{id:studentId,email:'test@example.invalid'}]});
+                if(action==='gostudy_my_destinations')return route.fulfill({json:[{course:'teacher'}]});
+                if(action==='gostudy_classroom_rooms')return route.fulfill({json:[{id:roomId,student_id:studentId,teacher_id:teacherId,student_label:'Test student'}]});
+                if(action==='gostudy_classroom_events')return route.fulfill({json:[]});
+                return route.fulfill({json:[]});
+              });
+              const tp=await teacher.newPage();
+              await tp.goto(base+'gostudy-teacher.html',{waitUntil:'domcontentloaded'});
+              const enter=tp.locator('.teacher-student-row').filter({hasText:'Test student'}).getByRole('link',{name:/Войти в класс/});
+              await enter.waitFor({timeout:25000});
+              const href=await enter.getAttribute('href');
+              assert.equal(new URL(href,base).pathname,new URL(lessonHref,base).pathname,'Teacher and student current lesson must match');
+              assert.equal(new URL(href,base).searchParams.get('classStudent'),studentId);
+              await enter.click();
+              await tp.waitForURL(url=>url.pathname==='/'+lessonHref);
+              await tp.locator('#finance-live-status').getByText('Онлайн · общая комната',{exact:true}).waitFor();
+              console.log('PRODUCTION PHARMA C1 VERIFIED: current student card, no homework, mobile layout, lesson content and assets, teacher card opens the SAME live lesson with mock-auth room');
+            } finally {await browser.close()}
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          NODE
