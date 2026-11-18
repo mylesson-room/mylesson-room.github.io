@@ -8,7 +8,7 @@ permissions:
   contents: read
 concurrency:
   group: gostudy-pages-${{ github.event_name == 'pull_request' && github.ref || 'production' }}
-  cancel-in-progress: ${{ github.event_name == 'push' }}
+  cancel-in-progress: true
 jobs:
   verify:
     runs-on: ubuntu-24.04
