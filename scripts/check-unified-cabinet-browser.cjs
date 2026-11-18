@@ -30,8 +30,8 @@ async function run(){
     const student='11111111-1111-4111-8111-111111111111';
     const other='22222222-2222-4222-8222-222222222222';
 
-    async function scenario({rooms=[],finance=[],published=[],profiles=[],canonical=null,expected,expectedName='Ученик',expectEmpty=false,expectAmbiguous=false,expectHomework=false,expectedHomework='business-ai-finance-b2-02-homework.html'}){
-      const page=await browser.newPage();
+    async function scenario({rooms=[],finance=[],published=[],profiles=[],canonical=null,expected,expectedName='Ученик',expectEmpty=false,expectAmbiguous=false,expectHomework=false,expectedHomework='business-ai-finance-b2-02-homework.html',mobile=false}){
+      const page=await browser.newPage(mobile?{viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true}:{});
       const errors=[];
       page.on('pageerror',e=>errors.push(e.message));
       await page.addInitScript(id => {
@@ -76,6 +76,10 @@ async function run(){
       assert.equal(await page.locator('header.top').count(),1,'Same canonical shared header is used once');
       assert.equal(await page.locator('.account .profile span').first().textContent(),expectedName,'Name must come from protected profile');
       assert.equal(await page.locator('#assignment').isVisible(),true,'Homework tile must always be visible');
+      if(mobile){
+        const sizes=await page.evaluate(()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth}));
+        assert.ok(sizes.scrollWidth<=sizes.width+2,'Universal student dashboard must fit 390px mobile viewport: '+JSON.stringify(sizes));
+      }
       assert.equal(await page.locator('#assignment').getAttribute('aria-disabled'),expectHomework?null:'true');
       assert.equal(await page.locator('#assignment').getAttribute('href'),expectHomework?expectedHomework:null);
       assert.equal(await page.locator('.v1-previous').count(),0,'Student home must not show previous lessons');
@@ -171,8 +175,19 @@ async function run(){
         expectedHomework:entry.legacyHomework || undefined,
         profiles:[{display_name:'Ученик'}],
       });
+      await scenario({
+        canonical:[{student_id:student,status:'active',published_at:'2026-11-18T00:00:00Z',lesson}],
+        published:entry.legacyHomework
+          ? [{student_id:student,lesson_path:entry.candidateCurrentLesson,published_at:'2026-11-18T00:00:00Z'}]
+          : [],
+        expected:entry.candidateCurrentLesson,
+        expectHomework:!!entry.legacyHomework,
+        expectedHomework:entry.legacyHomework || undefined,
+        profiles:[{display_name:'Ученик'}],
+        mobile:true
+      });
     }
-    console.log('Universal dashboard: '+inventory.entries.length+' legacy route candidates render through the canonical assignment component');
+    console.log('Universal dashboard: '+inventory.entries.length+' legacy route candidates render on desktop and 390px mobile');
 
     // If a canonical assignment API is reachable but returns an unexpected 404,
     // do NOT bypass it by reading old room memberships.
