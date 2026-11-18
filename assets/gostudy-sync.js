@@ -686,6 +686,8 @@
   }
 
   const liveLesson = {
+    'positive-thinking-a2.html':['travel_a2','gostudy-positive-thinking-a2-v1'],
+    'positive-thinking-a2-homework.html':['travel_a2','gostudy-positive-thinking-a2-homework-v1'],
     'general-english-b1-stories-01.html':['general_english_b1_stories',storiesKeys[1]],
     'general-english-b1-stories-01-homework.html':['general_english_b1_stories',storiesKeys[2]],
     'general-english-b1-01.html':['general_english_b1',generalB1Keys[1]],
