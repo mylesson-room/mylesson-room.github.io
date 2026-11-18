@@ -1,0 +1,64 @@
+name: Check published Pharma C1 content (temporary)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/pharma-c1-live-smoke-20261118.yml'
+permissions:
+  contents: read
+jobs:
+  live-smoke:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check published GitHub Pages HTML and cabinet
+        run: |
+          node <<'NODE'
+          const assert=require('node:assert/strict');
+          const base='https://mylesson-room.github.io/';
+          const lesson='pharma-ai-evidence-c1-20261118.html';
+          const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+          (async()=>{
+            let ok=false,report='';
+            for(let i=0;i<54;i++){
+              try{
+                const suffix='?live-check='+Date.now()+'-'+i;
+                const [page,cabinet,teacher]=await Promise.all([
+                  fetch(base+lesson+suffix,{headers:{'cache-control':'no-cache'}}),
+                  fetch(base+'student-pharma.html'+suffix,{headers:{'cache-control':'no-cache'}}),
+                  fetch(base+'assets/gostudy-sync.js'+suffix,{headers:{'cache-control':'no-cache'}})
+                ]);
+                assert.equal(page.status,200);
+                assert.equal(cabinet.status,200);
+                assert.equal(teacher.status,200);
+                const html=await page.text();
+                const config=JSON.parse(html.match(/id="lesson-data">([\s\S]*?)<\/script>/)[1]);
+                const cab=await cabinet.text();
+                const script=await teacher.text();
+                const current=JSON.parse(cab.match(/id="cabinet-settings">([\s\S]*?)<\/script>/)[1]);
+                assert.equal(config.title,'Can AI Really Invent New Medicines?');
+                assert.equal(config.steps.length,8);
+                assert.equal(config.steps.reduce((n,s)=>n+s.minutes,0),50);
+                assert.equal(config.lessonWords.length,18);
+                assert.equal(config.lessonWords[0].en,'clinical validation');
+                assert.equal(config.lessonWords[8].en,'placebo-controlled');
+                assert.equal(config.key,'gostudy-pharma-c1-ai-evidence-20261118-v1');
+                assert.equal(config.wordsKey,'gostudy-pharma-c1-v1');
+                assert.ok(config.steps[5].html.includes('youtube-nocookie.com/embed/XIbIu8cWSgw'));
+                assert.ok(config.steps[1].html.includes('Medical_Laboratory_Scientist_US_NIH.jpg'));
+                assert.ok(config.steps[2].html.includes('Biology_Lab_Equipment'));
+                assert.equal(current.title,config.title);
+                assert.equal(current.lesson,lesson);
+                assert.equal(current.homework,'');
+                assert.ok(script.includes('Can AI Really Invent New Medicines?'));
+                ok=true;
+                break;
+              }catch(e){report=String(e.message||e);}
+              await delay(7500);
+            }
+            assert.ok(ok,'GitHub Pages did not serve updated Pharma C1 content: '+report);
+            console.log('LIVE PHARMA C1 VERIFIED: new lesson on public site, 8 sections, video, images, 50 minutes, vocabulary and existing cabinet');
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          NODE
