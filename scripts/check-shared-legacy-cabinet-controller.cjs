@@ -31,11 +31,15 @@ const files=[
   }
 ];
 const shared=fs.readFileSync('assets/gostudy-legacy-cabinet-controller.js','utf8');
+const sharedShell=fs.readFileSync('assets/gostudy-legacy-shell.css','utf8');
+assert.ok(sharedShell.length>14000,'Shared legacy shell must contain the full common layout');
 assert.match(shared,/addEventListener\('storage',render\)/);
 assert.match(shared,/read\(config\.lessonStorageKey\)/);
 assert.match(shared,/read\(config\.profileStorageKey\)/);
 for(const entry of files){
  const html=fs.readFileSync(entry.path,'utf8');
+ assert.ok(html.includes('assets/gostudy-legacy-shell.css'),entry.path+' must use the common layout');
+ assert.ok(!html.includes('*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:140px}'),entry.path+' must not carry duplicate whole-page CSS');
  assert.match(html,/assets\/gostudy-legacy-cabinet-controller\.js/,entry.path);
  const match=html.match(/<script type="application\/json" id="legacy-cabinet-settings">([^<]+)<\/script>/);
  assert.ok(match,entry.path+' needs its data-only configuration');
