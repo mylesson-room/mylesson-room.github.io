@@ -1187,6 +1187,7 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     await sp.locator('#selectionTranslate.is-visible').waitFor();
     await tp.getByRole('button',{name:'Close dictionary'}).click();
     await tp.getByRole('button',{name:'Сбросить ответы'}).first().click();
+    await sp.waitForFunction(()=>document.querySelector('[data-exercise-field="vnm-welcome-note"]')?.value==='');
     await sp.reload();
     await sp.locator('#page-1.active').waitFor();
     await sp.locator('#back').click();
