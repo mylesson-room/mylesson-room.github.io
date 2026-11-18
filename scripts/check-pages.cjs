@@ -1086,17 +1086,17 @@ async function main() {
             const requestUrl = new URL(url);
             const action = requestUrl.pathname.split('/').at(-1);
             const data = route.request().postDataJSON() || {};
-            if (course === 'finance_b1') {
+            if (course === 'finance_b1' || course === 'feed_b2') {
               const actor = role === 'teacher' ? 'teacher' : studentId;
-              if (action === 'gostudy_classroom_rooms' && requestUrl.searchParams.get('course') === 'eq.finance-b1') {
-                return route.fulfill({json:[{id:'finance-b1-room',student_id:studentId,teacher_id:'teacher'}]});
+              if (action === 'gostudy_classroom_rooms' && requestUrl.searchParams.get('course') === 'eq.'+(course === 'feed_b2' ? 'feed-b2' : 'finance-b1')) {
+                return route.fulfill({json:[{id:course+'-room',student_id:studentId,teacher_id:'teacher'}]});
               }
               if (action === 'gostudy_classroom_events') {
                 const cursor = Number(requestUrl.searchParams.get('seq').slice(3));
                 return route.fulfill({json:roomEvents.filter(event => event.seq > cursor)});
               }
               if (action === 'gostudy_classroom_send') {
-                assert.equal(data.p_room,'finance-b1-room');
+                assert.equal(data.p_room,course+'-room');
                 roomEvents.push({seq:roomEvents.length+1,actor,kind:data.p_kind,payload:data.p_payload});
                 return route.fulfill({json:true});
               }
@@ -1146,6 +1146,61 @@ async function main() {
           await sp.waitForURL(url => url.pathname === '/student-general-english-b1-stories.html');
         } else await sp.goto(origin + (course === 'pharma_c1' ? '/student-pharma.html' : '/student-' + course.replaceAll('_', '-') + '.html'));
         await tp.goto(origin + '/gostudy-teacher.html');
+        if (course === 'feed_b2') {
+          await sp.locator('#assignment[aria-disabled="true"]').waitFor();
+          assert.equal(await sp.locator('.lesson-card-link').getAttribute('href'),'korean-wave-b2-20261118.html');
+          await sp.locator('.lesson-card-link').click();
+          await tp.locator('.teacher-enter-class').click();
+          for (const page of [sp,tp]) {
+            await page.waitForURL(url => url.pathname === expected);
+            await page.locator('#finance-live-status').getByText('Онлайн · общая комната',{exact:true}).waitFor();
+            await page.getByRole('heading',{name:'Korean Wave: Who Influences Whom?'}).first().waitFor();
+          }
+          assert.equal(await sp.locator('#lessonPages>.page').count(),7);
+          await sp.locator('[data-exercise-field="warm1"]').fill('Music crosses language barriers.');
+          await tp.waitForFunction(() => document.querySelector('[data-exercise-field="warm1"]')?.value === 'Music crosses language barriers.');
+          await sp.locator('#next').click();
+          await tp.locator('#moveStudent').waitFor();
+          await tp.locator('#moveStudent').click();
+          await sp.locator('#page-0.active').waitFor();
+          await sp.locator('#next').click();
+          await sp.locator('#next').click();
+          const choice=sp.locator('#page-2 .definition-picker').first();
+          await choice.locator('summary').click();
+          await choice.getByRole('button',{name:/break into the mainstream/}).click();
+          await sp.getByRole('button',{name:'Check answers'}).click();
+          await sp.locator('#page-2 .feedback,#page-2 .result').first().waitFor();
+          await sp.locator('#finance-chat-form input').fill('Korean Wave classroom test');
+          await sp.locator('#finance-chat-form button').click();
+          await tp.locator('#finance-messages').getByText('Korean Wave classroom test',{exact:true}).waitFor();
+          await tp.getByRole('button',{name:'Dictionary',exact:true}).click();
+          await tp.locator('#dictionarySource').fill('cultural exchange');
+          await tp.locator('#dictionaryTranslation').fill('культурный обмен');
+          await tp.locator('#dictionaryAddForm button').click();
+          await sp.getByRole('button',{name:'Dictionary',exact:true}).click();
+          await sp.locator('#myWords').getByText('культурный обмен',{exact:false}).waitFor();
+          await sp.reload();
+          await sp.locator('#page-2.active .definition-picker').first().waitFor();
+          assert.match(await sp.locator('#page-2 .definition-picker summary').first().innerText(),/break into the mainstream/);
+          await sp.goto(origin+'/student-feed-b2.html');
+          await sp.locator('#openWords').click();
+          await sp.locator('#words').getByText('cultural exchange',{exact:true}).waitFor();
+          await sp.locator('#practiceFromWords').click();
+          await sp.locator('[data-mode="type"]').click();
+          await sp.locator('#practiceInput').fill('cultural exchange');
+          await sp.locator('#practiceTypeForm button').click();
+          await sp.locator('#practiceAnswer[data-correct="true"]').waitFor();
+          assert.equal(mastery[0]?.word_key,'cultural exchange');
+          const mobile = await student.newPage({viewport:{width:390,height:844}});
+          await mobile.goto(origin+'/student-feed-b2.html');
+          assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),'Feed B2 mobile cabinet overflow');
+          await mobile.locator('.lesson-card-link').click();
+          await mobile.locator('#lessonPages>.page').first().waitFor();
+          assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),'Feed B2 mobile lesson overflow');
+          await mobile.close();
+          console.log('feed_b2: canonical cabinet, homework absent, 7 stages, teacher room, reset/navigation, chat, words, mastery, reload and mobile verified');
+          continue;
+        }
         if (course === 'finance_b1') {
           const guest = await browser.newPage();
           try {
