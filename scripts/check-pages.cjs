@@ -1191,7 +1191,8 @@ async function main() {
           await sp.locator('#practiceTypeForm button').click();
           await sp.locator('#practiceAnswer[data-correct="true"]').waitFor();
           assert.equal(mastery[0]?.word_key,'cultural exchange');
-          const mobile = await student.newPage({viewport:{width:390,height:844}});
+          const mobile = await student.newPage();
+          await mobile.setViewportSize({width:390,height:844});
           await mobile.goto(origin+'/student-feed-b2.html');
           assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),'Feed B2 mobile cabinet overflow');
           await mobile.locator('.lesson-card-link').click();
