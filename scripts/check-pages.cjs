@@ -1125,13 +1125,20 @@ async function main() {
           await sp.waitForURL(url => url.pathname === '/student-general-english-b1-stories.html');
         } else await sp.goto(origin + (course === 'pharma_c1' ? '/student-pharma.html' : '/student-' + course.replaceAll('_', '-') + '.html'));
         await tp.goto(origin + '/gostudy-teacher.html');
-        const studentLink = sp.locator('.home-open-lesson');
+        const canonicalCabinet = course === 'travel_a2';
+        const studentLink = canonicalCabinet ? sp.locator('.lesson-card-link') : sp.locator('.home-open-lesson');
         const teacherLink = tp.locator('.teacher-enter-class');
         await studentLink.waitFor();
-        const cabinetHeading = sp.locator('#student-home .home-lesson h2');
-        await sp.evaluate(() => document.documentElement.style.setProperty('--gostudy-ui-heading-size','29px'));
-        assert.equal(await cabinetHeading.evaluate(node => getComputedStyle(node).fontSize),'29px');
-        await sp.evaluate(() => document.documentElement.style.removeProperty('--gostudy-ui-heading-size'));
+        if (canonicalCabinet) {
+          assert.equal(await studentLink.getAttribute('href'),'positive-thinking-a2.html');
+          await sp.getByRole('button',{name:'Словарь',exact:true}).waitFor();
+          await sp.getByText('Positive Thinking').first().waitFor();
+        } else {
+          const cabinetHeading = sp.locator('#student-home .home-lesson h2');
+          await sp.evaluate(() => document.documentElement.style.setProperty('--gostudy-ui-heading-size','29px'));
+          assert.equal(await cabinetHeading.evaluate(node => getComputedStyle(node).fontSize),'29px');
+          await sp.evaluate(() => document.documentElement.style.removeProperty('--gostudy-ui-heading-size'));
+        }
         await teacherLink.waitFor();
         if (course === 'general_english_b1') {
           assert.equal(await sp.locator('.home-homework-link').count(),0);
