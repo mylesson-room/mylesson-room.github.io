@@ -1,0 +1,56 @@
+name: Verify published Feed B2 lesson (temporary)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/feed-b2-live-smoke.yml'
+permissions:
+  contents: read
+jobs:
+  live-smoke:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-save --no-package-lock playwright@1.58.2
+      - name: Check live GitHub Pages with Chrome
+        env:
+          GOSTUDY_CHROME: /usr/bin/google-chrome
+        run: |
+          node <<'NODE'
+          const {chromium}=require('playwright');
+          const assert=require('node:assert/strict');
+          (async()=>{
+            const browser=await chromium.launch({executablePath:process.env.GOSTUDY_CHROME,headless:true});
+            try {
+              const page=await browser.newPage({viewport:{width:390,height:844}});
+              const origin='https://mylesson-room.github.io/';
+              let ready=false;
+              for(let attempt=0;attempt<36;attempt++){
+                const response=await page.goto(origin+'student-feed-b2.html?live-check='+attempt,{waitUntil:'domcontentloaded',timeout:20000}).catch(()=>null);
+                if(response?.ok()){
+                  const link=page.locator('.lesson-card-link');
+                  await link.waitFor({timeout:5000}).catch(()=>{});
+                  ready=await link.getAttribute('href').catch(()=>null)==='korean-wave-b2-20261118.html';
+                }
+                if(ready)break;
+                await new Promise(resolve=>setTimeout(resolve,10000));
+              }
+              assert.ok(ready,'Published cabinet must link to Korean Wave B2');
+              await page.locator('#assignment[aria-disabled="true"]').waitFor();
+              await page.getByText('Пока не назначено',{exact:true}).waitFor();
+              assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Mobile cabinet must not overflow');
+              const lessonResponse=await page.goto(origin+'korean-wave-b2-20261118.html?live-check=1',{waitUntil:'domcontentloaded'});
+              assert.equal(lessonResponse.status(),200,'Published lesson must return HTTP 200');
+              const data=await page.locator('#lesson-data').evaluate(node=>JSON.parse(node.textContent));
+              assert.equal(data.title,'Korean Wave: Who Influences Whom?');
+              assert.equal(data.steps.length,7);
+              assert.equal(data.steps.reduce((sum,step)=>sum+step.minutes,0),50);
+              assert.equal(data.lessonWords.length,8);
+              const asset=await page.request.get(origin+'assets/gostudy-v1-lesson.js');
+              assert.equal(asset.status(),200);
+              console.log('PRODUCTION VERIFIED: new student card, no homework, lesson HTTP 200, seven stages, 50 min, eight words, shared assets, mobile cabinet');
+            } finally {await browser.close()}
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          NODE
