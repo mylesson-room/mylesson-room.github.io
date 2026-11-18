@@ -1047,6 +1047,156 @@ async function checkStudentWithoutCourse(browser, origin) {
   }
 }
 
+
+async function checkVietnamA2PrivateClassroom(browser,origin){
+  // Synthetic sessions only. Live Supabase authorization is verified separately under authenticated JWTs.
+  const studentId='b0a90cf8-3144-421f-8cc8-5ed893c28350';
+  const teacherId='acf2f6a1-f38b-45ef-836d-6cc9a9a5a832';
+  const roomId='77777777-7777-4777-8777-777777777777';
+  const rooms={
+    'my-trip-to-vietnam-a2.html':roomId,
+    'my-trip-to-vietnam-a2-homework.html':'88888888-8888-4888-8888-888888888888',
+    'english-placement.html':'99999999-9999-4999-8999-999999999999',
+  };
+  const ids={student:studentId,teacher:teacherId,outsider:'00000000-0000-4000-8000-000000000001'};
+  const events=new Map(Object.values(rooms).map(id=>[id,[]]));
+  const saved=new Map(),mastery=[];
+  const courseData=await readFile('assets/gostudy-sync.js','utf8');
+  assert.ok(courseData.includes("lesson:'my-trip-to-vietnam-a2.html'"),'Teacher course must point at the new lesson');
+  const configs=[
+    ['my-trip-to-vietnam-a2.html',7,60,'gostudy-vietnam-a2-20261118-v1'],
+    ['my-trip-to-vietnam-a2-homework.html',3,0,'gostudy-vietnam-a2-homework-20261118-v1'],
+  ];
+  for(const [path,pages,mins,key] of configs){
+    const html=await readFile(path,'utf8');
+    const config=JSON.parse(html.match(/id="vietnam-content">([\\s\\S]*?)<\\/script>/)[1]);
+    assert.equal(config.steps.length,pages);
+    assert.equal(config.steps.reduce((n,s)=>n+s.minutes,0),mins);
+    assert.equal(config.key,key);
+    assert.equal(config.wordsKey,'gostudy-english-placement-vocabulary');
+  }
+  const student=await browser.newContext({viewport:{width:1360,height:900}});
+  const teacher=await browser.newContext({viewport:{width:1360,height:900}});
+  const outsider=await browser.newContext();
+  const route=async(r)=>{
+    const request=r.request(),url=new URL(request.url()),method=request.method();
+    const actor=(request.headers().authorization||'').replace('Bearer test-','');
+    const target=ids[actor];
+    const answer=(status,data)=>r.fulfill({status,contentType:'application/json',body:JSON.stringify(data)});
+    if(url.pathname==='/auth/v1/user')return answer(target?200:401,target?{id:target,email:actor+'@example.invalid'}:{});
+    if(url.pathname==='/auth/v1/token'){
+      const email=request.postDataJSON()?.email||'';
+      const who=email.startsWith('teacher')?'teacher':'student';
+      return answer(200,{user:{id:ids[who],email},access_token:'test-'+who,refresh_token:'test',expires_in:3600});
+    }
+    if(!target)return answer(401,{});
+    if(url.pathname.endsWith('/gostudy_my_destinations'))return answer(200,actor==='teacher'?[{course:'teacher'}]:[{course:'english-placement'}]);
+    if(url.pathname.endsWith('/gostudy_legacy_teacher_view')){
+      if(actor==='teacher')return answer(200,[{id:studentId,label:'Vietnam A2 student',email:'student@example.invalid'}]);
+      return answer(200,[]);
+    }
+    if(url.pathname.endsWith('/gostudy_classroom_rooms')){
+      const lesson=(url.searchParams.get('lesson_path')||'').slice(3);
+      const student=(url.searchParams.get('student_id')||'').slice(3);
+      const found=rooms[lesson]&&student===studentId&&actor!=='outsider';
+      return answer(200,found?[{id:rooms[lesson],student_id:studentId,teacher_id:teacherId,student_label:'Vietnam A2 student'}]:[]);
+    }
+    if(url.pathname.endsWith('/gostudy_classroom_events')){
+      const room=(url.searchParams.get('room_id')||'').slice(3);
+      const seq=Number((url.searchParams.get('seq')||'gt.0').slice(3));
+      return answer(200,(events.get(room)||[]).filter(v=>v.seq>seq));
+    }
+    if(url.pathname.endsWith('/gostudy_classroom_send')){
+      const body=request.postDataJSON();
+      const list=events.get(body.p_room)||[];
+      list.push({seq:list.length+1,actor:target,kind:body.p_kind,payload:body.p_payload});
+      events.set(body.p_room,list);return answer(200,true);
+    }
+    if(url.pathname.endsWith('/gostudy_finance_word_progress')){
+      if(method==='POST')mastery.push(request.postDataJSON());
+      return answer(200,mastery);
+    }
+    if(url.pathname.endsWith('/gostudy_progress')){
+      if(method==='GET')return answer(200,[...saved.values()]);
+      const data=request.postDataJSON();saved.set(data.lesson_key,data);return answer(201,[data]);
+    }
+    if(url.pathname.endsWith('/gostudy_vocabulary_items'))return answer(200,[]);
+    return answer(200,[]);
+  };
+  try{
+    for(const [context,role] of [[student,'student'],[teacher,'teacher'],[outsider,'outsider']]){
+      await context.addInitScript(({id,role})=>{
+        sessionStorage.setItem('gostudy-cloud-session-v1',JSON.stringify({
+          user:{id,email:role+'@example.invalid'},access_token:'test-'+role,refresh_token:'test',expires_at:Date.now()+3600000
+        }));
+      },{id:ids[role],role});
+      await context.route('https://*.supabase.co/**',route);
+    }
+    const sp=await student.newPage();
+    await sp.goto(origin+'/student-english-placement.html');
+    await sp.locator('.lesson-card-link').waitFor();
+    assert.equal(await sp.locator('.lesson-card-link').getAttribute('href'),'my-trip-to-vietnam-a2.html');
+    assert.equal(await sp.locator('.homework-card a, #assignment a').count()>0,true,'Homework assigned card must be present');
+    const guest=await outsider.newPage();
+    await guest.goto(origin+'/student-english-placement.html');
+    await guest.locator('#gostudyAccessMessage').getByText('У этого аккаунта нет доступа к данному кабинету.').waitFor();
+    assert.equal(await guest.locator('main:visible').count(),0,'Outsider should not see student dashboard');
+    await sp.locator('.lesson-card-link').click();
+    await sp.waitForURL(/my-trip-to-vietnam-a2.html/);
+    await sp.locator('#lessonPages>.page.active').waitFor();
+    await sp.locator('#finance-live-status').getByText('Онлайн · общая комната',{exact:true}).waitFor();
+    assert.equal(await sp.locator('#lessonPages>.page').count(),7);
+    assert.equal(await sp.locator('a.call-btn').getAttribute('href'),'https://telemost.yandex.ru/');
+    assert.equal(await sp.locator('#selectionTranslate').count(),1);
+    await sp.locator('[data-exercise-field="vnm-welcome-note"]').fill('I prefer travelling with family.');
+    await sp.locator('#next').click();
+    await sp.locator('#next').click();
+    await sp.locator('#page-2.active').waitFor();
+    await sp.locator('#page-2 [data-exercise-field="vnm-g1-0"]').fill('get up');
+    await sp.getByRole('button',{name:'Check answers'}).click();
+    await sp.locator('#page-2 .feedback.good').first().waitFor();
+    await sp.reload();
+    await sp.locator('#page-2.active [data-exercise-field="vnm-g1-0"]').waitFor();
+    assert.equal(await sp.locator('[data-exercise-field="vnm-g1-0"]').inputValue(),'get up');
+    const tp=await teacher.newPage();
+    await tp.goto(origin+'/my-trip-to-vietnam-a2.html?classStudent='+studentId);
+    await tp.locator('#finance-live-status').getByText('Онлайн · общая комната',{exact:true}).waitFor();
+    await tp.locator('#moveStudent').waitFor();
+    await tp.locator('#moveStudent').click();
+    await sp.locator('#page-0.active').waitFor();
+    await sp.locator('#finance-chat-form input').fill('Test Vietnam A2 class message');
+    await sp.locator('#finance-chat-form button').click();
+    await tp.locator('#finance-messages').getByText('Test Vietnam A2 class message',{exact:true}).waitFor();
+    await tp.getByRole('button',{name:'Dictionary',exact:true}).click();
+    await tp.locator('#dictionarySource').fill('travel');
+    await tp.locator('#dictionaryTranslation').fill('путешествовать');
+    await tp.locator('#dictionaryAddForm button').click();
+    await sp.getByRole('button',{name:'Dictionary',exact:true}).click();
+    await sp.locator('#myWords').getByText('путешествовать',{exact:false}).waitFor();
+    await sp.getByRole('button',{name:'Close dictionary'}).click();
+    const homework=await student.newPage();
+    await homework.goto(origin+'/my-trip-to-vietnam-a2-homework.html');
+    await homework.locator('#lessonPages>.page.active').waitFor();
+    assert.equal(await homework.locator('#lessonPages>.page').count(),3);
+    await homework.locator('[data-exercise-field="vnm-hw-writing"]').fill('I usually wake up early. I like travelling.');
+    await homework.reload();
+    await homework.locator('#lessonPages>.page.active').waitFor();
+    assert.equal(await homework.locator('[data-exercise-field="vnm-hw-writing"]').inputValue(),'I usually wake up early. I like travelling.');
+    const mobile=await student.newPage();
+    await mobile.setViewportSize({width:390,height:844});
+    await mobile.goto(origin+'/student-english-placement.html');
+    await mobile.locator('.lesson-card-link').waitFor();
+    assert.ok(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Vietnam cabinet mobile overflow');
+    await mobile.locator('.lesson-card-link').click();
+    await mobile.locator('#lessonPages>.page.active').waitFor();
+    assert.ok(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Vietnam lesson mobile overflow');
+    await mobile.close();
+    console.log('VIETNAM A2: private cabinet, lesson & homework, auto-grading, answer restore, teacher sync, chat, dictionary, move student, outsider and mobile verified');
+  }finally{
+    await Promise.all([student.close(),teacher.close(),outsider.close()]);
+  }
+}
+
 async function main() {
   await checkVictoriaB2Methodology();
   await checkThreeProgressMeLessons();
@@ -1058,6 +1208,7 @@ async function main() {
     await checkSharedComponentReversible(browser,origin);
     await checkStudentWithoutCourse(browser,origin);
     await checkDariaPrivateRoom(browser,origin);
+    await checkVietnamA2PrivateClassroom(browser,origin);
     await checkFinanceRoom(browser, origin);
     await checkFinanceHomework(browser,origin);
     await checkGeneralB2Room(browser, origin);
