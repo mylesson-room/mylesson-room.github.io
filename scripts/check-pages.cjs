@@ -1197,6 +1197,7 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     await sp.locator('#practiceInput').fill('travel');
     await sp.locator('#practiceTypeForm button').click();
     await sp.locator('#practiceAnswer[data-correct="true"]').waitFor();
+    await sp.waitForFunction(()=>window.FinanceLive?.words().some(word=>word.en==='travel' && word.learned));
     assert.equal(mastery[0]?.word_key,'travel','Training should persist studied status in the private classroom');
     const homework=await student.newPage();
     await homework.goto(origin+'/my-trip-to-vietnam-a2-homework.html');
