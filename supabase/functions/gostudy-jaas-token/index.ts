@@ -59,8 +59,10 @@ Deno.serve(async (request) => {
   if (!/^Bearer \S+$/.test(authorization)) return respond(401, { error: 'Войдите в GoStudy.' });
   const supabase = Deno.env.get('SUPABASE_URL');
   const key = Deno.env.get('SUPABASE_ANON_KEY');
-  const appId = Deno.env.get('JAAS_APP_ID') || '';
-  const keyId = Deno.env.get('JAAS_KEY_ID') || '';
+  // Public JaaS identifiers for the pilot. Optional env vars override these.
+  // The RSA PRIVATE key is the only required secret; never commit it.
+  const appId = Deno.env.get('JAAS_APP_ID') || 'vpaas-magic-cookie-d7a5780b9ae54dacb95d85d7d4f4191f';
+  const keyId = Deno.env.get('JAAS_KEY_ID') || 'vpaas-magic-cookie-d7a5780b9ae54dacb95d85d7d4f4191f/a34acd';
   const privatePem = (Deno.env.get('JAAS_PRIVATE_KEY') || '').replace(/\\n/g, '\n');
   if (!supabase || !key || !APP_ID.test(appId) || !keyId.startsWith(appId + '/') || !privatePem)
     return respond(503, { error: 'Видео ещё не настроено администратором.' });
