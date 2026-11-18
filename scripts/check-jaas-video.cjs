@@ -98,7 +98,96 @@ const unpack = token => {
   assert.match(html, /gostudy-jaas-video\.js/);
   assert.doesNotMatch(html, /JAAS_PRIVATE_KEY|-----BEGIN PRIVATE KEY-----/);
   const front = fs.readFileSync('assets/gostudy-jaas-video.js', 'utf8');
-  assert.match(front, /FinanceLive\?\.connected\(\)/);
+  // Video must remain clickable even if classroom chat/live polling is delayed.
+  assert.doesNotMatch(front, /FinanceLive\\?\\.connected\\(\\)/);
   assert.doesNotMatch(front, /JAAS_PRIVATE_KEY|service_role/);
-  console.log('JaaS pilot: authorized teacher/student share room; denial, RS256, PKCS1/PKCS8, UI guards PASS');
+  // Regression: formerly a delayed/missing chat handshake disabled the video
+  // button forever. Test actual browser-adapter callbacks with synthetic DOM.
+  async function simulateVideo({ user, selected = null, rooms = [], includeAuth = true }) {
+    const events = {};
+    const controls = [];
+    const calls = [];
+    let joined;
+    const element = () => ({
+      textContent: '', disabled: false, hidden: false, classList: {
+        add() {}, remove() {},
+      }, setAttribute() {}, remove() {},
+      addEventListener(name, callback) { this.listeners ??= {}; this.listeners[name] = callback; },
+      after() {}, append() {}, prepend(...children) { controls.push(...children); },
+    });
+    const workspace = element();
+    const placeholder = element();
+    const actions = element();
+    const state = element();
+    const documentStub = {
+      body: { hasAttribute: name => name === 'data-jaas-video-pilot' },
+      head: { append(script) { script.onload(); } },
+      querySelector: selector => ({
+        '#lessonVideo .video-workspace': workspace,
+        '#lessonVideo .video-preview': placeholder,
+        '#lessonVideo .video-actions': actions,
+        '#lessonVideo .video-state': state,
+      }[selector] || null),
+      createElement: () => element(),
+      addEventListener(name, callback) { events[name] = callback; },
+    };
+    const auth = includeAuth ? {
+      userId: () => user,
+      classroomStudent: selected,
+      token: async () => 'synthetic-user-token',
+      request: async path => {
+        calls.push({ kind: 'rooms', path });
+        return { ok: true, data: rooms };
+      },
+    } : undefined;
+    const w = {
+      GoStudyFinanceAuth: auth,
+      addEventListener() {},
+      JitsiMeetExternalAPI: class {
+        constructor(domain, options) { joined = { domain, options }; }
+        addEventListener() {}
+        dispose() {}
+      },
+    };
+    const fetchMock = async (url, options) => {
+      const body = JSON.parse(options.body);
+      calls.push({ kind: 'token', url, body });
+      return Response.json({ appId, room: 'gostudy-finance-' + student.replace(/-/g, ''), jwt: 'synthetic-jwt' });
+    };
+    vm.runInNewContext(front, {
+      document: documentStub, window: w, fetch: fetchMock, Response, AbortSignal,
+      URLSearchParams, Error,
+    }, { filename: 'gostudy-jaas-video.js' });
+    const connect = controls.find(el => el.textContent === 'Включить видео');
+    assert.ok(connect, 'Connect button must be rendered');
+    assert.equal(connect.disabled, false, 'Connect must be usable without FinanceLive');
+    await connect.listeners.click();
+    return { calls, joined, status: state.textContent };
+  }
+  const teacherVideo = await simulateVideo({
+    user: teacher, rooms: [{ teacher_id: teacher, student_id: student }],
+  });
+  assert.deepEqual(teacherVideo.calls.map(x => x.kind), ['rooms', 'token']);
+  assert.equal(teacherVideo.calls[1].body.studentId, student);
+  assert.equal(teacherVideo.joined.domain, '8x8.vc');
+  assert.equal(teacherVideo.joined.options.roomName, appId + '/gostudy-finance-' + student.replace(/-/g, ''));
+  const studentVideo = await simulateVideo({
+    user: student, rooms: [{ teacher_id: teacher, student_id: student }],
+  });
+  assert.equal(studentVideo.calls[1].body.studentId, null);
+  const selectedTeacher = await simulateVideo({ user: teacher, selected: student });
+  assert.equal(selectedTeacher.calls.length, 1);
+  assert.equal(selectedTeacher.calls[0].body.studentId, student);
+  const noSession = await simulateVideo({ includeAuth: false });
+  assert.equal(noSession.calls.length, 0);
+  assert.match(noSession.status, /Войдите в аккаунт/);
+  const multipleRooms = await simulateVideo({
+    user: teacher, rooms: [
+      { teacher_id: teacher, student_id: student },
+      { teacher_id: teacher, student_id: stranger },
+    ],
+  });
+  assert.equal(multipleRooms.calls.length, 1);
+  assert.match(multipleRooms.status, /выбрав ученика/);
+  console.log('JaaS pilot: role-protected JWT and independently clickable video button PASS');
 })().catch(error => { console.error(error); process.exitCode = 1; });
