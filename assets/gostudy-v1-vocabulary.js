@@ -9,16 +9,16 @@ const masteryKey = word => String(word?.en || '').trim().toLocaleLowerCase('en')
 const isLearned = word => masteryEnabled && (Boolean(word?.learned) || !!mastery.get(masteryKey(word))?.studied_at);
 const activeWords = () => loadSavedWords().filter(word => !isLearned(word));
 async function masteryRequest(path,options={}) {
-  const auth=window.GoStudyFinanceAuth;
+  const auth=window.GoStudyFinanceAuth || window.GoStudyPrivateAccess;
   if(!auth?.userId())return null;
-  const response=await auth.request(path,options,await auth.token());
+  const response=auth===window.GoStudyPrivateAccess ? await auth.request(path,options) : await auth.request(path,options,await auth.token());
   if(!response.ok)throw Error('Не удалось синхронизировать статус слов ('+response.status+').');
   return response.data;
 }
 async function loadMastery() {
   if(!masteryEnabled)return;
   try {
-    const auth=window.GoStudyFinanceAuth;
+    const auth=window.GoStudyFinanceAuth || window.GoStudyPrivateAccess;
     if(!auth?.userId())return;
     const url='/rest/v1/gostudy_finance_word_progress?select=word_key,successful_count,studied_at&student_id=eq.'+encodeURIComponent(auth.userId());
     const records=await masteryRequest(url);
@@ -32,7 +32,7 @@ const solvedThisPractice=new Set();
 async function markLearned(word) {
   if(!masteryEnabled || !word?.en || isLearned(word))return;
   const key=masteryKey(word);
-  const auth=window.GoStudyFinanceAuth;
+  const auth=window.GoStudyFinanceAuth || window.GoStudyPrivateAccess;
   if(!auth?.userId())return;
   const row={student_id:auth.userId(),word_key:key,successful_count:Math.max(1,(mastery.get(key)?.successful_count||0)+1),studied_at:new Date().toISOString(),updated_at:new Date().toISOString()};
   try {
