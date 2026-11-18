@@ -29,5 +29,5 @@ for(const entry of inventory.entries){
   }
   assert.ok(fs.existsSync(entry.legacyCabinet),'Missing legacy cabinet: '+entry.legacyCabinet);
 }
-assert.ok(!/\\b[\\w.+-]+@[\\w.-]+\\.[a-z]{2,}\\b/i.test(JSON.stringify(inventory)),'Do not commit student emails or PII to inventory');
+assert.ok(!/\b[\w.+-]+@[\w.-]+\.[a-z]{2,}\b/i.test(JSON.stringify(inventory)),'Do not commit student emails or PII to inventory');
 console.log('GoStudy migration inventory: all '+names.length+' legacy HTML routes mapped to existing candidate lessons; confirmation still required.');
