@@ -5,7 +5,7 @@
 #lessonVideo .video-actions .jaas-connect:disabled{opacity:.48;cursor:not-allowed}
 #lessonVideo .video-actions .jaas-leave{background:#fff2f2;color:#b0303a;font-size:12px;font-weight:750;padding:10px 12px;border-radius:8px}
 #lessonVideo .video-actions .jaas-expand{background:#eef3fa;color:#415d84;font-size:12px;font-weight:750;padding:10px 12px;border-radius:8px}
-#lessonVideo .jaas-message{margin:0;padding:0 15px 12px;font:500 12px/1.5 inherit;color:#687691}
+#lessonVideo .jaas-message{margin:0;padding:0 15px 12px;font-size:12px;font-weight:500;line-height:1.5;color:#687691}
 #lessonVideo .video-actions [hidden],#lessonVideo .video-preview[hidden],#lessonVideo .jaas-frame[hidden]{display:none!important}
 #lessonVideo .jaas-frame{height:clamp(260px,37vh,520px);min-height:260px;position:relative;background:#151a27}
 #lessonVideo .jaas-frame iframe{display:block;width:100%;height:100%;border:0}
