@@ -33,4 +33,17 @@ const renderer=fs.readFileSync('assets/gostudy-v1-cabinet.js','utf8');
 for(const name of ['id="openWords"','id="practiceCard"','id="assignment"']) {
   assert.ok(renderer.includes(name),'Missing shared element: '+name);
 }
+
+// Every historical route must consume the same visual action tokens.
+// This checks shared styling, NOT full page/lesson functional parity.
+const tokenCss = fs.readFileSync('assets/gostudy-shared-visual.css','utf8');
+assert.match(tokenCss, /--gostudy-action-bg\s*:/, 'One primary-action color token is required');
+assert.match(stylesheet, /gostudy-shared-visual\.css/, 'Michael must consume the shared tokens');
+for (const path of tracked) {
+  const html = fs.readFileSync(path,'utf8');
+  if (html.includes('assets/gostudy-v1-cabinet.css')) continue;
+  assert.match(html, /assets\/gostudy-shared-visual\.css/, path+' must load shared action tokens');
+  assert.match(html, /data-gostudy-legacy-visual/, path+' must scope legacy visual normalization');
+}
+
 console.log('Unified cabinet guard: '+tracked.length+' frozen legacy routes; Michael = canonical UI; Placement = second test scenario.');
