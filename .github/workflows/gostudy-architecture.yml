@@ -26,6 +26,8 @@ jobs:
         run: node scripts/check-unified-cabinet.cjs
       - name: Verify complete legacy migration inventory
         run: node scripts/check-cabinet-migration-inventory.cjs
+      - name: Audit public lesson links against unconfirmed legacy candidates
+        run: node scripts/check-public-release-drift.cjs
       - name: Verify shared legacy cabinet controllers preserve browser storage
         run: node scripts/check-shared-legacy-cabinet-controller.cjs
       - name: Reject unsafe legacy migration inventory mutations
