@@ -1141,9 +1141,9 @@ async function main() {
         const teacherLink = tp.locator('.teacher-enter-class');
         await studentLink.waitFor();
         if (canonicalCabinet) {
-          assert.equal(await sp.locator('.lesson-card-link').getAttribute('href'),'travel-a2-04.html');
+          assert.equal(await sp.locator('.lesson-card-link').getAttribute('href'),'positive-thinking-a2.html');
           await sp.getByRole('button',{name:'Словарь',exact:true}).waitFor();
-          await sp.getByText('The train is late').first().waitFor();
+          await sp.getByText('Positive Thinking').first().waitFor();
         } else {
           const cabinetHeading = sp.locator('#student-home .home-lesson h2');
           await sp.evaluate(() => document.documentElement.style.setProperty('--gostudy-ui-heading-size','29px'));
