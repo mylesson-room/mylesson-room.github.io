@@ -32,6 +32,7 @@ try {
   };
   mutate(x=>{x.entries[0].teacherConfirmed=true},'unverified teacher confirmation');
   mutate(x=>{x.entries[0].studentEmail='private@example.invalid'},'private identity field');
+  mutate(x=>{x.auditNote='contact private@example.invalid'},'email in unstructured public inventory metadata');
   mutate(x=>{x.entries[0].candidateCurrentLesson='student.html'},'dashboard as lesson');
   mutate(x=>{x.entries[0].candidateCurrentLesson='../outside.html'},'path traversal');
   mutate(x=>{x.entries[0].legacyCabinet=x.entries[1].legacyCabinet},'duplicate cabinet');
@@ -39,7 +40,7 @@ try {
   mutate(x=>{x.entries.pop()},'missing legacy route');
   fs.writeFileSync(path.join(temp,'student-new-pupil.html'),'');
   assert.notEqual(run(original).status,0,'new bespoke student cabinet must be rejected');
-  console.log('Migration inventory negative fixtures: 8 unsafe mutations rejected; all 18 baseline routes preserved.');
+  console.log('Migration inventory negative fixtures: 9 unsafe mutations rejected; all 18 baseline routes preserved.');
 } finally {
   fs.rmSync(temp,{recursive:true,force:true});
 }
