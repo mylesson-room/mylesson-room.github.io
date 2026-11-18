@@ -1,0 +1,64 @@
+name: Check public Vietnam A2 lesson and homework (temporary)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/vietnam-a2-live-smoke-20261118.yml'
+permissions:
+  contents: read
+jobs:
+  live-smoke:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify actual published GitHub Pages content
+        run: |
+          node <<'NODE'
+          const assert=require('node:assert/strict');
+          const base='https://mylesson-room.github.io/';
+          const sleep=ms=>new Promise(done=>setTimeout(done,ms));
+          (async()=>{
+            let ok=false,last='';
+            for(let i=0;i<95;i++){
+              try{
+                const q='?vietnam-a2-check='+Date.now()+'-'+i;
+                const paths=['student-english-placement.html','my-trip-to-vietnam-a2.html','my-trip-to-vietnam-a2-homework.html','assets/gostudy-sync.js','english-placement.html','assets/gostudy-vietnam-a2.js'];
+                const result=await Promise.all(paths.map(path=>fetch(base+path+q,{headers:{'Cache-Control':'no-cache'}})));
+                result.forEach((r,n)=>assert.equal(r.status,200,'Public page unavailable: '+paths[n]));
+                const [cabinet,lesson,homework,sync,oldLesson,bootstrap]=await Promise.all(result.map(r=>r.text()));
+                const read=(html,id)=>JSON.parse(html.split('id="'+id+'">')[1].split('</script>')[0]);
+                const student=read(cabinet,'cabinet-settings');
+                const lessonPayload=read(lesson,'vietnam-content');
+                const homeworkPayload=read(homework,'vietnam-content');
+                const access=read(cabinet,'private-access-config');
+                assert.equal(student.cabinet,'student-english-placement.html');
+                assert.equal(student.title,'My Trip to Vietnam');
+                assert.equal(student.lesson,'my-trip-to-vietnam-a2.html');
+                assert.equal(student.homework,'my-trip-to-vietnam-a2-homework.html');
+                assert.equal(access.room.course,'vietnam-a2');
+                assert.equal(lessonPayload.title,'My Trip to Vietnam');
+                assert.equal(lessonPayload.steps.length,7);
+                assert.equal(lessonPayload.steps.reduce((sum,s)=>sum+s.minutes,0),60);
+                assert.equal(lessonPayload.key,'gostudy-vietnam-a2-20261118-v1');
+                assert.equal(homeworkPayload.steps.length,3);
+                assert.equal(homeworkPayload.key,'gostudy-vietnam-a2-homework-20261118-v1');
+                assert.equal(lessonPayload.wordsKey,homeworkPayload.wordsKey);
+                assert.ok(homeworkPayload.steps[0].html.includes('12–15'));
+                assert.ok(homeworkPayload.steps[1].html.includes('Question 5'));
+                assert.ok(lessonPayload.steps[2].html.includes('data-check-section'));
+                assert.ok(lessonPayload.steps[3].html.includes('Conversation script'));
+                assert.ok(sync.includes("lesson:'my-trip-to-vietnam-a2.html',lessonKey:"));
+                assert.ok(sync.includes("homework:'my-trip-to-vietnam-a2-homework.html'"));
+                assert.ok(oldLesson.includes('gostudy-placement.js'),'Previous diagnostic lesson must remain');
+                assert.ok(bootstrap.includes('pages.hidden=true'),'Prevent early edits before history loads');
+                for(const page of [lesson,homework])assert.ok(page.includes('gostudy-private-access.js'),'Private access missing');
+                ok=true;break;
+              }catch(e){last=String(e.message||e);}
+              await sleep(4000);
+            }
+            assert.ok(ok,'Live Pages have not published Vietnam A2 yet: '+last);
+            console.log('LIVE VIETNAM A2 VERIFIED: current student cabinet, teacher catalog, separate homework, seven 60-minute PDF lesson stages, access gate, prior placement lesson and bootstrap all live.');
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          NODE
