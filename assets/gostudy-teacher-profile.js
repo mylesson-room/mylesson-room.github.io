@@ -79,12 +79,14 @@
       if (!Array.isArray(updated) || updated.length !== 1 || updated[0].user_id !== studentId) {
         throw Error('Имя не сохранено. Проверьте права преподавателя и наличие профиля.');
       }
-      if (selected !== studentId || version !== submissionVersion) return;
-      input.value = updated[0].display_name;
-      message('Имя сохранено в GoStudy. Оно будет показано ученику после обновления кабинета.');
+      // Always update the roster entry for the student whose server write succeeded.
+      // The form, however, may now belong to a different selected student.
       document.dispatchEvent(new CustomEvent('gostudy-profile-updated',{
         detail:{studentId, displayName:updated[0].display_name}
       }));
+      if (selected !== studentId || version !== submissionVersion) return;
+      input.value = updated[0].display_name;
+      message('Имя сохранено в GoStudy. Оно будет показано ученику после обновления кабинета.');
     } catch(error) {
       if (selected === studentId && version === submissionVersion)
         message(error?.message || 'Не удалось сохранить имя.');
