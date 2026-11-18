@@ -1,0 +1,27 @@
+/* Read-only regression: full Positive Thinking pilot must never be mistaken for a live data migration. */
+'use strict';
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const pilot = JSON.parse(fs.readFileSync('docs/pilots/travel-a2-positive-thinking.json','utf8'));
+const html = fs.readFileSync(pilot.legacyCabinet,'utf8');
+const lessonHtml = fs.readFileSync(pilot.lesson,'utf8');
+const homeworkHtml = fs.readFileSync(pilot.homework.source,'utf8');
+const settings = JSON.parse(html.match(/<script\s+type="application\/json"\s+id="cabinet-settings">([^<]+)<\/script>/)?.[1] || '{}');
+const lesson = JSON.parse(lessonHtml.match(/<script\s+type="application\/json"\s+id="lesson-data">([^<]+)<\/script>/)?.[1] || '{}');
+const homework = JSON.parse(homeworkHtml.match(/<script\s+type="application\/json"\s+id="lesson-data">([^<]+)<\/script>/)?.[1] || '{}');
+assert.equal(pilot.status,'staging-only-blocked');
+assert.equal(pilot.canonicalCabinet,'student.html');
+assert.equal(settings.lesson,pilot.lesson);
+assert.equal(settings.homework,'','Do not expose the unpublished homework');
+assert.equal(pilot.homework.published,false);
+assert.equal(lesson.key,pilot.lessonKey);
+assert.equal(lesson.cabinet,pilot.legacyCabinet);
+assert.equal(lesson.title,'Positive Thinking');
+assert.ok(Array.isArray(lesson.steps) && lesson.steps.length>=7,'Original complete lesson must be preserved');
+assert.ok(homework.key && homework.key !== lesson.key,'Homework must have an independent progress namespace');
+assert.equal(new Set(pilot.requiredChecks).size,pilot.requiredChecks.length);
+assert.ok(pilot.requiredChecks.includes('verified-full-backup'));
+assert.ok(pilot.requiredChecks.includes('isolated-restore-rehearsal'));
+assert.ok(pilot.requiredChecks.includes('cross-account-rls-negative-tests'));
+assert.ok(!/(?:[\w.+-]+@[\w.-]+\.[a-z]{2,}|[a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12})/i.test(JSON.stringify(pilot)),'No student identity in public pilot metadata');
+console.log('Positive Thinking full-pilot metadata: consistent, homework unpublished, no Auth identity or production assignment. Migration NOT completed.');
