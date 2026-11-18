@@ -1136,7 +1136,7 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     await sp.goto(origin+'/student-english-placement.html');
     await sp.locator('.lesson-card-link').waitFor();
     assert.equal(await sp.locator('.lesson-card-link').getAttribute('href'),'my-trip-to-vietnam-a2.html');
-    assert.equal(await sp.locator('.homework-card a, #assignment a').count()>0,true,'Homework assigned card must be present');
+    assert.equal(await sp.locator('#assignment').getAttribute('href'),'my-trip-to-vietnam-a2-homework.html','Homework must open the assigned PDF tasks');
     const guest=await outsider.newPage();
     await guest.goto(origin+'/student-english-placement.html');
     await guest.locator('#gostudyAccessMessage').getByText('У этого аккаунта нет доступа к данному кабинету.').waitFor();
