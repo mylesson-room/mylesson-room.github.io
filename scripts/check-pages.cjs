@@ -1173,7 +1173,11 @@ async function main() {
           }
           const sidebarBox = await sidebar.boundingBox();
           const sheetBox = await page.locator('.room > .sheet').boundingBox();
-          assert.ok(sidebarBox.x >= sheetBox.x + sheetBox.width - 1, 'desktop tools must sit to the right of the lesson');
+          if (course === 'travel_a2') {
+            assert.ok(sidebarBox.x + sidebarBox.width <= sheetBox.x + 1, 'Positive Thinking approved layout: video and tools on the left');
+          } else {
+            assert.ok(sidebarBox.x >= sheetBox.x + sheetBox.width - 1, 'desktop tools must sit to the right of the lesson');
+          }
           await dictionary.click();
           await page.locator('.glass-words[open]').waitFor();
           assert.equal(await page.locator('.glass-words[open]').count(), 1);
