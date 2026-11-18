@@ -543,7 +543,13 @@
     open.href = lesson.lesson;
     open.textContent = started.page > 0 || Object.keys(started.answers || {}).length ? 'Продолжить урок' : 'Открыть урок';
     if (lesson.homework) homework.href = lesson.homework;
-    else {
+    else if (financeB1) {
+      homework.removeAttribute('href');
+      homework.textContent = 'Домашнее задание не назначено';
+      homework.setAttribute('aria-disabled', 'true');
+      homework.style.cssText = 'pointer-events:none;opacity:.55;cursor:not-allowed';
+      homework.closest('article').querySelector('h2').textContent = 'Пока нет задания';
+    } else {
       homework.closest('article').remove();
       home.querySelector('.home-duo').style.gridTemplateColumns = 'minmax(0,1fr)';
     }
