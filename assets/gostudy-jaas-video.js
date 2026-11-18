@@ -40,10 +40,12 @@
   let meeting = false;
   let scriptPromise = null;
   const getAuth = () => window.GoStudyFinanceAuth;
-  const authorized = () => Boolean(getAuth()?.userId() && window.FinanceLive?.connected());
+  // Video authorization lives in the Supabase token endpoint, not in the
+  // independent live-chat transport. Never silently disable the button.
+  const hasSession = () => Boolean(getAuth()?.userId());
   const status = (text) => { state.textContent = text; message.textContent = text; };
   function sync() {
-    connect.disabled = busy || Boolean(api) || !authorized();
+    connect.disabled = busy || Boolean(api);
     connect.hidden = Boolean(api);
     leaveButton.hidden = !api;
     expand.hidden = !api;
@@ -74,14 +76,39 @@
     }
     return scriptPromise;
   }
+  async function resolveStudentId(auth, accessToken) {
+    // Teacher links normally include classStudent, but direct lesson URLs do not.
+    // Find the single finance room the signed-in user can access via RLS.
+    // Do not guess a room if the teacher has more than one.
+    if (auth.classroomStudent) return auth.classroomStudent;
+    const response = await auth.request(
+      '/rest/v1/gostudy_finance_room?select=teacher_id,student_id',
+      {}, accessToken
+    );
+    if (!response.ok || !Array.isArray(response.data))
+      throw Error('Не удалось проверить доступ к видеокомнате.');
+    const userId = auth.userId();
+    const rooms = response.data.filter(room =>
+      room?.student_id === userId || room?.teacher_id === userId
+    );
+    if (rooms.length !== 1)
+      throw Error(rooms.length === 0
+        ? 'Видеокомната не назначена этому аккаунту.'
+        : 'Откройте урок через кабинет преподавателя, выбрав ученика.');
+    const room = rooms[0];
+    return room.student_id === userId ? null : room.student_id;
+  }
   async function join() {
-    if (busy || api || !authorized()) return;
+    if (busy || api) return;
     busy = true;
     sync();
     status('Подготавливаем видеосвязь…');
     try {
       const auth = getAuth();
+      if (!hasSession() || !auth?.token || !auth?.request)
+        throw Error('Войдите в аккаунт GoStudy для видеозвонка.');
       const token = await auth.token();
+      const studentId = await resolveStudentId(auth, token);
       const response = await fetch(endpoint, {
         method: 'POST',
         cache: 'no-store',
@@ -90,7 +117,7 @@
           Authorization: 'Bearer ' + token,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ studentId: auth.classroomStudent || null }),
+        body: JSON.stringify({ studentId }),
         signal: AbortSignal.timeout(15000),
       });
       const data = await response.json().catch(() => ({}));
@@ -98,7 +125,7 @@
       if (!appIdFormat.test(data.appId) || !roomFormat.test(data.room) || typeof data.jwt !== 'string')
         throw Error('Неверный ответ сервиса видео.');
       await loadLibrary(data.appId);
-      if (!authorized()) throw Error('Сессия урока завершена.');
+      if (!hasSession()) throw Error('Сессия GoStudy завершена. Войдите заново.');
       frame = document.createElement('div');
       frame.className = 'jaas-frame';
       frame.setAttribute('aria-label', 'Видеозвонок GoStudy');
@@ -138,7 +165,7 @@
       else if (frame.requestFullscreen) await frame.requestFullscreen();
     } catch { status('Полноэкранный режим не поддерживается.'); }
   });
-  document.addEventListener('finance-ready', () => { status('Можно включить видео'); sync(); });
+  document.addEventListener('finance-ready', () => { if (!api && !busy) status('Можно включить видео'); sync(); });
   document.addEventListener('finance-connect', sync);
   document.addEventListener('gostudy-private-signed-out', end);
   window.addEventListener('pagehide', end);
