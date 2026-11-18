@@ -980,6 +980,10 @@ async function checkStudentWithoutCourse(browser, origin) {
     if (path.endsWith('/gostudy_my_destinations')) {
       return route.fulfill({json:isTeacher ? [{course:'teacher'}] : assignedCourse ? [{course:assignedCourse.replaceAll('_','-')}] : []});
     }
+    if (path.endsWith('/gostudy_teacher_student_emails')) {
+      assert.ok(isTeacher);
+      return route.fulfill({json:student ? [{id:student.id,email:student.email}] : []});
+    }
     if (path.endsWith('/gostudy_students_without_course')) {
       assert.ok(isTeacher);
       return route.fulfill({json:student ? [{id:student.id,email:student.email}] : []});
