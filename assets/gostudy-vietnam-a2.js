@@ -36,10 +36,15 @@
       if(signout)document.querySelector('.header-right')?.append(signout);
       await loadScript(body.dataset.exercisesScript);
       const pages=document.getElementById('lessonPages');
-      if(pages)pages.inert=true;
-      document.addEventListener('finance-ready',()=>{if(pages)pages.inert=false;},{once:true});
+      // A private workbook must not accept edits until its remote answer history
+      // has been read. The shared workbook intentionally suppresses writes while
+      // synchronizing; displaying its fields early would silently lose edits.
+      if(pages){pages.inert=true;pages.hidden=true;pages.setAttribute('aria-busy','true');}
+      document.addEventListener('finance-ready',()=>{
+        if(pages){pages.inert=false;pages.hidden=false;pages.removeAttribute('aria-busy');}
+        if(message)message.hidden=true;
+      },{once:true});
       await loadScript(body.dataset.workbookScript);
-      if(message)message.hidden=true;
       document.querySelector('.classroom-access')?.setAttribute('hidden','');
     }catch(error){
       console.error('Vietnam A2 lesson loading failed',error);
