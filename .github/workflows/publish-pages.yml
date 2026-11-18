@@ -21,6 +21,7 @@ jobs:
       - run: npm install --no-save --no-package-lock playwright@1.58.2
       - run: npx playwright install --with-deps chromium
       - run: node scripts/check-template-contract.cjs
+      - run: node scripts/check-positive-thinking-lesson.cjs
       - run: node scripts/check-pages.cjs
       - name: Test shared student route with synthetic Supabase accounts
         run: node scripts/check-unified-cabinet-browser.cjs
