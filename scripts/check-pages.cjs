@@ -1331,10 +1331,11 @@ async function main() {
           await mobile.locator('.lesson-card-link').click();
           await mobile.locator('#lessonPages>.page.active').waitFor();
           assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),'Feed B2 mobile lesson overflow');
-          await mobile.locator('#nav button').nth(0).click();
+          await mobile.locator('.lesson-section-menu summary').click();
+          await mobile.locator('#lessonSections button').nth(0).click();
           await mobile.locator('#page-0.active .kw-photos').waitFor();
           assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),'Feed B2 mobile photo overflow');
-          await mobile.locator('#nav button').nth(1).click();
+          await mobile.locator('#next').click();
           await mobile.locator('#page-1.active .kw-video').waitFor();
           assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),'Feed B2 mobile video overflow');
           await mobile.close();
