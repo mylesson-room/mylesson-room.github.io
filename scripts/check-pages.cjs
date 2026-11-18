@@ -1277,8 +1277,8 @@ async function main() {
             await outsiderPage.locator('.classroom-access').getByText('Для этого аккаунта нет доступа к комнате.').waitFor();
             assert.equal(await outsiderPage.locator('#lessonPages').isVisible(),false,'Unrelated user must not see classroom data');
           } finally { await outsider.close(); }
-          await sp.locator('[data-exercise-field="warm1"]').fill('Music crosses language barriers.');
-          await tp.waitForFunction(() => document.querySelector('[data-exercise-field="warm1"]')?.value === 'Music crosses language barriers.');
+          await sp.locator('[data-exercise-field="kwphoto1"]').fill('Music crosses language barriers.');
+          await tp.waitForFunction(() => document.querySelector('[data-exercise-field="kwphoto1"]')?.value === 'Music crosses language barriers.');
           await sp.locator('#next').click();
           await sp.locator('#page-1.active iframe').waitFor({state:'attached'});
           assert.match(await sp.locator('#page-1 iframe').getAttribute('src'),/youtube-nocookie\.com\/embed\/s48XhclvQBs/);
