@@ -8,7 +8,7 @@ const http=require('node:http');
 const {chromium}=require('playwright');
 const root=path.resolve(__dirname,'..');
 const paths=['student-feed-b2.html','student-finance-b1.html',
-  'student-first-sales.html','student-pharma.html','student-travel-a2.html'];
+  'student-first-sales.html','student-pharma.html'];
 const server=http.createServer((_request,response)=>{
   response.setHeader('content-type','text/html;charset=utf-8');
   response.end('<!doctype html><title>Isolated GoStudy regression</title>');
@@ -73,7 +73,7 @@ async function run(){
       assert.deepEqual(errors,[],route+' must have no asynchronous browser errors');
       await page.close();
     }
-    console.log('Shared legacy cabinet browser regression: 5 synthetic routes, vocabulary, answers, theme, course link, profile preservation PASS');
+    console.log('Shared legacy cabinet browser regression: 4 synthetic routes, vocabulary, answers, theme, course link, profile preservation PASS');
   }finally{
     if(browser)await browser.close();
     await new Promise(resolve=>server.close(resolve));

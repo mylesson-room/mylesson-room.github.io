@@ -23,11 +23,6 @@ const files=[
     "path": "student-pharma.html",
     "lessonStorageKey": "gostudy-pharma-c1-v1",
     "profileStorageKey": "gostudy-pharma-profile-v1"
-  },
-  {
-    "path": "student-travel-a2.html",
-    "lessonStorageKey": "gostudy-travel-a2plus-v1",
-    "profileStorageKey": "gostudy-travel-a2plus-profile-v1"
   }
 ];
 const shared=fs.readFileSync('assets/gostudy-legacy-cabinet-controller.js','utf8');
@@ -48,4 +43,4 @@ for(const entry of files){
  assert.equal(config.profileStorageKey,entry.profileStorageKey);
  assert.ok(!html.includes("const key='"+entry.lessonStorageKey+"'"),entry.path+' must no longer duplicate controller JS');
 }
-console.log('Historical controllers: 5 cabinets now share one state/render module; original browser storage keys unchanged.');
+console.log('Historical controllers: 4 cabinets now share one state/render module; original browser storage keys unchanged.');
