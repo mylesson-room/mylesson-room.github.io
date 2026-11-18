@@ -1,0 +1,81 @@
+/* GoStudy approved lesson shell v1 — reusable visual layer based on Michael's lesson.
+   Keeps the legacy lesson renderer, answer namespaces and room synchronization untouched.
+   Opt in per lesson with data-gostudy-approved-lesson. */
+body[data-gostudy-approved-lesson]{
+  --accent:#5369da;--ink:#18254b;--stroke:#e2e7f6;
+  background:#f5f7fc;color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+body[data-gostudy-approved-lesson] .gostudy-lesson-topbar{
+  min-height:74px;padding:12px max(24px,calc((100vw - 1200px)/2));
+  background:#fff;border-bottom:1px solid var(--stroke);box-shadow:0 1px 8px #26345906;
+  position:sticky;top:0;z-index:20;
+}
+body[data-gostudy-approved-lesson] .gostudy-lesson-logo{color:#18254b;font-weight:800;letter-spacing:-.4px}
+body[data-gostudy-approved-lesson] .gostudy-cabinet-back{
+  display:inline-flex;align-items:center;gap:8px;border:1px solid var(--stroke);
+  padding:9px 14px;border-radius:11px;color:#5369da;background:#fff;text-decoration:none;
+}
+body[data-gostudy-approved-lesson] .room,
+body[data-gostudy-approved-lesson] .room.wide{
+  max-width:1320px;grid-template-columns:minmax(265px,32%) minmax(0,1fr);
+  gap:22px;padding:28px 24px;align-items:start;
+}
+body[data-gostudy-approved-lesson] .room>.side{grid-column:1;grid-row:1;top:92px;min-width:0}
+body[data-gostudy-approved-lesson] .room>.sheet{
+  grid-column:2;grid-row:1;min-width:0;border:1px solid var(--stroke);
+  border-radius:22px;box-shadow:0 5px 24px #2436500b;background:#fff;
+}
+body[data-gostudy-approved-lesson] .side>.panel{
+  background:#fff;border:1px solid var(--stroke);border-radius:18px;
+  box-shadow:0 3px 15px #24365008;padding:18px;
+}
+body[data-gostudy-approved-lesson] .call-head strong{font-size:14px;color:#4c5e84}
+body[data-gostudy-approved-lesson] .call{
+  background:#222c3b;color:#e4e9f4;min-height:180px;border-radius:14px;
+  box-shadow:inset 0 1px 8px #0002;
+}
+body[data-gostudy-approved-lesson] .sections>strong{
+  display:block;color:#243763;font-size:15px;margin:0 0 10px;
+}
+body[data-gostudy-approved-lesson] .sections button{
+  padding:11px 13px;margin:5px 0;border-radius:10px;text-align:left;
+  background:#fff;color:#526181;border:1px solid transparent;
+}
+body[data-gostudy-approved-lesson] .sections button:hover{background:#f5f7ff}
+body[data-gostudy-approved-lesson] .sections button[aria-current]{
+  background:#edf0ff;color:#5369da;font-weight:700;border-color:#d9dffd;
+}
+body[data-gostudy-approved-lesson] .lesson-meta{
+  background:#fff;color:#69789c;padding:20px clamp(20px,3vw,38px);
+}
+body[data-gostudy-approved-lesson] .lesson-meta span:last-child{color:#5369da}
+body[data-gostudy-approved-lesson] progress::-webkit-progress-value{background:#5369da}
+body[data-gostudy-approved-lesson] progress::-moz-progress-bar{background:#5369da}
+body[data-gostudy-approved-lesson] .lesson-content{background:#fff;padding:clamp(22px,3vw,40px)}
+body[data-gostudy-approved-lesson] .sheet h1{color:#18254b;letter-spacing:-.035em}
+body[data-gostudy-approved-lesson] .instruction{color:#475b84}
+body[data-gostudy-approved-lesson] .source{
+  background:#f5f7ff;border-left:4px solid #8699ed;border-radius:12px;
+}
+body[data-gostudy-approved-lesson] .activity fieldset{
+  background:#fff;border:1px solid #e2e7f6;border-radius:14px;padding:16px;
+}
+body[data-gostudy-approved-lesson] .activity .options label{
+  border:1px solid #dce3f5;border-radius:10px;background:#fff;
+}
+body[data-gostudy-approved-lesson] .activity .options label:has(input:checked){
+  border-color:#8293e9;background:#eff1ff;
+}
+body[data-gostudy-approved-lesson] button:focus-visible,
+body[data-gostudy-approved-lesson] a:focus-visible{outline:3px solid #ebb95f;outline-offset:2px}
+@media(max-width:800px){
+  body[data-gostudy-approved-lesson] .room,
+  body[data-gostudy-approved-lesson] .room.wide{
+    display:flex;flex-direction:column;gap:15px;padding:16px 12px;
+  }
+  body[data-gostudy-approved-lesson] .room>.side{
+    order:1;position:static;width:100%;
+  }
+  body[data-gostudy-approved-lesson] .room>.sheet{order:2;width:100%}
+  body[data-gostudy-approved-lesson] .call{min-height:100px;max-height:180px}
+}
