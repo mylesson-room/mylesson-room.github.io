@@ -1168,8 +1168,7 @@ async function main() {
           const choice=sp.locator('#page-2 .definition-picker').first();
           await choice.locator('summary').click();
           await choice.getByRole('button',{name:/break into the mainstream/}).click();
-          await sp.getByRole('button',{name:'Check answers'}).click();
-          await sp.locator('#page-2 .feedback,#page-2 .result').first().waitFor();
+          await sp.locator('#page-2 .feedback').first().filter({hasText:'Correct'}).waitFor();
           await sp.locator('#finance-chat-form input').fill('Korean Wave classroom test');
           await sp.locator('#finance-chat-form button').click();
           await tp.locator('#finance-messages').getByText('Korean Wave classroom test',{exact:true}).waitFor();
