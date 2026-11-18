@@ -119,6 +119,11 @@ const unpack = token => {
     const placeholder = element();
     const actions = element();
     const state = element();
+    workspace.querySelector = selector => ({
+      '.video-preview': placeholder,
+      '.video-actions': actions,
+      '.video-state': state,
+    }[selector] || null);
     const documentStub = {
       body: { hasAttribute: name => name === 'data-jaas-video-pilot' },
       head: { append(script) { script.onload(); } },
