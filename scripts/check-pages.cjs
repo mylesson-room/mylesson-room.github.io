@@ -1162,7 +1162,7 @@ async function main() {
             await page.waitForURL(url=>url.pathname===expected);
             await page.locator('#finance-live-status').getByText('Онлайн · общая комната',{exact:true}).waitFor();
             await page.getByRole('heading',{name:'From Discovery to Value: The Follow-Up That Wins Trust'}).first().waitFor();
-            assert.equal(await page.locator('.room > .side, .gostudy-shared-room > .gostudy-room-sidebar').count(),1);
+            await page.getByRole('button',{name:'Dictionary',exact:true}).waitFor();
           }
           assert.equal(await sp.locator('#lessonPages>.page').count(),8);
           assert.equal(await sp.locator('a.call-btn').getAttribute('href'),'https://telemost.yandex.ru/');
