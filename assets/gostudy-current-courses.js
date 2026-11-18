@@ -35,6 +35,7 @@ window.GoStudyCurrentCourses = {
   "finance-b1": [
     "gostudy-finance-b1-02-homework-v1",
     "gostudy-finance-b1-02-v1",
+    "gostudy-finance-b1-ai-20261118-v1",
     "gostudy-finance-b1-homework-v1",
     "gostudy-finance-b1-profile-v1",
     "gostudy-finance-b1-v1"
