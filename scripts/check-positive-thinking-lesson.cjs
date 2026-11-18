@@ -35,5 +35,13 @@ const renderer=fs.readFileSync('assets/gostudy-vimbox-workbook.js','utf8');
 assert.ok(renderer.includes('youtube-nocookie.com/embed'));
 assert.ok(renderer.includes('allowfullscreen'));
 assert.ok(html.includes('assets/gostudy-vimbox-workbook.js'));
+assert.ok(html.includes('data-gostudy-approved-lesson'),'Positive Thinking must opt into approved shared design');
+assert.ok(html.includes('assets/gostudy-approved-lesson-layout.css'),'Approved design stylesheet must load');
+const approved=fs.readFileSync('assets/gostudy-approved-lesson-layout.css','utf8');
+for(const required of ['grid-template-columns:minmax(265px,32%) minmax(0,1fr)','grid-column:1;grid-row:1','grid-column:2;grid-row:1','@media(max-width:800px)']) assert.ok(approved.includes(required),'Missing approved two-column/responsive layout contract: '+required);
+assert.ok(html.includes('assets/gostudy-sync.js'),'Realtime sync script must not be removed');
+assert.ok(html.includes('assets/gostudy-glass-vocabulary.js'),'Original vocabulary integration must remain');
+assert.ok(html.includes('assets/gostudy-classroom-ui.js'),'Original classroom rendering must remain');
+
 assert.ok(homework.html.includes('assets/gostudy-vimbox-workbook.js'));
 console.log('Positive Thinking A2+: 50 min, 7 steps, 29 checkable items, video, 15-min homework; old storage intact.');
