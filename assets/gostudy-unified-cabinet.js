@@ -14,10 +14,11 @@
     'ielts-reading': 'IELTS Reading'
   });
   let started = false;
+  let sessionEpoch = 0;
 
   function safeLessonPath(value) {
     const path = String(value || '').trim();
-    return /^[a-z][a-z0-9_-]*\.html$/i.test(path) ? path : null;
+    return path !== 'student.html' && /^[a-z][a-z0-9_-]*\.html$/i.test(path) ? path : null;
   }
 
   function courseLabel(value) {
@@ -93,7 +94,7 @@
   }
 
 
-  async function render(data, published, profiles = []) {
+  async function render(data, published, profiles = [], ownerId) {
     // A user with multiple legacy rooms needs an explicit teacher-selected CURRENT assignment.
     // Never guess from table order or expose historical lessons on the dashboard.
     const primary = data.length === 1 ? data[0] : null;
@@ -102,7 +103,7 @@
     const savedName = String(profiles[0]?.display_name || '').trim();
     const displayName = savedName && !savedName.includes('@') ? savedName.slice(0,60) : 'Ученик';
     const homework = primary && primary.homework
-      && published.some(row => row.lesson_path === primary.lesson && row.published_at)
+      && published.some(row => row.student_id === ownerId && row.lesson_path === primary.lesson && row.published_at)
       ? primary.homework
       : '';
 
@@ -166,11 +167,13 @@
   async function start() {
     if (started || !auth.userId()) return;
     started = true;
+    const currentEpoch = ++sessionEpoch;
+    const currentUserId = auth.userId();
     updateStatus('Загружаем ваши занятия…');
     try {
       const id = encodeURIComponent(auth.userId());
       const [published, profiles, canonical] = await Promise.all([
-        readRows('/rest/v1/gostudy_homework_published?select=lesson_path,published_at&student_id=eq.' + id),
+        readRows('/rest/v1/gostudy_homework_published?select=student_id,lesson_path,published_at&student_id=eq.' + id),
         // Protected profiles are staged until the migration is approved.
         readRows('/rest/v1/gostudy_profiles?select=display_name&user_id=eq.' + id).catch(() => []),
         readCanonicalAssignments(id)
@@ -184,12 +187,27 @@
         ]);
         assigned = assignmentsFromRooms(classrooms, finance, auth.userId());
       }
-      await render(assigned, published, profiles);
+      // A logout or account switch during the request must never render stale student data.
+      if (sessionEpoch !== currentEpoch || auth.userId() !== currentUserId) return;
+      await render(assigned, published, profiles, currentUserId);
     } catch (error) {
+      if (sessionEpoch !== currentEpoch || auth.userId() !== currentUserId) return;
       started = false;
       updateStatus(error?.message || 'Не удалось загрузить кабинет. Попробуйте войти ещё раз.');
     }
   }
+
+  // Logout must destroy mounted student data immediately, even on a shared computer
+  // where navigating/reloading may be slow or fail.
+  document.addEventListener('gostudy-private-signed-out', () => {
+    sessionEpoch++;
+    started = false;
+    document.querySelector('main')?.remove();
+    document.getElementById('cabinet-settings')?.remove();
+    updateStatus('');
+    // A fresh document also discards stale shared-renderer event handlers.
+    window.location.reload();
+  });
 
   if (auth) {
     document.addEventListener('gostudy-private-authorized', start);
