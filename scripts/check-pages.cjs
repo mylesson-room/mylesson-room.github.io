@@ -1034,6 +1034,9 @@ async function checkStudentWithoutCourse(browser, origin) {
     await sp.reload();
     await sp.getByRole('heading',{name:'Личный кабинет',exact:true}).waitFor();
 
+    // Real teacher reactivation: hidden tabs intentionally skip roster polling.
+    await tp.bringToFront();
+    await tp.waitForFunction(() => !document.hidden);
     await course.selectOption('travel_a2');
     await create();
     await form.getByRole('status').getByText(/Курс назначен/).waitFor();
