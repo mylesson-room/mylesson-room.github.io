@@ -70,7 +70,7 @@ jobs:
                 if(action==='gostudy_pharma_c1_teacher_view')return route.fulfill({json:[{id:studentId,label:'Test student',words:[],assigned:[],progress:[]}]});
                 if(action==='gostudy_teacher_student_emails')return route.fulfill({json:[{id:studentId,email:'test@example.invalid'}]});
                 if(action==='gostudy_my_destinations')return route.fulfill({json:[{course:'teacher'}]});
-                if(action==='gostudy_classroom_rooms')return route.fulfill({json:[{id:roomId,student_id:studentId,teacher_id:teacherId,student_label:'Test student'}]});
+                if(action==='gostudy_classroom_rooms')return route.fulfill({json:u.searchParams.get('course')==='eq.pharma-c1'?[{id:roomId,student_id:studentId,teacher_id:teacherId,student_label:'Test student'}]:[]});
                 if(action==='gostudy_classroom_events')return route.fulfill({json:[]});
                 return route.fulfill({json:[]});
               });
