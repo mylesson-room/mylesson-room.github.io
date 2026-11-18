@@ -1182,6 +1182,7 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
       document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
     });
     await sp.locator('#selectionTranslate.is-visible').waitFor();
+    await tp.getByRole('button',{name:'Close dictionary'}).click();
     await tp.getByRole('button',{name:'Сбросить ответы'}).first().click();
     await sp.reload();
     await sp.locator('#page-1.active').waitFor();
