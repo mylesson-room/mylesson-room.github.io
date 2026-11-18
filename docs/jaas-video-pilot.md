@@ -10,12 +10,13 @@
 
 ## One-time JaaS setup (deployment owner only)
 
-1. In the JaaS Developer Console (https://jaas.8x8.vc/), locate the **AppID** (e.g. `vpaas-magic-cookie-...`).
-2. In **API Keys**, generate a key pair or upload a public RSA key. Copy its complete **Key ID / kid**, which is `AppID/key-identifier`. If JaaS generates a key, download the private PEM **before closing the dialog**; the console cannot retrieve it later.
-3. Store these three values as **Supabase Edge Function secrets** in the **existing GoStudy Supabase project**, never in GitHub, client-side JS, lesson HTML, issue/PR comments, or this chat:
-   - `JAAS_APP_ID` — AppID, **not secret** by itself;
-   - `JAAS_KEY_ID` — complete `kid`, **not secret** by itself;
-   - `JAAS_PRIVATE_KEY` — full private RSA PEM (secret), either multiline or encoded with literal `\\n` newlines.
+1. JaaS account and API key are already generated; pilot **public** identifiers were inserted into the Edge Function:
+   - AppID `vpaas-magic-cookie-d7a5780b9ae54dacb95d85d7d4f4191f`;
+   - Key ID `vpaas-magic-cookie-d7a5780b9ae54dacb95d85d7d4f4191f/a34acd`.
+   These public values can be overridden later using `JAAS_APP_ID` / `JAAS_KEY_ID` environment variables.
+2. The JaaS console-generated **RSA Private Key** has been downloaded by the owner on their own device. Never upload that private key to GitHub or this chat.
+3. In Supabase Dashboard → **Edge Functions → Secrets**, store only:
+   - `JAAS_PRIVATE_KEY` — full locally downloaded private RSA PEM (secret), either multiline or encoded with literal `\\n` newlines.
 4. Supabase-provided `SUPABASE_URL` and `SUPABASE_ANON_KEY` must be present in the function runtime. Deploy function `gostudy-jaas-token` with `verify_jwt=false`; it **manually validates** the bearer against `/auth/v1/user` and then checks the finance-room RLS with that same user bearer. The function does **not** use service_role.
 5. Deploy the video pilot only after reviewing the draft PR, passing CI, protecting main, and customer approval. To test without affecting public GitHub Pages, use an authenticated isolated preview host matching the function's allowed `Origin` (currently fixed to production origin) or a reviewed staging environment/configuration. Do not merge to main just to obtain a test URL.
 
@@ -37,6 +38,6 @@ Disable the HTML opt-in `data-jaas-video-pilot` attribute and remove the two Jaa
 
 ## Known blockers
 
-- User registered a JaaS account, but the AppID, Key ID and **private key stored as Supabase secrets** have **not** been obtained/configured; no production Edge Function was deployed.
+- The AppID and Key ID have now been read from the owner's console and configured as public pilot defaults. The **private key has not been configured as a Supabase secret**; no production Edge Function was deployed.
 - Chat mode has no authorized browser access to the user's JaaS console. Do not invent credentials or claim the call works.
 - The pilot intentionally covers finance Lesson 2 only; the current generic classroom/Alla migration needs separate per-course authorization work after the first two-party call succeeds.
