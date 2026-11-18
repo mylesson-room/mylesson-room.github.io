@@ -1237,6 +1237,9 @@
     const rosterByCourse = new Map();
     let students = [];
     let studentEmails = new Map();
+    const studentProfileNames = new Map();
+    const studentDisplayName = student => studentProfileNames.get(student.id) ||
+      (student.label && !student.label.includes('@') ? student.label : 'Ученик');
     let signature = '';
     let busy = false;
     let pollTimer;
@@ -1249,19 +1252,20 @@
       const count = document.getElementById('teacher-student-count');
       if (count) count.textContent = 'Количество учеников '+new Set(students.map(student=>student.id)).size;
       for (const student of students) {
-        const label = student.email || student.label;
+        const displayName = studentDisplayName(student);
+        const label = student.email || displayName;
         const catalog = teacherCatalog[student.course];
         const course = catalog?.name || 'Без курса';
-        if (!(label+' '+(student.label || '')+' '+course).toLowerCase().includes(query)) continue;
+        if (!(label+' '+displayName+' '+course).toLowerCase().includes(query)) continue;
         const row = document.createElement('div');
         row.className = 'teacher-student-row';
         const avatar = document.createElement('span');
         avatar.className = 'teacher-avatar';
         avatar.setAttribute('aria-hidden','true');
-        avatar.textContent = label.slice(0,1).toUpperCase();
+        avatar.textContent = displayName.slice(0,1).toUpperCase();
         const info = document.createElement('div');
         const name = document.createElement('strong');
-        name.textContent = student.label || label;
+        name.textContent = displayName;
         const subtitle = document.createElement('small');
         subtitle.textContent = student.email || course;
         const level = document.createElement('small');
@@ -1293,6 +1297,13 @@
       if (!studentList.childElementCount) studentList.textContent = query ? 'Никого не нашли.' : 'Список пока пуст.';
     }
     if (studentSearch) studentSearch.oninput = renderStudentList;
+    document.addEventListener('gostudy-profile-updated', event => {
+      const id = event.detail?.studentId;
+      const displayName = String(event.detail?.displayName || '').trim();
+      if (!id || !displayName || displayName.includes('@')) return;
+      studentProfileNames.set(id,displayName);
+      renderStudentList();
+    });
     if (new URLSearchParams(location.search).has('selected')) document.getElementById('teacher-profile')?.setAttribute('open','');
 
     function renderStudent() {
@@ -1420,7 +1431,24 @@
         const roster = Array.from(courses.keys()).flatMap(course => (rosterByCourse.get(course) || []).map(row => ({...row,email:row.email || studentEmails.get(row.id)})));
         const assigned = new Set(roster.map(student=>student.id));
         roster.push(...(rosterByCourse.get(withoutCourse) || []).filter(student=>!assigned.has(student.id)));
-        const next = JSON.stringify(roster);
+        // Read teacher-authorized names from shared profiles, not legacy course labels.
+        // Missing profile table is expected before migration; never block legacy teaching.
+        const profileIds=[...new Set(roster.map(row=>row.id).filter(id=>/^[0-9a-f-]{36}$/i.test(id)))];
+        if(profileIds.length){
+          const q=new URLSearchParams({
+            select:'user_id,display_name',
+            user_id:'in.('+profileIds.join(',')+')'
+          });
+          const names=await request('/rest/v1/gostudy_profiles?'+q,{},access);
+          if(names.ok && Array.isArray(names.data)){
+            studentProfileNames.clear();
+            for(const entry of names.data){
+              if(profileIds.includes(entry.user_id)&&typeof entry.display_name==='string'&&!entry.display_name.includes('@'))
+                studentProfileNames.set(entry.user_id,entry.display_name.trim().slice(0,60) || 'Ученик');
+            }
+          }
+        }
+        const next = JSON.stringify([roster,[...studentProfileNames]]);
         if (signature !== next) {
           const selected = studentPicker.value || new URLSearchParams(location.search).get('selected');
           signature = next;
