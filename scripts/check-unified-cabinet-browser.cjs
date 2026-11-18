@@ -101,7 +101,7 @@ async function run(){
     });
     await scenario({
       finance:[{student_id:student}],
-      published:[{lesson_path:'business-ai-finance-b2-02.html',published_at:'2026-11-18T00:00:00Z'}],
+      published:[{student_id:student,lesson_path:'business-ai-finance-b2-02.html',published_at:'2026-11-18T00:00:00Z'}],
       expected:'business-ai-finance-b2-02.html',expectHomework:true
     });
     await scenario({
@@ -117,10 +117,27 @@ async function run(){
           lesson_path:'finance-b1-02.html',homework_path:'finance-b1-02-homework.html'}
       }],
       rooms:[{student_id:student,course:'english-placement',lesson_path:'english-placement.html'}],
-      published:[{lesson_path:'finance-b1-02.html',published_at:'2026-11-18T00:00:00Z'}],
+      published:[{student_id:student,lesson_path:'finance-b1-02.html',published_at:'2026-11-18T00:00:00Z'}],
       expected:'finance-b1-02.html',expectHomework:true,
       expectedHomework:'finance-b1-02-homework.html',
       profiles:[{display_name:'Ирина'}],expectedName:'Ирина'
+    });
+    // Published homework for another account must NEVER activate the current student's card,
+    // even if a course reuses exactly the same lesson path.
+    await scenario({
+      canonical:[{
+        student_id:student,status:'active',published_at:'2026-11-18T00:00:00Z',
+        lesson:{lesson_id:'finance-b1-02',course_id:'finance_b1',title:'Finance B1 — 02',
+          lesson_path:'finance-b1-02.html',homework_path:'finance-b1-02-homework.html'}
+      }],
+      published:[{student_id:other,lesson_path:'finance-b1-02.html',published_at:'2026-11-18T00:00:00Z'}],
+      expected:'finance-b1-02.html',expectHomework:false
+    });
+    // The canonical dashboard itself is NOT a lesson and cannot recursively link to itself.
+    await scenario({
+      canonical:[{student_id:student,status:'active',published_at:'2026-11-18T00:00:00Z',
+        lesson:{lesson_id:'malicious',course_id:'finance_b1',title:'Bad route',lesson_path:'student.html',homework_path:null}}],
+      expectEmpty:true
     });
     await scenario({
       canonical:[],rooms:[{student_id:student,course:'english-placement',lesson_path:'english-placement.html'}],
@@ -147,7 +164,7 @@ async function run(){
       await scenario({
         canonical:[{student_id:student,status:'active',published_at:'2026-11-18T00:00:00Z',lesson}],
         published:entry.legacyHomework
-          ? [{lesson_path:entry.candidateCurrentLesson,published_at:'2026-11-18T00:00:00Z'}]
+          ? [{student_id:student,lesson_path:entry.candidateCurrentLesson,published_at:'2026-11-18T00:00:00Z'}]
           : [],
         expected:entry.candidateCurrentLesson,
         expectHomework:!!entry.legacyHomework,
