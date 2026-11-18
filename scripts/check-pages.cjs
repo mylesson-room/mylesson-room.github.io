@@ -1137,6 +1137,9 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     await sp.locator('.lesson-card-link').waitFor();
     assert.equal(await sp.locator('.lesson-card-link').getAttribute('href'),'my-trip-to-vietnam-a2.html');
     assert.equal(await sp.locator('#assignment').getAttribute('href'),'my-trip-to-vietnam-a2-homework.html','Homework must open the assigned PDF tasks');
+    await sp.locator('#assignment').waitFor({state:'visible'});
+    assert.ok(await sp.locator('#assignment').isVisible(),'Assigned homework must actually be visible, not merely linked in the DOM');
+    assert.ok((await sp.locator('#assignment').boundingBox())?.width>150,'Homework tile must occupy visible desktop space');
     const guest=await outsider.newPage();
     await guest.goto(origin+'/student-english-placement.html');
     await guest.locator('#gostudyAccessMessage').getByText('У этого аккаунта нет доступа к данному кабинету.').waitFor();
@@ -1184,6 +1187,7 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     await sp.locator('#selectionTranslate.is-visible').waitFor();
     await tp.getByRole('button',{name:'Close dictionary'}).click();
     await tp.getByRole('button',{name:'Сбросить ответы'}).first().click();
+    await sp.waitForFunction(()=>document.querySelector('[data-exercise-field="vnm-welcome-note"]')?.value==='');
     await sp.reload();
     await sp.locator('#page-1.active').waitFor();
     await sp.locator('#back').click();
@@ -1211,6 +1215,9 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     await mobile.setViewportSize({width:390,height:844});
     await mobile.goto(origin+'/student-english-placement.html');
     await mobile.locator('.lesson-card-link').waitFor();
+    await mobile.locator('#assignment').waitFor({state:'visible'});
+    assert.equal(await mobile.locator('#assignment').getAttribute('href'),'my-trip-to-vietnam-a2-homework.html');
+    assert.ok((await mobile.locator('#assignment').boundingBox())?.width>150,'Homework must occupy mobile layout space');
     assert.ok(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Vietnam cabinet mobile overflow');
     await mobile.locator('.lesson-card-link').click();
     await mobile.locator('#lessonPages>.page.active').waitFor();

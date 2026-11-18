@@ -1,5 +1,5 @@
-[data-placement-cabinet] :is(#assignment, .nav a[href="#assignment"]) { display: none; }
-[data-placement-cabinet] .cards { grid-template-columns: minmax(0, 1fr); }
+/* The placement test was once the only card. The cabinet now has an assigned
+   Vietnam A2 lesson AND homework; use the canonical v1 cabinet card layout. */
 [data-placement-lesson] .lesson-brand img { display: block; width: 55px; height: 43px; object-fit: contain; }
 [data-placement-lesson] .finance-chat #finance-live-status { display: block !important; }
 #placement-loading { margin: 20px auto; max-width: 36rem; padding: 0 1rem; }
