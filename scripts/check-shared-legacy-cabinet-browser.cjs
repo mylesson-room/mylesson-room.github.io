@@ -41,7 +41,7 @@ async function run(){
       await page.setContent('<!doctype html><html><body>'
         +'<script type="application/json" id="legacy-cabinet-settings">'+JSON.stringify(config)+'</'+'script>'
         +'<h1 id="greeting"></h1>'
-        +'<form id="nameForm"><input id="name"><button type="submit">Save</button></form>'
+        +'<details open><summary>Профиль</summary><form id="nameForm"><input id="name"><button type="submit">Save</button></form></details>'
         +'<button id="theme">Theme</button>'
         +'<div id="assignmentCard"></div><div id="filterEmpty" hidden></div>'
         +'<p id="assignmentStatus"></p><p id="lastPage"></p><p id="wordsCount"></p>'
