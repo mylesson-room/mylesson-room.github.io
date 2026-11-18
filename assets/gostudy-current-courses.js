@@ -20,6 +20,8 @@ window.GoStudyCurrentCourses = {
     "gostudy-tiktok-a2-words-v1"
   ],
   "travel-a2": [
+    "gostudy-positive-thinking-a2-v1",
+    "gostudy-positive-thinking-a2-homework-v1",
     "gostudy-travel-a2plus-02-homework-v1",
     "gostudy-travel-a2plus-02-v1",
     "gostudy-travel-a2plus-03-homework-v1",
