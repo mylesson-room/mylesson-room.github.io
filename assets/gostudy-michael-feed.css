@@ -1,0 +1,181 @@
+/*
+ * GoStudy / Michael pilot — elevated lesson feed (v1).
+ * Isolated to business-ai-finance-b2-02.html via data-premium-feed.
+ * Pure presentation: no changes to exercises, video, realtime, or stored answers.
+ */
+body[data-premium-feed="michael-v1"] {
+  background: #edf3fc;
+  color: #202c43;
+}
+body[data-premium-feed="michael-v1"] .layout {
+  background: #eef4fc;
+}
+body[data-premium-feed="michael-v1"] .sidebar {
+  background: linear-gradient(165deg, #f6f9ff 0%, #edf3fc 100%);
+  border-right: 1px solid #dce6f3;
+}
+body[data-premium-feed="michael-v1"] .lesson-divider {
+  background: #e5edf7;
+}
+body[data-premium-feed="michael-v1"] .lesson {
+  min-width: 0;
+  padding: 20px 24px 22px;
+  background: radial-gradient(ellipse at 90% 0%, #e1eeff 0%, transparent 48%), #eef4fc;
+}
+body[data-premium-feed="michael-v1"] .lesson-content {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding: 29px clamp(22px, 3vw, 46px) 34px;
+  border: 1px solid #dce5f2;
+  border-radius: 27px;
+  background: #fff;
+  box-shadow: 0 20px 55px rgba(31, 65, 119, .13),
+              0 5px 15px rgba(27, 57, 104, .055);
+}
+body[data-premium-feed="michael-v1"] .hero {
+  padding: 0 0 20px;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+body[data-premium-feed="michael-v1"] .hero h1 {
+  max-width: 100%;
+  margin: 3px 0 10px;
+  font-size: clamp(26px, 2.4vw, 38px);
+  line-height: 1.18;
+  letter-spacing: -.8px;
+  color: #202341;
+}
+body[data-premium-feed="michael-v1"] #lessonPages .panel {
+  margin: 0;
+  padding: 0 0 24px;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+body[data-premium-feed="michael-v1"] #lessonPages .activity-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  margin: 0 0 22px;
+  border: 1px solid #d5e9f8;
+  border-radius: 19px;
+  background: linear-gradient(110deg, #e8f6ff 0%, #e4f0ff 100%);
+}
+body[data-premium-feed="michael-v1"] #lessonPages .activity-icon {
+  flex: 0 0 54px;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border: 1px solid #d6e9fa;
+  border-radius: 14px;
+  background: #fff;
+  color: #0c8eaf;
+  font-size: 25px;
+  box-shadow: 0 3px 11px rgba(33, 92, 134, .09);
+}
+body[data-premium-feed="michael-v1"] #lessonPages .activity-titles h2 {
+  margin: 0;
+  font-size: clamp(26px, 2.35vw, 38px);
+  line-height: 1.2;
+  letter-spacing: -.65px;
+  color: #242441;
+}
+body[data-premium-feed="michael-v1"] #lessonPages .lead {
+  color: #52627b;
+  line-height: 1.6;
+}
+body[data-premium-feed="michael-v1"] #lessonPages .warmup-scene,
+body[data-premium-feed="michael-v1"] #lessonPages .article,
+body[data-premium-feed="michael-v1"] #lessonPages .signal-card,
+body[data-premium-feed="michael-v1"] #lessonPages .chart {
+  border-color: #dce6f2;
+  box-shadow: 0 5px 18px rgba(38, 70, 105, .055);
+}
+body[data-premium-feed="michael-v1"] .pager {
+  border-top: 1px solid #dce5f1;
+  background: #fafdff;
+  box-shadow: 0 -4px 15px rgba(35, 69, 115, .05);
+}
+body[data-premium-feed="michael-v1"] .pager .primary {
+  color: #fff;
+  background: linear-gradient(110deg, #00a6c7, #07bfce);
+  border-radius: 12px;
+  box-shadow: 0 4px 13px rgba(0, 157, 188, .16);
+}
+body[data-premium-feed="michael-v1"] .pager .outline {
+  background: #fff;
+  border-color: #cad9ed;
+  color: #31517a;
+  border-radius: 12px;
+}
+@media (max-width: 1100px) {
+  body[data-premium-feed="michael-v1"] .lesson { padding: 14px 13px 16px; }
+  body[data-premium-feed="michael-v1"] .lesson-content {
+    padding: 23px 22px 28px;
+    border-radius: 22px;
+  }
+}
+@media (max-width: 800px) {
+  body[data-premium-feed="michael-v1"] .layout {
+    height: auto;
+  }
+  body[data-premium-feed="michael-v1"] .lesson {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    padding: 13px 12px calc(var(--lesson-toolbar-height, 46px) + 24px);
+  }
+  body[data-premium-feed="michael-v1"] .lesson-content {
+    min-height: 0;
+    overflow: visible;
+    overscroll-behavior: auto;
+    scrollbar-gutter: auto;
+    padding: 20px 18px 25px;
+  }
+  body[data-premium-feed="michael-v1"] .pager {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 12;
+  }
+}
+@media (max-width: 540px) {
+  body[data-premium-feed="michael-v1"] .lesson { padding: 10px 9px 74px; }
+  body[data-premium-feed="michael-v1"] .lesson-content {
+    border-radius: 19px;
+    padding: 18px 15px 23px;
+    box-shadow: 0 9px 24px rgba(31, 65, 119, .1);
+  }
+  body[data-premium-feed="michael-v1"] #lessonPages .activity-head {
+    gap: 10px;
+    padding: 12px;
+    border-radius: 14px;
+  }
+  body[data-premium-feed="michael-v1"] #lessonPages .activity-icon {
+    flex-basis: 44px;
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+  }
+}
+@media print {
+  body[data-premium-feed="michael-v1"] .lesson { padding: 0; background: #fff; }
+  body[data-premium-feed="michael-v1"] .lesson-content {
+    padding: 0;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
