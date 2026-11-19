@@ -1630,8 +1630,8 @@ async function main() {
           await sp.locator('#next').click();
           await sp.locator('#page-7.active').waitFor();
           await sp.getByRole('heading',{name:'From Seoul to Russia: K-pop beyond the music'}).first().waitFor();
-          assert.equal(await sp.locator('#page-7 [data-gap]').count(),6,'New K-pop Russia vocabulary choices must render');
-          assert.equal(await sp.locator('#page-7 [data-exercise-field]').count(),6,'Five reading questions and one speaking prompt must render');
+          assert.equal(await sp.locator('#page-7 .definition-picker').count(),6,'Six K-pop Russia vocabulary selectors must render');
+          assert.equal(await sp.locator('#page-7 textarea[data-exercise-field]').count(),6,'Five reading questions and one speaking prompt must render');
           await sp.goto(origin+'/student-feed-b2.html');
           await sp.locator('#openWords').click();
           await sp.locator('#words').getByText('cultural exchange',{exact:true}).waitFor();
