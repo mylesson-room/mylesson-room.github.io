@@ -405,6 +405,29 @@ async function checkFinanceRoom(browser, origin) {
     await tp.waitForURL(lessonUrl + '?classStudent=' + studentId);
     await Promise.all([sp,tp].map(page => page.waitForFunction(expected => document.querySelector('#finance-live-status')?.textContent === expected,status)));
 
+    // Michael-only visual contract: very light workspace and a continuous
+    // white lesson sheet without bottom-rounded corners above the pager.
+    for(const page of [sp,tp]){
+      const visual=await page.evaluate(()=>{
+        const read=sel=>getComputedStyle(document.querySelector(sel));
+        return {
+          workspace:read('.layout').backgroundColor,
+          lesson:read('.lesson').backgroundColor,
+          bottomLeft:read('.lesson-content').borderBottomLeftRadius,
+          bottomRight:read('.lesson-content').borderBottomRightRadius,
+          bottomBorder:read('.lesson-content').borderBottomWidth,
+          sheetBottom:document.querySelector('.lesson-content').getBoundingClientRect().bottom,
+          pagerTop:document.querySelector('.pager').getBoundingClientRect().top
+        };
+      });
+      assert.equal(visual.workspace,'rgb(247, 249, 252)','Michael workspace must match #F7F9FC reference');
+      assert.equal(visual.lesson,'rgb(247, 249, 252)','Michael lesson surround must match reference');
+      assert.equal(visual.bottomLeft,'0px','Lesson paper must not round at the bottom left');
+      assert.equal(visual.bottomRight,'0px','Lesson paper must not round at the bottom right');
+      assert.equal(visual.bottomBorder,'0px','Lesson paper bottom border must be hidden');
+      assert.ok(Math.abs(visual.sheetBottom-visual.pagerTop)<=2,'Paper must meet lesson navigation without a gap: '+JSON.stringify(visual));
+    }
+
     await cabinet.locator('#vocabCount').filter({hasText:'1 слово'}).waitFor();
     await sp.getByRole('button',{name:'Dictionary',exact:true}).click();
     await sp.getByRole('dialog').getByText('stress test',{exact:true}).waitFor();
