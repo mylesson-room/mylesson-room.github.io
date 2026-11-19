@@ -179,3 +179,50 @@ body[data-premium-feed="michael-v1"] .pager .outline {
     box-shadow: none;
   }
 }
+
+/* Continuous paper edges: the lesson sheet continues into the bottom
+   navigation, rather than ending as a floating rounded rectangle. */
+body[data-premium-feed="michael-v1"] .lesson {
+  padding-bottom: 0;
+}
+body[data-premium-feed="michael-v1"] .lesson-content {
+  border-bottom: 0;
+  border-radius: 27px 27px 0 0;
+  box-shadow: 10px 0 26px -19px rgba(31, 65, 119, .20),
+             -10px 0 26px -19px rgba(31, 65, 119, .20);
+}
+body[data-premium-feed="michael-v1"] .pager {
+  /* The pager spans the entire viewport, so its sides must remain borderless. */
+  border-radius: 0;
+  background: #fff;
+}
+@media (max-width: 1100px) {
+  body[data-premium-feed="michael-v1"] .lesson { padding-bottom: 0; }
+  body[data-premium-feed="michael-v1"] .lesson-content {
+    border-radius: 22px 22px 0 0;
+  }
+}
+@media (max-width: 800px) {
+  body[data-premium-feed="michael-v1"] .lesson {
+    padding-bottom: calc(var(--lesson-toolbar-height, 46px) + 24px);
+  }
+  body[data-premium-feed="michael-v1"] .lesson-content {
+    min-height: calc(100dvh - 140px);
+    border-bottom: 0;
+  }
+}
+@media (max-width: 540px) {
+  body[data-premium-feed="michael-v1"] .lesson-content {
+    border-radius: 19px 19px 0 0;
+    box-shadow: 7px 0 20px -17px rgba(31, 65, 119, .17),
+               -7px 0 20px -17px rgba(31, 65, 119, .17);
+  }
+}
+@media print {
+  body[data-premium-feed="michael-v1"] .lesson-content,
+  body[data-premium-feed="michael-v1"] .pager {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
