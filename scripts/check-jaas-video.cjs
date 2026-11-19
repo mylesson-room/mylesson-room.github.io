@@ -119,7 +119,7 @@ const unpack = token => {
     const element = () => ({ 
       textContent: '', disabled: false, hidden: false, classList: styleClasses(), setAttribute() {}, remove() {}, 
       addEventListener(name, callback) { this.listeners ??= {}; this.listeners[name] = callback; },
-      after() {}, append() {}, prepend(...children) { controls.push(...children); },
+      after() {}, append(...children) { controls.push(...children); }, replaceChildren(...children) { controls.push(...children); }, prepend(...children) { controls.push(...children); },
     });
     const workspace = element();
     const placeholder = element();
@@ -170,7 +170,7 @@ const unpack = token => {
       document: documentStub, window: w, fetch: fetchMock, Response, AbortSignal,
       URLSearchParams, Error,
     }, { filename: 'gostudy-jaas-video.js' });
-    const connect = controls.find(el => el.textContent === 'Включить видео');
+    const connect = controls.find(el => el.className === 'call-btn jaas-connect');
     assert.ok(connect, 'Connect button must be rendered');
     assert.equal(connect.disabled, false, 'Connect must be usable without FinanceLive');
     await connect.listeners.click();

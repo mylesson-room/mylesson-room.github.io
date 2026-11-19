@@ -16,8 +16,8 @@
   const connect = document.createElement('button');
   connect.type = 'button';
   connect.className = 'call-btn jaas-connect';
-  connect.setAttribute('aria-label','Включить видеоурок');
-  connect.textContent = 'Включить видео';
+  connect.setAttribute('aria-label', 'Включить видео');
+  connect.title = 'Включить видеосвязь';
   // A click must always produce a visible response, even before login.
   connect.disabled = false;
   const leaveButton = document.createElement('button');
@@ -25,7 +25,7 @@
   leaveButton.className = 'jaas-leave';
   leaveButton.setAttribute('aria-label', 'Завершить звонок');
   leaveButton.title = 'Завершить звонок';
-  leaveButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.1"><path d="M21 15.5c-5.4-4.5-12.6-4.5-18 0l2.2 3.1c.4.5 1.1.6 1.6.2L9 17v-2.4a11.8 11.8 0 0 1 6 0V17l2.2 1.8c.5.4 1.2.3 1.6-.2L21 15.5Z"/></svg>';
+  leaveButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><path d="M3 3l18 18"/><path d="M8.8 5.2h-2A2 2 0 0 0 4.8 7c.1 6.2 5.1 11.2 11.2 11.2a2 2 0 0 0 1.8-2v-2"/><path d="M14.7 12.8c.7.4 1.5.8 2.4 1l1.6-1.6a1.5 1.5 0 0 1 1.6-.3l1.8.8"/></svg>';
   leaveButton.hidden = true;
   const expand = document.createElement('button');
   expand.type = 'button';
@@ -46,13 +46,28 @@
   message.setAttribute('role', 'status');
   message.setAttribute('aria-live', 'polite');
   message.textContent = 'Видеосвязь доступна после входа в урок.';
-  // Michael-only premium video UI. Never remove/recreate the live Jitsi iframe.
-  // The old Telemost link belonged to the shared template; remove it here only.
+  // Reference design: two vertical video tiles, visually matching the approved
+  // teacher/student panel. These are pre-join placeholders, not fake media streams.
+  // Real participant video continues to render only inside the live Jitsi iframe.
   for (const legacy of actions.querySelectorAll?.(':scope > a, :scope > span') || []) legacy.remove();
-  const headline = placeholder.querySelector?.('strong');
-  const subtitle = placeholder.querySelector?.('span');
-  if (headline) headline.textContent = 'Ваш урок начинается здесь';
-  if (subtitle) subtitle.textContent = 'Преподаватель и ученик — в одной видеокомнате';
+  const personIcon = '<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="10.5" r="5.1"/><path d="M6 27v-3c0-5 4.2-9 10-9s10 4 10 9v3"/></svg>';
+  function makeTile(role, label) {
+    const tile = document.createElement('div');
+    tile.className = 'jaas-person-tile jaas-person-' + role;
+    const avatar = document.createElement('div');
+    avatar.className = 'jaas-person-icon';
+    avatar.innerHTML = personIcon;
+    const caption = document.createElement('span');
+    caption.className = 'jaas-person-label';
+    caption.textContent = label;
+    tile.append(avatar, caption);
+    return tile;
+  }
+  placeholder.replaceChildren(makeTile('teacher', 'Преподаватель'), makeTile('student', 'Ученик'));
+  placeholder.setAttribute('role','button');
+  placeholder.setAttribute('tabindex','0');
+  placeholder.setAttribute('aria-label','Включить видеосвязь между преподавателем и учеником');
+  placeholder.title = 'Нажмите для подключения видеосвязи';
   const micButton = document.createElement('button');
   micButton.type = 'button';
   micButton.className = 'jaas-mic';
@@ -61,9 +76,11 @@
   cameraButton.type = 'button';
   cameraButton.className = 'jaas-camera';
   cameraButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><rect x="2.5" y="5.5" width="13.5" height="13" rx="3"/><path d="m16 9 5.5-3v12L16 15z"/></svg>';
-  actions.prepend(connect, micButton, cameraButton, leaveButton, sizeButton, expand);
-  placeholder.append(connect); // large, central CTA replaces the external-link area
+  connect.innerHTML = cameraButton.innerHTML;
+  connect.innerHTML += '<span class="jaas-visually-hidden">Включить видео</span>';
+  actions.prepend(micButton, connect, cameraButton, leaveButton);
   actions.classList.add('jaas-control-bar');
+  workspace.append(sizeButton, expand);
   workspace.append(message);
   let api = null;
   let frame = null;
@@ -100,18 +117,28 @@
   // Video authorization lives in the Supabase token endpoint, not in the
   // independent live-chat transport. Never silently disable the button.
   const hasSession = () => Boolean(getAuth()?.userId());
-  const status = (text) => { state.textContent = text; message.textContent = text; };
+  const status = (text) => {
+    state.textContent = text;
+    message.textContent = text;
+    // Keep the reference layout clean, but never hide an authentication,
+    // camera or network error from the user.
+    workspace.classList.toggle('jaas-status-alert',
+      /ошиб|не удалось|нет доступа|не назначена|войдите|истекла|неверн|недоступен|не поддерживается|проверьте|не пройдена/i.test(text));
+  };
   function sync() {
     connect.disabled = busy || Boolean(api);
-    connect.textContent = busy ? 'Подключаемся…' : 'Включить видео';
+    connect.title = busy ? 'Подключаемся…' : 'Включить видеосвязь';
+    connect.setAttribute('aria-label', busy ? 'Подключаемся…' : 'Включить видео');
     connect.setAttribute('aria-busy', String(busy));
     connect.hidden = Boolean(api);
-    actions.hidden = !api; // no empty control strip before the call
-    micButton.hidden = !api;
+    actions.hidden = false;
+    micButton.hidden = false;
     cameraButton.hidden = !api;
-    leaveButton.hidden = !api;
+    leaveButton.hidden = false;
+    leaveButton.disabled = !api;
     expand.hidden = !api;
     sizeButton.hidden = !api;
+    workspace.classList.toggle('jaas-joining', busy);
     updateMedia();
   }
   function end() {
@@ -263,6 +290,13 @@
     }
   }
   connect.addEventListener('click', join);
+  placeholder.addEventListener('click', () => { if (!api && !busy) join(); });
+  placeholder.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      if (!api && !busy) join();
+    }
+  });
   micButton.addEventListener('click', () => {
     if (!api || !meeting) return;
     try { api.executeCommand('toggleAudio'); }

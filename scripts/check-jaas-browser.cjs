@@ -92,9 +92,21 @@ async function exercise(browser, origin, opts) {
     await button.waitFor({state:'visible'});
     assert.equal(await button.isEnabled(),true,'Button disabled before clicking');
     assert.equal(await page.locator('#lessonVideo a[href*="telemost.yandex.ru"]').count(),0,'Michael video UI still contains Telemost');
-    assert.equal(await button.locator('xpath=ancestor::*[contains(@class,"video-preview")]').count(),1,'Start video action must be inside the preview panel');
-    assert.equal(await page.locator('#lessonVideo .jaas-control-bar').count(),1,'Premium control bar missing');
-    if (mobile) await button.tap({timeout:6500});
+    const panel = page.locator('#lessonVideo .video-preview');
+    const cards = panel.locator('.jaas-person-tile');
+    assert.equal(await cards.count(),2,'Reference video panel must show exactly two stacked cards');
+    assert.deepEqual(await cards.locator('.jaas-person-label').allTextContents(),['Преподаватель','Ученик']);
+    assert.equal(await panel.evaluate(el=>getComputedStyle(el).flexDirection),'column','Teacher and student must stack vertically');
+    assert.equal(await cards.nth(0).evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(36, 54, 76)','Teacher tile color incorrect');
+    assert.equal(await cards.nth(1).evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(48, 79, 106)','Student tile color incorrect');
+    const dock = page.locator('#lessonVideo .jaas-control-bar');
+    assert.equal(await dock.isVisible(),true,'Minimal controls must be visible before connecting');
+    assert.equal(await dock.evaluate(el=>getComputedStyle(el).flexDirection),'row');
+    assert.equal(await page.locator('#lessonVideo .jaas-mic').isVisible(),true);
+    assert.equal(await page.locator('#lessonVideo .jaas-connect').isVisible(),true);
+    assert.equal(await page.locator('#lessonVideo .jaas-camera').isVisible(),false);
+    assert.equal(await page.locator('#lessonVideo .jaas-leave').isVisible(),true);
+    if (mobile) await panel.tap({timeout:6500});
     else await button.click({timeout:6500});
     if (fail) {
       await page.locator('.jaas-message').getByText(/Проверка доступа не пройдена/).waitFor({timeout:5000});
@@ -138,6 +150,7 @@ async function exercise(browser, origin, opts) {
       await endCall.click();
       assert.equal(await page.locator('.jaas-frame').count(),0,'Hangup must dispose media iframe');
       assert.equal(await button.isEnabled(),true,'Should be able to restart after hangup');
+      assert.equal(await page.locator('.jaas-person-tile').count(),2,'Pre-call tiles must return after hanging up');
     }
     assert.deepEqual(errors.filter(x=>x.includes('gostudy-jaas-video.js')),[],'JavaScript video adapter error');
     await page.close();
@@ -153,6 +166,6 @@ async function exercise(browser, origin, opts) {
     await exercise(browser,origin,{mobile:false,fail:false});
     await exercise(browser,origin,{mobile:true,fail:false});
     await exercise(browser,origin,{mobile:false,fail:true});
-    console.log('JaaS premium controls: desktop/mobile join, vertical Jitsi layout, mic/camera/hangup, no Telemost, persistent iframe PASS');
+    console.log('JaaS design: two reference tiles, exact colors, three icon dock, desktop click/mobile tap, real Jitsi controls, persisted iframe PASS');
   } finally { await browser.close();server.close(); }
 })().catch(error => {console.error(error);server.close();process.exitCode=1;});
