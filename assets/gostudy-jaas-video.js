@@ -117,7 +117,14 @@
   // Video authorization lives in the Supabase token endpoint, not in the
   // independent live-chat transport. Never silently disable the button.
   const hasSession = () => Boolean(getAuth()?.userId());
-  const status = (text) => { state.textContent = text; message.textContent = text; };
+  const status = (text) => {
+    state.textContent = text;
+    message.textContent = text;
+    // Keep the reference layout clean, but never hide an authentication,
+    // camera or network error from the user.
+    workspace.classList.toggle('jaas-status-alert',
+      /ошиб|не удалось|нет доступа|не назначена|войдите|истекла|неверн|недоступен|не поддерживается|проверьте|не пройдена/i.test(text));
+  };
   function sync() {
     connect.disabled = busy || Boolean(api);
     connect.title = busy ? 'Подключаемся…' : 'Включить видеосвязь';
