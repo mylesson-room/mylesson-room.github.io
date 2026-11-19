@@ -264,9 +264,9 @@ body[data-premium-feed="michael-v1"] #lessonVideo .jaas-control-bar .jaas-expand
 }
 body[data-premium-feed="michael-v1"] #lessonVideo .video-actions .jaas-mic[hidden],
 body[data-premium-feed="michael-v1"] #lessonVideo .video-actions .jaas-camera[hidden]{display:none!important}
-body[data-premium-feed="michael-v1"] #lessonVideo .jaas-control-bar:not(:has(~.jaas-frame)){
-  /* controls remain within the video panel; no extra Telemost action */
-}
+/* Remove legacy Telemost affordance even if the adapter fails to load. */
+body[data-premium-feed="michael-v1"] #lessonVideo .video-actions > a[href*="telemost.yandex.ru"],
+body[data-premium-feed="michael-v1"] #lessonVideo .video-actions > span{display:none!important}
 body[data-premium-feed="michael-v1"] #lessonVideo .jaas-message{
   border-top:1px solid #edf1f5;
   padding:12px 17px;
