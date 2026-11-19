@@ -12,3 +12,63 @@
 #lessonVideo .jaas-frame:fullscreen{width:100vw;height:100vh}
 #lessonVideo .jaas-on-call .live-dot{background:#36ad73}
 @media(max-width:760px){#lessonVideo .jaas-frame{height:380px}}
+
+/* A single iframe survives local lesson section changes on desktop and mobile.
+   On narrow viewports it stays visible above the fixed exercise pager. */
+#lessonVideo .jaas-size{background:#e8f2ff;color:#225bb0;font-size:12px;font-weight:750;padding:8px 10px;border-radius:8px}
+#lessonVideo .video-actions .jaas-size[hidden]{display:none!important}
+@media(max-width:800px){
+  body.jaas-video-active #lessonVideo .video-workspace.jaas-on-call{
+    position:fixed!important;
+    z-index:40;
+    right:max(8px,env(safe-area-inset-right));
+    bottom:calc(var(--lesson-toolbar-height,41px) + max(8px,env(safe-area-inset-bottom)));
+    left:auto;
+    top:auto;
+    width:min(94vw,420px);
+    max-height:calc(100dvh - 65px);
+    display:flex!important;
+    flex-direction:column;
+    gap:0;
+    background:#fff;
+    border:1px solid #dce5f2;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 12px 40px #10274455;
+  }
+  body.jaas-video-active #lessonVideo .jaas-on-call .video-top{
+    width:100%;height:30px;min-height:30px;padding:0 10px;
+    gap:5px;font-size:10px;box-sizing:border-box;
+  }
+  body.jaas-video-active #lessonVideo .jaas-on-call .video-state{
+    max-width:135px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  body.jaas-video-active #lessonVideo .jaas-on-call .jaas-frame{
+    display:block!important;
+    width:100%;height:min(42dvh,320px);min-height:105px;
+    flex:none;
+  }
+  body.jaas-video-active #lessonVideo .jaas-on-call .video-actions{
+    display:flex;flex-direction:row;justify-content:flex-start;align-items:center;
+    gap:6px;padding:6px 9px;border:0;
+  }
+  body.jaas-video-active #lessonVideo .jaas-on-call .video-actions>a,
+  body.jaas-video-active #lessonVideo .jaas-on-call .video-actions>span,
+  body.jaas-video-active #lessonVideo .jaas-on-call .jaas-expand,
+  body.jaas-video-active #lessonVideo .jaas-on-call .jaas-message{display:none!important}
+  body.jaas-video-active #lessonVideo .jaas-on-call .jaas-size,
+  body.jaas-video-active #lessonVideo .jaas-on-call .jaas-leave{
+    display:inline-flex!important;align-items:center;justify-content:center;
+    padding:7px 9px;font-size:11px;min-height:30px;
+  }
+  body.jaas-video-active #lessonVideo .jaas-on-call.jaas-compact{width:min(240px,65vw)}
+  body.jaas-video-active #lessonVideo .jaas-on-call.jaas-compact .jaas-frame{
+    height:clamp(100px,18dvh,145px);
+    min-height:100px;
+  }
+  body.jaas-video-active #lessonVideo .jaas-on-call.jaas-compact .video-top{height:26px;min-height:26px}
+  body.jaas-video-active #lessonVideo .jaas-on-call.jaas-compact .video-top>span:nth-child(2){display:none}
+}
+@media print{
+  body.jaas-video-active #lessonVideo .video-workspace.jaas-on-call{display:none!important}
+}
