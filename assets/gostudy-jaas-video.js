@@ -28,17 +28,35 @@
   expand.className = 'jaas-expand';
   expand.textContent = 'Развернуть';
   expand.hidden = true;
+  // Keep the original iframe mounted for the entire lesson. Moving/replacing it
+  // when the section changes can interrupt an active WebRTC call on iOS Safari.
+  const sizeButton = document.createElement('button');
+  sizeButton.type = 'button';
+  sizeButton.className = 'jaas-size';
+  sizeButton.textContent = 'Увеличить';
+  sizeButton.setAttribute('aria-label', 'Увеличить видео');
+  sizeButton.setAttribute('aria-pressed', 'false');
+  sizeButton.hidden = true;
   const message = document.createElement('p');
   message.className = 'jaas-message';
   message.setAttribute('role', 'status');
   message.textContent = 'Видеосвязь доступна после входа в урок.';
-  actions.prepend(connect, leaveButton, expand);
+  actions.prepend(connect, leaveButton, sizeButton, expand);
   workspace.append(message);
   let api = null;
   let frame = null;
   let busy = false;
   let meeting = false;
   let scriptPromise = null;
+  let compact = true;
+  const mobile = () => window.matchMedia?.('(max-width: 800px)').matches ?? false;
+  function setCompact(next) {
+    compact = Boolean(next);
+    workspace.classList.toggle('jaas-compact', compact);
+    sizeButton.textContent = compact ? 'Увеличить' : 'Свернуть';
+    sizeButton.setAttribute('aria-label', compact ? 'Увеличить видео' : 'Свернуть видео');
+    sizeButton.setAttribute('aria-pressed', String(!compact));
+  }
   const getAuth = () => window.GoStudyFinanceAuth;
   // Video authorization lives in the Supabase token endpoint, not in the
   // independent live-chat transport. Never silently disable the button.
@@ -49,6 +67,7 @@
     connect.hidden = Boolean(api);
     leaveButton.hidden = !api;
     expand.hidden = !api;
+    sizeButton.hidden = !api;
   }
   function end() {
     const previous = api;
@@ -58,7 +77,8 @@
     frame?.remove();
     frame = null;
     placeholder.hidden = false;
-    workspace.classList.remove('jaas-on-call');
+    workspace.classList.remove('jaas-on-call', 'jaas-compact');
+    document.body.classList.remove('jaas-video-active');
     status('Видео отключено');
     busy = false;
     sync();
@@ -141,6 +161,8 @@
         configOverwrite: { startWithAudioMuted: true, prejoinPageEnabled: true },
       });
       workspace.classList.add('jaas-on-call');
+      document.body.classList.add('jaas-video-active');
+      setCompact(mobile());
       api.addEventListener('videoConferenceJoined', () => {
         meeting = true;
         status('Вы в видеозвонке');
@@ -157,6 +179,7 @@
     }
   }
   connect.addEventListener('click', join);
+  sizeButton.addEventListener('click', () => setCompact(!compact));
   leaveButton.addEventListener('click', end);
   expand.addEventListener('click', async () => {
     if (!frame) return;
