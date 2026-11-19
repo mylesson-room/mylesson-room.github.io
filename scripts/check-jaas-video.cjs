@@ -103,15 +103,21 @@ const unpack = token => {
   assert.doesNotMatch(front, /JAAS_PRIVATE_KEY|service_role/);
   // Regression: formerly a delayed/missing chat handshake disabled the video
   // button forever. Test actual browser-adapter callbacks with synthetic DOM.
-  async function simulateVideo({ user, selected = null, rooms = [], includeAuth = true }) {
+  async function simulateVideo({ user, selected = null, rooms = [], includeAuth = true, mobile = false }) {
     const events = {};
     const controls = [];
     const calls = [];
     let joined;
-    const element = () => ({
-      textContent: '', disabled: false, hidden: false, classList: {
-        add() {}, remove() {},
-      }, setAttribute() {}, remove() {},
+    let starts = 0;
+    let disposed = 0;
+    const styleClasses = () => { const values = new Set(); return {
+      add(...names) { names.forEach(name => values.add(name)); },
+      remove(...names) { names.forEach(name => values.delete(name)); },
+      toggle(name, enabled) { if (enabled) values.add(name); else values.delete(name); },
+      contains(name) { return values.has(name); },
+    }; };
+    const element = () => ({ 
+      textContent: '', disabled: false, hidden: false, classList: styleClasses(), setAttribute() {}, remove() {}, 
       addEventListener(name, callback) { this.listeners ??= {}; this.listeners[name] = callback; },
       after() {}, append() {}, prepend(...children) { controls.push(...children); },
     });
@@ -125,7 +131,7 @@ const unpack = token => {
       '.video-state': state,
     }[selector] || null);
     const documentStub = {
-      body: { hasAttribute: name => name === 'data-jaas-video-pilot' },
+      body: { hasAttribute: name => name === 'data-jaas-video-pilot', classList: styleClasses() },
       head: { append(script) { script.onload(); } },
       querySelector: selector => ({
         '#lessonVideo .video-workspace': workspace,
@@ -148,10 +154,11 @@ const unpack = token => {
     const w = {
       GoStudyFinanceAuth: auth,
       addEventListener() {},
+      matchMedia: () => ({ matches: mobile }),
       JitsiMeetExternalAPI: class {
-        constructor(domain, options) { joined = { domain, options }; }
+        constructor(domain, options) { starts++; joined = { domain, options }; }
         addEventListener() {}
-        dispose() {}
+        dispose() { disposed++; }
       },
     };
     const fetchMock = async (url, options) => {
@@ -167,6 +174,20 @@ const unpack = token => {
     assert.ok(connect, 'Connect button must be rendered');
     assert.equal(connect.disabled, false, 'Connect must be usable without FinanceLive');
     await connect.listeners.click();
+    if (joined && mobile) {
+      assert.equal(workspace.classList.contains('jaas-compact'), true, 'Mobile starts in persistent mini-player');
+      assert.equal(documentStub.body.classList.contains('jaas-video-active'), true, 'Mobile dock stays on screen');
+      // Simulate exercise navigation: this must not remount the iframe.
+      events['finance-ready']?.();
+      const size = controls.find(el => el.className === 'jaas-size');
+      assert.ok(size, 'Mobile video must have resize control');
+      size.listeners.click();
+      assert.equal(workspace.classList.contains('jaas-compact'), false, 'Can expand video without reconnecting');
+      size.listeners.click();
+      assert.equal(workspace.classList.contains('jaas-compact'), true, 'Can minimize video without reconnecting');
+      assert.equal(starts, 1, 'One Jitsi iframe per call throughout lesson navigation');
+      assert.equal(disposed, 0, 'Lesson navigation never disposes video');
+    }
     return { calls, joined, status: state.textContent };
   }
   const teacherVideo = await simulateVideo({
@@ -177,10 +198,10 @@ const unpack = token => {
   assert.equal(teacherVideo.joined.domain, '8x8.vc');
   assert.equal(teacherVideo.joined.options.roomName, appId + '/gostudy-finance-' + student.replace(/-/g, ''));
   const studentVideo = await simulateVideo({
-    user: student, rooms: [{ teacher_id: teacher, student_id: student }],
+    user: student, rooms: [{ teacher_id: teacher, student_id: student }], mobile: true,
   });
   assert.equal(studentVideo.calls[1].body.studentId, null);
-  const selectedTeacher = await simulateVideo({ user: teacher, selected: student });
+  const selectedTeacher = await simulateVideo({ user: teacher, selected: student, mobile: true });
   assert.equal(selectedTeacher.calls.length, 1);
   assert.equal(selectedTeacher.calls[0].body.studentId, student);
   const noSession = await simulateVideo({ includeAuth: false });
@@ -194,5 +215,13 @@ const unpack = token => {
   });
   assert.equal(multipleRooms.calls.length, 1);
   assert.match(multipleRooms.status, /выбрав ученика/);
-  console.log('JaaS pilot: role-protected JWT and independently clickable video button PASS');
+  const css = fs.readFileSync('assets/gostudy-jaas-video.css', 'utf8');
+  assert.match(css, /position:fixed!important/, 'Mobile video must float while scrolling through lessons');
+  assert.match(css, /jaas-video-active/, 'Floating only while call is active');
+  assert.match(css, /z-index:40/, 'Floating video must stay above lesson navigation');
+  const workbookSource = fs.readFileSync('assets/gostudy-v1-workbook.js', 'utf8');
+  assert.match(workbookSource, /function go\(n\)/);
+  assert.match(workbookSource, /navigateFromControls\(nextPage\)/);
+  assert.doesNotMatch(workbookSource, /function go\(n\)\s*\{[\s\S]{0,500}(location\.href|location\.assign)/);
+  console.log('JaaS: secure JWT, active mobile mini-player, stable iframe on section navigation PASS');
 })().catch(error => { console.error(error); process.exitCode = 1; });
