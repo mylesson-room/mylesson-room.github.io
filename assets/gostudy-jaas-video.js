@@ -17,7 +17,8 @@
   connect.type = 'button';
   connect.className = 'call-btn jaas-connect';
   connect.textContent = 'Включить видео';
-  connect.disabled = true;
+  // A click must always produce a visible response, even before login.
+  connect.disabled = false;
   const leaveButton = document.createElement('button');
   leaveButton.type = 'button';
   leaveButton.className = 'jaas-leave';
@@ -40,6 +41,7 @@
   const message = document.createElement('p');
   message.className = 'jaas-message';
   message.setAttribute('role', 'status');
+  message.setAttribute('aria-live', 'polite');
   message.textContent = 'Видеосвязь доступна после входа в урок.';
   actions.prepend(connect, leaveButton, sizeButton, expand);
   workspace.append(message);
@@ -64,6 +66,8 @@
   const status = (text) => { state.textContent = text; message.textContent = text; };
   function sync() {
     connect.disabled = busy || Boolean(api);
+    connect.textContent = busy ? 'Подключаемся…' : 'Включить видео';
+    connect.setAttribute('aria-busy', String(busy));
     connect.hidden = Boolean(api);
     leaveButton.hidden = !api;
     expand.hidden = !api;
@@ -84,13 +88,27 @@
     sync();
   }
   function loadLibrary(appId) {
+    if (window.JitsiMeetExternalAPI) return Promise.resolve();
     if (!scriptPromise) {
       scriptPromise = new Promise((resolve, reject) => {
         const script = document.createElement('script');
+        let finished = false;
+        const timer = setTimeout(() => finish(Error('Jitsi не ответил за 15 секунд. Проверьте доступ к 8x8.vc и попробуйте ещё раз.')), 15000);
+        function finish(error) {
+          if (finished) return;
+          finished = true;
+          clearTimeout(timer);
+          script.onload = null;
+          script.onerror = null;
+          if (error) {
+            script.remove();
+            reject(error);
+          } else resolve();
+        }
         script.src = 'https://8x8.vc/' + appId + '/external_api.js';
         script.async = true;
-        script.onload = () => window.JitsiMeetExternalAPI ? resolve() : reject(Error('Jitsi не загрузился.'));
-        script.onerror = () => reject(Error('Сервис видеосвязи недоступен.'));
+        script.onload = () => finish(window.JitsiMeetExternalAPI ? null : Error('Видеоплеер Jitsi не загрузился.'));
+        script.onerror = () => finish(Error('Сервис Jitsi недоступен в этой сети. Проверьте доступ к 8x8.vc.'));
         document.head.append(script);
       }).catch(error => { scriptPromise = null; throw error; });
     }
@@ -122,7 +140,7 @@
     if (busy || api) return;
     busy = true;
     sync();
-    status('Подготавливаем видеосвязь…');
+    status('Проверяем доступ к видеокомнате…');
     try {
       const auth = getAuth();
       if (!hasSession() || !auth?.token || !auth?.request)
@@ -144,6 +162,7 @@
       if (!response.ok) throw Error(data.error || 'Нет доступа к видеокомнате.');
       if (!appIdFormat.test(data.appId) || !roomFormat.test(data.room) || typeof data.jwt !== 'string')
         throw Error('Неверный ответ сервиса видео.');
+      status('Загружаем видеоплеер Jitsi…');
       await loadLibrary(data.appId);
       if (!hasSession()) throw Error('Сессия GoStudy завершена. Войдите заново.');
       frame = document.createElement('div');
@@ -167,9 +186,10 @@
         meeting = true;
         status('Вы в видеозвонке');
       });
+      api.addEventListener('errorOccurred', () => status('Jitsi сообщает об ошибке видеозвонка. Попробуйте переподключиться.'));
       api.addEventListener('videoConferenceLeft', end);
       api.addEventListener('readyToClose', end);
-      status('Подключаемся к комнате…');
+      status('Открываем видеокомнату…');
     } catch (error) {
       end();
       status(error instanceof Error ? error.message : 'Не удалось подключить видео.');
