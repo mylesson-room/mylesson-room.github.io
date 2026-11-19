@@ -1,0 +1,97 @@
+/*
+ * Michael pilot: collapsible lesson chat.
+ * All selectors scoped to the approved Michael lesson only.
+ */
+body[data-premium-feed="michael-v1"] .lesson-chat-dropdown {
+  margin: 14px 0 0;
+  overflow: hidden;
+  border: 1px solid #dce6f3;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(28, 60, 107, .065);
+}
+body[data-premium-feed="michael-v1"] .lesson-chat-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 11px 15px;
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  font-size: 15px;
+  font-weight: 750;
+  color: #23334e;
+}
+body[data-premium-feed="michael-v1"] .lesson-chat-toggle::-webkit-details-marker { display: none; }
+body[data-premium-feed="michael-v1"] .lesson-chat-toggle:hover { background: #f6faff; }
+body[data-premium-feed="michael-v1"] .lesson-chat-toggle:focus-visible {
+  outline: 3px solid #3baecb;
+  outline-offset: -4px;
+  border-radius: 14px;
+}
+body[data-premium-feed="michael-v1"] .lesson-chat-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  color: #098bb2;
+  background: #e9f7fe;
+  border-radius: 10px;
+}
+body[data-premium-feed="michael-v1"] .lesson-chat-icon svg {
+  width: 19px;
+  height: 19px;
+}
+body[data-premium-feed="michael-v1"] .lesson-chat-spacer { flex: 1; }
+body[data-premium-feed="michael-v1"] .lesson-chat-unread {
+  min-width: 20px;
+  padding: 2px 7px;
+  text-align: center;
+  border-radius: 999px;
+  background: #0b9dbc;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+}
+body[data-premium-feed="michael-v1"] .lesson-chat-unread[hidden] { display: none !important; }
+body[data-premium-feed="michael-v1"] .lesson-chat-chevron {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  color: #526c91;
+  transition: transform .2s ease;
+}
+body[data-premium-feed="michael-v1"] .lesson-chat-dropdown[open] .lesson-chat-chevron {
+  transform: rotate(180deg);
+}
+body[data-premium-feed="michael-v1"] .lesson-chat-dropdown > .finance-chat {
+  margin: 0;
+  padding: 13px 14px 15px;
+  border: 0;
+  border-top: 1px solid #e2eaf5;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+  min-height: 0;
+}
+body[data-premium-feed="michael-v1"] .lesson-chat-dropdown > .finance-chat h2 {
+  display: none;
+}
+body[data-premium-feed="michael-v1"] .lesson-chat-dropdown #finance-messages {
+  max-height: min(38vh, 310px);
+}
+@media (max-width: 540px) {
+  body[data-premium-feed="michael-v1"] .lesson-chat-toggle {
+    min-height: 50px;
+    padding: 9px 12px;
+    font-size: 14px;
+  }
+  body[data-premium-feed="michael-v1"] .lesson-chat-dropdown > .finance-chat {
+    padding: 10px 12px 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-premium-feed="michael-v1"] .lesson-chat-chevron { transition: none; }
+}
