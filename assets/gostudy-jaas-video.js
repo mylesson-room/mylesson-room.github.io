@@ -106,6 +106,9 @@
     connect.textContent = busy ? 'Подключаемся…' : 'Включить видео';
     connect.setAttribute('aria-busy', String(busy));
     connect.hidden = Boolean(api);
+    actions.hidden = !api; // no empty control strip before the call
+    micButton.hidden = !api;
+    cameraButton.hidden = !api;
     leaveButton.hidden = !api;
     expand.hidden = !api;
     sizeButton.hidden = !api;
