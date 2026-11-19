@@ -226,3 +226,63 @@ body[data-premium-feed="michael-v1"] .pager {
     box-shadow: none;
   }
 }
+
+/*
+ * Michael lesson feed v3 — user-approved reference, 2026-11-19.
+ * The surrounding workspace uses exactly #F7F9FC (screenshot reference).
+ * The paper must reach the fixed lesson pager without a lower corner or gap.
+ */
+body[data-premium-feed="michael-v1"],
+body[data-premium-feed="michael-v1"] .layout,
+body[data-premium-feed="michael-v1"] .sidebar,
+body[data-premium-feed="michael-v1"] .lesson {
+  background: #f7f9fc;
+}
+body[data-premium-feed="michael-v1"] .sidebar {
+  border-right-color: #e8edf5;
+}
+body[data-premium-feed="michael-v1"] .lesson-divider {
+  background: #f0f3f8;
+}
+@media (min-width: 801px) {
+  body[data-premium-feed="michael-v1"] .lesson {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    padding-bottom: 0;
+    overflow: hidden;
+  }
+  body[data-premium-feed="michael-v1"] .lesson-content {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    box-sizing: border-box;
+    border-bottom: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    background: #fff;
+    box-shadow: 11px 0 28px -20px rgba(31, 65, 119, .12),
+               -11px 0 28px -20px rgba(31, 65, 119, .12);
+  }
+  body[data-premium-feed="michael-v1"] .pager {
+    flex: 0 0 var(--lesson-toolbar-height, 46px);
+    margin-top: 0;
+    border-radius: 0;
+  }
+}
+@media (max-width: 800px) {
+  body[data-premium-feed="michael-v1"] .lesson-content {
+    border-bottom: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    background: #fff;
+  }
+}
+@media print {
+  body[data-premium-feed="michael-v1"] .lesson,
+  body[data-premium-feed="michael-v1"] .lesson-content {
+    background: #fff;
+  }
+}
