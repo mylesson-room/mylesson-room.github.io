@@ -502,6 +502,16 @@ async function checkFinanceRoom(browser, origin) {
     assert.equal(await sp.getByRole('button',{name:'Check answers'}).count(),0);
 
     await sp.setViewportSize({width:390,height:844});
+    // Michael pilot: the lesson chat starts collapsed. Expand it before the
+    // existing live-message checks; closing the drawer must not remove messages.
+    const openMichaelChat=async page=>{
+      const chat=page.locator('.lesson-chat-dropdown');
+      await chat.waitFor({state:'visible'});
+      assert.equal(await chat.getAttribute('open'),null,'Pilot lesson chat should start collapsed');
+      await chat.locator('summary.lesson-chat-toggle').click();
+      await page.getByRole('textbox',{name:'Сообщение'}).waitFor({state:'visible'});
+    };
+    await Promise.all([sp,tp].map(openMichaelChat));
     for(const [sender,receiver,note] of [[sp,tp,'Сообщение ученика'],[tp,sp,'Сообщение преподавателя']]){
       await sender.getByRole('textbox',{name:'Сообщение'}).fill(note);
       await sender.getByRole('button',{name:'Отправить'}).click();
@@ -509,6 +519,7 @@ async function checkFinanceRoom(browser, origin) {
     }
     await Promise.all([sp.reload(),tp.reload()]);
     await Promise.all([sp,tp].map(page=>page.waitForFunction(expected=>document.querySelector('#finance-live-status')?.textContent===expected,status)));
+    await Promise.all([sp,tp].map(openMichaelChat));
     for(const page of [sp,tp]){
       await page.locator('#finance-messages').getByText('Сообщение ученика',{exact:true}).waitFor();
       await page.locator('#finance-messages').getByText('Сообщение преподавателя',{exact:true}).waitFor();
