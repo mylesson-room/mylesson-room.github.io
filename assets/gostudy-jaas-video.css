@@ -93,3 +93,236 @@
   font-size:13px;
   overflow-wrap:anywhere;
 }
+
+
+/* Michael / GoStudy premium classroom: only the video chrome, never a fake
+   replacement for Jitsi camera streams (which remain inside its iframe). */
+body[data-premium-feed="michael-v1"] #lessonVideo .video-workspace{
+  border:1px solid #dce6f4;
+  border-radius:20px;
+  background:#fff;
+  box-shadow:0 12px 32px rgba(28,54,88,.07),0 1px 3px rgba(28,54,88,.045);
+  overflow:hidden;
+}
+body[data-premium-feed="michael-v1"] #lessonVideo .video-top{
+  height:54px;
+  color:#49617c;
+  font-size:11px;
+  letter-spacing:.085em;
+  font-weight:800;
+  background:#fff;
+  padding-inline:17px;
+}
+body[data-premium-feed="michael-v1"] #lessonVideo .live-dot{
+  width:9px;
+  height:9px;
+  border:2px solid #fff;
+  box-shadow:0 0 0 1px #ccd8e6;
+}
+body[data-premium-feed="michael-v1"] #lessonVideo .video-preview{
+  position:relative;
+  isolate:isolate;
+  box-sizing:border-box;
+  width:100%;
+  min-height:355px;
+  aspect-ratio:auto;
+  padding:40px 20px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  color:#f7fbff;
+  background:
+    radial-gradient(circle at 92% -8%,transparent 0 31%,rgba(180,206,245,.10) 31.3% 31.7%,transparent 32%),
+    radial-gradient(circle at -12% 120%,transparent 0 36%,rgba(180,206,245,.10) 36.3% 36.7%,transparent 37%),
+    linear-gradient(147deg,#2b4363 0%,#202c42 70%,#1b273b 100%);
+}
+body[data-premium-feed="michael-v1"] #lessonVideo .video-preview .video-avatar{
+  width:90px;
+  height:90px;
+  flex:none;
+  border:1px solid rgba(210,227,250,.20);
+  background:rgba(255,255,255,.075);
+  color:#d5e4f8;
+  box-shadow:0 12px 36px rgba(4,17,35,.14);
+  border-radius:30px;
+  margin:0 0 7px;
+}
+body[data-premium-feed="michael-v1"] #lessonVideo .video-preview strong{
+  max-width:310px;
+  font-size:clamp(19px,1.5vw,24px);
+  font-weight:750;
+  letter-spacing:-.035em;
+  line-height:1.2;
+}
+body[data-premium-feed="michael-v1"] #lessonVideo .video-preview span{
+  color:#c8d7ea;
+  max-width:280px;
+  font-size:13px;
+  line-height:1.5;
+}
+body[data-premium-feed="michael-v1"] #lessonVideo .video-preview .jaas-connect{
+  width:auto;
+  min-height:50px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin:20px 0 0;
+  padding:12px 25px;
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:13px;
+  color:white;
+  background:linear-gradient(110deg,#208be8,#2773e9);
+  box-shadow:0 12px 28px rgba(1,32,91,.26),inset 0 1px 0 rgba(255,255,255,.12);
+  font-size:14px;
+  font-weight:800;
+  letter-spacing:.01em;
+  cursor:pointer;
+  transition:transform .15s,box-shadow .15s,background .15s;
+}
+body[data-premium-feed="michael-v1"] #lessonVideo .video-preview .jaas-connect:hover:not(:disabled){
+  transform:translateY(-2px);
+  background:linear-gradient(110deg,#209cf6,#1f75e8);
+  box-shadow:0 15px 31px rgba(1,32,91,.31);
+}
+body[data-premium-feed="michael-v1"] #lessonVideo .video-preview .jaas-connect:focus-visible{
+  outline:3px solid #94d8ff;
+  outline-offset:3px;
+}
+body[data-premium-feed="michael-v1"] #lessonVideo .jaas-frame{
+  box-sizing:border-box;
+  background:linear-gradient(165deg,#26374f,#172337);
+  height:clamp(355px,65vh,730px);
+  min-height:355px;
+  overflow:hidden;
+  border-radius:15px;
+  margin:0 11px 11px;
+  width:calc(100% - 22px);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);
+}
+body[data-premium-feed="michael-v1"] #lessonVideo .jaas-frame iframe{
+  display:block;
+  width:100%;
+  height:100%;
+  border:0;
+  border-radius:inherit;
+}
+body[data-premium-feed="michael-v1"] #lessonVideo .jaas-on-call .jaas-control-bar{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:12px;
+  padding:15px 12px 18px;
+  border:0;
+  background:#fff;
+}
+body[data-premium-feed="michael-v1"] #lessonVideo .jaas-control-bar .jaas-mic,
+body[data-premium-feed="michael-v1"] #lessonVideo .jaas-control-bar .jaas-camera,
+body[data-premium-feed="michael-v1"] #lessonVideo .jaas-control-bar .jaas-leave{
+  width:48px;
+  height:48px;
+  display:inline-grid;
+  place-items:center;
+  flex:none;
+  padding:0;
+  color:#476178;
+  background:#f0f5f9;
+  border:1px solid #e3eaf1;
+  border-radius:15px;
+  cursor:pointer;
+  transition:background .15s,transform .15s;
+}
+body[data-premium-feed="michael-v1"] #lessonVideo .jaas-control-bar button svg{width:22px;height:22px;}
+body[data-premium-feed="michael-v1"] #lessonVideo .jaas-control-bar button:hover:not(:disabled){transform:translateY(-1px);background:#e2edf6}
+body[data-premium-feed="michael-v1"] #lessonVideo .jaas-control-bar button:focus-visible{outline:3px solid #68bbea;outline-offset:2px}
+body[data-premium-feed="michael-v1"] #lessonVideo .jaas-control-bar button:disabled{opacity:.5;cursor:not-allowed}
+body[data-premium-feed="michael-v1"] #lessonVideo .jaas-control-bar .is-muted{
+  color:#9a5660;
+  background:#fff0f1;
+  border-color:#f4dade;
+}
+body[data-premium-feed="michael-v1"] #lessonVideo .jaas-control-bar .jaas-leave{
+  color:#fff;
+  background:#d84350;
+  border-color:#d84350;
+  border-radius:16px;
+  box-shadow:0 5px 14px rgba(216,67,80,.19);
+}
+body[data-premium-feed="michael-v1"] #lessonVideo .jaas-control-bar .jaas-leave:hover:not(:disabled){background:#c53142}
+body[data-premium-feed="michael-v1"] #lessonVideo .jaas-control-bar .jaas-size,
+body[data-premium-feed="michael-v1"] #lessonVideo .jaas-control-bar .jaas-expand{
+  color:#59718e;
+  border:1px solid #e3eaf1;
+  border-radius:12px;
+  background:#f4f7fb;
+  min-height:40px;
+  padding:0 13px;
+  font-size:12px;
+  font-weight:750;
+}
+body[data-premium-feed="michael-v1"] #lessonVideo .video-actions .jaas-mic[hidden],
+body[data-premium-feed="michael-v1"] #lessonVideo .video-actions .jaas-camera[hidden]{display:none!important}
+body[data-premium-feed="michael-v1"] #lessonVideo .jaas-control-bar:not(:has(~.jaas-frame)){
+  /* controls remain within the video panel; no extra Telemost action */
+}
+body[data-premium-feed="michael-v1"] #lessonVideo .jaas-message{
+  border-top:1px solid #edf1f5;
+  padding:12px 17px;
+  font-size:12px;
+  color:#73859c;
+  background:#fff;
+  text-align:center;
+}
+body[data-premium-feed="michael-v1"] #lessonVideo .jaas-frame:fullscreen{
+  width:100vw;
+  height:100vh;
+  margin:0;
+  border-radius:0;
+}
+@media(max-width:800px){
+  body[data-premium-feed="michael-v1"] #lessonVideo .video-preview{min-height:320px;padding:35px 22px}
+  body[data-premium-feed="michael-v1"] #lessonVideo .jaas-frame{height:380px;min-height:320px}
+  body[data-premium-feed="michael-v1"].jaas-video-active #lessonVideo .jaas-on-call .jaas-frame{
+    box-sizing:border-box;
+    width:calc(100% - 12px);
+    height:min(42dvh,320px);
+    min-height:105px;
+    margin:0 6px 6px;
+  }
+  body[data-premium-feed="michael-v1"].jaas-video-active #lessonVideo .jaas-on-call.jaas-compact .jaas-frame{
+    height:clamp(100px,18dvh,145px);
+    min-height:100px;
+  }
+  body[data-premium-feed="michael-v1"].jaas-video-active #lessonVideo .jaas-on-call .jaas-control-bar{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    padding:6px 8px 8px;
+    border:0;
+  }
+  body[data-premium-feed="michael-v1"].jaas-video-active #lessonVideo .jaas-on-call .jaas-control-bar .jaas-mic,
+  body[data-premium-feed="michael-v1"].jaas-video-active #lessonVideo .jaas-on-call .jaas-control-bar .jaas-camera,
+  body[data-premium-feed="michael-v1"].jaas-video-active #lessonVideo .jaas-on-call .jaas-control-bar .jaas-leave{
+    width:36px;
+    height:36px;
+    min-height:36px;
+    display:inline-grid!important;
+    border-radius:12px;
+  }
+  body[data-premium-feed="michael-v1"].jaas-video-active #lessonVideo .jaas-on-call .jaas-control-bar button svg{width:18px;height:18px}
+  body[data-premium-feed="michael-v1"].jaas-video-active #lessonVideo .jaas-on-call.jaas-compact .jaas-control-bar{gap:5px;padding:4px 5px 6px}
+  body[data-premium-feed="michael-v1"].jaas-video-active #lessonVideo .jaas-on-call.jaas-compact .jaas-control-bar .jaas-mic,
+  body[data-premium-feed="michael-v1"].jaas-video-active #lessonVideo .jaas-on-call.jaas-compact .jaas-control-bar .jaas-camera,
+  body[data-premium-feed="michael-v1"].jaas-video-active #lessonVideo .jaas-on-call.jaas-compact .jaas-control-bar .jaas-leave{
+    width:30px;
+    height:30px;
+    min-height:30px;
+    border-radius:10px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+ body[data-premium-feed="michael-v1"] #lessonVideo .jaas-control-bar button,
+ body[data-premium-feed="michael-v1"] #lessonVideo .jaas-connect{transition:none}
+}
