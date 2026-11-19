@@ -16,13 +16,16 @@
   const connect = document.createElement('button');
   connect.type = 'button';
   connect.className = 'call-btn jaas-connect';
+  connect.setAttribute('aria-label','Включить видеоурок');
   connect.textContent = 'Включить видео';
   // A click must always produce a visible response, even before login.
   connect.disabled = false;
   const leaveButton = document.createElement('button');
   leaveButton.type = 'button';
   leaveButton.className = 'jaas-leave';
-  leaveButton.textContent = 'Завершить звонок';
+  leaveButton.setAttribute('aria-label', 'Завершить звонок');
+  leaveButton.title = 'Завершить звонок';
+  leaveButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.1"><path d="M21 15.5c-5.4-4.5-12.6-4.5-18 0l2.2 3.1c.4.5 1.1.6 1.6.2L9 17v-2.4a11.8 11.8 0 0 1 6 0V17l2.2 1.8c.5.4 1.2.3 1.6-.2L21 15.5Z"/></svg>';
   leaveButton.hidden = true;
   const expand = document.createElement('button');
   expand.type = 'button';
@@ -43,7 +46,24 @@
   message.setAttribute('role', 'status');
   message.setAttribute('aria-live', 'polite');
   message.textContent = 'Видеосвязь доступна после входа в урок.';
-  actions.prepend(connect, leaveButton, sizeButton, expand);
+  // Michael-only premium video UI. Never remove/recreate the live Jitsi iframe.
+  // The old Telemost link belonged to the shared template; remove it here only.
+  for (const legacy of actions.querySelectorAll?.(':scope > a, :scope > span') || []) legacy.remove();
+  const headline = placeholder.querySelector?.('strong');
+  const subtitle = placeholder.querySelector?.('span');
+  if (headline) headline.textContent = 'Ваш урок начинается здесь';
+  if (subtitle) subtitle.textContent = 'Преподаватель и ученик — в одной видеокомнате';
+  const micButton = document.createElement('button');
+  micButton.type = 'button';
+  micButton.className = 'jaas-mic';
+  micButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 10.5a7 7 0 0 0 14 0M12 17.5V21m-4 0h8"/></svg>';
+  const cameraButton = document.createElement('button');
+  cameraButton.type = 'button';
+  cameraButton.className = 'jaas-camera';
+  cameraButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><rect x="2.5" y="5.5" width="13.5" height="13" rx="3"/><path d="m16 9 5.5-3v12L16 15z"/></svg>';
+  actions.prepend(connect, micButton, cameraButton, leaveButton, sizeButton, expand);
+  placeholder.append(connect); // large, central CTA replaces the external-link area
+  actions.classList.add('jaas-control-bar');
   workspace.append(message);
   let api = null;
   let frame = null;
@@ -51,6 +71,23 @@
   let meeting = false;
   let scriptPromise = null;
   let compact = true;
+  let audioMuted = true; // mirrors startWithAudioMuted until Jitsi emits actual status
+  let videoMuted = false;
+  function setMediaButton(button, muted, media) {
+    const enabled = !muted;
+    button.classList.toggle('is-muted', muted);
+    button.setAttribute('aria-pressed', String(enabled));
+    const label = media === 'audio' ? 'микрофон' : 'камеру';
+    const title = (enabled ? 'Выключить ' : 'Включить ') + label;
+    button.setAttribute('aria-label', title);
+    button.title = title;
+  }
+  function updateMedia() {
+    setMediaButton(micButton, audioMuted, 'audio');
+    setMediaButton(cameraButton, videoMuted, 'video');
+    micButton.disabled = !api || !meeting;
+    cameraButton.disabled = !api || !meeting;
+  }
   const mobile = () => window.matchMedia?.('(max-width: 800px)').matches ?? false;
   function setCompact(next) {
     compact = Boolean(next);
@@ -69,14 +106,20 @@
     connect.textContent = busy ? 'Подключаемся…' : 'Включить видео';
     connect.setAttribute('aria-busy', String(busy));
     connect.hidden = Boolean(api);
+    actions.hidden = !api; // no empty control strip before the call
+    micButton.hidden = !api;
+    cameraButton.hidden = !api;
     leaveButton.hidden = !api;
     expand.hidden = !api;
     sizeButton.hidden = !api;
+    updateMedia();
   }
   function end() {
     const previous = api;
     api = null;
     meeting = false;
+    audioMuted = true;
+    videoMuted = false;
     try { previous?.dispose(); } catch {}
     frame?.remove();
     frame = null;
@@ -177,7 +220,16 @@
         height: '100%',
         jwt: data.jwt,
         lang: 'ru',
-        configOverwrite: { startWithAudioMuted: true, prejoinPageEnabled: true },
+        configOverwrite: {
+          startWithAudioMuted: true,
+          prejoinPageEnabled: true,
+          toolbarButtons: ['settings'],
+          disableDeepLinking: true,
+        },
+        interfaceConfigOverwrite: {
+          TILE_VIEW_MAX_COLUMNS: 1,
+          SHOW_JITSI_WATERMARK: false,
+        },
       });
       workspace.classList.add('jaas-on-call');
       document.body.classList.add('jaas-video-active');
@@ -185,6 +237,18 @@
       api.addEventListener('videoConferenceJoined', () => {
         meeting = true;
         status('Вы в видеозвонке');
+        updateMedia();
+        // Ask Jitsi to show local + remote participants as a single-column gallery.
+        // Jitsi owns the actual video rendering inside its secure iframe.
+        try { api?.executeCommand?.('toggleTileView'); } catch {}
+      });
+      api.addEventListener('audioMuteStatusChanged', event => {
+        if (typeof event?.muted === 'boolean') audioMuted = event.muted;
+        updateMedia();
+      });
+      api.addEventListener('videoMuteStatusChanged', event => {
+        if (typeof event?.muted === 'boolean') videoMuted = event.muted;
+        updateMedia();
       });
       api.addEventListener('errorOccurred', () => status('Jitsi сообщает об ошибке видеозвонка. Попробуйте переподключиться.'));
       api.addEventListener('videoConferenceLeft', end);
@@ -199,6 +263,16 @@
     }
   }
   connect.addEventListener('click', join);
+  micButton.addEventListener('click', () => {
+    if (!api || !meeting) return;
+    try { api.executeCommand('toggleAudio'); }
+    catch { status('Не получилось переключить микрофон. Проверьте разрешения браузера.'); }
+  });
+  cameraButton.addEventListener('click', () => {
+    if (!api || !meeting) return;
+    try { api.executeCommand('toggleVideo'); }
+    catch { status('Не получилось переключить камеру. Проверьте разрешения браузера.'); }
+  });
   sizeButton.addEventListener('click', () => setCompact(!compact));
   leaveButton.addEventListener('click', end);
   expand.addEventListener('click', async () => {
@@ -212,5 +286,6 @@
   document.addEventListener('finance-connect', sync);
   document.addEventListener('gostudy-private-signed-out', end);
   window.addEventListener('pagehide', end);
+  updateMedia();
   sync();
 })();
