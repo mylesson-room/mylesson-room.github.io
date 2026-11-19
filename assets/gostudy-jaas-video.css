@@ -208,6 +208,7 @@ body[data-premium-feed="michael-v1"] #lessonVideo .jaas-frame iframe{
   border:0;
   border-radius:inherit;
 }
+body[data-premium-feed="michael-v1"] #lessonVideo .jaas-control-bar[hidden]{display:none!important}
 body[data-premium-feed="michael-v1"] #lessonVideo .jaas-on-call .jaas-control-bar{
   display:flex;
   align-items:center;
