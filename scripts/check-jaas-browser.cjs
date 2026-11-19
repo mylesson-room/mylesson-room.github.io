@@ -27,6 +27,10 @@ const fakeExternalApi = `
     constructor(domain, options) {
       window.__jitsiStarts = (window.__jitsiStarts || 0) + 1;
       window.__lastJitsiRoom = options.roomName;
+      window.__lastJitsiOptions = { interfaceConfigOverwrite: options.interfaceConfigOverwrite, configOverwrite: options.configOverwrite };
+      window.__jitsiCommands = [];
+      this.audioMuted = true;
+      this.videoMuted = false;
       this.events = {};
       this.iframe = document.createElement('iframe');
       this.iframe.src = 'about:blank';
@@ -34,6 +38,17 @@ const fakeExternalApi = `
       setTimeout(() => this.events.videoConferenceJoined?.(), 50);
     }
     addEventListener(event, handler) { this.events[event] = handler; }
+    executeCommand(command) {
+      window.__jitsiCommands.push(command);
+      if (command === 'toggleAudio') {
+        this.audioMuted = !this.audioMuted;
+        this.events.audioMuteStatusChanged?.({muted:this.audioMuted});
+      }
+      if (command === 'toggleVideo') {
+        this.videoMuted = !this.videoMuted;
+        this.events.videoMuteStatusChanged?.({muted:this.videoMuted});
+      }
+    }
     dispose() { window.__jitsiDisposed = (window.__jitsiDisposed || 0) + 1; this.iframe.remove(); }
   };
 `;
@@ -76,6 +91,9 @@ async function exercise(browser, origin, opts) {
     const button = page.locator('#lessonVideo .jaas-connect');
     await button.waitFor({state:'visible'});
     assert.equal(await button.isEnabled(),true,'Button disabled before clicking');
+    assert.equal(await page.locator('#lessonVideo a[href*="telemost.yandex.ru"]').count(),0,'Michael video UI still contains Telemost');
+    assert.equal(await button.locator('xpath=ancestor::*[contains(@class,"video-preview")]').count(),1,'Start video action must be inside the preview panel');
+    assert.equal(await page.locator('#lessonVideo .jaas-control-bar').count(),1,'Premium control bar missing');
     if (mobile) await button.tap({timeout:6500});
     else await button.click({timeout:6500});
     if (fail) {
@@ -86,6 +104,20 @@ async function exercise(browser, origin, opts) {
       await page.locator('.jaas-frame iframe').waitFor({state:'attached',timeout:6500});
       await page.waitForFunction(() => document.querySelector('.video-state')?.textContent === 'Вы в видеозвонке',{timeout:6500});
       assert.equal(await page.evaluate(() => window.__lastJitsiRoom),appId+'/'+roomName);
+      assert.equal(await page.evaluate(() => window.__lastJitsiOptions.interfaceConfigOverwrite.TILE_VIEW_MAX_COLUMNS),1,'Participants must stack vertically in Jitsi tile view');
+      await page.waitForFunction(() => window.__jitsiCommands.includes('toggleTileView'));
+      const microphone = page.locator('#lessonVideo .jaas-mic');
+      const camera = page.locator('#lessonVideo .jaas-camera');
+      const endCall = page.locator('#lessonVideo .jaas-leave');
+      assert.equal(await microphone.isEnabled(),true);
+      assert.equal(await camera.isEnabled(),true);
+      await microphone.click();
+      assert.equal(await microphone.getAttribute('aria-pressed'),'true','Microphone UI must follow real mute event');
+      await camera.click();
+      assert.equal(await camera.getAttribute('aria-pressed'),'false','Camera UI must follow real mute event');
+      const commands = await page.evaluate(() => window.__jitsiCommands);
+      assert.ok(commands.includes('toggleAudio') && commands.includes('toggleVideo'),'UI controls must use real Jitsi commands');
+      assert.equal(await endCall.isVisible(),true);
       const before = await page.evaluate(() => {
         window.__savedJitsiIframe = document.querySelector('.jaas-frame iframe');
         return window.__jitsiStarts;
@@ -98,7 +130,14 @@ async function exercise(browser, origin, opts) {
       if (mobile) {
         assert.equal(await page.locator('.jaas-compact').count(),1,'Mobile floating player not compact');
         assert.equal(await page.locator('.jaas-frame').isVisible(),true,'Video hidden on mobile');
+        await page.locator('#lessonVideo .jaas-size').click();
+        assert.equal(await page.locator('.jaas-compact').count(),0,'Mobile should be able to expand without reconnecting');
+        await page.locator('#lessonVideo .jaas-size').click();
+        assert.equal(await page.locator('.jaas-compact').count(),1,'Mobile should be able to collapse without reconnecting');
       }
+      await endCall.click();
+      assert.equal(await page.locator('.jaas-frame').count(),0,'Hangup must dispose media iframe');
+      assert.equal(await button.isEnabled(),true,'Should be able to restart after hangup');
     }
     assert.deepEqual(errors.filter(x=>x.includes('gostudy-jaas-video.js')),[],'JavaScript video adapter error');
     await page.close();
@@ -114,6 +153,6 @@ async function exercise(browser, origin, opts) {
     await exercise(browser,origin,{mobile:false,fail:false});
     await exercise(browser,origin,{mobile:true,fail:false});
     await exercise(browser,origin,{mobile:false,fail:true});
-    console.log('JaaS real-browser smoke: desktop click, mobile tap, active call on next exercise, error recovery PASS');
+    console.log('JaaS premium controls: desktop/mobile join, vertical Jitsi layout, mic/camera/hangup, no Telemost, persistent iframe PASS');
   } finally { await browser.close();server.close(); }
 })().catch(error => {console.error(error);server.close();process.exitCode=1;});
