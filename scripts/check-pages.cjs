@@ -1148,7 +1148,7 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     await sp.waitForURL(/my-trip-to-vietnam-a2.html/);
     await sp.locator('#lessonPages>.page.active').waitFor();
     await sp.waitForFunction(()=>document.querySelector('#finance-live-status')?.textContent?.trim()==='Онлайн · общая комната');
-    assert.equal(await sp.locator('#lessonPages>.page').count(),8);
+    assert.equal(await sp.locator('#lessonPages>.page').count(),7);
     const desktopListeningText=await sp.locator('#page-3').textContent();
     assert.ok(!/Your teacher reads the conversation twice|No audio file is included in the original PDF/.test(desktopListeningText),'Desktop Vietnam lesson must not render the removed Important notice');
     assert.equal(await sp.locator('#page-3').getByText('Important',{exact:true}).count(),0,'Desktop listening page must have no Important banner');
@@ -1563,7 +1563,7 @@ async function main() {
             await page.locator('#finance-live-status').getByText('Онлайн · общая комната',{exact:true}).waitFor();
             await page.getByRole('heading',{name:'Korean Wave: Who Influences Whom?'}).first().waitFor();
           }
-          assert.equal(await sp.locator('#lessonPages>.page').count(),7);
+          assert.equal(await sp.locator('#lessonPages>.page').count(),8);
           assert.equal(await sp.locator('#lessonPages audio').count(),0);
           for (const page of [sp,tp]) {
             await page.waitForFunction(() => {
