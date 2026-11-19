@@ -72,3 +72,24 @@
 @media print{
   body.jaas-video-active #lessonVideo .video-workspace.jaas-on-call{display:none!important}
 }
+
+
+/* Reliable touch/click target and explicit connection feedback on all viewports. */
+#lessonVideo .video-actions{position:relative;z-index:4}
+#lessonVideo .video-actions .jaas-connect{
+  position:relative;
+  z-index:5;
+  pointer-events:auto!important;
+  touch-action:manipulation;
+  user-select:none;
+}
+#lessonVideo .video-actions .jaas-connect[aria-busy="true"]{cursor:progress}
+#lessonVideo .jaas-message{
+  display:block;
+  padding:10px 15px 12px;
+  border-top:1px solid #e3eaf4;
+  background:#f7faff;
+  color:#27496e;
+  font-size:13px;
+  overflow-wrap:anywhere;
+}
