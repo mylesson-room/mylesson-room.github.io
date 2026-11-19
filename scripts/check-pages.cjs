@@ -1148,7 +1148,7 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     await sp.waitForURL(/my-trip-to-vietnam-a2.html/);
     await sp.locator('#lessonPages>.page.active').waitFor();
     await sp.waitForFunction(()=>document.querySelector('#finance-live-status')?.textContent?.trim()==='Онлайн · общая комната');
-    assert.equal(await sp.locator('#lessonPages>.page').count(),7);
+    assert.equal(await sp.locator('#lessonPages>.page').count(),8);
     const desktopListeningText=await sp.locator('#page-3').textContent();
     assert.ok(!/Your teacher reads the conversation twice|No audio file is included in the original PDF/.test(desktopListeningText),'Desktop Vietnam lesson must not render the removed Important notice');
     assert.equal(await sp.locator('#page-3').getByText('Important',{exact:true}).count(),0,'Desktop listening page must have no Important banner');
@@ -1627,6 +1627,11 @@ async function main() {
           await sp.reload();
           await sp.locator('#page-6.active').waitFor();
           assert.equal(await sp.locator(decision).inputValue(),'I would keep the scene and add a short introduction.');
+          await sp.locator('#next').click();
+          await sp.locator('#page-7.active').waitFor();
+          await sp.getByRole('heading',{name:'From Seoul to Russia: K-pop beyond the music'}).first().waitFor();
+          assert.equal(await sp.locator('#page-7 [data-gap]').count(),6,'New K-pop Russia vocabulary choices must render');
+          assert.equal(await sp.locator('#page-7 [data-exercise-field]').count(),6,'Five reading questions and one speaking prompt must render');
           await sp.goto(origin+'/student-feed-b2.html');
           await sp.locator('#openWords').click();
           await sp.locator('#words').getByText('cultural exchange',{exact:true}).waitFor();
