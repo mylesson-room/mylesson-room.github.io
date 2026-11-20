@@ -5,8 +5,8 @@
 (() => {
   'use strict';
   if (!document.body.matches('[data-classroom-course="sweden-a2"][data-classroom-lesson="sweden-a2-03.html"]')) return;
-  const panel=document.querySelector('#page-2 .panel');
-  if(!panel || panel.querySelector('.sweden-listening'))return;
+  const findPanel=()=>document.querySelector('#page-2 .panel');
+  if(findPanel()?.querySelector('.sweden-listening'))return;
   const text=[
     "Passenger: Excuse me. Is the ten twenty train to Lindby on time?",
     "Assistant: I'm sorry. It is delayed by twenty-five minutes.",
@@ -27,7 +27,18 @@
   const details=document.createElement('details');const summary=document.createElement('summary');summary.textContent='Transcript';
   const script=document.createElement('p');script.style.whiteSpace='pre-line';script.textContent=text.join('\n');
   details.append(summary,script);box.append(heading,desc,play,stop,status,details);
-  panel.querySelector('.lead')?.after(box);
+  const attach=()=>{
+    const panel=findPanel();
+    if(!panel || panel.querySelector('.sweden-listening'))return false;
+    const introduction=panel.querySelector('.lead');
+    if(introduction)introduction.after(box);else panel.prepend(box);
+    return true;
+  };
+  if(!attach()){
+    const observer=new MutationObserver(()=>{if(attach())observer.disconnect();});
+    observer.observe(document.body,{subtree:true,childList:true});
+    window.addEventListener('pagehide',()=>observer.disconnect(),{once:true});
+  }
   if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){
     play.disabled=true;status.textContent='Audio playback is not available in this browser. Use the transcript with your teacher.';
     return;
