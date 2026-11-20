@@ -12,7 +12,7 @@ const original={
  'sweden-a2-01-homework.html':'c67fd2e3c4b2bc89feb27274af67f05820bef687',
  'sweden-a2-02.html':'40aa2e65f12860202955864e6a0a757fa3c300ed',
  'sweden-a2-02-homework.html':'bcc02aa8f4b006b5ddb087b6e42e27ce9779a22a',
- 'student-sweden-legacy.html':'6fe82b8e3482edc1ab483331d39fb235fa6cdd87'
+ 'sweden-cabinet-legacy.html':'6fe82b8e3482edc1ab483331d39fb235fa6cdd87'
 };
 for(const [file,old] of Object.entries(original))
  assert.equal(sha(read(file)),old,file+': historical content, answer keys and localStorage must remain byte-identical');
