@@ -1844,10 +1844,13 @@ async function main() {
             await page.locator('#selectionTranslate').waitFor({state:'attached'});
             const videoStyle=await page.locator('#lessonVideo .video-preview').evaluate(el=>{
               const style=getComputedStyle(el);
-              return {minimum:style.minHeight,background:style.backgroundImage};
+              return {minimum:style.minHeight,background:style.backgroundColor,display:style.display};
             });
-            assert.equal(videoStyle.minimum,'355px','B1 video must use Michael shared premium preview layout');
-            assert.ok(videoStyle.background.includes('linear-gradient'),'B1 and Michael video backgrounds must use the same premium CSS');
+            // Michael's *final* two-person preview CSS overrides his older
+            // decorative 355px rule with min-height:0 and #f7f8fa.
+            assert.equal(videoStyle.minimum,'0px','B1 must inherit Michael final two-tile preview layout');
+            assert.equal(videoStyle.background,'rgb(247, 248, 250)','B1 must use Michael final two-tile background');
+            assert.equal(videoStyle.display,'flex','Shared video layout must remain flex');
             await page.evaluate(()=>{
               const root=document.querySelector('.sheet .lesson-content');
               const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
