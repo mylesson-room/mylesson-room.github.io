@@ -1906,6 +1906,16 @@ async function main() {
           await page.locator('.glass-words[open]').waitFor();
           assert.equal(await page.locator('.glass-words[open]').count(), 1);
         }
+        // B1 travel lesson: student city decisions were previously stored only
+        // as a local UI preference and were invisible in the teacher dashboard.
+        if (course === 'general_english_b1_stories') {
+          const studentChoice=sp.locator('.b1-travel-radio input[value="Da Nang"]');
+          await studentChoice.check();
+          const teacherOverview=tp.getByRole('navigation',{name:'Ответы ученицы по заданиям'});
+          await teacherOverview.getByRole('button',{name:'01 · Three places. One new life (1)',exact:true}).waitFor({timeout:12000});
+          await tp.locator('.b1-live-city-choice').getByText('Ученица выбрала: Da Nang',{exact:true}).waitFor();
+          assert.equal(await sp.locator('.b1-travel-radio input[value="Da Nang"]').isChecked(),true);
+        }
         assert.equal(new URL(tp.url()).searchParams.get('classStudent'), studentId);
         assert.equal(new URL(sp.url()).searchParams.has('classStudent'), false);
         if (course === 'general_english_b1_stories') {
@@ -1960,6 +1970,16 @@ async function main() {
           await tp.locator('.gostudy-live-draft').filter({hasText:'Riverside Café'}).waitFor({timeout:10000});
         }
         if (course === 'general_english_b1_stories') {
+          // A second independent city choice is retained and visible in the
+          // teacher's answer panel. It must not overwrite the warm-up choice.
+          await sp.locator('.b1-sections-menu summary').click();
+          await sp.locator('.sections button').nth(6).click();
+          await sp.locator('.b1-travel-radio input[value="Kyoto"]').check();
+          const overview=tp.getByRole('navigation',{name:'Ответы ученицы по заданиям'});
+          await overview.getByRole('button',{name:'07 · The relocation game (1)',exact:true}).click();
+          await tp.locator('.b1-live-city-choice').getByText('Ученица выбрала: Kyoto',{exact:true}).waitFor();
+          await overview.getByRole('button',{name:'01 · Three places. One new life (1)',exact:true}).click();
+          await tp.locator('.b1-live-city-choice').getByText('Ученица выбрала: Da Nang',{exact:true}).waitFor();
           const studentConfig = await tp.locator('#lesson-data').evaluate(node => JSON.parse(node.textContent));
           assert.equal(studentConfig.contentVersion,'would-you-live-here-b1-20261120-v1');
           assert.equal(studentConfig.steps.length,8,'B1 lesson needs eight ProgressMe-style sections');
