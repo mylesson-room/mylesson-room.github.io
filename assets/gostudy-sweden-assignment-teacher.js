@@ -9,7 +9,7 @@
   const save=form?.querySelector('button[type=submit]');
   const status=document.querySelector('#sweden-assignment-status');
   if(!form||!field||!save||!status)return;
-  const allowed=new Set(['sweden-a2-02.html','sweden-a2-03.html']);
+  const allowed=new Set(['sweden-a2-02.html','sweden-a2-02-michael.html','sweden-a2-03.html']);
   let studentId=null,busy=false;
   const report=text=>{status.textContent=text;};
   async function api(path,options={}){
