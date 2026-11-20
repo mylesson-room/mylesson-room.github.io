@@ -1,0 +1,21 @@
+name: Design2 IELTS private Michael UI
+on:
+  pull_request:
+    paths:
+      - 'ielts-reading-04.html'
+      - 'assets/gostudy-design2-ielts-chat.js'
+      - 'scripts/check-design2-ielts-private-ui.cjs'
+      - '.github/workflows/design2-ielts-private-ui.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  private-ui-contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check Michael layout and private IELTS content/authorization untouched
+        run: node scripts/check-design2-ielts-private-ui.cjs
