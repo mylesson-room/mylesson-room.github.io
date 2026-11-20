@@ -7,7 +7,7 @@
   if (document.body.dataset.cloudVocabulary !== 'sweden-a2') return;
   const auth = () => window.GoStudyFinanceAuth;
   const records = new Map();
-  let ready = false, loading = null, lastError = '', version=0;
+  let ready = false, loading = null, lastError = '', version=0, initialSnapshot = true;
   const normalize = word => ({
     en: String(word?.en || '').trim().replace(/\s+/g,' ').slice(0,150),
     ru: String(word?.ru || '').trim().replace(/\s+/g,' ').slice(0,300)
@@ -37,12 +37,22 @@
         if(!Array.isArray(rows))throw Error('Некорректный ответ словаря.');
         // Do not overwrite a newly ACKed save with a stale GET from before it.
         if(observedVersion!==version)return;
-        records.clear();
+        const previous = new Set(records.keys());
+        const incoming = new Map();
         for(const row of rows){
           const word=normalize(row);
-          if(word.en&&word.ru)records.set(word.en.toLocaleLowerCase('en'),word);
+          if(word.en&&word.ru)incoming.set(word.en.toLocaleLowerCase('en'),word);
         }
-        lastError='';ready=true;notify();
+        const added = initialSnapshot ? [] :
+          Array.from(incoming.entries()).filter(([key])=>!previous.has(key)).map(([,word])=>word);
+        initialSnapshot=false;
+        records.clear();
+        for(const [key,word] of incoming)records.set(key,word);
+        lastError='';ready=true;
+        // Initial cloud hydration is silent. Later cross-device words must show
+        // the exact same +word notification as Michael's live classroom.
+        if(added.length)for(const word of added)notify(true,word);
+        else notify();
       }catch(error){lastError=error.message;ready=false;notify();throw error;}
     })().finally(()=>{loading=null;});
     return loading;
