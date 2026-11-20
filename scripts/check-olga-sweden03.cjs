@@ -33,7 +33,13 @@ for(const [kind,{html,model}] of [['lesson',lesson],['homework',homework]]){
  assert.ok(html.includes('gostudy-v1-workbook.js')&&html.includes('gostudy-v1-exercises.js'),kind+' shared workbook engine missing');
  assert.ok(html.includes('gostudy-sync.js')&&html.includes('data-finance-live'),kind+' realtime engine missing');
  assert.ok(html.includes('data-translate-engine="google-web-pilot"'),kind+' Michael selection translator missing');
- assert.ok(!html.includes('data-jaas-video-pilot'),kind+' cannot copy finance-only video token handler');
+ if(kind==='lesson'){
+  assert.ok(html.includes('data-jaas-video-pilot') &&
+    html.includes('data-jaas-scope="sweden-a2"') &&
+    html.includes('gostudy-jaas-video.js'),kind+' must use shared Michael JaaS with Sweden-only scope');
+ }else{
+  assert.ok(!html.includes('data-jaas-video-pilot'),kind+' homework must not include live video');
+ }
  for(const step of model.steps){
   assert.ok(step.title&&step.instruction&&step.id&&step.minutes>=3,kind+' incomplete step');
   assert.ok(!ids.has(step.id),kind+' duplicate step ID '+step.id);ids.add(step.id);
