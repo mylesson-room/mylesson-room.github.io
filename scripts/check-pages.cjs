@@ -1856,9 +1856,9 @@ async function main() {
               const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
               let node;
               while((node=walker.nextNode())){
-                const pos=node.textContent.toLowerCase().indexOf('describe');
+                const pos=node.textContent.toLowerCase().indexOf('company');
                 if(pos<0)continue;
-                const range=document.createRange();range.setStart(node,pos);range.setEnd(node,pos+8);
+                const range=document.createRange();range.setStart(node,pos);range.setEnd(node,pos+7);
                 const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);
                 document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
                 break;
@@ -1970,7 +1970,7 @@ async function main() {
           assert.equal(studentConfig.vocabulary.length,6,'B1 active vocabulary cap');
           assert.equal(await tp.locator('body').getAttribute('data-dud-b1-premium'),'','Premium styling must activate for both roles');
           await sp.goto(origin + '/' + current.homework);
-          await sp.getByRole('heading',{name:'Homework',exact:true}).waitFor();
+          await sp.getByRole('heading',{name:'01 · A quick memory check',exact:true}).waitFor();
           assert.equal(await sp.locator('body').getAttribute('data-dud-b1-premium'),null,'Old homework design stays untouched');
           const homeworkConfig = await sp.locator('#lesson-data').evaluate(node=>JSON.parse(node.textContent));
           assert.equal(homeworkConfig.key,current.homeworkKey,'The protected homework progress key must remain stable');
