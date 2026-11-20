@@ -10,7 +10,7 @@
   if (!workspace || !placeholder || !actions || !state) return;
   const BASE = 'https://kawfqlohguwvmmplvrny.supabase.co';
   const ANON_KEY = 'sb_publishable_aAZxKwYpLcIXAjCiN5lBSg_qdFxvYwL';
-  const b1Stories = document.body.dataset.jaasScope === 'b1-stories';
+  const b1Stories = document.body?.dataset?.jaasScope === 'b1-stories';
   const endpoint = BASE + (b1Stories ? '/functions/v1/gostudy-jaas-b1-token' : '/functions/v1/gostudy-jaas-token');
   const appIdFormat = /^vpaas-magic-cookie-[A-Za-z0-9-]+$/;
   const roomFormat = b1Stories ? /^gostudy-b1-stories-[0-9a-f]{32}$/ : /^gostudy-finance-[0-9a-f]{32}$/;
