@@ -58,7 +58,7 @@ async function browserContext(browser,base,file,mobile){
  const page=await ctx.newPage();
  page.on('pageerror',e=>{if(/gostudy-sweden-cloud-words|gostudy-v1-workbook/i.test(e.message))console.error('PAGE ERROR '+e.message);});
  await page.goto(base+'/'+file,{waitUntil:'domcontentloaded'});
- await page.waitForFunction(()=>window.GoStudySwedenCloudWords?.isReady(),{timeout:12000});
+ await page.waitForFunction(()=>window.GoStudySwedenCloudWords?.isReady(),null,{timeout:12000});
  return {ctx,page};
 }
 async function run(browser,base,mobile){
@@ -80,7 +80,7 @@ async function run(browser,base,mobile){
   const mirrored=await second.page.evaluate(()=>window.GoStudySwedenCloudWords.words());
   assert.ok(mirrored.some(w=>w.en===expected),'other device must see server ACKed word');
   await second.page.reload({waitUntil:'domcontentloaded'});
-  await second.page.waitForFunction(()=>window.GoStudySwedenCloudWords?.isReady(),{timeout:10000});
+  await second.page.waitForFunction(()=>window.GoStudySwedenCloudWords?.isReady(),null,{timeout:10000});
   assert.ok((await second.page.evaluate(()=>window.GoStudySwedenCloudWords.words())).some(w=>w.en===expected),
     'refresh on other device must preserve word');
   rejectSaves=true;
