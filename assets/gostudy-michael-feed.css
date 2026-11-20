@@ -286,3 +286,9 @@ body[data-premium-feed="michael-v1"] .lesson-divider {
     background: #fff;
   }
 }
+
+/* Michael pilot: temporarily hide "⋯ Упражнение N → Добавить в домашнее задание".
+   Leave underlying homework assignments, answers and publication untouched. */
+body[data-premium-feed="michael-v1"] .homework-exercise-menu {
+  display: none !important;
+}
