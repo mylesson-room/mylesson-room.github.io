@@ -699,6 +699,11 @@
         const video = document.createElement('script');
         video.src = 'assets/gostudy-b1-stories-video.js?v=b1-20261120-1';
         document.body.append(video);
+        // Same authenticated classroom; chat uses a dedicated progress record,
+        // never the old lesson answers or homework state.
+        const chat = document.createElement('script');
+        chat.src = 'assets/gostudy-b1-stories-chat.js?v=b1-20261120-1';
+        document.body.append(chat);
       }
       if (classroomStudent === null) mountLesson();
       const vocabulary = document.createElement('script');
