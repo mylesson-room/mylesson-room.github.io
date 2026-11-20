@@ -50,7 +50,7 @@
       location.reload();
       return;
     }
-    document.body.dataset.classroomCourse='sweden-a2';
+    document.body.dataset.liveCourse='sweden-a2';
     document.body.dataset.classroomLesson=key;
     card.href=key;
     card.querySelector('h2').textContent=selected.title;
