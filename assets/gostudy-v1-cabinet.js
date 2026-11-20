@@ -56,7 +56,7 @@
   // Legacy lessons remain intact in storage for historical progress/rollback.
   const homeworkAvailable = typeof settings.homework === 'string' && settings.homework.trim() !== '';
   const homeworkCard = homeworkAvailable
-    ? '<a id="assignment" class="card homework homework-link" href="'+escape(settings.homework)+'" aria-label="Открыть домашнее задание"><h2>Домашнее задание</h2><p class="homework-subject">'+escape(settings.title)+'</p>'+(settings.duration?'<small>'+escape(settings.duration)+'</small>':'')+'<span class="tile-arrow" aria-hidden="true">›</span></a>'
+    ? '<a id="assignment" class="card homework homework-link" href="'+escape(settings.homework)+'" aria-label="Открыть домашнее задание"><h2>Домашнее задание</h2><p class="homework-subject">'+escape(settings.homeworkTitle || settings.title)+'</p>'+(settings.duration?'<small>'+escape(settings.duration)+'</small>':'')+'<span class="tile-arrow" aria-hidden="true">›</span></a>'
     : '<div id="assignment" class="card homework homework--unavailable" aria-disabled="true" role="group" aria-label="Домашнее задание пока не назначено"><h2>Домашнее задание</h2><p class="homework-subject">Пока не назначено</p><span class="homework-hint">Преподаватель ещё не опубликовал задание</span></div>';
   const values = {
     LESSON_LABEL:escape(settings.lessonLabel || "Открыть урок "+settings.course), CABINET:escape(settings.cabinet), COURSE:escape(settings.course), TITLE:escape(settings.title),
