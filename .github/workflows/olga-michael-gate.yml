@@ -1,0 +1,28 @@
+name: Olga Michael release gate
+on:
+  pull_request:
+    paths:
+      - 'sweden-a2-03.html'
+      - 'sweden-a2-03-homework.html'
+      - 'student-sweden.html'
+      - 'student-sweden-legacy.html'
+      - 'assets/gostudy-sweden*'
+      - 'assets/gostudy-jaas-video.js'
+      - 'scripts/check-olga-sweden03.cjs'
+      - 'scripts/check-olga-michael-static-parity.cjs'
+      - '.github/workflows/olga-michael-gate.yml'
+  workflow_dispatch:
+jobs:
+  method-and-parity:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Methodology and answer-key contract
+        run: node scripts/check-olga-sweden03.cjs
+      - name: Michael functionality static release gate
+        run: node scripts/check-olga-michael-static-parity.cjs
