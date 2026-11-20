@@ -27,7 +27,7 @@ const reference=read('business-ai-finance-b2-02.html');
 assert.equal(blobSha(reference),'0d4e2c78edb8fda2103fa4b7f83cff54a819c51f',
   'Michael HTML changed; audit visual parity before proceeding');
 const helper=read('assets/gostudy-design2-chat-desktop.js');
-assert.ok(helper.includes("chat.open = true")&&!/fetch\(|localStorage|supabase|studentId|service_role/.test(helper),
+assert.ok(helper.includes("dropdown.open = true")&&!/fetch\(|localStorage|supabase|studentId|service_role/.test(helper),
   'Only presentation may be changed in Design2 chat default');
 for(const [path,{sha,wasGoogle}] of Object.entries(pages)){
   const html=read(path);
