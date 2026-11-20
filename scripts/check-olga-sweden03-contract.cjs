@@ -36,7 +36,7 @@ assert.ok(teacher.includes('gostudy_legacy_teacher_view') &&
  'teacher page must verify course and use atomic authorized RPC');
 assert.ok(!teacher.includes('method:\'PATCH\''),'No insecure browser-side direct table update');
 const sql=read('docs/sql/olga-sweden-selection-review-only.sql');
-for(const token of ['REVIEW ONLY','gostudy_sweden_set_lesson','SECURITY DEFINER','gostudy_classroom_rooms',
+for(const token of ['APPLIED to Supabase','gostudy_sweden_set_lesson','SECURITY DEFINER','gostudy_classroom_rooms',
  'sweden-a2-02.html','sweden-a2-03.html','gostudy_classroom_member','GRANT SELECT',
  'REVOKE ALL'])assert.ok(sql.includes(token),'Pending RLS migration missing '+token);
 assert.ok(!/GRANT\s+INSERT|GRANT\s+DELETE|GRANT\s+UPDATE/i.test(sql),
