@@ -1808,6 +1808,27 @@ async function main() {
             await sp.locator('#practiceDialog form[method=dialog] button').click();
             assert.equal(await sp.locator('#student-home').count(),0,'Old course-specific dashboard must be gone');
             assert.equal(await sp.locator('.classroom-access:visible').count(),0,'Access gate is hidden on an authorized dashboard');
+            // Negative access test: knowing the URL cannot reveal another
+            // student's shared dashboard, course or saved vocabulary.
+            const outsider=await browser.newContext();
+            try {
+              await outsider.addInitScript(()=>{
+                sessionStorage.setItem('gostudy-cloud-session-v1',
+                  JSON.stringify({user:{id:'outsider'},access_token:'synthetic',expires_at:Date.now()+3600000}));
+              });
+              await outsider.route('https://*.supabase.co/**',route=>
+                route.fulfill({json:[{course:'unrelated-course'}]}));
+              const denied=await outsider.newPage();
+              await denied.goto(origin+'/student-'+course.replaceAll('_','-')+'.html');
+              await denied.locator('#cabinet-status').getByText(/не назначен этому аккаунту/).waitFor();
+              assert.equal(await denied.locator('.lesson-card-link').count(),0,'Unauthorized user must never see an assigned lesson');
+              assert.equal(await denied.locator('.vocab-dialog').count(),0,'Unauthorized user must never receive vocabulary markup');
+            } finally { await outsider.close(); }
+            const desktop=sp.viewportSize();
+            await sp.setViewportSize({width:390,height:844});
+            const width=await sp.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+            assert.ok(width<=1,'Shared cabinet must not overflow mobile viewport: '+width+'px');
+            await sp.setViewportSize(desktop);
             if(course==='general_english_b1') {
               assert.equal(await sp.locator('#assignment[aria-disabled="true"]').count(),1,
                 'Missing homework must be disabled instead of inventing an assignment');
