@@ -36,8 +36,8 @@
   const top=workspace.querySelector('.video-top span:nth-child(2)');
   if(top)top.textContent='ВИДЕО УРОКА';
   link.classList.add('telemost-fallback-link');
-  link.textContent='Открыть видео';
-  link.setAttribute('aria-label','Открыть видеосвязь через Яндекс Телемост в новой вкладке');
+  link.textContent='Открыть Телемост';
+  link.setAttribute('aria-label','Перейти на сайт Яндекс Телемост в новой вкладке');
   link.title='Телемост откроется в новой вкладке';
   link.setAttribute('rel','noopener noreferrer');
   link.setAttribute('target','_blank');
@@ -45,7 +45,7 @@
   if(oldNote)oldNote.remove();
   const note=document.createElement('p');
   note.className='telemost-fallback-note';
-  note.textContent='Видеосвязь откроется отдельно через Телемост';
+  note.textContent='Телемост откроется отдельно. Это не встроенная видеокомната.';
   actions.after(note);
   actions.classList.add('jaas-control-bar','telemost-fallback-controls');
   workspace.classList.add('gostudy-video-fallback');
