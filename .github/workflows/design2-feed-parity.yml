@@ -1,0 +1,21 @@
+name: Design 2 Michael Alla visual pilot
+on:
+  pull_request:
+    paths:
+      - 'my-trip-to-vietnam-a2.html'
+      - 'scripts/check-design2-feed-parity.cjs'
+      - '.github/workflows/design2-feed-parity.yml'
+      - 'docs/design2-ownership-20261120.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  reference-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Ensure shared Michael feed without changing Alla lesson material
+        run: node scripts/check-design2-feed-parity.cjs
