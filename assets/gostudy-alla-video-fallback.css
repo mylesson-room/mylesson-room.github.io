@@ -18,6 +18,11 @@ body[data-alla-video-fallback] #lessonVideo .gostudy-video-fallback .telemost-fa
   gap: 9px;
   padding: 11px 15px 15px;
 }
+/* The approved Michael stylesheet intentionally hides unintegrated Telemost.
+   Override that exact hidden-link rule ONLY for Alla's actual external fallback. */
+body[data-alla-video-fallback] #lessonVideo .gostudy-video-fallback .video-actions > a.telemost-fallback-link[href*="telemost.yandex.ru"] {
+  display: inline-flex !important;
+}
 body[data-alla-video-fallback] #lessonVideo .gostudy-video-fallback .telemost-fallback-link {
   min-height: 44px;
   padding: 10px 18px;
