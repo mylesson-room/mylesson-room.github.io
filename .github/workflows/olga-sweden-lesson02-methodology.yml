@@ -1,0 +1,21 @@
+name: Olga Sweden A2 Lesson 02 quality gate
+on:
+  pull_request:
+    paths:
+      - 'sweden-a2-02.html'
+      - 'sweden-a2-02-homework.html'
+      - 'scripts/check-olga-lesson02-methodology.cjs'
+      - '.github/workflows/olga-sweden-lesson02-methodology.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  a2-method:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify complete lesson scripts, existing audio, answer keys and A2 teaching outcomes
+        run: node scripts/check-olga-lesson02-methodology.cjs
