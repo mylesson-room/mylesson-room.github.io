@@ -798,6 +798,13 @@
       viewing: classroomStudent !== null,
       async read() {
         const access = await token();
+        if (course === 'country_house' && lessonKey.startsWith('gostudy-country-house-travel-a2-05-')) {
+          const result = await request('/functions/v1/gostudy-country-house-progress-view',{
+            method:'POST',body:{studentId:classroomStudent,lessonKey}
+          },access);
+          if (!result.ok) throw Error(result.data?.error||'Не удалось загрузить ответы.');
+          return result.data?.answers || {};
+        }
         const result = await request('/rest/v1/rpc/gostudy_'+course+'_teacher_view',{method:'POST',body:{}},access);
         if (!result.ok || !Array.isArray(result.data)) throw Error('Не удалось загрузить ответы.');
         const student = result.data.find(row=>row.id===classroomStudent);
