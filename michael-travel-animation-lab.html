@@ -2,46 +2,125 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#f5f7ff">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<title>Путешествия — тестовый урок · GoStudy</title>
-<link rel="stylesheet" href="assets/gostudy-v1-lesson.css">
+<meta name="theme-color" content="#f7f9fe">
+<title>Путешествия · Speaking B1 · GoStudy Lab</title>
 <style>
-/* Пустая лаборатория визуальных уроков. Не содержит закрытых материалов или прогресса. */
-.travel-lab{width:min(1080px,calc(100% - 36px));margin:clamp(22px,5vw,58px) auto}
-.travel-lab__heading{display:flex;align-items:center;gap:12px;margin:0 0 20px}
-.travel-lab__symbol{display:grid;place-items:center;width:50px;height:50px;border-radius:16px;background:#e5eeff;font-size:26px}
-.travel-lab__heading small{display:block;color:#8190a8;font-size:12px;letter-spacing:.05em;font-weight:800}
-.travel-lab__heading h1{margin:1px 0 0;font-size:clamp(28px,4vw,42px);letter-spacing:-1px;line-height:1.2}
-.travel-lab__stage{
-  display:grid;place-items:center;text-align:center;min-height:min(57vw,520px);
-  padding:38px 24px;background:#fff;border:1px solid #e1e8f4;
-  border-radius:24px;box-shadow:0 18px 46px #182e5309;
-}
-.travel-lab__stage p{max-width:460px;margin:0;font-size:clamp(21px,3vw,30px);line-height:1.4;font-weight:700;color:#52678b}
-.travel-lab__back{display:inline-flex;align-items:center;min-height:44px;padding:10px 16px;border:1px solid #dde7f5;border-radius:12px;background:#fff;color:#284a83;font-weight:650;font-size:14px}
-.travel-lab__back:hover{background:#f1f6ff}
-@media(max-width:720px){
- .travel-lab__stage{min-height:55dvh;border-radius:19px}
- .travel-lab__heading{gap:9px}
- .travel-lab__symbol{width:45px;height:45px}
-}
+:root{font-family:Inter,Manrope,-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;color:#182544;background:#f8faff;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0;min-height:100dvh}button,a{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #5f83f4;outline-offset:4px}a{text-decoration:none;color:inherit}
+.lab-shell{min-height:100dvh;background:radial-gradient(circle at 70% 14%,#e9f2ff 0,transparent 41%),linear-gradient(120deg,#fff,#f7f9ff 62%,#eef4ff);}
+.lab-top{height:65px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(18px,3vw,44px);border-bottom:1px solid #e5eaf5;background:#ffffffd9;gap:10px}
+.lab-brand{display:inline-flex;align-items:center;gap:12px;color:#192b56;font-weight:850;font-size:21px;white-space:nowrap}
+.lab-brand svg{width:48px;height:39px}
+.lab-return{display:inline-flex;align-items:center;gap:7px;min-height:43px;padding:9px 15px;border:1px solid #dce8fb;background:#ffffffbd;border-radius:14px;color:#275393;font-size:14px;font-weight:750;white-space:nowrap}
+.lab-space{display:grid;grid-template-columns:minmax(205px,1fr) minmax(0,2.45fr);gap:18px;max-width:1740px;margin:auto;padding:clamp(14px,2vw,26px)}
+.lab-empty{min-height:calc(100dvh - 125px);border:1px solid #e1eaff;border-radius:30px;background:linear-gradient(137deg,#ffffffdf,#f4f7ffb0);box-shadow:0 4px 40px #3e6baf08}
+.lab-workspace{min-width:0}
+.lab-title-row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 17px}
+.lab-title{display:flex;align-items:center;gap:13px;min-width:0;flex-wrap:wrap}
+.lab-title h1{font-size:clamp(24px,2.8vw,39px);line-height:1.15;letter-spacing:-.05em;margin:0;font-weight:850}
+.lab-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:15px;background:#e6edff;color:#1b335e;font-size:27px}
+.lab-tag{display:inline-flex;align-items:center;justify-content:center;border-radius:12px;background:#e8e8ff;color:#554bc9;padding:9px 12px;font-size:14px;font-weight:800}
+.lab-tag--speaking{background:#ddf2ff;color:#185484;gap:6px}
+.lab-progress{display:flex;align-items:center;gap:9px;color:#4a5d82;font-size:12px;white-space:nowrap;font-weight:750}
+.lab-dots{display:flex;gap:5px}.lab-dots i{display:block;width:15px;height:7px;border-radius:9px;background:#d5ddeb}.lab-dots i:first-child{background:#3469dc;width:30px}
+.lab-card{position:relative;padding:12px;background:white;border:1px solid #e6ecf8;border-radius:30px;box-shadow:0 20px 50px #2d4e880d}
+.lab-photo{position:relative;min-height:clamp(340px,66dvh,720px);border-radius:23px;isolation:isolate;overflow:hidden;background:linear-gradient(124deg,#35537d 5%,#7189ac 60%,#a2c3de 100%)}
+.lab-photo:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#132d57ca 0%,#2e4d7c88 36%,#0000 72%);z-index:1}
+.lab-photo:after{content:"";position:absolute;inset:0;z-index:0;opacity:.18;background:repeating-linear-gradient(90deg,transparent 0 10%,#eef5ff 10.2% 10.6%,transparent 10.7% 22%),radial-gradient(circle at 71% 16%,#fff 0,transparent 22%)}
+.lab-photo.is-loaded:after{opacity:0}
+.lab-photo__frame{position:absolute;inset:0;background-position:center;background-size:cover;z-index:0;transform:scale(1.012)}
+.lab-photo__copy{position:absolute;left:clamp(18px,4.3%,50px);top:clamp(20px,9%,73px);z-index:2;width:min(48%,395px);color:#fff;text-shadow:0 2px 15px #07173a3b}
+.lab-photo__mark{display:grid;place-items:center;width:46px;height:46px;border-radius:13px;background:#ffffff30;backdrop-filter:blur(18px);font-size:23px}
+.lab-photo__copy p{font-size:clamp(27px,3vw,48px);line-height:1.18;letter-spacing:-.04em;font-weight:850;margin:28px 0 20px}
+.lab-photo__copy > span:last-child{display:block;width:80px;height:6px;border-radius:9px;background:linear-gradient(90deg,#a5b7ff,#dfb6ff)}
+.lab-play{position:absolute;z-index:3;right:clamp(15px,3%,32px);bottom:clamp(15px,3%,32px);width:66px;height:66px;display:grid;place-items:center;border-radius:50%;border:1px solid #ffffffaf;background:linear-gradient(145deg,#ffffff5f,#8bb1ed48 55%,#ffffff29);backdrop-filter:blur(22px) saturate(1.35);-webkit-backdrop-filter:blur(22px) saturate(1.35);box-shadow:inset 0 2px 2px #ffffffbb,inset 0 -2px 4px #4a659533,0 10px 30px #061a4340;color:#fff;transition:transform .2s,box-shadow .2s}
+.lab-play:hover{transform:scale(1.08);box-shadow:inset 0 2px 4px #ffffffd9,0 12px 32px #0e29575d}
+.lab-play svg{width:25px;height:25px;margin-left:3px;filter:drop-shadow(0 2px 3px #25416a55)}
+.lab-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 12px 5px;color:#8190aa;font-size:12px}
+.lab-foot strong{font-size:13px;color:#5d7096;font-weight:650}
+.lab-setup{border:0;background:none;color:#4268af;text-decoration:underline;text-underline-offset:4px;font-size:12px}
+.lab-setup[hidden],.lab-status[hidden]{display:none!important}
+#videoFile{display:none}
+.immersive-layer{position:fixed;inset:0;z-index:100;display:none;overflow:hidden;background:#030710}
+.immersive-layer.is-visible{display:block}
+.immersive-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;background:#030710}
+.rift-layer{position:fixed;inset:0;z-index:110;display:none;overflow:hidden;pointer-events:none;perspective:1800px}
+.rift-layer.is-visible{display:block}
+.rift-leaf{position:absolute;inset:0;overflow:hidden;background:#fff;will-change:transform;backface-visibility:hidden;filter:drop-shadow(0 0 12px #d3edff9e)}
+.rift-leaf--left{clip-path:polygon(0 0,50.2% 0,49.5% 11%,50.6% 20%,49.7% 30%,50.3% 41%,49.2% 52%,50.5% 67%,49.5% 82%,50.4% 100%,0 100%)}
+.rift-leaf--right{clip-path:polygon(50.2% 0,100% 0,100% 100%,50.4% 100%,49.5% 82%,50.5% 67%,49.2% 52%,50.3% 41%,49.7% 30%,50.6% 20%,49.5% 11%)}
+.rift-page-copy{width:100%;height:100%;overflow:hidden}
+.rift-leaf--left,.rift-leaf--right{transform:translate3d(0,0,0) scale(1)}
+.rift-layer.is-splitting .rift-leaf--left{transform:translate3d(-110vw,-1%,0) rotateY(-10deg) scale(1.035)}
+.rift-layer.is-splitting .rift-leaf--right{transform:translate3d(110vw,1%,0) rotateY(10deg) scale(1.035)}
+.rift-leaf{transition:transform 1.27s cubic-bezier(.68,.02,.24,1)}
+.rift-spark{position:absolute;left:50%;top:0;height:100%;width:16px;transform:translateX(-50%);opacity:0;background:linear-gradient(90deg,transparent,#fff8f4 29%,#fff 49%,#ffe1b7 62%,transparent);filter:drop-shadow(0 0 14px #f4d0a9);clip-path:polygon(40% 0,85% 11%,13% 20%,78% 30%,30% 42%,100% 52%,20% 67%,80% 82%,43% 100%,12% 100%,50% 82%,0 67%,77% 52%,0 42%,59% 30%,0 20%,60% 11%,18% 0)}
+.rift-layer.is-splitting .rift-spark{animation:rift-flash .65s ease-out forwards}
+@keyframes rift-flash{0%{opacity:0;transform:translateX(-50%) scaleX(.25)}25%{opacity:1;transform:translateX(-50%) scaleX(3)}70%{opacity:.7}100%{opacity:0;transform:translateX(-50%) scaleX(1)}}
+body.is-playing{overflow:hidden}
+@media(max-width:980px){.lab-space{grid-template-columns:minmax(110px,.7fr) minmax(0,2.4fr);gap:12px}.lab-title-row{align-items:flex-start;flex-direction:column}.lab-photo{min-height:64dvh}}
+@media(max-width:640px){.lab-top{height:59px;padding:0 14px}.lab-brand{font-size:16px}.lab-brand svg{width:37px;height:32px}.lab-return{padding:7px 10px;font-size:12px;min-height:35px}.lab-space{display:block;padding:10px}.lab-empty{height:58px;min-height:0;margin-bottom:12px;border-radius:19px}.lab-title{gap:7px}.lab-title h1{font-size:26px}.lab-icon{width:36px;height:36px;font-size:21px}.lab-tag{padding:6px 8px;font-size:12px}.lab-title-row{gap:8px}.lab-photo{min-height:62dvh;border-radius:17px}.lab-card{padding:7px;border-radius:22px}.lab-photo__copy{left:19px;top:32px;width:51%}.lab-photo__copy p{font-size:clamp(23px,6vw,34px)}.lab-play{width:59px;height:59px;right:14px;bottom:14px}.lab-foot{font-size:11px;padding:12px 8px}}
+@media(prefers-reduced-motion:reduce){.rift-leaf,.lab-play{transition:none!important}.rift-layer.is-splitting .rift-leaf--left,.rift-layer.is-splitting .rift-leaf--right{transform:none}.rift-layer.is-splitting .rift-spark{animation:none}}
 </style>
 </head>
 <body>
-<header>
-  <a class="brand lesson-brand" href="student-business-ai-finance.html" aria-label="GoStudy — кабинет Михаила"><img src="assets/gostudy-emblem.svg" alt="GoStudy"></a>
-  <a class="travel-lab__back" href="student-business-ai-finance.html">← К кабинету</a>
-</header>
-<main class="travel-lab">
-  <div class="travel-lab__heading">
-    <span class="travel-lab__symbol" aria-hidden="true">✈</span>
-    <div><small>ЭКСПЕРИМЕНТАЛЬНЫЙ УРОК</small><h1>Путешествия</h1></div>
-  </div>
-  <section class="travel-lab__stage" aria-label="Тестовая площадка будущего урока">
-    <p>Тут проводим тестирование</p>
-  </section>
-</main>
+<div class="lab-shell" id="labShell">
+  <header class="lab-top">
+    <a class="lab-brand" href="student-business-ai-finance.html" aria-label="GoStudy — кабинет Михаила">
+      <svg viewBox="0 0 80 60" aria-hidden="true" fill="none"><path d="M12 39 20 16l15 10L42 8l9 18 17-10-5 23M8 48q16-7 31 4 15-11 31-4M10 54q14-8 29 4 15-12 31-4" stroke="#b98123" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      <span>GoStudy</span>
+    </a>
+    <a href="student-business-ai-finance.html" class="lab-return">← К кабинету</a>
+  </header>
+  <main class="lab-space">
+    <aside class="lab-empty" aria-hidden="true"></aside>
+    <section class="lab-workspace" aria-label="Тестовый speaking-урок B1">
+      <div class="lab-title-row">
+        <div class="lab-title"><span class="lab-icon" aria-hidden="true">✈</span><h1>Путешествия</h1><span class="lab-tag">B1</span><span class="lab-tag lab-tag--speaking">🎙 Speaking</span></div>
+        <div class="lab-progress" aria-label="Сцена 1 из 6"><span>Сцена 1 из 6</span><span class="lab-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+      </div>
+      <div class="lab-card">
+        <div class="lab-photo" id="labPhoto">
+          <div class="lab-photo__frame" id="photoFrame" aria-hidden="true"></div>
+          <div class="lab-photo__copy"><span class="lab-photo__mark" aria-hidden="true">✈</span><p>You are going on a trip!</p><span aria-hidden="true"></span></div>
+          <button type="button" id="playScene" class="lab-play" aria-label="Начать разговор в аэропорту" title="Начать сцену"><svg viewBox="0 0 28 28" fill="currentColor" aria-hidden="true"><path d="M7 4.5a2.2 2.2 0 0 1 3.3-1.9l15 9.5a2.2 2.2 0 0 1 0 3.8l-15 9.5A2.2 2.2 0 0 1 7 23.5Z"/></svg></button>
+        </div>
+        <div class="lab-foot"><strong>Airport check-in · Speaking practice</strong><span><button class="lab-setup" type="button" id="importScene" hidden>Подключить видео Grok</button><span class="lab-status" id="videoStatus" role="status"></span></span></div>
+      </div>
+    </section>
+  </main>
+</div>
+<input type="file" id="videoFile" accept="video/mp4,video/*" aria-label="Выбрать видео Grok">
+<div class="immersive-layer" id="immersiveLayer" aria-hidden="true"><video class="immersive-video" id="immersiveVideo" playsinline preload="auto"></video></div>
+<div class="rift-layer" id="riftLayer" aria-hidden="true"><div class="rift-leaf rift-leaf--left"><div class="rift-page-copy"></div></div><div class="rift-leaf rift-leaf--right"><div class="rift-page-copy"></div></div><div class="rift-spark"></div></div>
+<script>
+(()=>{'use strict';
+const shell=document.getElementById('labShell'),video=document.getElementById('immersiveVideo'),photo=document.getElementById('labPhoto'),photoFrame=document.getElementById('photoFrame'),play=document.getElementById('playScene'),filePicker=document.getElementById('videoFile'),importLink=document.getElementById('importScene'),status=document.getElementById('videoStatus'),immersive=document.getElementById('immersiveLayer'),rift=document.getElementById('riftLayer');
+let sourceReady=true,sourceObjectURL=null,isPlaying=false,transitionTimer=0,db=null,posterReady=false;
+const src='assets/michael-travel-checkin.mp4';
+const say=message=>{status.textContent=message};
+function showSetup(){if(sourceReady)return;importLink.hidden=false;say('Видео нужно подключить один раз.');}
+function openDatabase(){return new Promise((resolve,reject)=>{if(!('indexedDB' in window)){reject(Error('IndexedDB unavailable'));return}const request=indexedDB.open('gostudy-michael-cinema-v1',1);request.onupgradeneeded=()=>request.result.createObjectStore('media');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error)})}
+function storedVideo(){return new Promise((resolve,reject)=>{const t=db.transaction('media','readonly').objectStore('media').get('airport-video');t.onsuccess=()=>resolve(t.result||null);t.onerror=()=>reject(t.error)})}
+function saveVideo(blob){return new Promise((resolve,reject)=>{const t=db.transaction('media','readwrite');t.objectStore('media').put(blob,'airport-video');t.oncomplete=resolve;t.onerror=()=>reject(t.error)})}
+function attachVideo(blob){if(sourceObjectURL)URL.revokeObjectURL(sourceObjectURL);sourceObjectURL=URL.createObjectURL(blob);sourceReady=true;posterReady=false;video.src=sourceObjectURL;video.load();importLink.hidden=true;say('');}
+function tryPoster(){if(posterReady||video.readyState<2||!video.videoWidth)return;try{const canvas=document.createElement('canvas');canvas.width=640;canvas.height=Math.round(640*video.videoHeight/video.videoWidth);canvas.getContext('2d',{alpha:false}).drawImage(video,0,0,canvas.width,canvas.height);photoFrame.style.backgroundImage='url("'+canvas.toDataURL('image/jpeg',.87)+'")';photo.classList.add('is-loaded');posterReady=true}catch{ /* No poster if canvas is tainted. */ }}
+video.addEventListener('loadeddata',()=>{sourceReady=true;importLink.hidden=true;say('');tryPoster()});
+video.addEventListener('seeked',tryPoster);
+video.addEventListener('error',()=>{if(isPlaying){endScene();say('Не удалось воспроизвести видео. Выберите MP4 ещё раз.')}sourceReady=false;showSetup()});
+function clearSplit(){rift.classList.remove('is-visible','is-splitting');rift.querySelectorAll('.rift-page-copy').forEach(n=>n.replaceChildren())}
+function endScene(){if(!isPlaying)return;isPlaying=false;clearTimeout(transitionTimer);video.pause();try{video.currentTime=.1}catch{}immersive.classList.remove('is-visible');rift.classList.remove('is-visible','is-splitting');document.body.classList.remove('is-playing');shell.removeAttribute('aria-hidden');clearSplit();play.focus({preventScroll:true})}
+video.addEventListener('ended',endScene);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&isPlaying)endScene()});
+function buildSplit(){rift.querySelectorAll('.rift-page-copy').forEach(parent=>{const copy=shell.cloneNode(true);copy.removeAttribute('id');copy.setAttribute('inert','');copy.setAttribute('aria-hidden','true');copy.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));parent.append(copy)})}
+async function startScene(){if(isPlaying)return;if(!sourceReady){filePicker.click();return}isPlaying=true;try{try{video.currentTime=0}catch{}buildSplit();immersive.classList.add('is-visible');rift.classList.add('is-visible');document.body.classList.add('is-playing');shell.setAttribute('aria-hidden','true');const playing=video.play();if(playing)await playing;if(window.matchMedia('(prefers-reduced-motion:reduce)').matches){clearSplit();return}requestAnimationFrame(()=>requestAnimationFrame(()=>rift.classList.add('is-splitting')));transitionTimer=setTimeout(clearSplit,1400)}catch(error){endScene();say('Видео не запустилось. Нажмите Play ещё раз.')}}
+play.addEventListener('click',startScene);importLink.addEventListener('click',()=>filePicker.click());
+filePicker.addEventListener('change',async()=>{const file=filePicker.files?.[0];if(!file)return;if(!file.type.startsWith('video/')&&!/\.mp4$/i.test(file.name)){say('Выберите файл MP4.');return}attachVideo(file);try{db ||= await openDatabase();await saveVideo(file)}catch{say('Видео доступно до перезагрузки страницы.')}filePicker.value='';});
+video.src=src;video.load();
+(async()=>{try{db=await openDatabase();const saved=await storedVideo();if(saved)attachVideo(saved)}catch{ /* Private browsing can disable offline storage. */ }setTimeout(showSetup,1300)})();
+})();
+</script>
 </body>
 </html>
