@@ -1750,14 +1750,32 @@ async function main() {
           console.log('finance_b1: canonical cabinets, lesson tools, answers, chat, reload and vocabulary mastery verified');
           continue;
         }
-        const canonicalCabinet = course === 'travel_a2';
+        const canonicalCabinet = course === 'travel_a2' || course === 'general_english_b1_stories';
         const studentLink = canonicalCabinet ? sp.locator('.lesson-card-link') : sp.locator('.home-open-lesson');
         const teacherLink = tp.locator('.teacher-enter-class');
         await studentLink.waitFor();
         if (canonicalCabinet) {
-          assert.equal(await studentLink.getAttribute('href'),'positive-thinking-a2.html');
-          await sp.getByRole('button',{name:'Словарь',exact:true}).waitFor();
-          await sp.getByText('Positive Thinking').first().waitFor();
+          if (course === 'travel_a2') {
+            assert.equal(await studentLink.getAttribute('href'),'positive-thinking-a2.html');
+            await sp.getByRole('button',{name:'Словарь',exact:true}).waitFor();
+            await sp.getByText('Positive Thinking').first().waitFor();
+          } else {
+            // B1 Stories reuses Michael's actual cabinet JS/CSS after the
+            // protected destination RPC, not its old standalone dashboard.
+            assert.equal(await studentLink.getAttribute('href'),'general-english-b1-stories-01.html');
+            assert.equal(await sp.locator('.homework-link').getAttribute('href'),'general-english-b1-stories-01-homework.html');
+            await sp.getByText('A Small Plan That Went Wrong',{exact:true}).waitFor();
+            await sp.locator('.vocab-feature--practice').waitFor({state:'visible'});
+            await sp.getByRole('button',{name:/Словарь/}).first().click();
+            await sp.locator('#words[open]').waitFor();
+            await sp.locator('#practiceFromWords').waitFor({state:'visible'});
+            await sp.locator('#words form[method=dialog] button').click();
+            await sp.locator('#practiceCard').click();
+            await sp.locator('#practiceModes [data-mode="listen"]').waitFor();
+            await sp.locator('#practiceDialog form[method=dialog] button').click();
+            assert.equal(await sp.locator('#student-home').count(),0,'Old B1 cabinet renderer must be gone');
+            assert.equal(await sp.locator('.gostudy-cloud-bar:visible').count(),0,'Shared cabinet must not show legacy cloud bar');
+          }
         } else {
           const cabinetHeading = sp.locator('#student-home .home-lesson h2');
           await sp.evaluate(() => document.documentElement.style.setProperty('--gostudy-ui-heading-size','29px'));
