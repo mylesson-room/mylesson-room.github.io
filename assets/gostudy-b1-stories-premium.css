@@ -269,3 +269,41 @@ body[data-dud-b1-premium] .room>.side .b1-sections-menu>.sections {
 @media(prefers-reduced-motion:reduce) {
   body[data-dud-b1-premium] .room>.side .b1-sections-menu>summary::before{transition:none}
 }
+
+/* Reuse Michael's emblem / Dictionary / home-navigation vocabulary. */
+body[data-dud-b1-premium] .gostudy-lesson-topbar {
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  height:57px;box-sizing:border-box;padding:5px clamp(15px,2vw,32px);
+}
+body[data-dud-b1-premium] .gostudy-b1-lesson-brand {
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:44px;min-width:55px;
+}
+body[data-dud-b1-premium] .gostudy-b1-lesson-brand img {
+  display:block;width:56px;height:42px;object-fit:contain;
+}
+body[data-dud-b1-premium] .gostudy-b1-lesson-actions {
+  display:flex;align-items:center;gap:12px;
+}
+body[data-dud-b1-premium] .gostudy-b1-lesson-dictionary,
+body[data-dud-b1-premium] .gostudy-b1-lesson-actions .gostudy-cabinet-back {
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border:0;min-height:42px;padding:9px 13px;background:#eaf7fd;
+  border-radius:14px;color:#078ab5;font-size:14px;font-weight:800;
+  text-decoration:none;cursor:pointer;
+}
+body[data-dud-b1-premium] .gostudy-b1-lesson-actions .gostudy-cabinet-back {
+  width:42px;min-width:42px;padding:0;
+}
+body[data-dud-b1-premium] .gostudy-b1-lesson-actions button:disabled {
+  opacity:.55;cursor:wait;
+}
+body[data-dud-b1-premium] .gostudy-b1-lesson-dictionary:hover,
+body[data-dud-b1-premium] .gostudy-b1-lesson-actions .gostudy-cabinet-back:hover {
+  background:#d9f0fa;
+}
+@media(max-width:460px) {
+  body[data-dud-b1-premium] .gostudy-lesson-topbar{padding:5px 13px;}
+  body[data-dud-b1-premium] .gostudy-b1-lesson-actions{gap:8px;}
+  body[data-dud-b1-premium] .gostudy-b1-lesson-dictionary{padding:9px 10px;}
+}
