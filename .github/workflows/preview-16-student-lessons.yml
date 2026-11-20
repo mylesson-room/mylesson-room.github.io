@@ -1,0 +1,31 @@
+name: Preview latest lessons for 16 student accounts
+on:
+  pull_request:
+    paths:
+      - scripts/capture-16-student-latest-lessons.cjs
+      - .github/workflows/preview-16-student-lessons.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated Playwright browser controls
+        run: npm install --no-save --no-package-lock playwright@1.58.2
+      - name: Capture authentic HTML/CSS screenshots with synthetic sessions
+        run: |
+          export GOSTUDY_CHROME="$(command -v google-chrome)"
+          node scripts/capture-16-student-latest-lessons.cjs
+      - name: Upload all 17 individual previews and overview contact sheet
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gostudy-16-latest-lessons-screenshots
+          path: artifacts/latest-16-screens
+          retention-days: 14
+          if-no-files-found: warn
