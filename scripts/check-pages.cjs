@@ -1943,8 +1943,8 @@ async function main() {
           if (course === 'general_english_b1_stories') {
             const overview = tp.getByRole('navigation',{name:'Ответы ученицы по заданиям'});
             await sp.locator('.sheet [data-question] label').first().click();
-            await overview.getByRole('button',{name:'Warm-up (1)',exact:true}).click();
-            await tp.locator('.travel-student-answer').filter({hasText:'A colleague asks for an update.'}).waitFor();
+            await overview.getByRole('button',{name:'02 · The Friday Table (1)',exact:true}).click();
+            await tp.locator('.travel-student-answer').filter({hasText:'She found a better-paid job.'}).waitFor();
           }
           const option = sp.locator('.sheet [data-question] label').first();
           const label = (await option.innerText()).trim();
@@ -1961,11 +1961,11 @@ async function main() {
         }
         if (course === 'general_english_b1_stories') {
           const studentConfig = await tp.locator('#lesson-data').evaluate(node => JSON.parse(node.textContent));
-          assert.equal(studentConfig.contentVersion,'toxic-coworkers-b1-20261120');
+          assert.equal(studentConfig.contentVersion,'would-you-live-here-b1-20261120-v1');
           assert.equal(studentConfig.steps.length,8,'B1 lesson needs eight ProgressMe-style sections');
           assert.equal(studentConfig.steps.reduce((sum,step)=>sum+step.minutes,0),50,'B1 duration must remain 50 minutes');
-          assert.equal(studentConfig.steps[0].title,'Lesson information');
-          assert.equal(studentConfig.steps.at(-1).title,"Let's talk: Solve the problem");
+          assert.equal(studentConfig.steps[0].title,'01 · Three places. One new life');
+          assert.equal(studentConfig.steps.at(-1).title,'08 · What feels like home?');
           assert.equal(studentConfig.key,current.lessonKey,'Existing progress key must remain stable');
           assert.equal(studentConfig.vocabulary.length,6,'B1 active vocabulary cap');
           assert.equal(await tp.locator('body').getAttribute('data-dud-b1-premium'),'','Premium styling must activate for both roles');
@@ -1973,7 +1973,9 @@ async function main() {
           await sp.getByRole('heading',{name:'Homework',exact:true}).waitFor();
           assert.equal(await sp.locator('body').getAttribute('data-dud-b1-premium'),null,'Old homework design stays untouched');
           const homeworkConfig = await sp.locator('#lesson-data').evaluate(node=>JSON.parse(node.textContent));
-          assert.equal(homeworkConfig.key,current.homeworkKey,'Original homework key and responses stay untouched');
+          assert.equal(homeworkConfig.key,current.homeworkKey,'The protected homework progress key must remain stable');
+          assert.equal(homeworkConfig.contentVersion,'would-you-live-here-homework-20261120-v1');
+          assert.equal(homeworkConfig.steps.length,2,'New homework must contain two activities');
         }
         console.log(course + ': both cabinets open the current lesson and shared dictionary');
       } catch (error) { throw new Error(course + ': ' + error.message, {cause: error}); }
