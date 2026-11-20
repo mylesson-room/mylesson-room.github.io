@@ -38,6 +38,13 @@
         try { await loadScript(source); }
         catch(error){ console.warn('Optional classroom visual unavailable:',source,error); }
       }
+      // Desktop live class keeps chat ready for teacher/student typing; phones
+      // start collapsed to preserve exercise space, with unread indicators.
+      if(body.dataset.premiumChatScript && !body.hasAttribute('data-vietnam-homework') &&
+         window.matchMedia('(min-width: 801px)').matches){
+        const chat=document.querySelector('#lessonVideo .lesson-chat-dropdown');
+        if(chat)chat.open=true;
+      }
       const signout=document.getElementById('gostudyAccessSignout');
       if(signout)document.querySelector('.header-right')?.append(signout);
       await loadScript(body.dataset.exercisesScript);
