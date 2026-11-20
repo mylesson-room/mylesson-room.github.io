@@ -283,7 +283,17 @@ async function checkMigratedRooms(browser, origin) {
       ]);
       await tp.waitForURL(url => url.pathname === '/'+lesson.path && url.searchParams.get('classStudent') === studentId);
       for (const page of [sp,tp]) {
-        await page.getByText('Онлайн · общая комната',{exact:true}).waitFor();
+        if (lesson.course === 'country-house') {
+          // The new A2+ lesson uses Michael's compact collapsed chat, so its
+          // status lives in a hidden <details> until the user opens it.
+          await page.waitForFunction(()=>document.querySelector('#finance-live-status')?.textContent === 'Онлайн · общая комната');
+          const chat=page.locator('.lesson-chat-dropdown');
+          await chat.waitFor({state:'visible'});
+          await chat.locator('summary').click();
+          await chat.locator('#finance-live-status').getByText('Онлайн · общая комната').waitFor();
+        } else {
+          await page.getByText('Онлайн · общая комната',{exact:true}).waitFor();
+        }
         const tools = await page.locator('.video-workspace').boundingBox();
         const content = await page.locator('.lesson').boundingBox();
         assert.ok(tools.x+tools.width <= content.x+1,'video and chat should be to the left of the lesson');
