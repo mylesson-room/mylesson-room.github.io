@@ -37,6 +37,10 @@ jobs:
         run: |
           export GOSTUDY_CHROME="$(command -v google-chrome)"
           node scripts/check-olga-sweden03-browser.cjs
+      - name: Verify cloud vocabulary from two separate sessions and browser sizes
+        run: |
+          export GOSTUDY_CHROME="$(command -v google-chrome)"
+          node scripts/check-olga-cloud-words-browser.cjs
       - name: Two independent devices and server-acknowledged cloud vocabulary
         run: |
           export GOSTUDY_CHROME="$(command -v google-chrome)"
