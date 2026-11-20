@@ -5,7 +5,7 @@
 ## Reference
 - Michael lesson: `business-ai-finance-b2-02.html`
 - Michael cabinet: `student-business-ai-finance.html`
-- Olga cabinet: `student-sweden.html` (old cabinet copied intact to `student-sweden-legacy.html`)
+- Olga cabinet: `student-sweden.html` (old cabinet copied intact to `sweden-cabinet-legacy.html`)
 - New lesson: `sweden-a2-03.html`; homework: `sweden-a2-03-homework.html`
 - Do not change any original `sweden-a2.html`, `sweden-a2-02.html`, or historical homework.
 - Lesson 02 must remain assigned until teacher explicitly switches to Lesson 03.
