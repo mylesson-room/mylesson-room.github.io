@@ -744,6 +744,13 @@
       const vocabulary = document.createElement('script');
       vocabulary.src = status.dataset.vocabulary;
       document.body.append(vocabulary);
+      if (currentPage === 'general-english-b1-stories-01.html') {
+        document.getElementById('b1LessonDictionary')?.addEventListener('click',()=>{
+          const target=document.querySelector('.glass-lesson-tools button[aria-label="Открыть словарь"]');
+          if(target) target.click();
+          else document.getElementById('lesson-access').textContent='Словарь загружается…';
+        });
+      }
     } catch (error) {
       status.textContent = error.message || 'Не удалось открыть урок. Обновите страницу.';
     }
