@@ -1,0 +1,22 @@
+name: Design2 B1 TikTok legacy lesson visual bridge
+on:
+  pull_request:
+    paths:
+      - 'general-english-b1-01.html'
+      - 'tiktok-a2.html'
+      - 'assets/gostudy-design2-legacy-michael.css'
+      - 'scripts/check-design2-legacy-b1-tiktok.cjs'
+      - '.github/workflows/design2-legacy-b1-tiktok.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  legacy-content-lock:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Enforce unchanged lesson data and approved-only visual layer
+        run: node scripts/check-design2-legacy-b1-tiktok.cjs
