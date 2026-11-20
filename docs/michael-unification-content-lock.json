@@ -1,0 +1,475 @@
+{
+  "created": "2026-11-20",
+  "purpose": "Original static lesson, homework, cabinet and routing-content SHA-1 fingerprints, to prove zero educational-source edits in the migration branch. No personal data.",
+  "source_ref": "main",
+  "files": [
+    {
+      "path": "art-b1-02-homework.html",
+      "sha": "6ea782bf93cd4df8c1bf6156adc91b4a18009551"
+    },
+    {
+      "path": "art-b1-02.html",
+      "sha": "ca54150d3ce1c7251567dc0151437a7b4daaeb85"
+    },
+    {
+      "path": "art-b1-03-homework.html",
+      "sha": "5cb4c86e7f08a5685e97d9eacfefde77d2fae692"
+    },
+    {
+      "path": "art-b1-03.html",
+      "sha": "efba21a6d99806652c6424e29827a531439dbd50"
+    },
+    {
+      "path": "art-b1-homework.html",
+      "sha": "a9dacb9ee8a4a18572e7d770eab79079815cc3e8"
+    },
+    {
+      "path": "art-mosaics-b1.html",
+      "sha": "03e8e5a65a9cf8bc26822ff7b70a8003f3e6dfb5"
+    },
+    {
+      "path": "business-ai-b2c1-02.html",
+      "sha": "df7f1ce787945cd6b3212bf31790206833512638"
+    },
+    {
+      "path": "business-ai-b2c1-03-homework.html",
+      "sha": "a429c3219bf64cda189c99d26d166cda8d372e22"
+    },
+    {
+      "path": "business-ai-b2c1-03.html",
+      "sha": "7450802badf1d4fdd13a1576a5cb3e1ab817cbf0"
+    },
+    {
+      "path": "business-ai-b2c1-homework.html",
+      "sha": "2810142a47beb20c36da7e4e7a0f28a11071ea9e"
+    },
+    {
+      "path": "business-ai-b2c1.html",
+      "sha": "e1b0280f70d185179d1de6158c0f649d8408c659"
+    },
+    {
+      "path": "business-ai-finance-b2-02-homework.html",
+      "sha": "cda2b33a546e2a4875d5f0e61b6bd412e5bd8da7"
+    },
+    {
+      "path": "business-ai-finance-b2-02.html",
+      "sha": "0d4e2c78edb8fda2103fa4b7f83cff54a819c51f"
+    },
+    {
+      "path": "business-ai-finance-b2-homework.html",
+      "sha": "b866661ce617a0c4b7b87aefd7531a50b30908c0"
+    },
+    {
+      "path": "business-ai-finance-b2.html",
+      "sha": "94c015483b05c871a8d94c2d491703f423cdf511"
+    },
+    {
+      "path": "country-house-a2-02-homework.html",
+      "sha": "560711ed9aa4ef7ebf6200105b242b92a4bfcf08"
+    },
+    {
+      "path": "country-house-a2-02.html",
+      "sha": "a30386d502837c67912770ef32818a49f4be92dc"
+    },
+    {
+      "path": "country-house-a2-03-homework.html",
+      "sha": "a60c37ffb8f936aca2f7f26a29b8429d24d97907"
+    },
+    {
+      "path": "country-house-a2-03.html",
+      "sha": "215d09839851e7c73e8c0dd3433b05c9bd36f649"
+    },
+    {
+      "path": "country-house-a2-04-homework.html",
+      "sha": "564bca32f565de50fa0d87a4525544c7670303ac"
+    },
+    {
+      "path": "country-house-a2-04.html",
+      "sha": "00813eeb9e25787125e4c0c58a6e71dfdd2cb30a"
+    },
+    {
+      "path": "country-house-a2-homework.html",
+      "sha": "c13da7c7ef976c25e6bc9f26044e5bf3a3c41109"
+    },
+    {
+      "path": "country-house-a2.html",
+      "sha": "6e2ecf8efd34cfb49e5d45cd5af565becc7f877e"
+    },
+    {
+      "path": "country-house-travel-a2-05-homework.html",
+      "sha": "0d59279a21dc36a82f2a721a85024955e2450787"
+    },
+    {
+      "path": "country-house-travel-a2-05.html",
+      "sha": "ff8a48d028798434920814f481c8d63f8ba5ebdd"
+    },
+    {
+      "path": "design-lab.html",
+      "sha": "8fb0f66e7471c45404b843a5617103a6d9be8027"
+    },
+    {
+      "path": "english-placement.html",
+      "sha": "9b89b786faa823984c9c9080148aeff145460002"
+    },
+    {
+      "path": "feed-b2-02-homework.html",
+      "sha": "4caeb9f01c15be9ccf334ce5a87490a2ec3c2a4e"
+    },
+    {
+      "path": "feed-b2-02.html",
+      "sha": "da0c6d30218004e0e4353575d44f1b0ca29ad635"
+    },
+    {
+      "path": "feed-b2-03-homework.html",
+      "sha": "9737171572f62e33a07cfc8be66ad80170382c33"
+    },
+    {
+      "path": "feed-b2-03.html",
+      "sha": "749c96fe67cd41162b352cf6d9938989896035e7"
+    },
+    {
+      "path": "feed-b2-04-homework.html",
+      "sha": "c79de45639a58419a6a366d7bc561357e77d4409"
+    },
+    {
+      "path": "feed-b2-04.html",
+      "sha": "a191588235ec2e52a5f43e51e3afb35b82d47e98"
+    },
+    {
+      "path": "feed-choice-b2.html",
+      "sha": "4c32310ca430b03e931078f464946e0d2d805bb6"
+    },
+    {
+      "path": "finance-b1-02-homework.html",
+      "sha": "5ffbd192532b75b89ad64348cdae40c4e29b6384"
+    },
+    {
+      "path": "finance-b1-02.html",
+      "sha": "951e9f1359df4baca1beb70ed903df7d6d4cd4f9"
+    },
+    {
+      "path": "finance-b1-ai-20261118.html",
+      "sha": "35e6577bee2aaa436b8e92f3f58d509178828967"
+    },
+    {
+      "path": "finance-b1-homework.html",
+      "sha": "2c86d9ea65a8088236a4a8ed96ed935f083d90e6"
+    },
+    {
+      "path": "finance-b1.html",
+      "sha": "1e8a62a9336dde8a658a66b9de888cdaa8cf9cea"
+    },
+    {
+      "path": "first-sales-c1-02-homework.html",
+      "sha": "0d76e2eff753bbd0e18fc7662f15bac0a537d27f"
+    },
+    {
+      "path": "first-sales-c1-02.html",
+      "sha": "775d48b9a9d6306fab1d4bca7c61531d9f2a71e2"
+    },
+    {
+      "path": "first-sales-c1-03.html",
+      "sha": "4987d4053512ae780e27aeab181842a148088c7e"
+    },
+    {
+      "path": "first-sales-c1-homework.html",
+      "sha": "57688125d2200391967d785acde17da39c518ebb"
+    },
+    {
+      "path": "first-sales-c1.html",
+      "sha": "e4401cde1fa52f459f610f4e78e440aeb76e1ea2"
+    },
+    {
+      "path": "general-english-b1-01.html",
+      "sha": "59cf612f9252aaf5bd70d4bf4a732e395cb72517"
+    },
+    {
+      "path": "general-english-b1-stories-01-homework.html",
+      "sha": "dfe49d35ffcb80fbcf821c94e039075bcb7ff6df"
+    },
+    {
+      "path": "general-english-b1-stories-01.html",
+      "sha": "eacea781fa65ca6f160dafe042c385405db53327"
+    },
+    {
+      "path": "general-english-b2-01.html",
+      "sha": "4f86f139e5f420c5e39967510454c4897988aa45"
+    },
+    {
+      "path": "general-english-b2-m01-l01.html",
+      "sha": "ce06853af058f759851f4799c4f5d1c127d1f7f9"
+    },
+    {
+      "path": "gostudy-account.html",
+      "sha": "2185f77ba977a47d5dee1ccdda82ab51b361aa69"
+    },
+    {
+      "path": "gostudy-teacher.html",
+      "sha": "24705b337065bc78349d05a4e4a59cebf7ffe8f4"
+    },
+    {
+      "path": "gostudy-ui-kit.html",
+      "sha": "219caf756c1c49815a1b90ae291ac49f7b7eb9ba"
+    },
+    {
+      "path": "gostudy.html",
+      "sha": "c191e2f7ab5f9bbc445e493db7bd814e94b43a67"
+    },
+    {
+      "path": "ielts-reading-01-homework.html",
+      "sha": "eefc52303df52fa49e19b9734a545e248c4f7af6"
+    },
+    {
+      "path": "ielts-reading-01.html",
+      "sha": "eefc52303df52fa49e19b9734a545e248c4f7af6"
+    },
+    {
+      "path": "ielts-reading-02-homework.html",
+      "sha": "eefc52303df52fa49e19b9734a545e248c4f7af6"
+    },
+    {
+      "path": "ielts-reading-02.html",
+      "sha": "eefc52303df52fa49e19b9734a545e248c4f7af6"
+    },
+    {
+      "path": "ielts-reading-03-homework.html",
+      "sha": "eefc52303df52fa49e19b9734a545e248c4f7af6"
+    },
+    {
+      "path": "ielts-reading-03.html",
+      "sha": "eefc52303df52fa49e19b9734a545e248c4f7af6"
+    },
+    {
+      "path": "ielts-reading-04.html",
+      "sha": "ec7091e24b07516cf29a3213e18299c448f31047"
+    },
+    {
+      "path": "index.html",
+      "sha": "48d2fa3e752e6ae56bb4ead514b38468bd4448f1"
+    },
+    {
+      "path": "international-sports-trip-b1.html",
+      "sha": "346f7e091482fd7af70816120681eebaff4e7b04"
+    },
+    {
+      "path": "korean-wave-b2-20261118.html",
+      "sha": "3e834b1ca95202f1842d9e29b471581173b81ce4"
+    },
+    {
+      "path": "login.html",
+      "sha": "b35ba4f1ed6653713a2503c1d20c8cf31157cf44"
+    },
+    {
+      "path": "my-trip-to-vietnam-a2-homework.html",
+      "sha": "246bdaebde1eeb43c81460ec12f90367b3e43e95"
+    },
+    {
+      "path": "my-trip-to-vietnam-a2.html",
+      "sha": "959c12631aa9bd780e140ab4b5862978e95e6071"
+    },
+    {
+      "path": "pharma-ai-evidence-c1-20261118.html",
+      "sha": "adf0dc354d8ab29066e6c37b380dc4efc6d8b30b"
+    },
+    {
+      "path": "pharma-c1-02-homework.html",
+      "sha": "918c9bb1f8b2effec6f6a1d18c6345c50cd945c4"
+    },
+    {
+      "path": "pharma-c1-02.html",
+      "sha": "eb557ebbfeef273bc4057222885afbe3bf521198"
+    },
+    {
+      "path": "pharma-c1-03-homework.html",
+      "sha": "2270d779681b230030090c980f155d803bf076f9"
+    },
+    {
+      "path": "pharma-c1-03.html",
+      "sha": "a707a84d799f40d24085f73f31022562313c2e30"
+    },
+    {
+      "path": "pharma-c1.html",
+      "sha": "a91b0f029e25bfb98f9616065e9eacb66b1ec202"
+    },
+    {
+      "path": "positive-thinking-a2-homework.html",
+      "sha": "32a2e0dbd025e178dc509d3dc4b1d6783c57a2cb"
+    },
+    {
+      "path": "positive-thinking-a2.html",
+      "sha": "f39b10026b104982f1ae720a3bb25fee340bab40"
+    },
+    {
+      "path": "student-art-b1.html",
+      "sha": "367a197e16700bb69eae64d106192c7ef67c1236"
+    },
+    {
+      "path": "student-business-ai-finance.html",
+      "sha": "e9da2efb57826ffc5f25e68a40a0e396e250b2be"
+    },
+    {
+      "path": "student-business-ai.html",
+      "sha": "e8528d4840c13fd82987d6bb7b8539f048a63e42"
+    },
+    {
+      "path": "student-country-house.html",
+      "sha": "67fdf6406cab91e3b006a29877e129d3944cd9e0"
+    },
+    {
+      "path": "student-english-placement.html",
+      "sha": "24405c10f21a8b051b3df9f0db19684aeb2bc435"
+    },
+    {
+      "path": "student-feed-b2.html",
+      "sha": "f4bb163563603af93efe0f14de65bd882c04fd37"
+    },
+    {
+      "path": "student-finance-b1.html",
+      "sha": "4ec874a44194e367689c6f7531faf7cee2caaf97"
+    },
+    {
+      "path": "student-first-sales.html",
+      "sha": "de11bc58061aa6458559b497ae3af6505c6f2281"
+    },
+    {
+      "path": "student-general-english-b1-stories.html",
+      "sha": "3c26de56192a08a6907561d74ce94e3139ff7253"
+    },
+    {
+      "path": "student-general-english-b2.html",
+      "sha": "0dd954586e3a648ada947e6b31ea6b1ba1403801"
+    },
+    {
+      "path": "student-ielts-reading.html",
+      "sha": "c72eae811d6de3fff92aee28def80f947b3aa831"
+    },
+    {
+      "path": "student-pharma.html",
+      "sha": "0681ccac95d921e1c63495e9bf7a0e908df87133"
+    },
+    {
+      "path": "student-sweden.html",
+      "sha": "6fe82b8e3482edc1ab483331d39fb235fa6cdd87"
+    },
+    {
+      "path": "student-travel-a2.html",
+      "sha": "f93f4e29a0ab4e8ae2fee9ff63a3263312469234"
+    },
+    {
+      "path": "student-turkey.html",
+      "sha": "067cf076a840648f48625ff42d137ea00b76a779"
+    },
+    {
+      "path": "sweden-a2-01-homework.html",
+      "sha": "c67fd2e3c4b2bc89feb27274af67f05820bef687"
+    },
+    {
+      "path": "sweden-a2-02-homework.html",
+      "sha": "bcc02aa8f4b006b5ddb087b6e42e27ce9779a22a"
+    },
+    {
+      "path": "sweden-a2-02.html",
+      "sha": "40aa2e65f12860202955864e6a0a757fa3c300ed"
+    },
+    {
+      "path": "sweden-a2.html",
+      "sha": "edd099c80c681f4cdf8a55885d3a797e4da0285f"
+    },
+    {
+      "path": "tiktok-a2-homework.html",
+      "sha": "5da46f1d0ac1b5801b12f878407cee622a26d667"
+    },
+    {
+      "path": "tiktok-a2.html",
+      "sha": "5951c6ef83fcf97c6d404246a0b633a8d3b1d43f"
+    },
+    {
+      "path": "travel-a2-02-homework.html",
+      "sha": "c67d720799bff9c06867de395407e00dcebfc9d4"
+    },
+    {
+      "path": "travel-a2-02.html",
+      "sha": "f81e777635f16f15041d0dee43992f31dc1c587f"
+    },
+    {
+      "path": "travel-a2-03-homework.html",
+      "sha": "7438a8c68135246c4368c4a3d52bfb500a32ac21"
+    },
+    {
+      "path": "travel-a2-03.html",
+      "sha": "fc61e1beb0afbca2e21f3d1905be5364101bd7c1"
+    },
+    {
+      "path": "travel-a2-04-homework.html",
+      "sha": "3096d56fee34460520208e11ff0be4513458a218"
+    },
+    {
+      "path": "travel-a2-04.html",
+      "sha": "11887f96f955c3c2fed12b0c4d4f32f50741d146"
+    },
+    {
+      "path": "travel-a2-homework.html",
+      "sha": "b0a6927ebb550fafba229168bb77f937c3e8b788"
+    },
+    {
+      "path": "travel-b1-02-homework.html",
+      "sha": "c821965209b34f104d66d877be08b1aeaa479f88"
+    },
+    {
+      "path": "travel-b1-02.html",
+      "sha": "26071062f1bbae42d50aa89101a069f3dbc44742"
+    },
+    {
+      "path": "travel-b1-03-homework.html",
+      "sha": "34707b83642ac3fbd5030f51bac9bd836fe4c77b"
+    },
+    {
+      "path": "travel-b1-03.html",
+      "sha": "abb20e9548a06e5b955ed699ef40f6224fb0e232"
+    },
+    {
+      "path": "travel-b2-02-homework.html",
+      "sha": "13cddd0c1f8f0a3246113b804ecffd0995453238"
+    },
+    {
+      "path": "travel-b2-02.html",
+      "sha": "5b5df0ad1a161613511f9df966afb5b5cb488c04"
+    },
+    {
+      "path": "travel-b2-03.html",
+      "sha": "6572409fb5b5ebf07115750788981c3214c62a5f"
+    },
+    {
+      "path": "travel-b2-04-homework.html",
+      "sha": "24117494b0886e39c28474b1c973cda1538e2216"
+    },
+    {
+      "path": "travel-b2-04-practice.html",
+      "sha": "f81a7ca9426ce067dd30e1a55e52fb02fe20525d"
+    },
+    {
+      "path": "travel-b2-04.html",
+      "sha": "fd4cbe1addf43ed0f2ef0a954a3e95d28a3fad22"
+    },
+    {
+      "path": "travel-b2-homework.html",
+      "sha": "8fabbb4c9afe8e96e2a055a84ff088d1f76e964a"
+    },
+    {
+      "path": "travel-disruptions-b2.html",
+      "sha": "03d454fa100c1016d5fec5cfda6a125911b8062e"
+    },
+    {
+      "path": "travel-homework-b2.html",
+      "sha": "d84e6b06fa9307d517c058e63302d76a5d3f68f8"
+    },
+    {
+      "path": "travel-weekend-a2.html",
+      "sha": "f0baec78bf85358ac9e3595a7aa2439db652b81f"
+    },
+    {
+      "path": "turkey-b1.html",
+      "sha": "b808240e2ef04b7dfe531ac9f23529337faaf942"
+    }
+  ]
+}

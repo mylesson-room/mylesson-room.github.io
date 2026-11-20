@@ -638,6 +638,30 @@
         }
         throw new Error('Курс '+title+' не назначен этому аккаунту.');
       }
+      if (document.body.hasAttribute('data-unified-legacy-cabinet')) {
+        // Approved single cabinet renderer; called ONLY after the existing
+        // RLS-scoped, course-specific destination RPC allows this student.
+        // This does not change lessons, homework, answer IDs or saved words.
+        const settings=document.getElementById('cabinet-settings');
+        if(!settings)throw Error('Конфигурация кабинета недоступна.');
+        const configured=JSON.parse(settings.textContent);
+        if(configured.cabinet !== currentPage ||
+           configured.lesson?.includes('..') || configured.homework?.includes('..'))
+          throw Error('Неверная конфигурация кабинета.');
+        const loadScript=source=>new Promise((resolve,reject)=>{
+          const script=document.createElement('script');
+          script.src=source;
+          script.onload=resolve;
+          script.onerror=()=>reject(Error('Не удалось загрузить кабинет. Обновите страницу.'));
+          document.body.append(script);
+        });
+        await loadScript('assets/gostudy-v1-cabinet.js?v=unified-protected-20261120');
+        await loadScript('assets/gostudy-v1-vocabulary.js?v=unified-protected-20261120');
+        status.hidden=true;
+        content.hidden=true;
+        document.body.dataset.unifiedAuthorized='true';
+        return;
+      }
       if (storiesCabinet && document.body.hasAttribute('data-unified-b1-cabinet')) {
         // Same actual cabinet renderer and word-training component as Michael.
         // Load them only AFTER the existing B1 access RPC succeeds.

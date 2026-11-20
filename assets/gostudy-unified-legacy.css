@@ -1,0 +1,27 @@
+/* Shared access shell for legacy course routes using Michael's actual
+   gostudy-v1-cabinet.js and gostudy-v1-cabinet.css.
+   No course-specific layout, no old coursework, no user data here. */
+body[data-unified-legacy-cabinet]{
+  background:#fff;
+  min-width:0;
+}
+body[data-unified-legacy-cabinet] #general-b1-cabinet,
+body[data-unified-legacy-cabinet] #tiktok-cabinet,
+body[data-unified-legacy-cabinet] #travel-b2-cabinet{
+  display:none!important;
+}
+body[data-unified-legacy-cabinet] .gostudy-unified-status{
+  width:min(660px,calc(100% - 28px));
+  box-sizing:border-box;
+  margin:45px auto 0;
+  padding:18px 20px;
+  border:1px solid #dbe8f4;
+  border-radius:14px;
+  background:#f5faff;
+  color:#31445f;
+  font:600 16px/1.5 Manrope,system-ui,sans-serif;
+}
+body[data-unified-legacy-cabinet] .gostudy-unified-status[hidden]{display:none!important}
+body[data-unified-legacy-cabinet][data-unified-authorized="true"] .classroom-access{
+  display:none!important;
+}

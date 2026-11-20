@@ -1771,7 +1771,7 @@ async function main() {
           console.log('finance_b1: canonical cabinets, lesson tools, answers, chat, reload and vocabulary mastery verified');
           continue;
         }
-        const canonicalCabinet = course === 'travel_a2' || course === 'general_english_b1_stories';
+        const canonicalCabinet = ['travel_a2','general_english_b1_stories','general_english_b1','tiktok_a2','travel_b2'].includes(course);
         const studentLink = canonicalCabinet ? sp.locator('.lesson-card-link') : sp.locator('.home-open-lesson');
         const teacherLink = tp.locator('.teacher-enter-class');
         await studentLink.waitFor();
@@ -1780,7 +1780,7 @@ async function main() {
             assert.equal(await studentLink.getAttribute('href'),'positive-thinking-a2.html');
             await sp.getByRole('button',{name:'Словарь',exact:true}).waitFor();
             await sp.getByText('Positive Thinking').first().waitFor();
-          } else {
+          } else if (course === 'general_english_b1_stories') {
             // B1 Stories reuses Michael's actual cabinet JS/CSS after the
             // protected destination RPC, not its old standalone dashboard.
             assert.equal(await studentLink.getAttribute('href'),'general-english-b1-stories-01.html');
@@ -1796,6 +1796,47 @@ async function main() {
             await sp.locator('#practiceDialog form[method=dialog] button').click();
             assert.equal(await sp.locator('#student-home').count(),0,'Old B1 cabinet renderer must be gone');
             assert.equal(await sp.locator('.gostudy-cloud-bar:visible').count(),0,'Shared cabinet must not show legacy cloud bar');
+          } else {
+            assert.equal(await studentLink.getAttribute('href'),current.lesson.split('?')[0],
+              'The active lesson link must keep its pre-migration destination');
+            await sp.locator('.vocab-feature--practice').waitFor({state:'visible'});
+            await sp.locator('#openWords').click();
+            await sp.locator('#words[open]').waitFor();
+            await sp.locator('#words form[method=dialog] button').click();
+            await sp.locator('#practiceCard').click();
+            await sp.locator('#practiceModes [data-mode="listen"]').waitFor();
+            await sp.locator('#practiceDialog form[method=dialog] button').click();
+            assert.equal(await sp.locator('#student-home').count(),0,'Old course-specific dashboard must be gone');
+            assert.equal(await sp.locator('.classroom-access:visible').count(),0,'Access gate is hidden on an authorized dashboard');
+            // Negative access test: knowing the URL cannot reveal another
+            // student's shared dashboard, course or saved vocabulary.
+            const outsider=await browser.newContext();
+            try {
+              await outsider.addInitScript(()=>{
+                sessionStorage.setItem('gostudy-cloud-session-v1',
+                  JSON.stringify({user:{id:'outsider'},access_token:'synthetic',expires_at:Date.now()+3600000}));
+              });
+              await outsider.route('https://*.supabase.co/**',route=>
+                route.fulfill({json:[{course:'unrelated-course'}]}));
+              const denied=await outsider.newPage();
+              await denied.goto(origin+'/student-'+course.replaceAll('_','-')+'.html');
+              await denied.locator('#cabinet-status').getByText(/не назначен этому аккаунту/).waitFor();
+              assert.equal(await denied.locator('.lesson-card-link').count(),0,'Unauthorized user must never see an assigned lesson');
+              assert.equal(await denied.locator('.vocab-dialog').count(),0,'Unauthorized user must never receive vocabulary markup');
+            } finally { await outsider.close(); }
+            const desktop=sp.viewportSize();
+            await sp.setViewportSize({width:390,height:844});
+            const width=await sp.evaluate(()=>document.documentElement.scrollWidth-window.innerWidth);
+            assert.ok(width<=1,'Shared cabinet must not overflow mobile viewport: '+width+'px');
+            await sp.setViewportSize(desktop);
+            if(course==='general_english_b1') {
+              assert.equal(await sp.locator('#assignment[aria-disabled="true"]').count(),1,
+                'Missing homework must be disabled instead of inventing an assignment');
+            } else {
+              assert.equal(await sp.locator('.homework-link').getAttribute('href'),
+                new URL(current.homework,origin).pathname.slice(1).split('?')[0],
+                'Homework URL must remain unchanged');
+            }
           }
         } else {
           const cabinetHeading = sp.locator('#student-home .home-lesson h2');
