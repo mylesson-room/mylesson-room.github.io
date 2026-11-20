@@ -97,7 +97,9 @@
     const key = JSON.stringify(answered);
     if (key === overviewKey) return;
     overviewKey = key;
-    liveOverview.hidden = answered.length === 0;
+    // Keep the teacher's answers panel visible even before the first reply.
+    // Previously it looked as if the live feed had never connected.
+    liveOverview.hidden = false;
     const heading = document.createElement('strong');
     heading.textContent = 'Ответы ученицы';
     const list = document.createElement('ul');
@@ -111,13 +113,35 @@
       item.append(button);
       list.append(item);
     }
-    liveOverview.replaceChildren(heading,list);
+    if (!answered.length) {
+      const empty = document.createElement('p');
+      empty.className='b1-live-empty';
+      empty.textContent='Пока нет ответов в этом уроке. Выбор города и ответы на задания появятся здесь автоматически.';
+      liveOverview.replaceChildren(heading,empty);
+    } else liveOverview.replaceChildren(heading,list);
   }
 
   function showStudentAnswers() {
     if (!live?.viewing || classroom) return;
     const step = config.steps[index];
     const choices = studentAnswers[step.id] ?? studentAnswers[index];
+    // Two interactive city decisions are now first-class student responses.
+    // Show the selected city in the teacher's current section, not just
+    // an invisible preference stored in the student's local state.
+    let cityBadge = sheet.querySelector('.b1-live-city-choice');
+    const isCityStep = step.id === 'newhome-warmup' || step.id === 'newhome-relocation';
+    const city = typeof choices === 'string' ? choices.trim() : '';
+    if (isCityStep && ['Porto','Da Nang','Kyoto'].includes(city)) {
+      if (!cityBadge) {
+        cityBadge = document.createElement('p');
+        cityBadge.className = 'b1-live-city-choice';
+        cityBadge.setAttribute('role','status');
+        const widget=sheet.querySelector('.b1-travel-widget');
+        if(widget) widget.after(cityBadge);
+        else sheet.querySelector('.lesson-content').append(cityBadge);
+      }
+      cityBadge.textContent='Ученица выбрала: '+city;
+    } else cityBadge?.remove();
     const orderNote = sheet.querySelector('.gostudy-live-order');
     if (orderNote) {
       const order = Array.isArray(choices) ? choices.map(i=>step.items[i]).filter(Boolean) : [];
@@ -238,7 +262,7 @@
       : '';
     const isNewHomeB1 = document.body.hasAttribute('data-dud-b1-premium') && config.contentVersion === 'would-you-live-here-b1-20261120-v1';
     const travelChoices = [['Porto','Porto · neighbourhood cafés'],['Da Nang','Da Nang · beach and sunshine'],['Kyoto','Kyoto · culture and traditions']];
-    const selectedTravelCity = state.travelCity && travelChoices.some(c=>c[0]===state.travelCity) ? state.travelCity : 'Porto';
+    const selectedTravelCity = typeof state.answers[step.id] === 'string' && travelChoices.some(c=>c[0]===state.answers[step.id]) ? state.answers[step.id] : '';
     const travelExtra = !isNewHomeB1 ? '' : step.id === 'newhome-warmup'
       ? '<div class="b1-travel-widget"><h3>🌍 Choose your city</h3><p>Where would you spend a month working remotely?</p><div class="b1-travel-radio">'+travelChoices.map(([id,label])=>'<label><input type="radio" name="b1TravelCity" value="'+escape(id)+'"'+(selectedTravelCity===id?' checked':'')+'><span>'+escape(label)+'</span></label>').join('')+'</div><p class="b1-travel-next" role="status"></p></div>'
       : step.id === 'newhome-relocation'
@@ -266,10 +290,11 @@
         'Da Nang': 'Describe a normal working day near the beach. How is it different from a holiday?',
         'Kyoto': 'What might be exciting in Kyoto, and what would take time to learn?'
       };
-      if (prompt) prompt.textContent = reminders[selectedTravelCity];
+      if (prompt) prompt.textContent = reminders[selectedTravelCity] || 'Выберите город, затем объясните свой выбор.';
       widget?.querySelectorAll('input[name="b1TravelCity"]').forEach(input => {
         input.addEventListener('change', () => {
-          state.travelCity = input.value;
+          state.travelCity = input.value; // Preserve old local preference without deletion.
+          state.answers[step.id] = input.value; // Visible through authenticated teacher progress.
           save();
           if (prompt) prompt.textContent = reminders[input.value] || '';
         });
@@ -305,7 +330,9 @@
       roomSync?.answer(index,step.id,draft.value,true);
       sheet.querySelector('.draft-status').textContent = 'Ответ сохранён';
     };
-    sheet.querySelectorAll('input,select').forEach(input => {
+    // Only exercise fields should be processed as numbered answers.
+    // B1 city selector radios are separate speaking choices, not MCQ inputs.
+    sheet.querySelectorAll('[data-question] input,[data-question] select').forEach(input => {
       input.onchange = () => {
         const i = Number(input.dataset.answer ?? input.name.slice(1));
         current[i] = input.value === '' ? null : Number(input.value);

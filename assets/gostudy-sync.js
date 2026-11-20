@@ -761,7 +761,7 @@
         // fully initialized. No unrelated finance lesson components are loaded.
         vocabulary.addEventListener('load',()=>{
           const translator=document.createElement('script');
-          translator.src='assets/gostudy-b1-michael-selection.js?v=1';
+          translator.src='assets/gostudy-b1-michael-selection.js?v=b1-word-feedback-20261120';
           document.body.append(translator);
         },{once:true});
       }

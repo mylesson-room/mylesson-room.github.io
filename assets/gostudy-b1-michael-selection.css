@@ -80,3 +80,63 @@ body[data-dud-b1-premium] .selection-translate #selectionGoogle{
 @media print{
   body[data-dud-b1-premium] .selection-translate{display:none!important}
 }
+
+/* The word itself must be visible after saving, including when the teacher
+   adds it from a different device. Scope this to the B1 premium classroom. */
+body[data-dud-b1-premium] .b1-word-added-notice {
+  position:fixed;
+  z-index:180;
+  right:20px;
+  bottom:84px;
+  width:min(376px,calc(100vw - 24px));
+  box-sizing:border-box;
+  display:grid;
+  grid-template-columns:32px minmax(0,1fr) auto 18px;
+  align-items:center;
+  gap:10px;
+  padding:14px 13px;
+  border-radius:17px;
+  border:1px solid #c5e6da;
+  background:linear-gradient(115deg,#f5fcf9,#ffffff 75%);
+  box-shadow:0 14px 40px rgba(19,62,78,.18);
+  color:#173a41;
+  font:14px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+body[data-dud-b1-premium] .b1-word-added-notice[hidden]{display:none!important}
+body[data-dud-b1-premium] .b1-word-notice-check{
+  display:grid;place-items:center;width:30px;height:30px;
+  border-radius:50%;background:#d7f5e8;color:#218365;
+  font-size:18px;font-weight:800;
+}
+body[data-dud-b1-premium] .b1-word-notice-content{min-width:0;display:grid;gap:2px}
+body[data-dud-b1-premium] .b1-word-notice-label{
+  display:block;font-size:11px;font-weight:700;letter-spacing:.1px;color:#438278;
+}
+body[data-dud-b1-premium] .b1-word-notice-term{
+  display:block;font-size:15px;font-weight:800;color:#173a41;
+  overflow-wrap:anywhere;
+}
+body[data-dud-b1-premium] .b1-word-notice-meaning{
+  font-size:12px;color:#5c7481;overflow-wrap:anywhere;
+}
+body[data-dud-b1-premium] .b1-word-notice-open{
+  border:1px solid #c2dfd7;border-radius:9px;
+  padding:8px 10px;background:#fff;color:#277861;
+  font-size:12px;font-weight:700;cursor:pointer;
+}
+body[data-dud-b1-premium] .b1-word-notice-close{
+  border:0;background:transparent;color:#688b91;
+  font-size:22px;line-height:1;cursor:pointer;padding:0;
+}
+@media(max-width:680px){
+  body[data-dud-b1-premium] .b1-word-added-notice{
+    left:12px;right:12px;bottom:calc(78px + env(safe-area-inset-bottom,0px));
+    width:auto;
+    grid-template-columns:28px minmax(0,1fr) auto 16px;
+    gap:7px;padding:12px 9px;
+  }
+  body[data-dud-b1-premium] .b1-word-notice-open{padding:7px 8px}
+}
+@media print{
+  body[data-dud-b1-premium] .b1-word-added-notice{display:none!important}
+}

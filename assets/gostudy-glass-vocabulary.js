@@ -37,6 +37,54 @@
   const form = by(dictionary,'form');
   const term = form.elements.term, meaning = form.elements.meaning;
   const status = by(dictionary,'.glass-status');
+  // B1 Stories: show the saved term itself, as in the Michael vocabulary UX.
+  // This is a course-scoped notification; it doesn't modify shared finance
+  // storage, any other student's dictionary, or the classroom message feed.
+  let b1Notice, b1NoticeTimer;
+  function announceB1Word(word,{fromTeacher=false}={}) {
+    if (!b1MichaelTranslator || !word?.en || !word?.ru) return;
+    if (!b1Notice) {
+      b1Notice = document.createElement('aside');
+      b1Notice.id = 'b1WordAddedNotice';
+      b1Notice.className = 'b1-word-added-notice';
+      b1Notice.hidden = true;
+      b1Notice.setAttribute('role','status');
+      b1Notice.setAttribute('aria-live','polite');
+      const symbol = document.createElement('span');
+      symbol.className = 'b1-word-notice-check';
+      symbol.setAttribute('aria-hidden','true');
+      symbol.textContent = '✓';
+      const content = document.createElement('div');
+      content.className = 'b1-word-notice-content';
+      for (const [tag,className] of [['span','b1-word-notice-label'],['strong','b1-word-notice-term'],['small','b1-word-notice-meaning']]) {
+        const node = document.createElement(tag);
+        node.className = className;
+        content.append(node);
+      }
+      const action = document.createElement('button');
+      action.type = 'button';
+      action.className = 'b1-word-notice-open';
+      action.textContent = 'Словарь';
+      action.addEventListener('click',()=>{b1Notice.hidden=true;open('words');});
+      const dismiss = document.createElement('button');
+      dismiss.type = 'button';
+      dismiss.className = 'b1-word-notice-close';
+      dismiss.setAttribute('aria-label','Закрыть уведомление о слове');
+      dismiss.textContent = '×';
+      dismiss.addEventListener('click',()=>{b1Notice.hidden=true;});
+      b1Notice.append(symbol,content,action,dismiss);
+      document.body.append(b1Notice);
+    }
+    const message = fromTeacher
+      ? 'Преподаватель добавил слово'
+      : classMode ? 'Добавлено ученице' : 'Добавлено в словарь';
+    by(b1Notice,'.b1-word-notice-label').textContent = message;
+    by(b1Notice,'.b1-word-notice-term').textContent = String(word.en);
+    by(b1Notice,'.b1-word-notice-meaning').textContent = String(word.ru);
+    b1Notice.hidden = false;
+    clearTimeout(b1NoticeTimer);
+    b1NoticeTimer = setTimeout(()=>{b1Notice.hidden=true;},8500);
+  }
   if (compactToolbar) {
     const pronounce=button('Озвучить',()=>speak(term.value.trim()),'glass-pronounce');
     pronounce.disabled=true;
@@ -123,17 +171,22 @@
     const [en,ru] = russian.test(a) && !russian.test(b) ? [b,a] : [a,b];
     if (inRoom) {
       if (!window.FinanceLive?.send('word',{en,ru})) throw Error('Подключаем словарь. Попробуйте ещё раз.');
+      announceB1Word({en,ru});
       return true;
     }
     if (classMode) {
       if (!shared?.signedIn) throw Error('Войди в кабинет преподавателя и открой урок через «Войти в класс».');
       await shared.add(en,ru);
       assigned = [...assigned.filter(word=>norm(word.en)!==norm(en)),{en,ru}];
+      if (dictionary.open && tab==='words') renderWords();
+      announceB1Word({en,ru});
       return true;
     }
     const list = words().filter(word => norm(word.en)!==norm(en));
     const record = JSON.stringify({words:[...list,{en,ru}],removed:hiddenWords().filter(value=>value!==norm(en))});
     try { storage.setItem(key,record); } catch { return false; }
+    if (dictionary.open && tab==='words') renderWords();
+    announceB1Word({en,ru});
     return true;
   }
   async function removeWord(word) {
@@ -290,21 +343,45 @@
     }
     practice.append(feedback,next);
   }
-  let loading=false;
+  let loading=false, assignedBaselineReady=false;
   async function refreshAssigned() {
-    if (!shared || loading || !dictionary.open || document.hidden) return;
+    // In a B1 student lesson, listen for teacher-assigned words even when the
+    // dictionary is closed. Previously the open-only guard suppressed the
+    // student notification and delayed the visible vocabulary update.
+    const watchB1Student = b1MichaelTranslator && !classMode;
+    if (!shared || loading || document.hidden || (!dictionary.open && !watchB1Student)) return;
     loading=true;
     try {
-      const next=await shared.read();
-      if(JSON.stringify(next)!==JSON.stringify(assigned)){
-        assigned=next;
-        if(dictionary.open && tab==='words')renderWords();
-        else if(dictionary.open && !practice.querySelector('h3'))show(tab,false);
+      const next = await shared.read();
+      if (!Array.isArray(next)) return;
+      const previousWords = new Set(assigned.map(word=>norm(word.en)));
+      const hasChanged = JSON.stringify(next)!==JSON.stringify(assigned);
+      if (hasChanged) {
+        assigned = next;
+        if (dictionary.open && tab==='words') renderWords();
+        else if (dictionary.open && !practice.querySelector('h3')) show(tab,false);
+        if (watchB1Student) {
+          document.dispatchEvent(new Event('gostudy-stories-vocabulary-updated'));
+          if (assignedBaselineReady) {
+            const newWords = next.filter(word=>word?.en && word?.ru && !previousWords.has(norm(word.en)));
+            if (newWords.length) announceB1Word(newWords[newWords.length-1],{fromTeacher:true});
+          }
+        }
       }
-    } catch(error){if(dictionary.open && tab==='words')status.textContent=error.message;}
-    finally{loading=false;}
+      // Do not announce existing assigned words on first page load/reload.
+      assignedBaselineReady=true;
+    } catch(error) {
+      if (dictionary.open && tab==='words') status.textContent=error.message;
+    } finally { loading=false; }
   }
-  if(shared)setInterval(refreshAssigned,3000);
+  if(shared){
+    refreshAssigned();
+    setInterval(refreshAssigned,b1MichaelTranslator && !classMode ? 5000 : 3000);
+    if(b1MichaelTranslator && !classMode){
+      window.addEventListener('focus',refreshAssigned);
+      document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshAssigned();});
+    }
+  }
   if (inRoom) document.addEventListener('finance-word',() => {
     if (dictionary.open && tab === 'words') renderWords();
   });
