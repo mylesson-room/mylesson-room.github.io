@@ -1938,7 +1938,7 @@ async function main() {
         await sp.locator('.glass-list').getByText('release check', {exact:true}).waitFor({timeout:7000});
         await sp.getByRole('button',{name:'На слух',exact:true}).click();
         await sp.getByRole('button',{name:'Прослушать слово',exact:true}).waitFor();
-        await sp.getByRole('button',{name:'Словарь',exact:true}).click();
+        await sp.locator('.glass-words .glass-tabs').getByRole('button',{name:'Словарь',exact:true}).click();
         for (const page of [sp,tp]) {
           assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'horizontal overflow');
         }
