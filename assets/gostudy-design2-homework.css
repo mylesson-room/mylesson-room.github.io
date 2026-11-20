@@ -1,0 +1,12 @@
+/* Design 2: approved Michael lesson chrome on isolated existing homework pages.
+   Keep chat and vocabulary accessible, but do not show a dummy video-call panel.
+   Exercises, lesson IDs, progress and auth are unchanged. */
+body[data-design2-homework] #lessonVideo .video-workspace {
+  display: none !important;
+}
+body[data-design2-homework] #lessonVideo .finance-chat {
+  margin-top: 0;
+}
+body[data-design2-homework] .sidebar {
+  min-width: 0;
+}
