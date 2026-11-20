@@ -330,7 +330,9 @@
       roomSync?.answer(index,step.id,draft.value,true);
       sheet.querySelector('.draft-status').textContent = 'Ответ сохранён';
     };
-    sheet.querySelectorAll('input,select').forEach(input => {
+    // Only exercise fields should be processed as numbered answers.
+    // B1 city selector radios are separate speaking choices, not MCQ inputs.
+    sheet.querySelectorAll('[data-question] input,[data-question] select').forEach(input => {
       input.onchange = () => {
         const i = Number(input.dataset.answer ?? input.name.slice(1));
         current[i] = input.value === '' ? null : Number(input.value);
