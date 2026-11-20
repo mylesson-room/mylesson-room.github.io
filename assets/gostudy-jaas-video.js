@@ -10,9 +10,10 @@
   if (!workspace || !placeholder || !actions || !state) return;
   const BASE = 'https://kawfqlohguwvmmplvrny.supabase.co';
   const ANON_KEY = 'sb_publishable_aAZxKwYpLcIXAjCiN5lBSg_qdFxvYwL';
-  const endpoint = BASE + '/functions/v1/gostudy-jaas-token';
+  const b1Stories = document.body?.dataset?.jaasScope === 'b1-stories';
+  const endpoint = BASE + (b1Stories ? '/functions/v1/gostudy-jaas-b1-token' : '/functions/v1/gostudy-jaas-token');
   const appIdFormat = /^vpaas-magic-cookie-[A-Za-z0-9-]+$/;
-  const roomFormat = /^gostudy-finance-[0-9a-f]{32}$/;
+  const roomFormat = b1Stories ? /^gostudy-b1-stories-[0-9a-f]{32}$/ : /^gostudy-finance-[0-9a-f]{32}$/;
   const connect = document.createElement('button');
   connect.type = 'button';
   connect.className = 'call-btn jaas-connect';
@@ -113,7 +114,7 @@
     sizeButton.setAttribute('aria-label', compact ? 'Увеличить видео' : 'Свернуть видео');
     sizeButton.setAttribute('aria-pressed', String(!compact));
   }
-  const getAuth = () => window.GoStudyFinanceAuth;
+  const getAuth = () => b1Stories ? window.GoStudyB1VideoAuth : window.GoStudyFinanceAuth;
   // Video authorization lives in the Supabase token endpoint, not in the
   // independent live-chat transport. Never silently disable the button.
   const hasSession = () => Boolean(getAuth()?.userId());
@@ -185,6 +186,9 @@
     return scriptPromise;
   }
   async function resolveStudentId(auth, accessToken) {
+    // The B1 token endpoint validates the existing restricted B1 course RPC.
+    // Do not look at the unrelated finance-room table for this lesson.
+    if (b1Stories) return auth.classroomStudent || null;
     // Teacher links normally include classStudent, but direct lesson URLs do not.
     // Find the single finance room the signed-in user can access via RLS.
     // Do not guess a room if the teacher has more than one.
