@@ -15,7 +15,7 @@
   const swedenA2 = document.body?.dataset?.jaasScope === 'sweden-a2';
   const endpoint = BASE + '/functions/v1/gostudy-jaas-sweden-token';
   const appIdFormat = /^vpaas-magic-cookie-[A-Za-z0-9-]+$/;
-  const roomFormat = b1Stories ? /^gostudy-b1-stories-[0-9a-f]{32}$/ : countryHouse ? /^gostudy-country-house-[0-9a-f]{32}$/ : /^gostudy-finance-[0-9a-f]{32}$/;
+  const roomFormat = /^gostudy-sweden-a2-[0-9a-f]{32}$/;
   const connect = document.createElement('button');
   connect.type = 'button';
   connect.className = 'call-btn jaas-connect';
