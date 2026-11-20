@@ -699,6 +699,10 @@
         const video = document.createElement('script');
         video.src = 'assets/gostudy-b1-stories-video.js?v=b1-20261120-1';
         document.body.append(video);
+        // Isolated lesson chat runs only after the protected course RPC succeeds.
+        const chat = document.createElement('script');
+        chat.src = 'assets/gostudy-b1-stories-chat.js?v=b1-20261120-1';
+        document.body.append(chat);
       }
       if (classroomStudent === null) mountLesson();
       const vocabulary = document.createElement('script');
