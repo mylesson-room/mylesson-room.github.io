@@ -108,7 +108,7 @@ async function sample(browser,origin,{name,html,mobile,role='student'}){
       let node;
       while(node=walker.nextNode()){
         if(node.textContent.trim().length<8)continue;
-        const start=node.textContent.search(/\\S/);
+        const start=node.textContent.search(/\S/);
         if(start<0)continue;
         const r=document.createRange();
         r.setStart(node,start);
