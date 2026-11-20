@@ -229,7 +229,7 @@ body[data-dud-b1-premium] .room>.sheet .b1-activity-titles {
 body[data-dud-b1-premium] .room>.sheet .b1-activity-head h1 {
   margin:0;padding:0;background:transparent;border:0;
   color:#242441;line-height:1.2;letter-spacing:-.025em;
-  font-size:clamp(25px,2.4vw,38px);
+  font-size:var(--gostudy-ui-heading-size,clamp(25px,2.4vw,38px));
   overflow-wrap:anywhere;
 }
 body[data-dud-b1-premium] .room>.sheet .b1-activity-time {
