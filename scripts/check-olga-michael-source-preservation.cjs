@@ -17,7 +17,12 @@ const originals={
 const css='<link rel="stylesheet" href="assets/gostudy-olga-michael.css?v=1">';
 const js='<script src="assets/gostudy-olga-michael-shell.js?v=1"></script>';
 const videoCSS='<link rel="stylesheet" href="assets/gostudy-jaas-video.css?v=two-tiles-20261119-1">';
-const videoJS='<script src="assets/gostudy-sync.js?v=olga-v1"></script><script src="assets/gostudy-olga-jaas-video.js?v=1"></script>';
+const chatCSS='<link rel="stylesheet" href="assets/gostudy-michael-chat.css?v=1">';
+const videoJS='<script src="assets/gostudy-sync.js?v=olga-v1"></script>'+
+ '<script src="assets/gostudy-finance-live.js?v=olga-v1"></script>'+
+ '<script src="assets/gostudy-olga-live-bridge.js?v=1"></script>'+
+ '<script src="assets/gostudy-michael-chat.js?v=1"></script>'+
+ '<script src="assets/gostudy-olga-jaas-video.js?v=1"></script>';
 
 for(const [file,sha] of Object.entries(originals)){
  const source=read(file);
@@ -29,12 +34,15 @@ for(const [file,sha] of Object.entries(originals)){
  const live=kind==='lesson';
  if(live){
   assert.equal(source.split(videoCSS).length,2,file+' exact shared Michael JaaS CSS');
+  assert.equal(source.split(chatCSS).length,2,file+' shared Michael chat');
+  assert.ok(source.includes('data-classroom-lesson="'+file+'"')&&source.includes('data-classroom-course="sweden-a2"'),
+  file+' approved course + lesson room pairing');
   assert.equal(source.split(videoJS).length,2,file+' dedicated Sweden JaaS scripts');
   assert.ok(source.includes('data-jaas-scope="sweden-a2"'),file+' Sweden-only video room');
  }
  const prev=source
-   .replace(css+(live?videoCSS:'')+'</head>','</head>')
-   .replace('<body '+(live?'data-olga-michael data-olga-kind="lesson" data-finance-live data-olga-jaas-video data-jaas-scope="sweden-a2" ':attr),'<body')
+   .replace(css+(live?videoCSS+chatCSS:'')+'</head>','</head>')
+   .replace('<body '+(live?'data-olga-michael data-olga-kind="lesson" data-finance-live data-olga-jaas-video data-jaas-scope="sweden-a2" data-classroom-course="sweden-a2" data-classroom-lesson="'+file+'" ':attr),'<body')
    .replace(js+(live?videoJS:'')+'</body>','</body>');
  assert.equal(blob(prev),sha,file+' original inline lesson material/state/javascript must be bit-exact');
 }
@@ -48,6 +56,13 @@ assert.ok(cssText.includes('body[data-olga-michael]'), 'CSS must be route scoped
 assert.equal(blob(read('business-ai-finance-b2-02.html')),'0d4e2c78edb8fda2103fa4b7f83cff54a819c51f',
  'Michael reference must not change');
 const video=read('assets/gostudy-olga-jaas-video.js');
+const live=read('assets/gostudy-olga-live-bridge.js');
+assert.ok(live.includes("gostudy-sweden-a2-lesson02-v1") &&
+  live.includes("gostudy-sweden-a2-v2") &&
+  live.includes("finance-ready")&&live.includes("finance-event")&&live.includes("teacherMode()"),
+ 'Teacher/student room adapter must support page, chat, answer and vocabulary events');
+assert.ok(!/localStorage\.setItem|localStorage\.removeItem|SUPABASE_SERVICE_ROLE_KEY/.test(live),
+ 'Classroom bridge may never overwrite old local data or use privileged credentials');
 const server=read('supabase/functions/gostudy-jaas-sweden-token/index.ts');
 assert.ok(video.includes('/functions/v1/gostudy-jaas-sweden-token') &&
   video.includes('data-olga-jaas-video') && video.includes('auth.classroomStudent || null'),
