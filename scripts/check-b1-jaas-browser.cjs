@@ -91,7 +91,7 @@ async function exercise(browser,origin,mobile,fail){
         return window.__b1Starts;
       });
       await page.locator('.sheet .next').click();
-      await page.locator('.sheet h1').filter({hasText:'Warm-up'}).waitFor();
+      await page.locator('.sheet h1').filter({hasText:'The Friday Table'}).waitFor();
       assert.equal(await page.evaluate(()=>window.__oldB1Video===document.querySelector('#lessonVideo .jaas-frame iframe')),true,'Video iframe restarted on section change');
       assert.equal(await page.evaluate(()=>window.__b1Starts),original);
       if(mobile){
