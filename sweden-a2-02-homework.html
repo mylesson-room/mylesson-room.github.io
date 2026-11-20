@@ -74,7 +74,23 @@ function card(title,body){return '<article class="card"><h2>'+title+'</h2>'+body
 function promptBox(title,text){return '<div class="prompt"><h3>'+title+'</h3><p>'+text+'</p></div>';}
 function b2mc(group,qs){return qs.map((q,i)=>{const id='q'+group+'-'+i;return '<div class="question"><p>'+(i+1)+'. '+esc(q[0])+'</p><div class="options">'+q[1].map((v,j)=>'<label class="option"><input type="radio" name="'+id+'" data-q="'+group+':'+i+'" value="'+j+'" '+(Number(state.answers[id])===j&&state.answers[id]!==undefined?'checked':'')+'><span>'+esc(v)+'</span></label>').join('')+'</div><div class="feedback" id="fb-'+id+'" role="status"></div></div>';}).join('');}
 function feedWelcome() {
-  return "<p>Три коротких текста, 12 пропусков и автоматическая проверка.</p>" +
+  return "<p><b>Home practice (15–20 minutes).</b> Use the six useful expressions from the lesson, check Past Simple and going to, then write a short message. Extra exercises are optional.</p>" +
+  card("1 · Six expressions from your day in Stockholm",
+   "<p>Choose the best answer. Remember how you spoke at the café and changed your plan.</p>" +
+   "<p>I'm staying here for lunch. I'd like to… "+hwChoice("review1","eat in",["eat in","take away","a receipt"])+"</p>" +
+   "<p>I'm leaving the café. I'd like my sandwich to… "+hwChoice("review2","take away",["a forecast","take away","an entrance"])+"</p>" +
+   "<p>After paying, can I have…? "+hwChoice("review3","a receipt",["a receipt","the forecast","around the corner"])+"</p>" +
+   "<p>Excuse me, where is the museum…? "+hwChoice("review4","an entrance",["a receipt","an entrance","take away"])+"</p>" +
+   "<p>The café is near us. It's… "+hwChoice("review5","around the corner",["around the corner","at the forecast","take away"])+"</p>" +
+   "<p>I want to know if it will rain. I check… "+hwChoice("review6","a forecast",["a forecast","a receipt","an entrance"])+"</p>") +
+  card("2 · Yesterday and tomorrow",
+    "<p>Yesterday I… "+hwChoice("review7","went",["go","went","am going"])+" to a museum.</p>"+
+    "<p>Tomorrow I… "+hwChoice("review8","am going to",["am going to","went","go yesterday"])+" walk by the water.</p>") +
+  card("3 · Message to a friend",
+    "<p>Write 4–6 simple sentences: What did you do yesterday? What are you going to do tomorrow? What happens if it rains? Use <b>at least four</b> of your six useful expressions.</p>"+
+    area('homeworkTravelMessage',"Yesterday I… Tomorrow I'm going to… If it rains…",5)+
+    "<p><b>Check before you finish:</b> 1 past sentence, 1 future plan, 4 expressions, one reason.</p>")+
+  "<details><summary>Optional extra practice — 12 earlier exercises (and previously saved answers)</summary>" +
   card("1 · Lunch by the water", "<p>Новая лексика. A bakery — пекарня, a queue — очередь, a bill — счёт, a table outside — столик на улице.</p><p>" +
   "Ben wanted fresh bread, so he went to a " +
   hwChoice("hw1", "bakery", ["bakery","queue","bill"]) +
@@ -104,7 +120,7 @@ function feedWelcome() {
   hwChoice("hw11", "is going to bring", ["is going to bring","are going to bring","is going bring"]) +
   " a map. After lunch, my friends " +
   hwChoice("hw12", "are going to join", ["is going to join","are going to join","are going join"]) +
-  " a walking tour." + '</p>');
+  " a walking tour." + '</p>')+"</details>";
 }
 const VOCAB_GAPS=[["coll0","Please close the ___ behind you.","gate"],["coll1","I need a ___ when it gets dark.","torch"],["coll2","Can you sweep the ___ before our guests arrive?","floor"],["coll3","Please put ___ the tools before it rains.","away"]];
 function feedWords(){return card("Words for a day out","<div class=\"word-grid\"><article class=\"word\"><strong>eat in</strong><p>Would you like to eat in?</p><details><summary>Перевод</summary><p>есть на месте</p></details><button data-add=\"0\" class=\"small-button\">＋ В словарь</button></article><article class=\"word\"><strong>take away</strong><p>Can I have this to take away?</p><details><summary>Перевод</summary><p>взять с собой</p></details><button data-add=\"1\" class=\"small-button\">＋ В словарь</button></article><article class=\"word\"><strong>a menu</strong><p>Could I see the menu?</p><details><summary>Перевод</summary><p>меню</p></details><button data-add=\"2\" class=\"small-button\">＋ В словарь</button></article><article class=\"word\"><strong>a receipt</strong><p>Can I have a receipt, please?</p><details><summary>Перевод</summary><p>чек</p></details><button data-add=\"3\" class=\"small-button\">＋ В словарь</button></article><article class=\"word\"><strong>an entrance</strong><p>The entrance is around the corner.</p><details><summary>Перевод</summary><p>вход</p></details><button data-add=\"4\" class=\"small-button\">＋ В словарь</button></article><article class=\"word\"><strong>around the corner</strong><p>The café is around the corner.</p><details><summary>Перевод</summary><p>за углом</p></details><button data-add=\"5\" class=\"small-button\">＋ В словарь</button></article><article class=\"word\"><strong>a raincoat</strong><p>I need my raincoat today.</p><details><summary>Перевод</summary><p>дождевик</p></details><button data-add=\"6\" class=\"small-button\">＋ В словарь</button></article><article class=\"word\"><strong>a forecast</strong><p>What does the forecast say?</p><details><summary>Перевод</summary><p>прогноз</p></details><button data-add=\"7\" class=\"small-button\">＋ В словарь</button></article><article class=\"word\"><strong>indoors</strong><p>We can do something indoors.</p><details><summary>Перевод</summary><p>в помещении</p></details><button data-add=\"8\" class=\"small-button\">＋ В словарь</button></article><article class=\"word\"><strong>a return ticket</strong><p>Two return tickets, please.</p><details><summary>Перевод</summary><p>билет туда и обратно</p></details><button data-add=\"9\" class=\"small-button\">＋ В словарь</button></article><article class=\"word\"><strong>crowded</strong><p>The café was crowded.</p><details><summary>Перевод</summary><p>многолюдный; переполненный</p></details><button data-add=\"10\" class=\"small-button\">＋ В словарь</button></article><article class=\"word\"><strong>quieter</strong><p>This street is quieter.</p><details><summary>Перевод</summary><p>тише; спокойнее</p></details><button data-add=\"11\" class=\"small-button\">＋ В словарь</button></article></div>")+card("What do you need?","<p>You want to sit at a table. Choose… "+hwChoice("word1","eat in",["take away","eat in","receipt"])+"</p>"+"<p>You need to find the door to a museum. Ask for… "+hwChoice("word2","the entrance",["the forecast","the receipt","the entrance"])+"</p>");}
