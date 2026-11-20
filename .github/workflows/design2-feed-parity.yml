@@ -1,0 +1,35 @@
+name: Design 2 Michael Alla visual pilot
+on:
+  pull_request:
+    paths:
+      - 'my-trip-to-vietnam-a2.html'
+      - 'scripts/check-design2-feed-parity.cjs'
+      - 'scripts/check-design2-michael-alla-browser.cjs'
+      - '.github/workflows/design2-feed-parity.yml'
+      - 'docs/design2-ownership-20261120.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  reference-contract:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Ensure shared Michael feed without changing Alla lesson material
+        run: node scripts/check-design2-feed-parity.cjs
+      - name: Install isolated browser test dependency
+        run: npm install --no-save --no-package-lock playwright@1.58.2
+      - name: Test actual Michael and Alla lesson pages in browser
+        run: |
+          GOSTUDY_CHROME="$(command -v google-chrome)"
+          export GOSTUDY_CHROME
+          node scripts/check-design2-michael-alla-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: design2-michael-alla-mock-screenshots
+          path: artifacts/design2-visual/
+          if-no-files-found: ignore
