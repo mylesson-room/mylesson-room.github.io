@@ -106,8 +106,12 @@ async function create(browser,base,id,mobile){
     await learner.page.locator('#finance-chat-form button').click();
     await tutor.page.waitForFunction(()=>document.querySelector('#finance-messages')?.textContent.includes('Hello from synthetic Olga'),null,{timeout:15000});
     console.log('OLGA TWO ROLES PASS: typed chat arrives at teacher');
-    for(let i=0;i<3;i++)await tutor.page.locator('#next').click();
-    await tutor.page.locator('#page-3.active').waitFor();
+    // Michael normally auto-follows the student's page presence. Derive
+    // the actual teacher page first instead of assuming it is still page 0.
+    const at=Number((await tutor.page.locator('#lessonPages .page.active').getAttribute('id')).slice(5));
+    for(let i=at;i<3;i++)await tutor.page.locator('#next').click();
+    for(let i=at;i>3;i--)await tutor.page.locator('#back').click();
+    await tutor.page.locator('#page-3.active').waitFor({state:'visible',timeout:12000});
     await tutor.page.locator('#moveStudent:not([hidden])').waitFor({state:'visible',timeout:15000});
     await tutor.page.locator('#moveStudent').click();
     await learner.page.locator('#page-3.active').waitFor({state:'visible',timeout:15000});
