@@ -1,0 +1,502 @@
+{
+  "key": "gostudy-general-english-b1-stories-01-v1",
+  "title": "Toxic Co-workers: How to Handle Difficult People",
+  "level": "B1 · Adult General English · 50 minutes",
+  "cabinet": "student-general-english-b1-stories.html",
+  "course": "general-english-b1-stories",
+  "overview": {
+    "title": "Toxic Co-workers: How to Handle Difficult People",
+    "level": "B1",
+    "duration": 50,
+    "format": "1-to-1 lesson",
+    "goal": "Describe difficult workplace behaviour, use six expressions, discuss strategies and advise a colleague using gerunds and infinitives."
+  },
+  "vocabulary": [
+    [
+      "interrupt someone",
+      "speak while another person is talking",
+      "перебивать"
+    ],
+    [
+      "take credit for someone's work",
+      "say that another person's work is yours",
+      "присваивать чужие заслуги"
+    ],
+    [
+      "micromanage",
+      "control every small detail of someone's work",
+      "чрезмерно контролировать"
+    ],
+    [
+      "set boundaries",
+      "say clearly what behaviour you will accept",
+      "устанавливать границы"
+    ],
+    [
+      "spread rumours",
+      "share unverified stories about other people",
+      "распускать слухи"
+    ],
+    [
+      "speak up",
+      "say what you think when something is unfair",
+      "высказываться открыто"
+    ]
+  ],
+  "steps": [
+    {
+      "id": "toxic-info",
+      "title": "Lesson information",
+      "minutes": 3,
+      "instruction": "Look at the lesson goals. What do you already know about difficult workplace relationships?",
+      "source": [
+        "B1 · Adults · 50 minutes",
+        "Goal: describe difficult co-worker behaviour and suggest respectful ways to respond.",
+        "Vocabulary: interrupt someone; take credit for someone's work; micromanage; set boundaries; spread rumours; speak up.",
+        "Grammar: gerunds and infinitives after common verbs (avoid doing, decide to do, suggest doing, agree to do).",
+        "Reading: practical advice about dealing with a difficult team member.",
+        "Speaking: describe a work situation, choose a response and practise a constructive conversation."
+      ],
+      "visual": {
+        "kind": "cards",
+        "cards": [
+          [
+            "💬",
+            "Talk",
+            "Workplace problems",
+            "How would you react?"
+          ],
+          [
+            "🧩",
+            "Learn",
+            "6 useful expressions",
+            "Use them in context"
+          ],
+          [
+            "🎯",
+            "Solve",
+            "A real-life scenario",
+            "Make a communication plan"
+          ]
+        ]
+      },
+      "teacherNotes": "3 min. Present outcomes without pre-teaching solutions. Ask: Does disagreeing with a colleague always mean they are toxic? Focus on observable actions, not labelling people."
+    },
+    {
+      "id": "toxic-warmup",
+      "title": "Warm-up",
+      "minutes": 6,
+      "instruction": "Look at these everyday office situations. Which behaviour is the hardest to deal with? Explain your reasons.",
+      "visual": {
+        "kind": "cards",
+        "cards": [
+          [
+            "🙊",
+            "Situation A",
+            "Frequent interruptions",
+            "A colleague keeps speaking over others in meetings."
+          ],
+          [
+            "🏆",
+            "Situation B",
+            "Taking credit",
+            "Someone presents your idea as their own."
+          ],
+          [
+            "🔎",
+            "Situation C",
+            "Too much control",
+            "A teammate checks every little step you take."
+          ]
+        ]
+      },
+      "source": [
+        "Discuss: Which situation have you seen before, even outside work? How did people respond?",
+        "Is it better to talk to the person immediately, wait, or ask a manager? Does the answer depend on the situation?",
+        "Mini-task: Give one example of an annoying habit that is NOT necessarily toxic."
+      ],
+      "type": "choice",
+      "items": [
+        [
+          "Which situation is an example of taking credit for someone else's work?",
+          [
+            "A colleague asks for an update.",
+            "A colleague says your idea was theirs.",
+            "A colleague gives constructive feedback."
+          ],
+          1,
+          "Taking credit means claiming somebody else's achievement."
+        ],
+        [
+          "What is usually a sensible first step in a minor conflict?",
+          [
+            "Describe the specific behaviour calmly.",
+            "Spread rumours about the person.",
+            "Avoid every conversation forever."
+          ],
+          0,
+          "Focus on the behaviour and its effect."
+        ],
+        [
+          "Which sentence gives an observation rather than a personal insult?",
+          [
+            "You are a terrible person.",
+            "You always ruin everything.",
+            "I was interrupted twice in the meeting."
+          ],
+          2,
+          "An observation is easier to discuss constructively."
+        ]
+      ],
+      "teacherNotes": "6 min. Prioritise 4 minutes of speaking; use choices as a quick check, not the main activity."
+    },
+    {
+      "id": "toxic-topical-vocab",
+      "title": "Topical vocabulary",
+      "minutes": 7,
+      "instruction": "Match the six expressions to their meanings, then make one short example about a team.",
+      "source": [
+        "interrupt someone · take credit for someone's work · micromanage · set boundaries · spread rumours · speak up",
+        "After matching, choose TWO expressions and say: 'A difficult co-worker might...' or 'A good manager should...'."
+      ],
+      "type": "match",
+      "items": [
+        [
+          "1. interrupt someone ___",
+          [
+            "stop somebody while they are speaking",
+            "organise a team event",
+            "tell a personal story"
+          ],
+          0
+        ],
+        [
+          "2. take credit for someone's work ___",
+          [
+            "ask permission to help",
+            "claim another person's achievement",
+            "plan a project together"
+          ],
+          1
+        ],
+        [
+          "3. micromanage ___",
+          [
+            "let people work independently",
+            "ignore tasks",
+            "control tiny details"
+          ],
+          2
+        ],
+        [
+          "4. set boundaries ___",
+          [
+            "explain what behaviour is acceptable",
+            "make somebody work late",
+            "leave the office"
+          ],
+          0
+        ],
+        [
+          "5. spread rumours ___",
+          [
+            "ask a polite question",
+            "share unverified stories",
+            "write a meeting summary"
+          ],
+          1
+        ],
+        [
+          "6. speak up ___",
+          [
+            "agree with everything",
+            "avoid eye contact",
+            "say something when there is a problem"
+          ],
+          2
+        ]
+      ],
+      "teacherNotes": "7 min. Exactly six active phrases. After checking, demand productive examples; avoid introducing extra target phrases."
+    },
+    {
+      "id": "toxic-vocab",
+      "title": "Vocabulary in action",
+      "minutes": 5,
+      "instruction": "Complete the six sentences with expressions from the previous section. Then tell your teacher which sentence sounds most realistic.",
+      "source": [
+        "Use each target expression once. Some verbs may need a different form.",
+        "Model: 'I prefer to speak up when I notice something unfair.'"
+      ],
+      "type": "gap",
+      "items": [
+        [
+          "Our new colleague often ___ when I am explaining my ideas.",
+          [
+            "sets boundaries",
+            "interrupts me",
+            "speaks up"
+          ],
+          1
+        ],
+        [
+          "I spent two days preparing the slides, but Tom tried to ___.",
+          [
+            "take credit for my work",
+            "micromanage",
+            "spread rumours"
+          ],
+          0
+        ],
+        [
+          "My manager likes to ___ every small task instead of trusting us.",
+          [
+            "speak up",
+            "set boundaries",
+            "micromanage"
+          ],
+          2
+        ],
+        [
+          "It is important to ___ if people keep contacting you late at night.",
+          [
+            "set boundaries",
+            "take credit for work",
+            "interrupt someone"
+          ],
+          0
+        ],
+        [
+          "Some people ___ about colleagues they hardly know.",
+          [
+            "speak up",
+            "spread rumours",
+            "set boundaries"
+          ],
+          1
+        ],
+        [
+          "If you see something unfair, it can help to ___ politely.",
+          [
+            "micromanage",
+            "take credit",
+            "speak up"
+          ],
+          2
+        ]
+      ],
+      "teacherNotes": "5 min. Recycle only the six active expressions. Ask for reasons, not just answers."
+    },
+    {
+      "id": "toxic-reading",
+      "title": "Reading: A difficult team member",
+      "minutes": 8,
+      "instruction": "Read the case study. Decide whether the manager's response was fair, then answer the questions.",
+      "source": [
+        "A few months ago, Maya joined a small marketing team. She enjoyed the work, but meetings soon became stressful. One colleague, Daniel, often interrupted her and took credit for ideas she had shared earlier. He also checked every detail of her projects, even though he was not her manager.",
+        "At first, Maya avoided saying anything because she wanted to be friendly. But the situation got worse. During a meeting, Daniel presented Maya's campaign idea as his own. She felt embarrassed, yet she did not want to start an argument in front of everyone.",
+        "Maya decided to keep notes about specific incidents. She then asked Daniel to have a private conversation. Instead of calling him 'toxic', she explained what had happened: 'When you present my ideas without mentioning me, I feel that my work is not recognised.' She suggested agreeing on who would present each part of the next project.",
+        "Daniel seemed surprised. He apologised for not giving her credit, although he did not agree with everything she said. They made a clearer plan for future meetings. Maya also spoke to their manager, who encouraged the whole team to share responsibilities more openly.",
+        "The problem did not disappear overnight, but Maya learned that setting boundaries and speaking up calmly could improve the situation. Her main lesson was simple: describe actions, explain their effect, and ask for a specific change."
+      ],
+      "type": "choice",
+      "items": [
+        [
+          "Why did Maya avoid speaking to Daniel at first?",
+          [
+            "She was leaving her job.",
+            "She wanted to keep relationships friendly.",
+            "She enjoyed the interruptions."
+          ],
+          1
+        ],
+        [
+          "What happened during the meeting?",
+          [
+            "Daniel claimed her campaign idea.",
+            "Maya missed the meeting.",
+            "The manager cancelled the campaign."
+          ],
+          0
+        ],
+        [
+          "Why did Maya keep notes?",
+          [
+            "To post rumours online.",
+            "To embarrass Daniel publicly.",
+            "To remember specific incidents."
+          ],
+          2
+        ],
+        [
+          "How did Maya begin her conversation?",
+          [
+            "She described an action and its effect.",
+            "She insulted Daniel.",
+            "She demanded that he be fired."
+          ],
+          0
+        ],
+        [
+          "What is the key message of the text?",
+          [
+            "Never disagree with colleagues.",
+            "Discuss specific behaviour and propose a change.",
+            "Every problem needs an immediate formal complaint."
+          ],
+          1
+        ]
+      ],
+      "teacherNotes": "8 min: first read for the main idea, then details. Follow-up: Was Maya right to speak to a manager as well? Accept reasoned alternatives."
+    },
+    {
+      "id": "toxic-grammar",
+      "title": "Grammar: Gerunds and infinitives",
+      "minutes": 7,
+      "instruction": "Notice the verb pattern, choose the correct form, then make two more sentences about workplace communication.",
+      "source": [
+        "Some verbs are followed by -ing: avoid arguing, suggest talking, keep interrupting, practise listening.",
+        "Other verbs are followed by to + verb: decide to speak, agree to listen, want to help, need to change.",
+        "Compare: 'She stopped interrupting' (she no longer did it) and 'She stopped to speak' (she paused another activity in order to speak).",
+        "Your task: explain which pattern is used after avoid, suggest, decide and agree."
+      ],
+      "type": "choice",
+      "items": [
+        [
+          "It's best to avoid ___ colleagues in public.",
+          [
+            "criticising",
+            "to criticise",
+            "criticise"
+          ],
+          0
+        ],
+        [
+          "Maya decided ___ privately.",
+          [
+            "talking",
+            "to talk",
+            "talk"
+          ],
+          1
+        ],
+        [
+          "The manager suggested ___ clearer roles.",
+          [
+            "to define",
+            "define",
+            "defining"
+          ],
+          2
+        ],
+        [
+          "Daniel agreed ___ Maya's contribution.",
+          [
+            "to mention",
+            "mentioning",
+            "mention"
+          ],
+          0
+        ],
+        [
+          "Please stop ___ me when I'm presenting.",
+          [
+            "to interrupt",
+            "interrupting",
+            "interrupt"
+          ],
+          1
+        ],
+        [
+          "I want ___ boundaries without being rude.",
+          [
+            "setting",
+            "set",
+            "to set"
+          ],
+          2
+        ]
+      ],
+      "teacherNotes": "7 min. Ellicit -ing vs to-infinitive; distinguish stop doing vs stop to do. Ask for 2 original examples."
+    },
+    {
+      "id": "toxic-practice",
+      "title": "Practice: Choose a response",
+      "minutes": 6,
+      "instruction": "You are in an uncomfortable work situation. Choose a response, explain why, and improve it in your own words.",
+      "visual": {
+        "kind": "cards",
+        "cards": [
+          [
+            "🗣️",
+            "Case 1",
+            "Meeting interruption",
+            "You are interrupted for the third time."
+          ],
+          [
+            "📨",
+            "Case 2",
+            "Late-night messages",
+            "A colleague expects instant replies after work."
+          ],
+          [
+            "🤝",
+            "Case 3",
+            "Shared project",
+            "Someone takes credit for the team's idea."
+          ]
+        ]
+      },
+      "source": [
+        "Role-play 1: 'I haven't finished explaining my point. Could I just finish?'",
+        "Role-play 2: Use a polite boundary: 'I can reply tomorrow morning. Is that OK?'",
+        "Role-play 3: Suggest a concrete next step: 'Let's agree on who presents which part.'"
+      ],
+      "type": "choice",
+      "items": [
+        [
+          "Which response helps if somebody interrupts you?",
+          [
+            "You're always the problem!",
+            "Could I finish my point, please?",
+            "I will spread rumours about you."
+          ],
+          1
+        ],
+        [
+          "Which sentence sets a clear boundary?",
+          [
+            "I can answer work messages during office hours.",
+            "I will never speak to you again.",
+            "You are lazy and unpleasant."
+          ],
+          0
+        ],
+        [
+          "What is a constructive way to respond to stolen credit?",
+          [
+            "Ignore every future task.",
+            "Argue loudly in the meeting.",
+            "Could we mention everyone's contributions in the presentation?"
+          ],
+          2
+        ]
+      ],
+      "teacherNotes": "6 min: use choices only as a launchpad for role-play. Change roles and ask learner to produce 2–3 complete lines."
+    },
+    {
+      "id": "toxic-final",
+      "title": "Let's talk: Solve the problem",
+      "minutes": 8,
+      "instruction": "Final task: advise a friend whose colleague keeps interrupting them, takes credit and sends messages late at night.",
+      "source": [
+        "Round 1 (2 min): Describe the problem using at least THREE expressions from today's vocabulary.",
+        "Round 2 (3 min): Role-play a calm conversation. Use at least TWO gerunds and TWO infinitives (e.g., 'I suggest talking...' and 'I decided to...').",
+        "Round 3 (2 min): Your partner disagrees. Respond politely, set one boundary and agree on a next step.",
+        "Reflection (1 min): Which phrase would be most useful in your real life? What will you do differently?"
+      ],
+      "type": "write",
+      "teacherNotes": "8 min. Performance criteria: (1) three target phrases used accurately, (2) at least one correct -ing and one correct to-infinitive, (3) a respectful request and specific next step, (4) clear and understandable speech. Give one correction and one repeat opportunity. Homework remains the previously assigned independent task, unchanged."
+    }
+  ],
+  "contentVersion": "toxic-coworkers-b1-20261120"
+}

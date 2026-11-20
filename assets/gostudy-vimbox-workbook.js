@@ -17,6 +17,12 @@
     const page = config.steps.findIndex(step => step.id === 'original-' + (Number(state.page) || 0));
     state = {version: 2, page: Math.max(0,page), answers: Object.fromEntries(config.steps.filter(step => step.id.startsWith('original-') && Object.hasOwn(previous,step.id.slice(9))).map(step => [step.id,previous[step.id.slice(9)]]))};
   }
+  // Changing the subject of the current B1 lesson must not discard earlier
+  // responses. Keep all answer IDs, but start the newly authored content at
+  // Lesson information rather than an old section number.
+  if (config.contentVersion && state.contentVersion !== config.contentVersion) {
+    state = {...state,contentVersion:config.contentVersion,page:0};
+  }
   let index = Math.min(Math.max(Number(state.page) || 0,0),config.steps.length-1);
   const escape = value => String(value).replace(/[&<>"']/g,char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const save = () => storage.setItem(config.key,JSON.stringify({...state,page:index}));
