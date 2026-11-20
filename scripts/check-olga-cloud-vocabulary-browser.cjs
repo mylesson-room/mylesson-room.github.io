@@ -63,6 +63,12 @@ const server=createServer(async(req,res)=>{
   await pb.waitForFunction(()=>window.GoStudySwedenCloudWords?.isReady());
   assert.deepEqual(await pa.evaluate(()=>window.GoStudySwedenCloudWords.words()),[],'must not import legacy browser words');
   assert.equal(await pc.evaluate(()=>window.GoStudySwedenCloudWords.isReady()),false,'outsider cannot read');
+  await pb.evaluate(()=>{
+    window.__newCloudWords=[];
+    document.addEventListener('finance-word',event=>{
+      if(event.detail.notify)window.__newCloudWords.push(event.detail.word.en);
+    });
+  });
   const saved=await pa.evaluate(()=>window.GoStudySwedenCloudWords.save({en:'platform',ru:'платформа'}));
   assert.equal(saved.en,'platform');
   assert.equal(serverWrites,1,'exactly one write confirmed by server');
@@ -70,6 +76,8 @@ const server=createServer(async(req,res)=>{
   assert.equal((await pb.evaluate(()=>window.GoStudySwedenCloudWords.words())).length,0,'device B initially stale');
   await pb.evaluate(()=>window.GoStudySwedenCloudWords.refresh());
   assert.deepEqual(await pb.evaluate(()=>window.GoStudySwedenCloudWords.words().map(x=>x.en)),['platform'],'device B sees same cloud word');
+  assert.deepEqual(await pb.evaluate(()=>window.__newCloudWords),['platform'],
+    'cross-device addition must pop up as a Michael +word notification');
   const pbreloaded=await b.newPage();await pbreloaded.goto(base+'/fixture?user=olga');
   await pbreloaded.waitForFunction(()=>window.GoStudySwedenCloudWords?.isReady());
   assert.deepEqual(await pbreloaded.evaluate(()=>window.GoStudySwedenCloudWords.words().map(x=>x.en)),['platform'],'new tab has cloud word');
