@@ -1298,7 +1298,9 @@ async function main() {
     const source = await readFile('assets/gostudy-sync.js', 'utf8');
     const catalog = runInNewContext('('+source.match(/const classroomCatalog = ([^\n]+);/)[1]+')');
     const studentId = '11111111-1111-4111-8111-111111111111';
-    for (const [course, entry] of Object.entries(catalog)) {
+    // Run the changed B1 parity case first, then all other regressions.
+    const parityFirstCourses=Object.entries(catalog).sort(([a],[b])=>Number(b==='general_english_b1_stories')-Number(a==='general_english_b1_stories'));
+    for (const [course, entry] of parityFirstCourses) {
       if (['business_ai','country_house','art_b1'].includes(course)) continue; // Covered by the v1 classroom and methodology suites above.
       const current = entry.lessons.at(-1);
       const expected = new URL(current.lesson, origin).pathname;
@@ -1812,7 +1814,20 @@ async function main() {
           await page.evaluate(() => document.documentElement.style.removeProperty('--gostudy-ui-heading-size'));
           assert.equal(await heading.evaluate(node => getComputedStyle(node).fontSize),originalFont);
           if (course === 'general_english_b1_stories') {
-            await page.locator('#b1LessonDictionary').waitFor({state:'visible'});
+            const b1HeaderButton=page.locator('#b1LessonDictionary');
+            const headerDebug=await b1HeaderButton.evaluate(element=>{
+              const chain=[];let current=element;
+              while(current && chain.length<6) {
+                const style=getComputedStyle(current),box=current.getBoundingClientRect();
+                chain.push({tag:current.tagName,class:current.className,id:current.id,
+                  display:style.display,visibility:style.visibility,opacity:style.opacity,
+                  width:Math.round(box.width),height:Math.round(box.height),hidden:current.hidden});
+                current=current.parentElement;
+              }
+              return chain;
+            });
+            console.log('B1 header dictionary computed layout:',JSON.stringify(headerDebug));
+            await b1HeaderButton.waitFor({state:'visible'});
             await page.locator('#b1LessonDictionary').click();
             await page.locator('.glass-words[open]').waitFor();
             await page.locator('.glass-words[open]').evaluate(dialog=>dialog.close());
