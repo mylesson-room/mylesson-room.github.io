@@ -693,11 +693,17 @@ async function checkFinanceHomework(browser,origin){
   await teacher.locator('.homework-teacher-actions').waitFor();
   await teacher.getByRole('button',{name:'Continue',exact:true}).click();
   const second=teacher.locator('#vocab .term').nth(1);
-  await second.locator('.homework-exercise-menu summary').click();
-  await second.getByRole('button',{name:'Добавить в домашнее задание'}).click();
+  const exerciseMenu=second.locator('.homework-exercise-menu');
+  await exerciseMenu.waitFor({state:'attached'});
+  assert.equal(await exerciseMenu.isVisible(),false,'Michael: homework assignment menu must be hidden in lesson UI');
+  assert.equal(await teacher.locator('.homework-exercise-menu:visible').count(),0,'No per-exercise homework menus should be visible');
+  // Exercise assignment is temporarily hidden, not deleted. Simulate the
+  // pre-existing handler to ensure saved drafts and publication still work.
+  await exerciseMenu.evaluate(node=>node.querySelector('button').click());
   await teacher.locator('.homework-draft-status').filter({hasText:'В черновике: 1'}).waitFor();
   assert.deepEqual(draft.exercise_ids,['finance2-vocab-02'],'Only the second vocabulary exercise is assigned');
-  await second.getByRole('button',{name:/Добавить в домашнее задание|Добавлено/}).click();
+  await exerciseMenu.evaluate(node=>node.querySelector('button').click());
+  await teacher.locator('.homework-draft-status').filter({hasText:'В черновике: 1'}).waitFor();
   assert.deepEqual(draft.exercise_ids,['finance2-vocab-02'],'Repeated assignment must not duplicate exercise');
   await student.reload();
   await student.locator('#homework-status').filter({hasText:'не опубликовано'}).waitFor();
