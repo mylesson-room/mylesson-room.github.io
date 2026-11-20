@@ -750,9 +750,16 @@
           vocabulary.addEventListener('load',()=>{button.disabled=false;});
           vocabulary.addEventListener('error',()=>{button.title='Словарь не загрузился. Обновите страницу.';});
           button.addEventListener('click',()=>{
-            document.querySelector('.glass-lesson-tools button[aria-label="Открыть словарь"]')?.click();
+            window.GoStudyB1Glossary?.open('words');
           });
         }
+        // Same Michael selection popup only after the B1 vocabulary store is
+        // fully initialized. No unrelated finance lesson components are loaded.
+        vocabulary.addEventListener('load',()=>{
+          const translator=document.createElement('script');
+          translator.src='assets/gostudy-b1-michael-selection.js?v=1';
+          document.body.append(translator);
+        },{once:true});
       }
       document.body.append(vocabulary);
     } catch (error) {
