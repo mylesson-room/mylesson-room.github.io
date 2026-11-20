@@ -29,9 +29,29 @@
   message.textContent='Старые слова и ответы не удалены. Открывайте этот раздел с того же устройства, на котором Вы занимались раньше.';
   const old=document.createElement('a');old.href='sweden-cabinet-legacy.html';old.textContent='Открыть старый кабинет для проверки сохранённых ответов';
   detail.append(summary,message,old);status.after(detail);
+  let liveLoaded=false;
+  function loadLive(){
+    if(liveLoaded || !window.GoStudyFinanceAuth?.userId())return;
+    liveLoaded=true;
+    const script=document.createElement('script');
+    script.src='assets/gostudy-finance-live.js?v=classroom-sweden-1';
+    script.onerror=()=>{
+      liveLoaded=false;
+      status.textContent='Словарь и чат временно не синхронизируются. Проверьте интернет.';
+    };
+    document.head.append(script);
+  }
   function show(path){
     const selected=lessons[path] || lessons['sweden-a2-02.html'];
     const key=lessons[path]?path:'sweden-a2-02.html';
+    if(document.body.dataset.classroomLesson!==key && liveLoaded){
+      // Existing room subscription is tied to the previous assignment.
+      // Refresh first; never silently connect to the wrong lesson's event stream.
+      location.reload();
+      return;
+    }
+    document.body.dataset.classroomCourse='sweden-a2';
+    document.body.dataset.classroomLesson=key;
     card.href=key;
     card.querySelector('h2').textContent=selected.title;
     const sub=card.querySelector('.lesson-date');if(sub)sub.textContent=selected.label;
@@ -62,6 +82,10 @@
     }catch(error){
       status.textContent='Нет связи с назначениями: пока доступен урок 2. Обновите страницу позже.';
       console.warn('Sweden assignment read:',error.message);
+    }finally{
+      // A single course-scoped real-time subscription provides the same shared
+      // vocabulary/chat events as Michael, only after authenticated selection.
+      loadLive();
     }
   }
   refresh();
