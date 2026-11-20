@@ -227,7 +227,12 @@
       if(!word || !saveVocabulary)return;
       saveBtn.disabled=true;
       try { const saved=await saveVocabulary(word); if(saved===false)throw Error('Не удалось сохранить');
-        saveBtn.textContent='✓';showStatus('Добавлено в словарь');
+        // The shared B1 glossary shows a separate word-specific toast for
+        // both roles. Keep the same compact translator, but confirm exactly
+        // which term and meaning were saved instead of a generic ✓.
+        saveBtn.textContent='✓';
+        const isTeacher=new URLSearchParams(location.search).has('classStudent');
+        showStatus((isTeacher?'Добавлено ученице: ':'Добавлено в словарь: ')+word.en+' — '+word.ru);
       } catch(error) { saveBtn.disabled=false;showStatus(error?.message||'Не удалось добавить слово'); }
      });
   }
