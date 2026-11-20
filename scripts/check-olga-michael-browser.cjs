@@ -44,8 +44,17 @@ async function check(browser,base,file,kind,mobile){
   if(kind!=='cabinet'){
     await page.locator('#title').waitFor({state:'visible',timeout:11000});
     assert.ok((await page.locator('#content').innerText()).length>50,label+' original lesson content missing');
-    assert.equal(await page.locator('.olga-video-tile').count(),2,label+' participant tiles');
-    assert.equal(await page.locator('.olga-state').isVisible(),true,label+' blocked video clearly labelled');
+    const videoTiles=await page.locator('.jaas-person-tile').count() ||
+      await page.locator('.olga-video-tile').count();
+    assert.equal(videoTiles,2,label+' real Michael two participant placeholders');
+    assert.equal(await page.locator('.olga-state').isVisible(),true,label+' video status clearly labelled');
+    if(kind==='lesson'){
+      assert.equal(await page.locator('#lessonVideo .jaas-connect').count(),1,
+        label+' must display real JaaS join control with Sweden-specific token');
+    }else {
+      assert.equal(await page.locator('#lessonVideo .jaas-connect').count(),0,
+        label+' homework must never start camera');
+    }
     assert.equal(await page.locator('.olga-michael-side button').first().textContent(),'Мой словарь');
     await page.locator('.olga-michael-side button').first().click();
     await page.locator('#dictionary[open]').waitFor({state:'visible'});
