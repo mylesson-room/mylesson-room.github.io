@@ -49,4 +49,26 @@ for(const [path,{sha,wasGoogle}] of Object.entries(pages)){
   assert.equal(blobSha(reverted),sha,
     path+' original lesson body, answers, IDs, routes, words and homework must be byte-for-byte identical');
 }
-console.log('DESIGN2 BATCH GUARD PASS: five exact original lesson blobs preserved; Michael unchanged; shared feed/chat/translation UX');
+
+const homeworkCSS='<link rel="stylesheet" href="assets/gostudy-design2-homework.css?v=1">';
+for(const [path,sha] of Object.entries({
+  'art-b1-03-homework.html':'5cb4c86e7f08a5685e97d9eacfefde77d2fae692',
+  'business-ai-b2c1-03-homework.html':'a429c3219bf64cda189c99d26d166cda8d372e22'
+})){
+  const html=read(path);
+  for(const token of [baseCss,feed,chatCSS,homeworkCSS,engine,chatJS,
+    '<body data-premium-feed="michael-v1" data-translate-engine="google-web-pilot" data-design2-homework ']){
+    assert.equal(html.split(token).length,2,path+' requires exactly one '+token);
+  }
+  assert.ok(html.indexOf(engine)<html.indexOf(chatJS),path+' chat requires the actual live workbook DOM');
+  assert.ok(!html.includes('data-jaas-video-pilot'),path+' must not show unauthorized video');
+  const reverted=html
+    .replace(baseCss+feed+chatCSS+homeworkCSS,baseCss)
+    .replace('<body data-premium-feed="michael-v1" data-translate-engine="google-web-pilot" data-design2-homework ','<body ')
+    .replace(engine+chatJS,engine);
+  assert.equal(blobSha(reverted),sha,path+' homework question/answer data must remain byte-for-byte unchanged');
+}
+assert.ok(read('assets/gostudy-design2-homework.css').includes('data-design2-homework'),
+  'Hide unused video only on tagged homework pages');
+
+console.log('DESIGN2 BATCH GUARD PASS: five lesson + two homework Git blobs untouched; Michael reference unchanged; UI-only opt-ins');
