@@ -1794,7 +1794,7 @@ async function main() {
           await page.locator('header.gostudy-lesson-topbar:visible').waitFor();
           assert.equal(await page.locator('header.gostudy-lesson-topbar:visible').count(), 1);
           assert.equal(await page.locator('.gostudy-cabinet-back:visible').count(), 1);
-          const dictionary = page.locator('.glass-lesson-tools button[aria-label="Открыть словарь"]');
+          const dictionary = course === 'general_english_b1_stories' ? page.locator('#b1LessonDictionary') : page.locator('.glass-lesson-tools button[aria-label="Открыть словарь"]');
           const sidebar = page.locator('.room > .side, .gostudy-shared-room > .gostudy-room-sidebar');
           if (course === 'general_english_b1_stories') {
             await page.locator('#b1LessonDictionary:visible').waitFor();
