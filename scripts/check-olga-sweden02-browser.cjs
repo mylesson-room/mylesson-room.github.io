@@ -51,8 +51,12 @@ async function run(browser,base,file,mobile){
    assert.equal(await page.locator('#lessonVideo .jaas-person-tile').count(),2,'Michael 2 tiles');
    await page.locator('#lessonVideo .jaas-connect').click();
    await page.waitForFunction(()=>document.querySelector('#lessonVideo .jaas-message')?.textContent.includes('Synthetic token denied'),null,{timeout:10000});
-   await page.locator('#lessonSections button').nth(4).click();
-   await page.locator('#page-4.active').waitFor({state:'visible'});
+   // Section sidebar is intentionally collapsed on touch devices, so use
+   // the same visible Back/Next navigation that a student uses.
+   for(let step=1;step<=4;step++){
+    await page.locator('#next').click();
+    await page.locator('#page-'+step+'.active').waitFor({state:'visible'});
+   }
    await page.locator('#page-4 .sweden-listening details summary').waitFor({state:'visible'});
   }else assert.equal(await page.locator('#lessonVideo .video-workspace').isVisible(),false);
   const viewport=await page.evaluate(()=>({width:document.documentElement.scrollWidth,limit:innerWidth}));
