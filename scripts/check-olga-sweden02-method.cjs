@@ -37,9 +37,11 @@ for(const {s,c} of [a,h]){
 assert.ok(a.s.includes('data-jaas-scope="sweden-a2"')&&a.s.includes('gostudy-jaas-video.js'));
 assert.ok(!h.s.includes('data-jaas-video-pilot'),'Homework cannot pretend to host active camera');
 assert.ok(a.c.steps.some(x=>x.title.includes('café: two rounds')),'Two-round role-play mandatory');
-assert.ok(a.c.steps.some(x=>x.title.includes('Listen at the café')),'Authentic listening with transcript mandatory');
+assert.ok(a.c.steps.some(x=>x.title.includes('Listen: a rainy day in Stockholm')),'Authentic listening with transcript mandatory');
 const listening=fs.readFileSync('assets/gostudy-sweden02-michael-listening.js','utf8');
-for(const part of ['#page-4 .panel','speechSynthesis','Transcript','MutationObserver','pagehide'])
+assert.ok(listening.length>185000,'Original MP3 must be embedded (not TTS placeholder)');
+assert.ok(!listening.includes('speechSynthesis'),'Original audio must not be substituted with synthesized voice');
+for(const part of ['#page-4 .panel','data:audio/mpeg;base64,SUQz','Transcript','MutationObserver','pagehide','Yesterday was my first full day in Stockholm'])
  assert.ok(listening.includes(part),'Audio/transcript contract failed: '+part);
 const rubric={
  'A2 language and lexical load':9.3,
@@ -47,7 +49,7 @@ const rubric={
  'Meaningful speaking and negotiation':9.5,
  'Vocabulary recycling':9.4,
  'Past Simple versus going to':9.2,
- 'Reading and listening integration':9.1,
+ 'Reading and authentic MP3 listening integration':9.3,
  '50-minute pacing and learner agency':9.4,
  'Homework transfer and keys':9.4
 };
