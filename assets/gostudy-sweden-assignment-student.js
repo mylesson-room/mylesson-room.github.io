@@ -27,7 +27,7 @@
   summary.textContent='Сохранённые материалы из старого кабинета';
   const message=document.createElement('p');
   message.textContent='Старые слова и ответы не удалены. Открывайте этот раздел с того же устройства, на котором Вы занимались раньше.';
-  const old=document.createElement('a');old.href='student-sweden-legacy.html';old.textContent='Открыть старый кабинет для проверки сохранённых ответов';
+  const old=document.createElement('a');old.href='sweden-cabinet-legacy.html';old.textContent='Открыть старый кабинет для проверки сохранённых ответов';
   detail.append(summary,message,old);status.after(detail);
   function show(path){
     const selected=lessons[path] || lessons['sweden-a2-02.html'];
