@@ -76,6 +76,15 @@ const onlyUiBoot=`      // UI-only enhancements load after the authorized lesson
       }
 `;
 assert.ok(boot.includes(onlyUiBoot),'Private lesson loader contains unexpected changes');
-assert.equal(gitSha(boot.replace(onlyUiBoot,'')),'e6934d11c8432ddb8a02c3cfd7f20350d683cc93',
+const desktopChat=`      // Desktop live class keeps chat ready for teacher/student typing; phones
+      // start collapsed to preserve exercise space, with unread indicators.
+      if(body.dataset.premiumChatScript && !body.hasAttribute('data-vietnam-homework') &&
+         window.matchMedia('(min-width: 801px)').matches){
+        const chat=document.querySelector('#lessonVideo .lesson-chat-dropdown');
+        if(chat)chat.open=true;
+      }
+`;
+assert.ok(boot.includes(desktopChat),'Required desktop-only chat preference missing');
+assert.equal(gitSha(boot.replace(onlyUiBoot,'').replace(desktopChat,'')),'e6934d11c8432ddb8a02c3cfd7f20350d683cc93',
  'Existing auth, boot, answers and lesson state must remain exactly unchanged');
 console.log('Design2 guard PASS: Michael unchanged; Alla lesson/homework original blobs reconstruct exactly; UI-only assets');
