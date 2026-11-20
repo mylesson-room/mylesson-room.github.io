@@ -1,0 +1,94 @@
+/* Staged UI parity for Olga: present the original Sweden A2 material inside
+   the approved Michael-style learning space. Nothing here controls access or data.
+   Scope every rule so no other student or Michael's canonical lesson is affected. */
+body[data-olga-michael] {
+  --bg:#f6f9fd; --card:#fff; --ink:#223750; --muted:#62738b;
+  --line:#dce7f2; --accent:#206ec9; --tint:#e8f6ff; --soft:#f5f9ff;
+  background:#f6f9fd;color:var(--ink);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+body[data-olga-michael] > header {
+  position:sticky;top:0;z-index:40;min-height:66px;height:auto;
+  display:flex;align-items:center;background:#fff;border-bottom:1px solid #e2eaf5;
+  padding:12px max(20px,calc((100vw - 1380px)/2));
+  box-shadow:0 4px 22px #21436a08;
+}
+body[data-olga-michael] .brand {color:#213750;letter-spacing:-.6px}
+body[data-olga-michael] .header-actions .small-button {
+  border:1px solid #d7e3f1;border-radius:11px;background:#fff;
+  min-height:40px;color:#245c9e;font-size:13px;font-weight:650;
+}
+body[data-olga-michael] .shell {
+  width:100%;max-width:1450px;margin:0 auto;padding:24px 20px 72px;
+  display:grid;grid-template-columns:minmax(265px,33.333%) minmax(0,1fr);gap:19px;
+  align-items:start;
+}
+body[data-olga-michael] .shell > main{
+  min-width:0;grid-column:2;background:white;border:1px solid #e2eaf5;
+  border-radius:20px;box-shadow:0 5px 22px #244a750b;padding:27px;
+}
+body[data-olga-michael] .shell > .olga-michael-side{
+  grid-column:1;grid-row:1;position:sticky;top:89px;min-width:0;
+  display:grid;gap:14px;
+}
+body[data-olga-michael] .olga-panel {
+  border:1px solid #e0e8f2;border-radius:17px;background:#fff;
+  box-shadow:0 5px 20px #1a38520a;overflow:hidden;
+}
+body[data-olga-michael] .olga-panel-title{
+  font-size:11px;letter-spacing:1.4px;font-weight:850;color:#405a79;
+  padding:15px 17px;background:#f4f7fb;border-bottom:1px solid #e3eaf3;
+}
+body[data-olga-michael] .olga-panel-copy{padding:16px;font-size:13px;color:#657b94}
+body[data-olga-michael] .olga-panels-actions{display:flex;gap:9px;flex-wrap:wrap;padding:0 16px 16px}
+body[data-olga-michael] .olga-panels-actions a,body[data-olga-michael] .olga-panels-actions button{
+  border-radius:10px;border:1px solid #d9e7f5;color:#1a5fad;
+  padding:9px 12px;font-size:12px;min-height:40px;background:#f5faff;
+}
+body[data-olga-michael] .olga-video-tiles{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:15px;
+}
+body[data-olga-michael] .olga-video-tile{
+  border-radius:13px;min-height:116px;display:flex;align-items:center;
+  justify-content:center;flex-direction:column;gap:9px;
+  background:#213750;color:#e9f0fc;
+}
+body[data-olga-michael] .olga-video-tile span{font-size:11px;font-weight:650}
+body[data-olga-michael] .olga-video-tile svg{width:26px;height:26px}
+body[data-olga-michael] .olga-link{color:#256abe!important;font-size:13px;text-decoration:none}
+body[data-olga-michael] .olga-state{padding:0 16px 16px;color:#677c94;font-size:12px}
+body[data-olga-michael] .lesson-bar{margin-bottom:16px}
+body[data-olga-michael] #title {color:#223750;letter-spacing:-.65px}
+body[data-olga-michael] .hero{
+  background:linear-gradient(110deg,#e8f6ff 0%,#e4f0ff 100%);
+  border-color:#d8e9f9;color:#203e60;
+}
+body[data-olga-michael] .hero .eyebrow,
+body[data-olga-michael] .hero p{color:#456b94}
+body[data-olga-michael] #content>.card,
+body[data-olga-michael] .card{
+  border:1px solid #e0e9f4;background:#fff;border-radius:15px;
+  box-shadow:0 3px 12px #1b3e6307;
+}
+body[data-olga-michael] .primary{background:#216ec9;border-color:#216ec9;color:white;border-radius:11px}
+body[data-olga-michael] :is(button,a,select,textarea,input):focus-visible{outline:3px solid #48b4dd;outline-offset:2px}
+body[data-olga-michael] .footer{font-size:11px}
+body[data-olga-michael] #storageNote{color:#b56a30}
+body[data-olga-michael][data-olga-kind="cabinet"] .olga-overview{
+  max-width:1100px;margin:0 auto 18px;padding:19px 24px;background:#fff;
+  border:1px solid #dce7f3;border-radius:17px;color:#233e61;
+}
+body[data-olga-michael][data-olga-kind="cabinet"] .olga-overview p{margin:8px 0;color:#587089;font-size:13px}
+body[data-olga-michael][data-olga-kind="cabinet"] .picker{
+  position:static;top:auto;background:#fff;color:#324f73;
+  border-bottom:1px solid #dde7f2;box-shadow:none;
+}
+@media(max-width:800px){
+ body[data-olga-michael] > header{position:relative;padding:12px}
+ body[data-olga-michael] .shell{display:flex;flex-direction:column;padding:9px;gap:12px}
+ body[data-olga-michael] .shell >.olga-michael-side{order:0;position:static;width:100%}
+ body[data-olga-michael] .shell >main{order:1;width:100%;padding:17px;border-radius:15px}
+ body[data-olga-michael] .olga-video-tile{min-height:80px}
+ body[data-olga-michael] .olga-video-tiles{gap:8px}
+ body[data-olga-michael] .card{padding:18px}
+}
