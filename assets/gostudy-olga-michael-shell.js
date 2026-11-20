@@ -64,6 +64,19 @@
    'Встроенная видеосвязь ожидает отдельного подтверждения доступа.';
  video.querySelector('.video-workspace').append(status);
  aside.append(video);
+ if(!body.hasAttribute('data-olga-homework')){
+   const chat=document.createElement('section');
+   chat.className='finance-chat olga-panel';
+   chat.setAttribute('aria-label','Чат урока');
+   chat.innerHTML='<h2>Чат урока</h2>'+
+     '<p id="finance-live-status" role="status">Проверяем доступ к общей комнате…</p>'+
+     '<a href="login.html" class="finance-login">Войти в GoStudy</a>'+
+     '<p id="finance-activity" role="status"></p>'+
+     '<ol id="finance-messages" role="log" aria-live="polite"></ol>'+
+     '<form id="finance-chat-form"><input aria-label="Сообщение" maxlength="1000" required disabled placeholder="Сообщение">'+
+     '<button type="submit" disabled>Отправить</button></form>';
+   aside.append(chat);
+ }
  const tools=document.createElement('section');tools.className='olga-panel';
  const heading=document.createElement('div');heading.className='olga-panel-title';heading.textContent='ИНСТРУМЕНТЫ УРОКА';
  const content=document.createElement('div');content.className='olga-panel-copy';
