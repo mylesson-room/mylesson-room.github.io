@@ -1,6 +1,4 @@
--- REVIEW ONLY: never run until Sweden browser-local backup has been exported,
--- restored in a test browser, and accepted by the owner and Centralization.
--- This is one student / course; all unrelated course rows remain untouched.
+-- APPLIED to Supabase 2026-11-21: protected Sweden lesson selection & room seeded\n-- with existing Lesson 02 ONLY. All historical local answers/words are untouched.\n-- Review/traceability record; do not automatically rerun on PR merge.
 BEGIN;
 CREATE TABLE IF NOT EXISTS public.gostudy_sweden_lesson_selection (
   student_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE RESTRICT,
@@ -34,7 +32,7 @@ BEGIN
   IF p_lesson_path NOT IN ('sweden-a2-02.html','sweden-a2-03.html') OR p_lesson_path IS NULL
     THEN RAISE EXCEPTION 'Invalid Sweden lesson' USING ERRCODE='22023';
   END IF;
-  SELECT COUNT(*), MIN(s.student_id) INTO v_count,v_student
+  SELECT COUNT(*), MIN(s.student_id::text)::uuid INTO v_count,v_student
   FROM gostudy_private.lesson_course_students s
   WHERE s.course='sweden-a2' AND s.teacher_id=v_me;
   IF v_count <> 1 OR v_student IS NULL
@@ -45,14 +43,14 @@ BEGIN
   INSERT INTO public.gostudy_sweden_lesson_selection AS a
     (student_id,teacher_id,lesson_path,updated_at)
   VALUES (v_student,v_me,p_lesson_path,now())
-  ON CONFLICT (student_id) DO UPDATE SET
+  ON CONFLICT ON CONSTRAINT gostudy_sweden_lesson_selection_pkey DO UPDATE SET
     lesson_path=EXCLUDED.lesson_path,updated_at=now()
   WHERE a.teacher_id=v_me;
   IF NOT FOUND THEN RAISE EXCEPTION 'Existing assignment owned by someone else' USING ERRCODE='42501'; END IF;
   INSERT INTO public.gostudy_classroom_rooms AS r
     (student_id,teacher_id,course,lesson_path,student_label)
   VALUES (v_student,v_me,'sweden-a2',p_lesson_path,'Ольга')
-  ON CONFLICT (student_id,course) DO UPDATE SET
+  ON CONFLICT ON CONSTRAINT gostudy_classroom_rooms_student_id_course_key DO UPDATE SET
     lesson_path=EXCLUDED.lesson_path
   WHERE r.teacher_id=v_me;
   IF NOT FOUND THEN RAISE EXCEPTION 'Existing Sweden classroom owned by someone else' USING ERRCODE='42501'; END IF;
@@ -66,12 +64,12 @@ INSERT INTO public.gostudy_sweden_lesson_selection(student_id,teacher_id,lesson_
 SELECT student_id,teacher_id,'sweden-a2-02.html'
 FROM gostudy_private.lesson_course_students
 WHERE course='sweden-a2'
-ON CONFLICT (student_id) DO NOTHING;
+ON CONFLICT ON CONSTRAINT gostudy_sweden_lesson_selection_pkey DO NOTHING;
 INSERT INTO public.gostudy_classroom_rooms(student_id,teacher_id,course,lesson_path,student_label)
 SELECT student_id,teacher_id,'sweden-a2','sweden-a2-02.html','Ольга'
 FROM gostudy_private.lesson_course_students
 WHERE course='sweden-a2'
-ON CONFLICT (student_id,course) DO NOTHING;
+ON CONFLICT ON CONSTRAINT gostudy_classroom_rooms_student_id_course_key DO NOTHING;
 COMMIT;
 -- REQUIRED rollout tests:
 -- 1 student sees only self + cannot call teacher RPC; unrelated user sees no row
@@ -80,3 +78,6 @@ COMMIT;
 -- 4 old browser-local answer keys stay untouched and export/restore passes
 -- 5 new lesson 03 real student+teacher answer/page/chat/word tests; video
 -- 6 JaaS signed token endpoint separately tests denial/allowlist, then real two-party call
+
+-- Verified with transactional role simulations + ROLLBACK: teacher assignment 03, student denial,
+-- outsider SELECT 0; production remains assigned lesson 02 and course room 02.
