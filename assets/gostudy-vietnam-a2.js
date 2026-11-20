@@ -32,6 +32,12 @@
       });
       body.append(config);
       await loadScript(body.dataset.lessonScript);
+      // UI-only enhancements load after the authorized lesson shell exists.
+      // Optional scripts must never prevent private lessons/homework from opening.
+      for(const source of [body.dataset.premiumChatScript,body.dataset.videoPreviewScript].filter(Boolean)){
+        try { await loadScript(source); }
+        catch(error){ console.warn('Optional classroom visual unavailable:',source,error); }
+      }
       const signout=document.getElementById('gostudyAccessSignout');
       if(signout)document.querySelector('.header-right')?.append(signout);
       await loadScript(body.dataset.exercisesScript);
