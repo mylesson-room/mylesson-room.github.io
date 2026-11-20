@@ -14,6 +14,48 @@
     };
     before.replaceWith(room);
     document.body.classList.add('color-workbook');
+    if (document.body.hasAttribute('data-dud-b1-premium')) {
+      // Match Michael's resizable video/lesson boundary. This shared room
+      // extension is activated only for the B1 premium lesson, not its homework.
+      const divider=document.createElement('div');
+      divider.className='b1-lesson-divider';
+      divider.setAttribute('role','separator');
+      divider.setAttribute('aria-label','Ширина видео и инструментов');
+      divider.setAttribute('aria-orientation','vertical');
+      divider.setAttribute('aria-valuemin','25');
+      divider.setAttribute('aria-valuemax','45');
+      divider.tabIndex=0;
+      const storeKey='gostudy-b1-lesson-sidebar-width-v1';
+      const clamp=value=>Math.max(25,Math.min(45,Number(value)||31));
+      let saved=31;
+      try { saved=clamp(localStorage.getItem(storeKey)); }catch{}
+      const apply=value=>{
+        const width=clamp(value);
+        room.style.setProperty('--b1-sidebar-width',width+'%');
+        divider.setAttribute('aria-valuenow',String(width));
+        try {localStorage.setItem(storeKey,String(width));}catch{}
+      };
+      apply(saved);
+      room.append(divider);
+      divider.addEventListener('pointerdown',event=>{
+        if(event.button!==0)return;
+        divider.setPointerCapture(event.pointerId);
+        divider.classList.add('is-dragging');
+        event.preventDefault();
+      });
+      divider.addEventListener('pointermove',event=>{
+        if(!divider.hasPointerCapture(event.pointerId))return;
+        const rect=room.getBoundingClientRect();
+        apply((event.clientX-rect.left)/rect.width*100);
+      });
+      divider.addEventListener('lostpointercapture',()=>divider.classList.remove('is-dragging'));
+      divider.addEventListener('keydown',event=>{
+        const delta={ArrowLeft:-2,ArrowRight:2}[event.key];
+        if(!delta)return;
+        event.preventDefault();
+        apply(Number(divider.getAttribute('aria-valuenow'))+delta);
+      });
+    }
     return room;
   }
 
