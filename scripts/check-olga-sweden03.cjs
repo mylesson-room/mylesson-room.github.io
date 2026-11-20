@@ -7,9 +7,13 @@ const assert=require('node:assert/strict');
 const read=p=>fs.readFileSync(p,'utf8');
 const parse=p=>{
  const html=read(p);
- const match=html.match(/<script type="application\\/json" id="lesson-data">([\\s\\S]*?)<\\/script>/);
- assert.ok(match,p+' must use canonical v1 lesson payload');
- return {html,model:JSON.parse(match[1])};
+ const marker='<script type="application/json" id="lesson-data">';
+ const start=html.indexOf(marker);
+ assert.ok(start>=0,p+' must use canonical v1 lesson payload');
+ const end=html.indexOf('</script>',start+marker.length);
+ assert.ok(end>start,p+' must close lesson JSON script');
+ const payload=html.slice(start+marker.length,end);
+ return {html,model:JSON.parse(payload)};
 };
 const lesson=parse('sweden-a2-03.html');
 const homework=parse('sweden-a2-03-homework.html');
