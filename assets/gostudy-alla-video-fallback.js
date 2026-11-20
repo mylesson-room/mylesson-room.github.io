@@ -41,8 +41,12 @@
   link.title='Телемост откроется в новой вкладке';
   link.setAttribute('rel','noopener noreferrer');
   link.setAttribute('target','_blank');
-  const note=actions.querySelector(':scope > span');
-  if(note)note.textContent='В новой вкладке — Телемост';
+  const oldNote=actions.querySelector(':scope > span');
+  if(oldNote)oldNote.remove();
+  const note=document.createElement('p');
+  note.className='telemost-fallback-note';
+  note.textContent='Видеосвязь откроется отдельно через Телемост';
+  actions.after(note);
   actions.classList.add('jaas-control-bar','telemost-fallback-controls');
   workspace.classList.add('gostudy-video-fallback');
 })();
