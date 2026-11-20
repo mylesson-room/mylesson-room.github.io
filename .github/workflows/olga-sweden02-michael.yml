@@ -1,0 +1,34 @@
+name: Olga Sweden A2 Lesson 02 Michael method and browser QA
+on:
+  pull_request:
+    paths:
+      - 'sweden-a2-02-michael.html'
+      - 'sweden-a2-02-michael-homework.html'
+      - 'assets/gostudy-sweden02-michael-listening.js'
+      - 'scripts/check-olga-sweden02-method.cjs'
+      - 'scripts/check-olga-sweden02-browser.cjs'
+      - '.github/workflows/olga-sweden02-michael.yml'
+permissions:
+  contents: read
+jobs:
+  lesson02:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Enforce A2 9/10 methodology and keys
+        run: node scripts/check-olga-sweden02-method.cjs
+      - name: Install test controls
+        run: npm install --no-save --no-package-lock playwright@1.58.2
+      - name: Verify identical Michael video and student exercise UI
+        run: |
+          export GOSTUDY_CHROME="$(command -v google-chrome)"
+          node scripts/check-olga-sweden02-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: olga-sweden02-michael-previews
+          path: artifacts/olga-sweden02/
+          if-no-files-found: ignore
