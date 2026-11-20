@@ -358,9 +358,27 @@
      document.addEventListener('keydown',e=>{if(e.key==='Escape')hide()});
      document.addEventListener('pointerdown',e=>{if(pop.classList.contains('is-visible')&&!pop.contains(e.target))hide()});
      document.querySelectorAll('#back,#next').forEach(el=>el.addEventListener('click',hide));
-     saveBtn.addEventListener('click',()=>{
+     saveBtn.addEventListener('click',async()=>{
       const word=makeWord(lemma(phrase),target.value.trim());
-      if(word && saveVocabulary?.(word)){saveBtn.textContent='✓';saveBtn.disabled=true;}
+      if(!word||!saveVocabulary)return;
+      saveBtn.disabled=true;
+      const prior=saveBtn.textContent;
+      saveBtn.textContent='…';
+      try{
+        if(await saveVocabulary(word)){
+          saveBtn.textContent='✓';
+          saveBtn.disabled=true;
+          if(status)status.textContent='Слово сохранено в словаре.';
+        }else{
+          saveBtn.textContent=prior;
+          saveBtn.disabled=false;
+          if(status)status.textContent='Слово не сохранено. Проверьте подключение к уроку.';
+        }
+      }catch(error){
+        saveBtn.textContent=prior;
+        saveBtn.disabled=false;
+        if(status)status.textContent='Не удалось сохранить слово: '+error.message;
+      }
      });
   }
 

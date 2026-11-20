@@ -119,6 +119,10 @@ function updateWords(){
 updateWords();
 window.copyHomework=()=>navigator.clipboard.writeText($("#homework").value).then(()=>alert("Email copied")).catch(()=>alert("Copy unavailable in this browser"));
 function readWords(){
+  // Sweden A2 uses authenticated Supabase as its ONLY source of vocabulary.
+  // Do not display historical browser-local words: the owner has waived them.
+  if (document.body.dataset.cloudVocabulary === 'sweden-a2')
+    return window.GoStudySwedenCloudWords?.words() || [];
   if (config.preserve) {
     const words = new Map();
     for (const key of student ? [] : [...(config.legacyWords || []),WORDS_KEY]) for (const store of new Set([localStorage,stores])) {
@@ -142,12 +146,21 @@ function readWords(){
 }
 $("#openLessonDictionary").addEventListener("click",()=>{drawWords();$("#lessonDictionary").showModal()});
 function drawWords(){let w=readWords();$("#wordCountSidebar").textContent=w.length;$("#myWords").innerHTML=w.slice().reverse().map(x=>'<small><b>'+esc(x.en)+'</b> — '+esc(x.ru)+'</small>').join("")||'<small>No words saved yet.</small>'}
-window.addWord=i=>{let words=readWords(),w=VOCAB[i];if(window.FinanceLive?.send("word",{en:w[0],ru:w[2]})||document.body.dataset.classroomCourse)return;if(!words.some(x=>x.en.toLowerCase()===w[0].toLowerCase())){words.push({en:w[0],ru:w[2]});try{let obj=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");obj.words=words;localStorage.setItem(WORDS_KEY,JSON.stringify(obj))}catch(e){alert("Vocabulary saving unavailable")}}drawWords()};
+window.addWord=i=>{
+  if(document.body.dataset.cloudVocabulary==='sweden-a2'){
+    const word=VOCAB[i];
+    if(word)window.GoStudySwedenCloudWords?.save({en:word[0],ru:word[2]})
+      .catch(error=>{console.warn('Sweden word save:',error.message); alert(error.message)});
+    return;
+  }
+  let words=readWords(),w=VOCAB[i];if(window.FinanceLive?.send("word",{en:w[0],ru:w[2]})||document.body.dataset.classroomCourse)return;if(!words.some(x=>x.en.toLowerCase()===w[0].toLowerCase())){words.push({en:w[0],ru:w[2]});try{let obj=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");obj.words=words;localStorage.setItem(WORDS_KEY,JSON.stringify(obj))}catch(e){alert("Vocabulary saving unavailable")}}drawWords()};
 
 
 const {makeWord} = window.GoStudyLessonControls;
 function saveVocabulary(word){
  if(!word)return false;
+ if(document.body.dataset.cloudVocabulary==='sweden-a2')
+   return window.GoStudySwedenCloudWords?.save(word) || Promise.reject(Error('Облачный словарь недоступен.'));
  if(window.FinanceLive?.send("word",word))return true;
  if(config.privateRoom || document.body.dataset.classroomCourse)return false;
  try{
@@ -180,10 +193,19 @@ async function translateVocabulary(source,signal){
    catch(e){if(e.name!=="AbortError")console.warn("Dictionary translation unavailable")}
   },350);
  });
- $("#dictionaryAddForm").addEventListener("submit",e=>{
+ $("#dictionaryAddForm").addEventListener("submit",async e=>{
   e.preventDefault();
-  if(!saveVocabulary(makeWord(source.value,translation.value)))return;
-  source.value="";translation.value="";edited=false;seq++;controller?.abort();clearTimeout(timer);source.focus();
+  const form=$("#dictionaryAddForm"),submit=form.querySelector('button[type=submit],button:not([type])');
+  if(submit)submit.disabled=true;
+  try{
+    if(!await saveVocabulary(makeWord(source.value,translation.value)))return;
+    source.value="";translation.value="";edited=false;seq++;controller?.abort();clearTimeout(timer);source.focus();
+  }catch(error){
+    console.warn('Vocabulary save:',error.message);
+    const status=document.querySelector('#selectionStatus');
+    if(status)status.textContent='Слово не сохранено: '+error.message;
+    else alert('Слово не сохранено: '+error.message);
+  }finally{if(submit)submit.disabled=false;}
  });
 }
 window.GoStudyLessonControls.bindDivider();

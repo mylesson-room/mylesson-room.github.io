@@ -1,0 +1,20 @@
+name: Olga Sweden two-role JaaS JWT security
+on:
+  pull_request:
+    paths:
+      - 'scripts/check-jaas-sweden-token.cjs'
+      - 'supabase/functions/gostudy-jaas-sweden-token/index.ts'
+      - '.github/workflows/olga-sweden-jaas-security.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  signed-tokens:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Signed JWT, course isolation, denial and same-room test
+        run: node scripts/check-jaas-sweden-token.cjs
