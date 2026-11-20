@@ -1909,12 +1909,19 @@ async function main() {
         // B1 travel lesson: student city decisions were previously stored only
         // as a local UI preference and were invisible in the teacher dashboard.
         if (course === 'general_english_b1_stories') {
+          // The preceding vocabulary checks leave two modal dictionaries open.
+          // Close them to test the actual lesson surface, then reopen them for
+          // the remaining dictionary synchronization assertions below.
+          await Promise.all([sp,tp].map(page=>page.locator('.glass-words[open]').evaluate(dialog=>dialog.close())));
           const studentChoice=sp.locator('.b1-travel-radio input[value="Da Nang"]');
           await studentChoice.check();
           const teacherOverview=tp.getByRole('navigation',{name:'Ответы ученицы по заданиям'});
           await teacherOverview.getByRole('button',{name:'01 · Three places. One new life (1)',exact:true}).waitFor({timeout:12000});
           await tp.locator('.b1-live-city-choice').getByText('Ученица выбрала: Da Nang',{exact:true}).waitFor();
           assert.equal(await sp.locator('.b1-travel-radio input[value="Da Nang"]').isChecked(),true);
+          await sp.locator('#b1LessonDictionary').click();
+          await tp.locator('#b1LessonDictionary').click();
+          await Promise.all([sp,tp].map(page=>page.locator('.glass-words[open]').waitFor()));
         }
         assert.equal(new URL(tp.url()).searchParams.get('classStudent'), studentId);
         assert.equal(new URL(sp.url()).searchParams.has('classStudent'), false);
