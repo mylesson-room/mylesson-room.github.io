@@ -146,9 +146,15 @@ async function pageFor(browser,base,{file,mobile=false,role='student',assigned='
      await item.page.locator('#sweden-assignment-form button').click();
      await item.page.waitForFunction(()=>document.querySelector('#sweden-assignment-status')?.textContent.includes('Сохранено'),{timeout:7000});
      assert.equal(item.getMock().postCount,1,'teacher-only RPC called once');
+     const join=item.page.locator('#sweden-teacher-join');
+     await join.waitFor({state:'visible',timeout:7000});
+     assert.ok((await join.getAttribute('href')).includes('?classStudent='+student),
+       'Teacher join must carry the exact authorized student room');
     }else{
      assert.equal(await item.page.locator('#sweden-lesson').isDisabled(),true,'student must never enable teacher assignment');
      assert.equal(item.getMock().postCount,0,'student must not send teacher-only mutation');
+     assert.equal(await item.page.locator('#sweden-teacher-join').isVisible(),false,
+       'Unauthorized student must never see teacher join control');
     }
     console.log('OLGA SELECTOR PASS '+role);
    }finally{await item.context.close();}
