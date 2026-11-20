@@ -1,0 +1,41 @@
+name: Olga Sweden A2 lesson 3 protected staging
+on:
+  pull_request:
+    paths:
+      - 'student-sweden.html'
+      - 'student-sweden-legacy.html'
+      - 'sweden-a2-03.html'
+      - 'sweden-a2-03-homework.html'
+      - 'teacher-sweden-assignment.html'
+      - 'gostudy-teacher.html'
+      - 'assets/gostudy-sweden*.js'
+      - 'docs/sql/olga-sweden-selection-review-only.sql'
+      - 'scripts/check-olga-sweden03*.cjs'
+      - '.github/workflows/olga-sweden03-staging.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  olga-acceptance:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Historic data and Michael integration source locks
+        run: node scripts/check-olga-sweden03-contract.cjs
+      - name: New A2 methodology >9 and answer-key audit
+        run: node scripts/check-olga-sweden03.cjs
+      - name: Isolated browser controls
+        run: npm install --no-save --no-package-lock playwright@1.58.2
+      - name: Real Chromium UI and mock-role browser checks
+        run: |
+          export GOSTUDY_CHROME="$(command -v google-chrome)"
+          node scripts/check-olga-sweden03-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: olga-sweden03-desktop-mobile-mock-acceptance
+          path: artifacts/olga-sweden03/
+          if-no-files-found: ignore
