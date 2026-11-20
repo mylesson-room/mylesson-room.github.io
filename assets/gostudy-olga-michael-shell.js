@@ -50,14 +50,19 @@
  const aside=document.createElement('aside');aside.className='olga-michael-side';
  aside.setAttribute('aria-label','Инструменты урока');
  const video=document.createElement('section');video.className='olga-panel';
- video.innerHTML='<div class="olga-panel-title">ВИДЕО УРОКА</div>'+
-   '<div class="olga-video-tiles">'+
-     '<div class="olga-video-tile">'+icon+'<span>Преподаватель</span></div>'+
-     '<div class="olga-video-tile">'+icon+'<span>Ольга</span></div>'+
-   '</div>';
+ video.id='lessonVideo';
+ const enabled=body.hasAttribute('data-olga-jaas-video');
+ video.innerHTML='<div class="video-workspace">'+
+   '<div class="video-top"><span class="live-dot"></span><span>ВИДЕО УРОКА</span><span class="video-state">Не подключено</span></div>'+
+   '<div class="video-preview" role="group" aria-label="Преподаватель и Ольга до подключения">'+
+     '<div class="olga-video-tiles">'+
+       '<div class="olga-video-tile">'+icon+'<span>Преподаватель</span></div>'+
+       '<div class="olga-video-tile">'+icon+'<span>Ольга</span></div>'+
+     '</div></div><div class="video-actions"></div></div>';
  const status=document.createElement('p');status.className='olga-state';
- status.textContent='Встроенная видеосвязь пока не активирована: защищённая комната Ольги не создана.';
- video.append(status);
+ status.textContent=enabled?'Подключение доступно только авторизованным участникам Sweden A2.':
+   'Встроенная видеосвязь ожидает отдельного подтверждения доступа.';
+ video.querySelector('.video-workspace').append(status);
  aside.append(video);
  const tools=document.createElement('section');tools.className='olga-panel';
  const heading=document.createElement('div');heading.className='olga-panel-title';heading.textContent='ИНСТРУМЕНТЫ УРОКА';
