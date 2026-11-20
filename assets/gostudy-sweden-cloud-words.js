@@ -7,7 +7,7 @@
   if (document.body.dataset.cloudVocabulary !== 'sweden-a2') return;
   const auth = () => window.GoStudyFinanceAuth;
   const records = new Map();
-  let ready = false, loading = null, lastError = '';
+  let ready = false, loading = null, lastError = '', version=0;
   const normalize = word => ({
     en: String(word?.en || '').trim().replace(/\s+/g,' ').slice(0,150),
     ru: String(word?.ru || '').trim().replace(/\s+/g,' ').slice(0,300)
@@ -32,8 +32,11 @@
     if(loading)return loading;
     loading=(async()=>{
       try{
+        const observedVersion=version;
         const rows=await request('/rest/v1/gostudy_sweden_words?select=en,ru,word_key,updated_at&order=updated_at.asc');
         if(!Array.isArray(rows))throw Error('Некорректный ответ словаря.');
+        // Do not overwrite a newly ACKed save with a stale GET from before it.
+        if(observedVersion!==version)return;
         records.clear();
         for(const row of rows){
           const word=normalize(row);
@@ -55,6 +58,7 @@
       throw Error('Сервер не подтвердил добавление слова.');
     const key=word.en.toLocaleLowerCase('en');
     const added=!records.has(key);
+    version++;
     records.set(key,word);ready=true;lastError='';
     notify(added,word);return word;
   }
