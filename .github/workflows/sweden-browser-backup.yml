@@ -1,0 +1,18 @@
+name: Sweden browser-only legacy backup safety
+on:
+  pull_request:
+    paths:
+      - 'sweden-backup-check.html'
+      - 'scripts/check-sweden-backup-readonly.cjs'
+      - '.github/workflows/sweden-browser-backup.yml'
+permissions:
+  contents: read
+jobs:
+  readonly-backup:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/check-sweden-backup-readonly.cjs
