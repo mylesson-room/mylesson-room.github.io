@@ -1812,6 +1812,10 @@ async function main() {
           await page.evaluate(() => document.documentElement.style.removeProperty('--gostudy-ui-heading-size'));
           assert.equal(await heading.evaluate(node => getComputedStyle(node).fontSize),originalFont);
           if (course === 'general_english_b1_stories') {
+            await page.locator('#b1LessonDictionary').waitFor({state:'visible'});
+            await page.locator('#b1LessonDictionary').click();
+            await page.locator('.glass-words[open]').waitFor();
+            await page.locator('.glass-words[open]').evaluate(dialog=>dialog.close());
             const sectionsMenu=sidebar.locator('.b1-sections-menu');
             await sectionsMenu.waitFor({state:'visible'});
             assert.equal(await sectionsMenu.getAttribute('open'),null,'B1 sections default to Michael-style collapsed view');
