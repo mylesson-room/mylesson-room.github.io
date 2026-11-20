@@ -73,12 +73,19 @@
       if(!range||!pop.classList.contains('is-visible'))return;
       const rect=range.getBoundingClientRect(),margin=10;
       const header=document.querySelector('header')?.getBoundingClientRect().bottom||0;
-      const pager=document.querySelector('.step-nav')?.getBoundingClientRect().top||innerHeight;
-      const width=pop.offsetWidth;
+      const footer=document.querySelector('.step-nav')?.getBoundingClientRect().top||innerHeight;
+      const safeTop=Math.max(10,Math.min(innerHeight-180,header+8));
+      const safeBottom=Math.min(innerHeight-10,Math.max(safeTop+160,footer-8));
+      const width=Math.min(pop.offsetWidth,innerWidth-margin*2);
       pop.style.left=Math.round(Math.max(margin,Math.min(innerWidth-width-margin,rect.left)))+'px';
-      pop.style.maxHeight=Math.max(150,pager-header-25)+'px';
-      const below=pager-rect.bottom-8,above=rect.top-header-8;
-      pop.style.top=Math.round(below>pop.offsetHeight||below>=above?rect.bottom+8:Math.max(header+8,rect.top-pop.offsetHeight-8))+'px';
+      pop.style.maxHeight=Math.max(145,Math.min(450,safeBottom-safeTop))+'px';
+      const height=pop.offsetHeight;
+      // Clamp inside the visible lesson viewport, including when the selected
+      // text is close to the navigation bar or partially off screen.
+      const proposed=rect.bottom+8+height<=safeBottom ? rect.bottom+8
+        : rect.top-height-8>=safeTop ? rect.top-height-8
+        : Math.max(safeTop,Math.min(rect.bottom+8,safeBottom-height));
+      pop.style.top=Math.round(Math.max(safeTop,Math.min(safeBottom-height,proposed)))+'px';
      }
      function showStatus(t){status.textContent=t;status.hidden=!t;}
      function hide(){pop.classList.remove('is-visible');range=null;controller?.abort();seq++;}
