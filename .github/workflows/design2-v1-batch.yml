@@ -3,6 +3,9 @@ on:
   pull_request:
     paths:
       - 'art-b1-03.html'
+      - 'art-b1-03-homework.html'
+      - 'business-ai-b2c1-03-homework.html'
+      - 'assets/gostudy-design2-homework.css'
       - 'business-ai-b2c1-03.html'
       - 'first-sales-c1-03.html'
       - 'general-english-b2-01.html'
