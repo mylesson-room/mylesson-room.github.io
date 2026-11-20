@@ -8,8 +8,8 @@ const crypto=require('node:crypto');
 const read=p=>fs.readFileSync(p,'utf8');
 const sha=s=>{const bytes=Buffer.from(s,'utf8');return crypto.createHash('sha1').update('blob '+bytes.length+'\0').update(bytes).digest('hex');};
 const original={
- 'sweden-a2.html':'5860d86b117a365be68d54fd58c40b6e0b3cbe6',
- 'sweden-a2-01-homework.html':'888e8b507e3c719f6ec61745083273ae2897da2c',
+ 'sweden-a2.html':'edd099c80c681f4cdf8a55885d3a797e4da0285f',
+ 'sweden-a2-01-homework.html':'c67fd2e3c4b2bc89feb27274af67f05820bef687',
  'sweden-a2-02.html':'40aa2e65f12860202955864e6a0a757fa3c300ed',
  'sweden-a2-02-homework.html':'bcc02aa8f4b006b5ddb087b6e42e27ce9779a22a',
  'student-sweden-legacy.html':'6fe82b8e3482edc1ab483331d39fb235fa6cdd87'
