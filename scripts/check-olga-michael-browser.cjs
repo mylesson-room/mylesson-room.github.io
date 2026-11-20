@@ -56,8 +56,8 @@ async function check(browser,base,file,kind,mobile){
       assert.equal(await page.locator('#lessonVideo .jaas-connect').count(),0,
         label+' homework must never start camera');
     }
-    assert.equal(await page.locator('.olga-michael-side button').first().textContent(),'Мой словарь');
-    await page.locator('.olga-michael-side button').first().click();
+    assert.equal(await page.locator('.olga-panel').last().locator('.olga-panels-actions').first().locator('button').first().textContent(),'Мой словарь');
+    await page.locator('.olga-panel').last().locator('.olga-panels-actions').first().locator('button').first().click();
     await page.locator('#dictionary[open]').waitFor({state:'visible'});
     await page.locator('#closeDict').click();
     await page.locator('#dictionary[open]').waitFor({state:'hidden'});
