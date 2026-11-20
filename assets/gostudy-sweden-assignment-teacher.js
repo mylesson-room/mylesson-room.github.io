@@ -49,8 +49,8 @@
     if(busy||!studentId||!allowed.has(field.value))return;
     busy=true;save.disabled=true;field.disabled=true;
     try{
-      const response=await api('/rest/v1/gostudy_sweden_lesson_selection?student_id=eq.'+encodeURIComponent(studentId),{
-        method:'PATCH',headers:{Prefer:'return=representation'},body:{lesson_path:field.value}
+      const response=await api('/rest/v1/rpc/gostudy_sweden_set_lesson',{
+        method:'POST',body:{p_lesson_path:field.value}
       });
       if(!Array.isArray(response)||response.length!==1||response[0]?.lesson_path!==field.value)
         throw Error('Назначение не подтвердилось — обновите страницу.');
