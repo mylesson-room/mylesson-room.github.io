@@ -66,9 +66,13 @@ function renderLesson(config){
   record=await getAssignment(room.student_id)||{exercise_ids:[],published_at:null};
   const query=new URLSearchParams({classStudent:room.student_id});link.href=homeworkPath+'?'+query;
   update();
+  const allowExerciseMenus=document.body.dataset.premiumFeed!=='michael-v1';
   for(const d of defs){
    if(!d.element)continue;
    d.element.dataset.exerciseId=d.id;
+   // Michael's visual pilot hides this whole feature, so don't insert the
+   // menu into the DOM at all; saved assignments and homework remain intact.
+   if(!allowExerciseMenus)continue;
    const control=document.createElement('details');control.className='homework-exercise-menu';
    const summary=document.createElement('summary');summary.textContent='⋯ Упражнение '+d.number;summary.setAttribute('aria-label','Меню упражнения '+d.number);
    const button=document.createElement('button');button.type='button';button.textContent='Добавить в домашнее задание';

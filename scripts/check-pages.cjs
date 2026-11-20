@@ -646,7 +646,8 @@ async function checkSharedComponentReversible(browser,origin){
 async function checkFinanceHomework(browser,origin){
  const studentId='11111111-1111-4111-8111-111111111111',teacherId='22222222-2222-4222-8222-222222222222';
  const lesson='business-ai-finance-b2-02.html',homework='business-ai-finance-b2-02-homework.html';
- let draft=null,published=null;const answers=new Map();
+ // Existing draft proves that hiding the exercise menus does not delete homework.
+ let draft={exercise_ids:['finance2-vocab-02'],published_at:null},published=null;const answers=new Map();
  const contexts=[];
  const makeContext=async(id,role,mobile=false)=>{
   const context=await browser.newContext(mobile?{viewport:{width:390,height:844},isMobile:true,hasTouch:true}:{});
@@ -692,19 +693,13 @@ async function checkFinanceHomework(browser,origin){
   await student.locator('#homework-status').filter({hasText:'не опубликовано'}).waitFor();
   await teacher.locator('.homework-teacher-actions').waitFor();
   await teacher.getByRole('button',{name:'Continue',exact:true}).click();
-  const second=teacher.locator('#vocab .term').nth(1);
-  const exerciseMenu=second.locator('.homework-exercise-menu');
-  await exerciseMenu.waitFor({state:'attached'});
-  assert.equal(await exerciseMenu.isVisible(),false,'Michael: homework assignment menu must be hidden in lesson UI');
-  assert.equal(await teacher.locator('.homework-exercise-menu:visible').count(),0,'No per-exercise homework menus should be visible');
-  // Exercise assignment is temporarily hidden, not deleted. Simulate the
-  // pre-existing handler to ensure saved drafts and publication still work.
-  await exerciseMenu.evaluate(node=>node.querySelector('button').click());
+  await teacher.locator('#vocab .term').nth(1).waitFor();
+  // Regression: hiding by CSS is insufficient; no menu can exist in the DOM
+  // for the Michael pilot. Other lessons still retain the original feature.
+  assert.equal(await teacher.locator('.homework-exercise-menu').count(),0,'Michael must not inject exercise-to-homework menus');
+  assert.equal(await teacher.getByText('⋯ Упражнение',{exact:false}).count(),0,'No exercise-to-homework labels in Michael lesson');
   await teacher.locator('.homework-draft-status').filter({hasText:'В черновике: 1'}).waitFor();
-  assert.deepEqual(draft.exercise_ids,['finance2-vocab-02'],'Only the second vocabulary exercise is assigned');
-  await exerciseMenu.evaluate(node=>node.querySelector('button').click());
-  await teacher.locator('.homework-draft-status').filter({hasText:'В черновике: 1'}).waitFor();
-  assert.deepEqual(draft.exercise_ids,['finance2-vocab-02'],'Repeated assignment must not duplicate exercise');
+  assert.deepEqual(draft.exercise_ids,['finance2-vocab-02'],'Existing draft survives removal of the buttons');
   await student.reload();
   await student.locator('#homework-status').filter({hasText:'не опубликовано'}).waitFor();
   await teacher.locator('.homework-publish').click();
@@ -718,7 +713,7 @@ async function checkFinanceHomework(browser,origin){
   assert.ok(answers.has('finance2-vocab-02'),'Mobile homework answer persisted');
   await student.reload();
   assert.equal(await student.locator('.homework-task select').inputValue(),answers.get('finance2-vocab-02').value);
-  console.log('Finance homework: draft -> one exercise -> idempotent assignment -> student blocked -> publish -> mobile save/reload verified');
+  console.log('Finance homework: Michael exercise menus absent from DOM, existing draft preserved, student blocked -> publish -> mobile save/reload verified');
  }finally{for(const context of contexts)await context.close();}
 }
 
