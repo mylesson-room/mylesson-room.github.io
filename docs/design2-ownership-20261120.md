@@ -47,3 +47,19 @@
 - Visual screenshots and responsive interaction at desktop and phone resolutions for Michael **and** Alla.
 - Authenticated student and teacher smoke checks; no unauthorized pages or damaged progress.
 - Recorded results, explicit acceptance; then Centralization coordinates final migration merge.
+
+
+## Browser verification — PR #51 (2026-11-20)
+
+CI: [Design 2 test run #44715253248](https://github.com/mylesson-room/mylesson-room.github.io/actions/runs/44715253248).
+- Browser: Chromium on GitHub Actions (1365 x 850 desktop and 390 x 844 touch mobile); actual repository HTML/CSS/JS files served locally.
+- Login and Supabase API responses mocked with **synthetic** IDs, so no real accounts, production secrets, backend reads, or writes. This is NOT a verified live authorization or cross-account RLS test.
+- Michael student desktop/mobile, Alla student desktop/mobile, Alla teacher mobile: all 5 browser rendering/navigation test cases passed.
+- Both lessons match the approved Michael CSS computed values for lesson paper color, horizontal padding, continuous bottom edge, and section heading gradient at both breakpoints.
+- Neither lesson had horizontal page overflow; lesson navigation advanced from `page-0` to `page-1`; common translation-selection control rendered.
+- Visual screenshot artifacts available on the run under `design2-michael-alla-mock-screenshots` (5 screenshots). Screenshots are mock-auth test renders, **not** visual proof of production access.
+- **Known functional gap:** Michael has embedded JaaS two-person video tiles and connect control; Alla still has old external Telemost button. Do **not** silently replace functional Telemost with a mock call button. Centralization must confirm secure room membership/token support for Vietnam A2 before Design 2 reuses `assets/gostudy-jaas-video.js/css`.
+- Not yet tested: live Supabase permissions, student and teacher logins under real accounts, camera/mic permissions, live translation service responses, cross-device and cross-user answer sync, video persistence on mobile, overall accessibility review.
+- Production remains unchanged; customer acceptance and Centralization security/backup signoff required before merge/release.
+
+**Next safe Design 2 task:** prepare reusable VIDEO UI/chrome integration only after Centralization provides a secure reusable course-independent token interface. Do not edit `assets/gostudy-sync.js`, database schema, or Supabase auth.
