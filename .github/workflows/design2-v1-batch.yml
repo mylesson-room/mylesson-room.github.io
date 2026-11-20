@@ -1,0 +1,42 @@
+name: Design2 Michael unified v1 lesson batch
+on:
+  pull_request:
+    paths:
+      - 'art-b1-03.html'
+      - 'art-b1-03-homework.html'
+      - 'business-ai-b2c1-03-homework.html'
+      - 'assets/gostudy-design2-homework.css'
+      - 'business-ai-b2c1-03.html'
+      - 'first-sales-c1-03.html'
+      - 'general-english-b2-01.html'
+      - 'pharma-ai-evidence-c1-20261118.html'
+      - 'assets/gostudy-design2-chat-desktop.js'
+      - 'scripts/check-design2-michael-v1-batch.cjs'
+      - 'scripts/check-design2-michael-v1-batch-browser.cjs'
+      - '.github/workflows/design2-v1-batch.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  michael-parity-batch:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify untouched Michael and exact preserved lesson content
+        run: node scripts/check-design2-michael-v1-batch.cjs
+      - name: Install isolated browser test dependency
+        run: npm install --no-save --no-package-lock playwright@1.58.2
+      - name: Check each lesson in desktop and mobile Chrome
+        run: |
+          GOSTUDY_CHROME="$(command -v google-chrome)"
+          export GOSTUDY_CHROME
+          node scripts/check-design2-michael-v1-batch-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: design2-v1-batch-visuals
+          path: artifacts/design2-batch
+          if-no-files-found: ignore
