@@ -1,5 +1,5 @@
 {
-  "key": "gostudy-general-english-b1-stories-toxic-20261120-v1",
+  "key": "gostudy-general-english-b1-stories-01-v1",
   "title": "Toxic Co-workers: How to Handle Difficult People",
   "level": "B1 · Adult General English · 50 minutes",
   "cabinet": "student-general-english-b1-stories.html",
@@ -497,5 +497,6 @@
       "type": "write",
       "teacherNotes": "8 min. Performance criteria: (1) three target phrases used accurately, (2) at least one correct -ing and one correct to-infinitive, (3) a respectful request and specific next step, (4) clear and understandable speech. Give one correction and one repeat opportunity. Homework remains the previously assigned independent task, unchanged."
     }
-  ]
+  ],
+  "contentVersion": "toxic-coworkers-b1-20261120"
 }
