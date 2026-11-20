@@ -97,11 +97,17 @@ async function sample(browser,origin,{name,html,mobile,role='student'}){
       const dropdown=page.locator('#lessonVideo .lesson-chat-dropdown');
       await dropdown.waitFor({state:'attached',timeout:6000});
       assert.equal(await dropdown.locator('#finance-chat-form').count(),1,name+' chat form lost');
+      if(await dropdown.getAttribute('open') !== null){
+        await dropdown.locator('summary.lesson-chat-toggle').click({timeout:6000});
+        await page.waitForFunction(()=>!document.querySelector('#lessonVideo .lesson-chat-dropdown')?.open);
+      }
       await page.evaluate(()=>document.dispatchEvent(new CustomEvent('finance-event',{
         detail:{kind:'chat',own:false,initial:false}
       })));
       assert.equal(await dropdown.locator('.lesson-chat-unread').textContent(),'1',name+' unread notification missing');
       await dropdown.locator('summary.lesson-chat-toggle').click({timeout:6000});
+      await page.waitForFunction(()=>document.querySelector('#lessonVideo .lesson-chat-dropdown')?.open &&
+        document.querySelector('#lessonVideo .lesson-chat-unread')?.hidden===true);
       assert.equal(await dropdown.getAttribute('open'),'',
         name+' chat must open without dropping existing DOM/form');
       assert.equal(await dropdown.locator('.lesson-chat-unread').isVisible(),false,
