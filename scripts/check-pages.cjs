@@ -1831,6 +1831,36 @@ async function main() {
             await page.locator('#b1LessonDictionary').click();
             await page.locator('.glass-words[open]').waitFor();
             await page.locator('.glass-words[open]').evaluate(dialog=>dialog.close());
+            // Michael parity: the dictionary is top-right ONLY, not a
+            // floating round book button, and selection uses his compact popup.
+            assert.equal(await page.locator('.glass-lesson-tools:visible').count(),0,'Legacy floating dictionary must be removed in B1');
+            assert.equal(await page.locator('.glass-translation:visible').count(),0,'Old sidebar translator must be gone');
+            await page.locator('#selectionTranslate').waitFor({state:'attached'});
+            const videoStyle=await page.locator('#lessonVideo .video-preview').evaluate(el=>{
+              const style=getComputedStyle(el);
+              return {minimum:style.minHeight,background:style.backgroundImage};
+            });
+            assert.equal(videoStyle.minimum,'355px','B1 video must use Michael shared premium preview layout');
+            assert.ok(videoStyle.background.includes('linear-gradient'),'B1 and Michael video backgrounds must use the same premium CSS');
+            await page.evaluate(()=>{
+              const root=document.querySelector('.sheet .lesson-content');
+              const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+              let node;
+              while((node=walker.nextNode())){
+                const pos=node.textContent.toLowerCase().indexOf('describe');
+                if(pos<0)continue;
+                const range=document.createRange();range.setStart(node,pos);range.setEnd(node,pos+8);
+                const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);
+                document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
+                break;
+              }
+            });
+            const popup=page.locator('#selectionTranslate');
+            await popup.waitFor({state:'visible'});
+            assert.ok(await popup.evaluate(el=>el.getBoundingClientRect().width)<=340,'Michael translator must be compact');
+            assert.ok(await popup.evaluate(el=>getComputedStyle(el).position)==='fixed','Translator should float next to selection');
+            await page.keyboard.press('Escape');
+            await popup.waitFor({state:'hidden'});
             const sectionsMenu=sidebar.locator('.b1-sections-menu');
             await sectionsMenu.waitFor({state:'visible'});
             assert.equal(await sectionsMenu.getAttribute('open'),null,'B1 sections default to Michael-style collapsed view');
