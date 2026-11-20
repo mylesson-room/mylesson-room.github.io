@@ -1778,7 +1778,13 @@ async function main() {
           const sidebar = page.locator('.room > .side, .gostudy-shared-room > .gostudy-room-sidebar');
           await sidebar.getByRole('button', {name:'Открыть словарь'}).waitFor();
           assert.equal(await page.locator('.gostudy-classroom-back:visible').count(), 0);
-          await sidebar.getByText('Видеосвязь', {exact:true}).waitFor();
+          if (course === 'general_english_b1_stories') {
+            await sidebar.locator('#lessonVideo .jaas-connect').waitFor({state:'visible'});
+            assert.equal(await sidebar.locator('#lessonVideo .jaas-person-tile').count(),2,
+              'The approved two-person video tiles should replace the old static video label');
+          } else {
+            await sidebar.getByText('Видеосвязь', {exact:true}).waitFor();
+          }
           await page.locator('.sheet .lesson-meta').waitFor();
           await page.locator('[data-shared-classroom]').waitFor();
           const heading = page.locator('.sheet h1').first();
