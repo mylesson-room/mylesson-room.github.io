@@ -692,6 +692,14 @@
       });
       document.querySelector('.room').hidden = false;
       status.hidden = true;
+      // Only after the protected B1 access RPC succeeds do we expose
+      // authenticated video helpers and mount the persistent JaaS panel.
+      if (currentPage === 'general-english-b1-stories-01.html') {
+        window.GoStudyB1VideoAuth = { token, request, userId:()=>session?.user?.id, classroomStudent };
+        const video = document.createElement('script');
+        video.src = 'assets/gostudy-b1-stories-video.js?v=b1-20261120-1';
+        document.body.append(video);
+      }
       if (classroomStudent === null) mountLesson();
       const vocabulary = document.createElement('script');
       vocabulary.src = status.dataset.vocabulary;
