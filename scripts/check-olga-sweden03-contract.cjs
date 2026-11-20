@@ -43,18 +43,20 @@ assert.ok(!/GRANT\s+INSERT|GRANT\s+DELETE|GRANT\s+UPDATE/i.test(sql),
  'Students must not be able to write lesson assignments directly');
 const lesson=read('sweden-a2-03.html');
 const homework=read('sweden-a2-03-homework.html');
-assert.ok(lesson.includes('data-sweden-jaas-v1')&&lesson.includes('gostudy-sweden-v1-jaas.js'),
- 'New Sweden lesson must use the exact approved video control layout and scoped token handler');
+assert.ok(lesson.includes('data-jaas-video-pilot') &&
+ lesson.includes('data-jaas-scope="sweden-a2"')&&lesson.includes('gostudy-jaas-video.js'),
+ 'New Sweden lesson must use the identical approved Michael video controls, Sweden-only token scope');
 assert.ok(lesson.includes('gostudy-jaas-video.css'),'Approved Michael video controls CSS missing');
 assert.ok(homework.includes('data-design2-homework')&&!homework.includes('data-sweden-jaas-v1'),
  'Homework must not present fake camera/mic buttons');
-const video=read('assets/gostudy-sweden-v1-jaas.js');
-assert.ok(video.includes('gostudy-jaas-sweden-token') &&
+const video=read('assets/gostudy-jaas-video.js');
+assert.ok(video.includes("jaasScope === 'sweden-a2'")&&
+ video.includes('gostudy-jaas-sweden-token')&&
  video.includes('^gostudy-sweden-a2-')&&
- video.includes('resolveStudentId') &&
- video.includes('videoConferenceJoined'),'Dedicated signed JaaS integration missing');
-assert.ok(!video.includes('gostudy_finance_room')&&!video.includes('gostudy-jaas-country-house-token'),
- 'Never let Olga join Michael or Irina rooms');
+ video.includes('if (b1Stories || countryHouse || swedenA2) return auth.classroomStudent || null;')&&
+ video.includes('videoConferenceJoined'), 'Approved shared Michael video must route only Sweden course tokens for Olga');
+assert.ok(video.includes('gostudy_finance_room'),
+ 'Existing Michael finance room must remain unchanged in shared video adapter');
 const listening=read('assets/gostudy-sweden03-listening.js');
 assert.ok(listening.includes('MutationObserver')&&listening.includes('Transcript'),
  'Transcript/listening must survive asynchronous workbook loading');
