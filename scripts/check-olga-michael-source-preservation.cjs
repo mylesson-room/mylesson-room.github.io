@@ -16,6 +16,9 @@ const originals={
 };
 const css='<link rel="stylesheet" href="assets/gostudy-olga-michael.css?v=1">';
 const js='<script src="assets/gostudy-olga-michael-shell.js?v=1"></script>';
+const videoCSS='<link rel="stylesheet" href="assets/gostudy-jaas-video.css?v=two-tiles-20261119-1">';
+const videoJS='<script src="assets/gostudy-sync.js?v=olga-v1"></script><script src="assets/gostudy-olga-jaas-video.js?v=1"></script>';
+
 for(const [file,sha] of Object.entries(originals)){
  const source=read(file);
  const kind=file==='student-sweden.html'?'cabinet':file.includes('homework')?'homework':'lesson';
@@ -23,7 +26,16 @@ for(const [file,sha] of Object.entries(originals)){
  assert.equal(source.split(css).length,2,file+' must import exactly one CSS bridge');
  assert.equal(source.split(js).length,2,file+' must import exactly one UI script');
  assert.ok(source.includes('<body '+attr),file+' body must opt in exactly once');
- const prev=source.replace(css+'</head>','</head>').replace('<body '+attr,'<body').replace(js+'</body>','</body>');
+ const live=kind==='lesson';
+ if(live){
+  assert.equal(source.split(videoCSS).length,2,file+' exact shared Michael JaaS CSS');
+  assert.equal(source.split(videoJS).length,2,file+' dedicated Sweden JaaS scripts');
+  assert.ok(source.includes('data-jaas-scope="sweden-a2"'),file+' Sweden-only video room');
+ }
+ const prev=source
+   .replace(css+(live?videoCSS:'')+'</head>','</head>')
+   .replace('<body '+(live?'data-olga-michael data-olga-kind="lesson" data-finance-live data-olga-jaas-video data-jaas-scope="sweden-a2" ':attr),'<body')
+   .replace(js+(live?videoJS:'')+'</body>','</body>');
  assert.equal(blob(prev),sha,file+' original inline lesson material/state/javascript must be bit-exact');
 }
 const shell=read('assets/gostudy-olga-michael-shell.js');
@@ -35,4 +47,16 @@ assert.ok(!/localStorage\.setItem|localStorage\.removeItem|fetch\(|supabase|serv
 assert.ok(cssText.includes('body[data-olga-michael]'), 'CSS must be route scoped');
 assert.equal(blob(read('business-ai-finance-b2-02.html')),'0d4e2c78edb8fda2103fa4b7f83cff54a819c51f',
  'Michael reference must not change');
-console.log('OLGA SOURCE GUARD PASS: 5 original source blobs unchanged; four legacy state keys preserved; no backend calls/data writes');
+const video=read('assets/gostudy-olga-jaas-video.js');
+const server=read('supabase/functions/gostudy-jaas-sweden-token/index.ts');
+assert.ok(video.includes('/functions/v1/gostudy-jaas-sweden-token') &&
+  video.includes('data-olga-jaas-video') && video.includes('auth.classroomStudent || null'),
+ 'Olga video must use Sweden-only signed token and authenticated teacher/student identities');
+assert.ok(!video.includes("'/functions/v1/gostudy-jaas-token'"),
+ 'Do not copy Michael finance endpoint into Olga');
+assert.ok(server.includes('gostudy_legacy_teacher_view') &&
+  server.includes("p_course:'sweden_a2'") && server.includes("row?.course === 'sweden-a2'"),
+ 'Video issuer must validate teacher roster and student enrollment for Sweden A2');
+assert.ok(!server.includes('service_role')&&!server.includes('INSERT INTO')&&!server.includes('SUPABASE_SERVICE_ROLE_KEY'),
+ 'Video token must not bypass RLS or mutate data');
+console.log('OLGA SOURCE GUARD PASS: 5 legacy source blobs unchanged, old keys preserved, JaaS token scoped to Sweden');
