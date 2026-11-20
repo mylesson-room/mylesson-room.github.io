@@ -14,7 +14,9 @@
   const join=document.createElement('a');
   join.id='sweden-teacher-join';
   join.hidden=true;
-  join.style.cssText='display:inline-flex;margin:16px 0;padding:12px 17px;border:1px solid #b4cfea;border-radius:12px;font-weight:700;';
+  // Do not set display:inline-flex: it overrides the [hidden] attribute
+  // and would expose an unverified link before teacher authorization.
+  join.style.cssText='margin:16px 0;padding:12px 17px;border:1px solid #b4cfea;border-radius:12px;font-weight:700;';
   join.textContent='Войти в текущий урок Ольги';
   form.after(join);
   function updateJoin(){
