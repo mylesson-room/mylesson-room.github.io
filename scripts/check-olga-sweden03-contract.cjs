@@ -26,7 +26,7 @@ assert.ok(cabinet.includes('assets/gostudy-v1-cabinet.js') &&
  'Olga student cabinet must reuse Michael UI and cloud assignment resolver');
 const student=read('assets/gostudy-sweden-assignment-student.js');
 assert.ok(student.includes("show('sweden-a2-02.html')"),'Previous lesson 2 MUST remain default');
-assert.ok(student.includes("details")||student.includes('student-sweden-legacy.html'),'Historic cabinet link missing');
+assert.ok(student.includes("details")||student.includes('sweden-cabinet-legacy.html'),'Historic cabinet link missing');
 assert.ok(!/method:\s*'PATCH'|method:\s*'DELETE'|gostudy_sweden_set_lesson/.test(student),
  'student UI must never mutate assignment');
 const teacher=read('assets/gostudy-sweden-assignment-teacher.js');
