@@ -21,7 +21,7 @@ body[data-alla-video-fallback] #lessonVideo .gostudy-video-fallback .telemost-fa
 body[data-alla-video-fallback] #lessonVideo .gostudy-video-fallback .telemost-fallback-link {
   min-height: 44px;
   padding: 10px 18px;
-  display: inline-flex;
+  display: inline-flex !important; /* Michael JaaS CSS hides legacy Telemost links by default */
   align-items: center;
   justify-content: center;
   border: 0;
