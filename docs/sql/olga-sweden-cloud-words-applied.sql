@@ -36,22 +36,23 @@ RETURNS TABLE(en text,ru text,word_key text)
 LANGUAGE plpgsql SECURITY DEFINER SET search_path TO ''
 AS $$
 DECLARE
-  v_student uuid := (SELECT auth.uid());
+  v_me uuid := (SELECT auth.uid());
+  v_student uuid;
   v_teacher uuid;
   v_count int;
   v_en text := btrim(p_en);
   v_ru text := btrim(p_ru);
   v_key text := lower(btrim(p_en));
 BEGIN
-  IF v_student IS NULL THEN RAISE EXCEPTION 'Not signed in' USING ERRCODE='42501'; END IF;
+  IF v_me IS NULL THEN RAISE EXCEPTION 'Not signed in' USING ERRCODE='42501'; END IF;
   IF v_en IS NULL OR v_ru IS NULL OR length(v_en) NOT BETWEEN 1 AND 150
       OR length(v_ru) NOT BETWEEN 1 AND 300 THEN
       RAISE EXCEPTION 'Invalid word' USING ERRCODE='22023';
   END IF;
-  SELECT count(*),min(s.teacher_id::text)::uuid INTO v_count,v_teacher
+  SELECT count(*),min(s.student_id::text)::uuid,min(s.teacher_id::text)::uuid INTO v_count,v_student,v_teacher
   FROM gostudy_private.lesson_course_students s
-  WHERE s.course='sweden-a2' AND s.student_id=v_student;
-  IF v_count<>1 OR v_teacher IS NULL THEN
+  WHERE s.course='sweden-a2' AND (s.student_id=v_me OR s.teacher_id=v_me);
+  IF v_count<>1 OR v_teacher IS NULL OR v_student IS NULL THEN
       RAISE EXCEPTION 'No access to Sweden vocabulary' USING ERRCODE='42501';
   END IF;
   RETURN QUERY
@@ -67,6 +68,6 @@ GRANT EXECUTE ON FUNCTION public.gostudy_sweden_save_word(text,text) TO authenti
 COMMIT;
 -- QA executed with SET LOCAL ROLE authenticated and simulated student/teacher/outsider
 -- session subjects inside a transaction that was ROLLED BACK:
--- Student RPC save PASS; teacher read 1; unrelated read 0; unrelated RPC denied.
+-- Student RPC save PASS; teacher RPC save PASS; teacher read 1; unrelated read 0; unrelated RPC denied.
 -- No QA words persist in the table.
 -- Real phone-to-computer validation remains outstanding until student UI release.
