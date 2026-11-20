@@ -92,6 +92,44 @@ async function sample(browser,origin,{name,html,mobile,role='student'}){
       assert.ok(measure.sidebar.width>250&&measure.lesson.width>500,name+' desktop needs left video / right exercises');
       assert.ok(measure.sidebar.right<=measure.lesson.left+20,name+' sidebar must precede the exercise sheet');
     }
+    if(name.startsWith('alla')){
+      // The same Michael chat UI must wrap (not replace) the real chat handlers.
+      const dropdown=page.locator('#lessonVideo .lesson-chat-dropdown');
+      await dropdown.waitFor({state:'attached',timeout:6000});
+      assert.equal(await dropdown.locator('#finance-chat-form').count(),1,name+' chat form lost');
+      await page.evaluate(()=>document.dispatchEvent(new CustomEvent('finance-event',{
+        detail:{kind:'chat',own:false,initial:false}
+      })));
+      assert.equal(await dropdown.locator('.lesson-chat-unread').textContent(),'1',name+' unread notification missing');
+      await dropdown.locator('summary.lesson-chat-toggle').click({timeout:6000});
+      assert.equal(await dropdown.getAttribute('open'),'',
+        name+' chat must open without dropping existing DOM/form');
+      assert.equal(await dropdown.locator('.lesson-chat-unread').isVisible(),false,
+        name+' unread badge should reset after opening');
+      await dropdown.locator('summary.lesson-chat-toggle').click({timeout:6000});
+      if(name.includes('homework')){
+        assert.equal(await page.locator('#lessonVideo .video-workspace').isVisible(),false,
+          name+' homework should not show video call');
+      }else{
+        const tiles=page.locator('#lessonVideo .jaas-person-tile');
+        await tiles.nth(1).waitFor({state:'visible',timeout:6000});
+        assert.equal(await tiles.count(),2,name+' must visually match Michael two participant tiles');
+        assert.deepEqual(await page.locator('#lessonVideo .jaas-person-label').allTextContents(),
+          ['Преподаватель','Ученик'],name+' participant captions');
+        assert.equal(await page.locator('#lessonVideo .video-preview').getAttribute('role'),'group',
+          name+' placeholder must NOT pretend to start a call');
+        assert.equal(await page.locator('#lessonVideo .jaas-connect').count(),0,
+          name+' must not offer fake JaaS button without approved token service');
+        const existing=page.locator('#lessonVideo a.telemost-fallback-link[href*="telemost.yandex.ru"]');
+        assert.equal(await existing.isVisible(),true,name+' original real Telemost link must remain visible');
+        assert.equal(await existing.getAttribute('target'),'_blank',name+' opens externally');
+      }
+    }
+    // A shared word notification must be visible for incoming classroom vocabulary events.
+    await page.evaluate(()=>document.dispatchEvent(new CustomEvent('finance-word',{
+      detail:{word:{en:'design2-test',ru:'тест'},notify:true}
+    })));
+    assert.equal(await page.locator('#finance-toast').isVisible(),true,name+' word added toast not visible');
     await page.screenshot({path:path.join(imageDir,name+'.png'),fullPage:true,animations:'disabled'});
 
     // Both lessons must open the same dictionary panel, not merely render its button.
@@ -143,6 +181,8 @@ async function sample(browser,origin,{name,html,mobile,role='student'}){
     const refMobile=await sample(browser,origin,{name:'michael-mobile',html:'business-ai-finance-b2-02.html',mobile:true});
     const allaMobile=await sample(browser,origin,{name:'alla-mobile',html:'my-trip-to-vietnam-a2.html',mobile:true});
     await sample(browser,origin,{name:'alla-teacher-mobile',html:'my-trip-to-vietnam-a2.html',mobile:true,role:'teacher'});
+    await sample(browser,origin,{name:'alla-homework-desktop',html:'my-trip-to-vietnam-a2-homework.html',mobile:false});
+    await sample(browser,origin,{name:'alla-homework-mobile',html:'my-trip-to-vietnam-a2-homework.html',mobile:true});
     for(const [name,ref,actual] of [
       ['desktop',refDesktop,allaDesktop],['mobile',refMobile,allaMobile]
     ]){
@@ -152,6 +192,6 @@ async function sample(browser,origin,{name,html,mobile,role='student'}){
       assert.equal(actual.heading.backgroundImage,ref.heading.backgroundImage,name+' heading background differs from Michael');
     }
     assert.equal(refDesktop.videoConnect,true,'Michael reference video integration unexpectedly missing');
-    console.log('Design2 Michael/Alla layout PASS (synthetic account; real browser); video parity is separately blocked by auth/token handoff.');
+    console.log('Design2 Michael/Alla lesson+homework PASS (synthetic student/teacher in real browser); real video remains blocked by token authorization.');
   }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});
