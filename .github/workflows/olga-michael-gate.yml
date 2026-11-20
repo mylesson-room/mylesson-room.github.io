@@ -5,7 +5,7 @@ on:
       - 'sweden-a2-03.html'
       - 'sweden-a2-03-homework.html'
       - 'student-sweden.html'
-      - 'student-sweden-legacy.html'
+      - 'sweden-cabinet-legacy.html'
       - 'assets/gostudy-sweden*'
       - 'assets/gostudy-jaas-video.js'
       - 'scripts/check-olga-sweden03.cjs'
