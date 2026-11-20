@@ -1,6 +1,6 @@
 # Olga Sweden A2 — acceptance contract: Michael is the only baseline
 
-**Status 2026-11-21: BLOCKED / DRAFT ONLY.** No production merge, database write, or student lesson reassignment. A high methodology score alone is NOT acceptance.
+**Status 2026-11-21: BLOCKED / DRAFT ONLY.** New video-token function deployed, but **no production Pages merge, database SQL writes, or student lesson reassignment**. A high methodology score alone is NOT acceptance.
 
 ## Reference
 - Michael lesson: `business-ai-finance-b2-02.html`
@@ -11,7 +11,7 @@
 - Lesson 02 must remain assigned until teacher explicitly switches to Lesson 03.
 
 ## Release blockers (all mandatory)
-- [ ] **Video**: identical Michael/JaaS video tile, button, controls, camera/mic/leave/expand, compact and expanded layout. The current new lesson has only the base Telemost placeholder. Michael's `gostudy-jaas-video.js` is scoped to Finance/B1/Country House token endpoints and must **not** be blindly enabled for Sweden. Build a Sweden-scoped token endpoint with server-validated student/teacher course membership, student-specific room, and no private key in client code. Test joining from both authenticated roles on real devices.
+- [ ] **Video**: identical Michael/JaaS video tile, button, controls, camera/mic/leave/expand, compact and expanded layout. The new lesson loads the same `gostudy-jaas-video.js` as Michael with a Sweden-only scope and signed JWT endpoint. `gostudy-jaas-sweden-token` was deployed in Supabase (active v1); it checks teacher/student course membership without a service-role key. **Still required:** real two-party audio/video connection and allow/deny membership testing on real authenticated devices.
 - [ ] **Call persistence**: same mounted Jitsi iframe survives every intra-lesson section change on desktop and mobile; verify iOS Safari, not just DOM inspection. Do not promise cross-document navigation persistence: changing actual HTML pages may destroy the iframe; require deliberate architecture for this.
 - [ ] **Translator**: highlight word/phrase -> same Michael Google translation UI, direction, + action, visible added-word confirmation, and updated word count. Verify both EN→RU and RU→EN on desktop and mobile.
 - [ ] **Vocabulary**: same Michael header button, dialog, stored words, teacher/student updates, cross-device sync and persistence after refresh. Existing Olga words must remain available, including legacy browser-only data. Current old words are **not yet migrated** to the new canonical store.
@@ -24,10 +24,10 @@
 - [ ] **QA & release**: PR checks green, production preview, authenticated teacher+student walkthrough on desktop and phone, then owner acceptance; only then merge and deploy.
 
 ## Known technical gaps in this draft
-1. No Sweden-scoped signed video endpoint and no video adapter loaded.
+1. The Sweden-scoped JaaS endpoint is deployed and the shared video client is loaded, but no real teacher/student video call has been completed.
 2. Translator and dictionary have not been tested with real Olga data.
 3. Old Sweden browser-only progress has not been backed up or migrated to the canonical store.
-4. Cloud selection RLS migration is staged as review-only SQL and has **not** run.
+4. Cloud selection RLS migration is staged as review-only SQL and has **not** run; current production Sweden room/lesson selection remains unchanged.
 5. Teacher RPC and classroom event synchronization have not passed real two-account tests.
 6. No real iOS/desktop visual acceptance yet.
 
