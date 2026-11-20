@@ -70,6 +70,7 @@ async function setContext(browser,id,student){
     const studentChat=sp.locator('.b1-chat-dropdown');
     const teacherChat=tp.locator('.b1-chat-dropdown');
     await Promise.all([studentChat,teacherChat].map(x=>x.waitFor({state:'visible'})));
+    await Promise.all([sp,tp].map(page=>page.waitForFunction(()=>document.querySelector('.b1-chat-dropdown')?.dataset.loaded==='true')));
     assert.equal(await studentChat.getAttribute('open'),null);
     assert.equal(await teacherChat.getAttribute('open'),null);
     await studentChat.locator('summary').click();
