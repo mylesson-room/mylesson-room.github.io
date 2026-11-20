@@ -22,7 +22,8 @@ const server=createServer(async(req,res)=>{
 async function pageFor(browser,base,{file,mobile=false,role='student',assigned='sweden-a2-02.html'}){
  const id=role==='teacher'?teacher:student;
  const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1365,height:850},isMobile:mobile,hasTouch:mobile});
- let selected=assigned,postCount=0,tokenCount=0;
+ let selected=assigned,postCount=0,tokenCount=0,wordWrites=0;
+ const cloudWords=[];
  await context.addInitScript(({id})=>{
   const session=JSON.stringify({user:{id,email:'preview@example.invalid'},access_token:'synthetic-token-not-valid',refresh_token:'preview',expires_at:Date.now()+3600000});
   sessionStorage.setItem('gostudy-cloud-session-v1',session);
@@ -46,6 +47,16 @@ async function pageFor(browser,base,{file,mobile=false,role='student',assigned='
     else status=403;
   }
   if(p.includes('/gostudy_classroom_rooms'))answer=[{id:room,teacher_id:teacher,student_id:student,course:'sweden-a2',lesson_path:'sweden-a2-03.html',student_label:'Ольга'}];
+  if(p.includes('/gostudy_sweden_words'))answer=cloudWords;
+  if(p.includes('/rpc/gostudy_sweden_save_word')){
+    if(role==='student'){
+      const values=JSON.parse(route.request().postData()||'{}');
+      const word={en:values.p_en,ru:values.p_ru,word_key:String(values.p_en||'').toLowerCase(),updated_at:new Date().toISOString()};
+      const existing=cloudWords.findIndex(x=>x.word_key===word.word_key);
+      if(existing<0)cloudWords.push(word);else cloudWords[existing]=word;
+      wordWrites++;answer=[word];
+    }else{status=403;answer={error:'Only student may save own words'};}
+  }
   if(p.includes('/gostudy_classroom_events')||p.includes('/gostudy_progress')||p.includes('/gostudy_vocabulary_items'))answer=[];
   if(p.includes('/rpc/gostudy_classroom_send'))answer=true;
   if(p.includes('/functions/v1/gostudy-jaas-sweden-token')){status=403;answer={error:'Mock denies JaaS: token endpoint is not deployed in this test.'};tokenCount++;}
@@ -55,7 +66,7 @@ async function pageFor(browser,base,{file,mobile=false,role='student',assigned='
  page.on('pageerror',err=>errors.push(err.message));
  await page.goto(base+'/'+file+(role==='teacher'&&file==='sweden-a2-03.html'?'?classStudent='+student:''),{waitUntil:'domcontentloaded',timeout:20000});
  const name=file.replace('.html','')+'-'+role+'-'+(mobile?'mobile':'desktop');
- return {context,page,name,errors,getMock:()=>({selected,postCount,tokenCount})};
+ return {context,page,name,errors,getMock:()=>({selected,postCount,tokenCount,wordWrites,cloudWords})};
 }
 (async()=>{
  await mkdir(shots,{recursive:true});
@@ -81,6 +92,15 @@ async function pageFor(browser,base,{file,mobile=false,role='student',assigned='
      assert.ok(stats.chat&&stats.translator&&stats.dictionary,name+' chat/dictionary/translator markup');
      await page.locator('#openLessonDictionary').click();
      await page.locator('#lessonDictionary[open]').waitFor({state:'visible',timeout:4000});
+     await page.waitForFunction(()=>window.GoStudySwedenCloudWords?.isReady(),{timeout:5000});
+     // This is the REAL dictionary form inside the shared Michael lesson,
+     // not a synthetic hand-built vocabulary fixture.
+     await page.locator('#dictionarySource').fill('platform');
+     await page.locator('#dictionaryTranslation').fill('платформа');
+     await page.locator('#dictionaryAddForm button').click();
+     await page.waitForFunction(()=>document.querySelector('#myWords')?.textContent.includes('platform'),{timeout:5000});
+     assert.equal(item.getMock().wordWrites,1,name+' word must persist through real authenticated save RPC');
+     assert.equal(await page.locator('#wordCountSidebar').innerText(),'1',name+' dictionary updates only after server ACK');
      await page.locator('#lessonDictionary form[method="dialog"] button').click();
      await page.locator('#next').click();
      await page.locator('#page-1.active').waitFor({state:'visible',timeout:4000});
