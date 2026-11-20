@@ -1811,6 +1811,23 @@ async function main() {
           assert.equal(await heading.evaluate(node => getComputedStyle(node).fontSize),'29px');
           await page.evaluate(() => document.documentElement.style.removeProperty('--gostudy-ui-heading-size'));
           assert.equal(await heading.evaluate(node => getComputedStyle(node).fontSize),originalFont);
+          if (course === 'general_english_b1_stories') {
+            const sectionsMenu=sidebar.locator('.b1-sections-menu');
+            await sectionsMenu.waitFor({state:'visible'});
+            assert.equal(await sectionsMenu.getAttribute('open'),null,'B1 sections default to Michael-style collapsed view');
+            await sectionsMenu.locator('summary').click();
+            await sectionsMenu.locator('.sections button').nth(1).click();
+            await page.locator('.sheet h1').filter({hasText:'Warm-up'}).waitFor();
+            await sectionsMenu.locator('.sections button').first().click();
+            await page.locator('.sheet h1').filter({hasText:'Lesson information'}).waitFor();
+            await sectionsMenu.locator('summary').click();
+            const divider=page.locator('.b1-lesson-divider');
+            await divider.waitFor({state:'visible'});
+            const oldWidth=Number(await divider.getAttribute('aria-valuenow'));
+            await divider.focus();
+            await divider.press('ArrowRight');
+            assert.ok(Number(await divider.getAttribute('aria-valuenow'))>oldWidth,'B1 split divider must be keyboard adjustable');
+          }
           if (await page.locator('.gostudy-shared-room').count()) {
             const first = sidebar.locator('.sections button').first();
             await first.waitFor();
