@@ -46,6 +46,7 @@ async function check(browser,base,file,kind,mobile){
     assert.ok((await page.locator('#content').innerText()).length>50,label+' original lesson content missing');
     const videoTiles=await page.locator('.jaas-person-tile').count() ||
       await page.locator('.olga-video-tile').count();
+    if(videoTiles!==2)console.log('VIDEO DEBUG '+label+' '+(await page.locator('#lessonVideo').innerHTML()).slice(0,2100)+' errors='+errors.join(';'));
     assert.equal(videoTiles,2,label+' real Michael two participant placeholders');
     assert.equal(await page.locator('.olga-state').isVisible(),true,label+' video status clearly labelled');
     if(kind==='lesson'){
