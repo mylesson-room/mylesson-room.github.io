@@ -1796,7 +1796,13 @@ async function main() {
           assert.equal(await page.locator('.gostudy-cabinet-back:visible').count(), 1);
           const dictionary = page.locator('.glass-lesson-tools button[aria-label="Открыть словарь"]');
           const sidebar = page.locator('.room > .side, .gostudy-shared-room > .gostudy-room-sidebar');
-          await sidebar.getByRole('button', {name:'Открыть словарь'}).waitFor();
+          if (course === 'general_english_b1_stories') {
+            await page.locator('#b1LessonDictionary:visible').waitFor();
+            assert.equal(await sidebar.getByRole('button',{name:'Открыть словарь'}).count(),0,
+              'B1 should not keep the obsolete floating dictionary');
+          } else {
+            await sidebar.getByRole('button', {name:'Открыть словарь'}).waitFor();
+          }
           assert.equal(await page.locator('.gostudy-classroom-back:visible').count(), 0);
           if (course === 'general_english_b1_stories') {
             await sidebar.locator('#lessonVideo .jaas-connect').waitFor({state:'visible'});
