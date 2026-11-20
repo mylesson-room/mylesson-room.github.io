@@ -50,9 +50,16 @@
   async function save(item){
     const word=normalize(item);
     if(!word.en||!word.ru)throw Error('Укажите слово и перевод.');
-    const rows=await request('/rest/v1/rpc/gostudy_sweden_save_word',{
-      method:'POST',body:{p_en:word.en,p_ru:word.ru}
-    });
+    // The teacher can add a word for Olga only through a separately
+    // membership-verified RPC. Students always save to their own account.
+    const targetStudent=auth()?.classroomStudent || null;
+    const endpoint=targetStudent
+      ? '/rest/v1/rpc/gostudy_sweden_save_teacher_word'
+      : '/rest/v1/rpc/gostudy_sweden_save_word';
+    const payload=targetStudent
+      ? {p_student:targetStudent,p_en:word.en,p_ru:word.ru}
+      : {p_en:word.en,p_ru:word.ru};
+    const rows=await request(endpoint,{method:'POST',body:payload});
     if(!Array.isArray(rows)||rows.length!==1||
         String(rows[0].en)!==word.en||String(rows[0].ru)!==word.ru)
       throw Error('Сервер не подтвердил добавление слова.');
