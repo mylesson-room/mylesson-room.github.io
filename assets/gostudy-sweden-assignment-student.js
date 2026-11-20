@@ -8,6 +8,10 @@
       title:'Your first day in Sweden',homework:'sweden-a2-02-homework.html',
       label:'Урок 2 · выбран по умолчанию'
     },
+    'sweden-a2-02-michael.html':{
+      title:'Your First Full Day in Stockholm',homework:'sweden-a2-02-michael-homework.html',
+      label:'Урок 2 · дизайн и функции Михаила'
+    },
     'sweden-a2-03.html':{
       title:'A Day Trip from Stockholm',homework:'sweden-a2-03-homework.html',
       label:'Урок 3 · назначен преподавателем'
