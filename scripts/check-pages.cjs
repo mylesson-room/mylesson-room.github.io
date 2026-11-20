@@ -1766,7 +1766,7 @@ async function main() {
             // protected destination RPC, not its old standalone dashboard.
             assert.equal(await studentLink.getAttribute('href'),'general-english-b1-stories-01.html');
             assert.equal(await sp.locator('.homework-link').getAttribute('href'),'general-english-b1-stories-01-homework.html');
-            await sp.getByText('A Small Plan That Went Wrong',{exact:true}).waitFor();
+            await sp.getByText('A Postcard From a New Home',{exact:true}).waitFor();
             await sp.locator('.vocab-feature--practice').waitFor({state:'visible'});
             await sp.getByRole('button',{name:/Словарь/}).first().click();
             await sp.locator('#words[open]').waitFor();
@@ -1875,9 +1875,9 @@ async function main() {
             assert.equal(await sectionsMenu.getAttribute('open'),null,'B1 sections default to Michael-style collapsed view');
             await sectionsMenu.locator('summary').click();
             await sectionsMenu.locator('.sections button').nth(1).click();
-            await page.locator('.sheet h1').filter({hasText:'Warm-up'}).waitFor();
+            await page.locator('.sheet h1').filter({hasText:'The Friday Table'}).waitFor();
             await sectionsMenu.locator('.sections button').first().click();
-            await page.locator('.sheet h1').filter({hasText:'Lesson information'}).waitFor();
+            await page.locator('.sheet h1').filter({hasText:'Three places. One new life'}).waitFor();
             await sectionsMenu.locator('summary').click();
             const divider=page.locator('.b1-lesson-divider');
             await divider.waitFor({state:'visible'});
