@@ -1,0 +1,189 @@
+/* GoStudy / General English B1 Stories — premium Michael-derived lesson shell.
+   Scoped to authorized lesson only. Does not style or change its original homework. */
+body[data-dud-b1-premium]{
+  --b1-ink:#202341;--b1-muted:#566780;--b1-accent:#049db9;
+  margin:0;background:#f7f9fc;color:var(--b1-ink);
+  font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+body[data-dud-b1-premium] .gostudy-lesson-topbar{
+  min-height:57px;padding:8px clamp(18px,2vw,32px);
+  background:#fff;border-bottom:1px solid #e5eaf3;box-shadow:0 2px 10px #23426b07;
+  position:sticky;top:0;z-index:25;
+}
+body[data-dud-b1-premium] .gostudy-lesson-logo{
+  color:#1d2b4a;font-size:22px;letter-spacing:-.6px;font-weight:850;
+}
+body[data-dud-b1-premium] .gostudy-cabinet-back{
+  padding:8px 13px;background:#f6fbff;color:#16799c;
+  border:1px solid #dfebf3;border-radius:12px;font-weight:750;
+}
+body[data-dud-b1-premium] .room,
+body[data-dud-b1-premium] .room.wide{
+  width:100%;max-width:none;margin:0;padding:16px 17px 0;
+  display:grid;grid-template-columns:minmax(270px,31%) minmax(0,1fr);
+  gap:14px;align-items:start;background:#f7f9fc;
+}
+body[data-dud-b1-premium] .room>.side{
+  grid-column:1;grid-row:1;position:sticky;top:73px;
+  min-width:0;width:100%;max-height:calc(100dvh - 78px);
+  overflow-y:auto;scrollbar-gutter:stable;padding:1px 7px 18px 1px;
+}
+body[data-dud-b1-premium] .room>.sheet{
+  grid-column:2;grid-row:1;display:flex;flex-direction:column;
+  box-sizing:border-box;min-width:0;height:calc(100dvh - 73px);
+  min-height:430px;padding:0;overflow:hidden;background:#fff;
+  border:1px solid #e0e6f0;border-bottom:0;border-radius:27px 27px 0 0;
+  box-shadow:11px 0 28px -20px #23406c20,-11px 0 28px -20px #23406c20;
+}
+body[data-dud-b1-premium] .room>.sheet>.lesson-meta{
+  flex:none;display:flex;justify-content:space-between;gap:12px;
+  padding:14px clamp(20px,3vw,42px) 10px;
+  border:0;background:#fff;color:#70809a;
+  font-size:13px;font-weight:750;
+}
+body[data-dud-b1-premium] .room>.sheet>progress{
+  flex:none;display:block;margin:0 clamp(20px,3vw,42px) 14px;
+  width:calc(100% - clamp(40px,6vw,84px));height:4px;
+  accent-color:#00acc5;border-radius:5px;
+}
+body[data-dud-b1-premium] .room>.sheet>.lesson-content{
+  flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;
+  background:#fff;padding:10px clamp(20px,3vw,42px) 40px;
+}
+body[data-dud-b1-premium] .room>.sheet .step-nav{
+  flex:none;display:flex;align-items:center;justify-content:space-between;
+  gap:12px;margin:0;padding:9px clamp(20px,3vw,42px);
+  min-height:57px;box-sizing:border-box;
+  background:#fff;border-top:1px solid #e1e9f3;
+}
+body[data-dud-b1-premium] .room>.sheet .step-nav button,
+body[data-dud-b1-premium] .room>.sheet .step-nav a{
+  min-height:39px;min-width:110px;padding:8px 17px;
+  border-radius:12px;font-size:15px;font-weight:800;
+  text-decoration:none;cursor:pointer;
+}
+body[data-dud-b1-premium] .room>.sheet .step-nav .next,
+body[data-dud-b1-premium] .room>.sheet .step-nav .cta{
+  border-color:#06b7ca;color:#fff;background:linear-gradient(110deg,#00a3cb,#03c1c7);
+  box-shadow:0 5px 16px #0888ba26;
+}
+body[data-dud-b1-premium] .room>.sheet .step-nav .back{
+  background:#f8fbff;border:1px solid #d6e3f3;color:#284e7e;
+}
+body[data-dud-b1-premium] .room>.sheet .label{
+  width:max-content;max-width:100%;margin:0 0 12px;
+  padding:6px 13px;border-radius:999px;background:#e4f7fd;
+  color:#047d9c;font-size:12px;font-weight:800;
+  letter-spacing:.04em;text-transform:uppercase;
+}
+body[data-dud-b1-premium] .room>.sheet h1{
+  padding:15px 19px;margin:0 0 18px;
+  background:linear-gradient(110deg,#e5f6fd,#e6efff);
+  border:1px solid #d3e9fa;border-radius:18px;
+  color:#172e4c;font-size:clamp(25px,2.6vw,37px);
+  line-height:1.22;letter-spacing:-.025em;
+}
+body[data-dud-b1-premium] .room>.sheet .instruction{
+  color:#415675;font-size:16px;font-weight:650;line-height:1.6;
+  margin:0 0 22px;
+}
+body[data-dud-b1-premium] .room>.sheet .source{
+  margin:15px 0 22px;padding:clamp(17px,2vw,26px);
+  background:#f7fbfe;border:1px solid #dfeaf4;
+  border-left:4px solid #66cce0;border-radius:16px;
+  color:#273950;font-size:16px;line-height:1.75;
+}
+body[data-dud-b1-premium] .room>.sheet .source p{margin:0 0 11px}
+body[data-dud-b1-premium] .room>.sheet .source p:last-child{margin-bottom:0}
+body[data-dud-b1-premium] .room>.sheet .activity fieldset,
+body[data-dud-b1-premium] .room>.sheet .gap-row{
+  margin:13px 0;padding:16px 17px;border:1px solid #dfe8f3;
+  border-radius:17px;background:#fff;box-shadow:0 3px 12px #20496d09;
+}
+body[data-dud-b1-premium] .room>.sheet :is(.options label,.word-menu summary){
+  border:1px solid #dce7f5;border-radius:12px;background:#fafdff;
+  padding:10px 13px;
+}
+body[data-dud-b1-premium] .room>.sheet .options label:has(input:checked){
+  border-color:#65c6d9;background:#e7f8fb;
+}
+body[data-dud-b1-premium] .room>.sheet .travel-cards{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:17px 0 20px;
+}
+body[data-dud-b1-premium] .room>.sheet .travel-cards>div{
+  min-width:0;border:1px solid #dce9f5;border-radius:17px;
+  padding:16px;background:linear-gradient(125deg,#eff9ff,#fffdfa);
+  box-shadow:0 4px 12px #37576b0c;
+}
+body[data-dud-b1-premium] .room>.sheet .travel-cards>div>span{
+  display:block;font-size:27px;margin-bottom:6px;
+}
+body[data-dud-b1-premium] .room>.sheet .travel-cards :is(strong,b,small){overflow-wrap:anywhere}
+body[data-dud-b1-premium] .room>.sheet .activity .check{
+  border-radius:12px;background:#049fb9;color:#fff;min-height:43px;
+}
+body[data-dud-b1-premium] .room>.side>.panel{
+  border:1px solid #dfe8f4;border-radius:19px;
+  padding:16px;background:#fff;box-shadow:0 5px 16px #31516b0b;
+}
+body[data-dud-b1-premium] .room>.side .call{
+  min-height:200px;aspect-ratio:4/3;
+  background:radial-gradient(ellipse at 75% 0%,#3d5e87,#1a273b 75%);
+  border-radius:16px;color:#ebf5ff;
+}
+body[data-dud-b1-premium] .room>.side .sections{
+  border:1px solid #dfe8f4;border-radius:19px;background:#fff;
+  padding:14px;margin-top:12px;box-shadow:0 5px 16px #31516b0b;
+  max-height:min(43vh,410px);overflow:auto;
+}
+body[data-dud-b1-premium] .room>.side .sections strong{
+  display:block;color:#28364f;margin:0 0 12px;font-size:16px;
+}
+body[data-dud-b1-premium] .room>.side .sections button{
+  border:0;background:transparent;border-radius:11px;
+  display:block;width:100%;text-align:left;padding:9px 10px;
+  margin:3px 0;color:#53617d;font-size:14px;
+}
+body[data-dud-b1-premium] .room>.side .sections button[aria-current]{
+  background:#e5f6fc;color:#047f9d;font-weight:800;
+}
+body[data-dud-b1-premium] .room>.side .sections button:hover{background:#eef6fc}
+body[data-dud-b1-premium] :is(button,a,summary):focus-visible{
+  outline:3px solid #04a7c9;outline-offset:3px;
+}
+@media(max-width:800px){
+  body[data-dud-b1-premium] .room,
+  body[data-dud-b1-premium] .room.wide{display:flex;flex-direction:column;gap:12px;padding:10px 9px 80px}
+  body[data-dud-b1-premium] .room>.side{
+    position:static;order:0;overflow:visible;max-height:none;padding:0;width:100%;
+  }
+  body[data-dud-b1-premium] .room>.sheet{
+    order:1;width:100%;height:auto;min-height:calc(100dvh - 220px);
+    overflow:visible;border-radius:20px 20px 0 0;
+  }
+  body[data-dud-b1-premium] .room>.sheet>.lesson-content{
+    flex:initial;overflow:visible;scrollbar-gutter:auto;padding:12px 17px 25px;
+  }
+  body[data-dud-b1-premium] .room>.sheet>.lesson-meta{padding:12px 17px 8px}
+  body[data-dud-b1-premium] .room>.sheet>progress{margin:0 17px 14px;width:calc(100% - 34px)}
+  body[data-dud-b1-premium] .room>.sheet .step-nav{
+    position:fixed;z-index:30;bottom:0;left:0;right:0;
+    min-height:56px;padding:8px 12px max(8px,env(safe-area-inset-bottom));
+    box-shadow:0 -3px 12px #1b42731a;
+  }
+  body[data-dud-b1-premium] .room>.side>.panel:has(.call-head){padding:10px}
+  body[data-dud-b1-premium] .room>.side .call{min-height:105px;aspect-ratio:auto}
+  body[data-dud-b1-premium] .room>.side .sections{max-height:180px}
+}
+@media(max-width:460px){
+  body[data-dud-b1-premium] .room>.sheet h1{font-size:24px;padding:13px}
+  body[data-dud-b1-premium] .room>.sheet .travel-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  body[data-dud-b1-premium] .room>.sheet .step-nav button{min-width:90px}
+}
+@media print{
+  body[data-dud-b1-premium] .room{display:block;background:#fff;padding:0}
+  body[data-dud-b1-premium] .room>.side{display:none}
+  body[data-dud-b1-premium] .room>.sheet{height:auto;border:0;box-shadow:none}
+  body[data-dud-b1-premium] .room>.sheet .step-nav{display:none}
+  body[data-dud-b1-premium] .room>.sheet>.lesson-content{overflow:visible}
+}
