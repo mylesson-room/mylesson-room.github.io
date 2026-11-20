@@ -651,9 +651,27 @@
         content.hidden = true;
         mountLesson();
         await loadScript('assets/gostudy-v1-vocabulary.js?v=b1-unified-20261120');
-        // The course's existing cloud words are shared with lesson vocabulary;
-        // refresh the shared count after asynchronous initial progress sync.
-        window.dispatchEvent(new Event('pageshow'));
+        // Keep Michael's training UI, but read teacher-assigned words from
+        // the B1 course's existing protected RPC — never finance-room tables.
+        const refreshWords = async () => {
+          if (document.hidden) return;
+          try {
+            const words=await window.GoStudyWorkbookWords?.read();
+            if (!Array.isArray(words)) return;
+            const signature=JSON.stringify(words);
+            if (signature !== window.GoStudyB1AssignedSignature) {
+              window.GoStudyB1AssignedSignature=signature;
+              window.GoStudyB1AssignedWords=words;
+              document.dispatchEvent(new Event('b1-vocabulary-updated'));
+            }
+          }catch{}
+        };
+        refreshWords();
+        window.addEventListener('focus',refreshWords);
+        const timer=setInterval(refreshWords,20000);
+        window.addEventListener('pagehide',()=>clearInterval(timer),{once:true});
+        // Progress sync may finish after the initial cabinet render.
+        setTimeout(()=>window.dispatchEvent(new Event('pageshow')),1200);
         return;
       }
       status.hidden = true;
