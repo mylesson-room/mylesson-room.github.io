@@ -67,8 +67,20 @@
     const added=!records.has(key);
     version++;
     records.set(key,word);ready=true;lastError='';
+    // Reuse Michael's instant room notification while Supabase remains the
+    // canonical durable vocabulary store for every device.
+    if(window.FinanceLive?.connected())window.FinanceLive.send('word',word);
     notify(added,word);return word;
   }
+  document.addEventListener('finance-word',event=>{
+    const word=event.detail?.word;
+    if(event.detail?.notify && word?.en &&
+       !records.has(String(word.en).trim().toLocaleLowerCase('en'))){
+      // A remote participant added this word in the classroom. Refresh
+      // immediately rather than waiting for the cross-device poll.
+      refresh().catch(()=>{});
+    }
+  });
   window.GoStudySwedenCloudWords={
     words:()=>Array.from(records.values()),
     save,refresh,isReady:()=>ready,lastError:()=>lastError
