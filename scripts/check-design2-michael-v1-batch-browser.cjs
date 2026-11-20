@@ -17,7 +17,9 @@ const lessons=[
   ['business-ai-b2c1-03.html','business-ai'],
   ['first-sales-c1-03.html','first-sales'],
   ['general-english-b2-01.html','general-english-b2'],
-  ['pharma-ai-evidence-c1-20261118.html','pharma-c1']
+  ['pharma-ai-evidence-c1-20261118.html','pharma-c1'],
+  ['art-b1-03-homework.html','art-b1'],
+  ['business-ai-b2c1-03-homework.html','business-ai']
 ];
 const server=createServer(async(req,res)=>{
   const pathname=decodeURIComponent(new URL(req.url,'http://127.0.0.1').pathname);
@@ -33,6 +35,7 @@ const cors={'access-control-allow-origin':'*','access-control-allow-headers':'*'
 async function run(browser,base,lesson,course,mobile){
   const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1365,height:850},isMobile:mobile,hasTouch:mobile});
   const tag=lesson.replace('.html','')+'-'+(mobile?'mobile':'desktop');
+  const homework=lesson.endsWith('-homework.html');
   try{
     await context.addInitScript(({id})=>{
       const session=JSON.stringify({user:{id,email:'synthetic@example.invalid'},access_token:'synthetic-no-real-access',refresh_token:'synthetic',expires_at:Date.now()+3600000});
@@ -77,15 +80,17 @@ async function run(browser,base,lesson,course,mobile){
     assert.equal(stats.padding,mobile?'15px':'40.95px',tag+' requires Michael responsive padding');
     assert.ok(stats.headingBg.startsWith('linear-gradient(110deg'),tag+' requires approved heading gradient');
     assert.equal(stats.chatFound,true,tag+' shared Michael chat missing');
-    assert.equal(stats.chatOpen,!mobile,tag+' desktop chat should start open, mobile compact');
+    assert.equal(stats.chatOpen,!mobile&&!homework,tag+' desktop lesson chat open, mobile/homework compact');
     assert.equal(stats.translator,true,tag+' shared contextual selection translator missing');
     assert.equal(stats.dictionary,true,tag+' shared dictionary missing');
-    assert.ok(stats.pages>=2,tag+' lesson sections missing');
+    assert.ok(stats.pages>=1,tag+' lesson sections missing');
+    if(homework)assert.equal(await page.locator('#lessonVideo .video-workspace').isVisible(),false,
+      tag+' standalone homework must not pretend to contain an active call');
     await page.locator('#openLessonDictionary').click();
     await page.locator('#lessonDictionary[open]').waitFor({state:'visible',timeout:5500});
     await page.locator('#lessonDictionary form[method="dialog"] button').click();
     await page.locator('#lessonDictionary[open]').waitFor({state:'hidden'});
-    if(mobile){
+    if(mobile||homework){
       await page.locator('#lessonVideo .lesson-chat-toggle').click();
       await page.waitForFunction(()=>document.querySelector('#lessonVideo .lesson-chat-dropdown')?.open);
       assert.equal(await page.locator('#finance-chat-form').isVisible(),true,tag+' mobile chat form must be usable');
@@ -93,8 +98,10 @@ async function run(browser,base,lesson,course,mobile){
     }else{
       assert.equal(await page.locator('#finance-chat-form').isVisible(),true,tag+' desktop chat input must be visible');
     }
-    await page.locator('#next').click();
-    await page.locator('#page-1.active').waitFor({state:'visible'});
+    if(stats.pages>=2){
+      await page.locator('#next').click();
+      await page.locator('#page-1.active').waitFor({state:'visible'});
+    }
     const serious=errors.filter(e=>/gostudy-v1-lesson|gostudy-v1-workbook|gostudy-finance-live/.test(e));
     assert.deepEqual(serious,[],tag+' JS rendering/workbook errors');
     await page.screenshot({path:path.join(root,'artifacts','design2-batch',tag+'.png'),fullPage:false,animations:'disabled'});
@@ -108,6 +115,6 @@ async function run(browser,base,lesson,course,mobile){
   try{
     const base='http://127.0.0.1:'+server.address().port;
     for(const [lesson,course] of lessons)for(const mobile of [false,true])await run(browser,base,lesson,course,mobile);
-    console.log('Design2 batch Chromium: 10/10 student desktop+mobile lessons PASS (mock auth), Michael layout/chat/dictionary/navigation.');
+    console.log('Design2 batch Chromium: 14/14 desktop/mobile active lesson and homework scenarios PASS (mock auth), Michael feed/chat/dictionary/navigation.');
   }finally{await browser.close();server.close();}
 })().catch(err=>{console.error(err);server.close();process.exitCode=1;});
