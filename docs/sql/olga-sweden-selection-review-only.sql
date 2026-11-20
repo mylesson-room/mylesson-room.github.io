@@ -17,13 +17,7 @@ CREATE POLICY sweden_selection_member_read
 ON public.gostudy_sweden_lesson_selection
 FOR SELECT TO authenticated
 USING (
-  (student_id = (SELECT auth.uid()) OR teacher_id = (SELECT auth.uid()))
-  AND EXISTS (
-    SELECT 1 FROM gostudy_private.lesson_course_students
-    WHERE student_id = gostudy_sweden_lesson_selection.student_id
-      AND teacher_id = gostudy_sweden_lesson_selection.teacher_id
-      AND course = 'sweden-a2'
-  )
+  gostudy_private.gostudy_classroom_member(student_id,teacher_id,'sweden-a2')
 );
 -- Only the server-owned RPC can mutate a selection AND its active course room.
 CREATE OR REPLACE FUNCTION public.gostudy_sweden_set_lesson(p_lesson_path text)
