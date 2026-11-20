@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="460" viewBox="0 0 1200 460" role="img" aria-labelledby="title desc">
+<title id="title">Would You Live Here?</title><desc id="desc">Colourful illustrated skyline of Porto, a tropical beach in Da Nang and traditional Kyoto houses.</desc>
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#b9d8ff"/><stop offset="1" stop-color="#f3e3c8"/></linearGradient>
+<linearGradient id="sunset" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffcfac"/><stop offset="1" stop-color="#ffecd8"/></linearGradient>
+<linearGradient id="ocean" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#52c4d2"/><stop offset="1" stop-color="#2187ae"/></linearGradient>
+<linearGradient id="japan" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#c0cedf"/><stop offset="1" stop-color="#e6efdd"/></linearGradient>
+<filter id="shadow" x="-10%" y="-20%" width="120%" height="145%"><feDropShadow dx="0" dy="8" stdDeviation="9" flood-color="#344d6b" flood-opacity=".15"/></filter>
+<clipPath id="p"><rect x="6" y="6" width="384" height="448" rx="24"/></clipPath><clipPath id="d"><rect x="406" y="6" width="388" height="448" rx="24"/></clipPath><clipPath id="k"><rect x="810" y="6" width="384" height="448" rx="24"/></clipPath>
+</defs>
+<rect width="1200" height="460" fill="#f3f7fd"/>
+<g clip-path="url(#p)">
+<rect x="6" y="6" width="384" height="448" fill="url(#sunset)"/>
+<circle cx="316" cy="93" r="43" fill="#fff3bf"/>
+<path d="M6 318Q110 287 220 299T390 284V457H6Z" fill="#a2c4ac"/>
+<rect x="10" y="329" width="380" height="130" fill="#4595b5"/>
+<path d="M10 342Q80 328 140 345T265 343T390 349" fill="none" stroke="#cee3d7" stroke-width="5"/>
+<g stroke="#b26d52" stroke-width="2">
+<rect x="18" y="141" width="80" height="194" fill="#f1bf84"/><rect x="93" y="115" width="73" height="220" fill="#e6a78d"/>
+<rect x="163" y="161" width="78" height="174" fill="#f3c881"/><rect x="236" y="123" width="73" height="212" fill="#da9993"/><rect x="304" y="176" width="80" height="159" fill="#f6d5a0"/></g>
+<g fill="#f4f4ef" stroke="#b16b57" stroke-width="2"><path d="M36 184h24v35H36zM36 243h24v35H36zM108 153h25v36h-25zM108 217h25v36h-25zM182 196h26v35h-26zM182 258h26v35h-26zM248 162h28v35h-28zM248 227h28v35h-28zM322 211h26v32h-26zM322 261h26v32h-26z"/></g>
+<g fill="#a86462"><path d="M7 141l50-31 43 31ZM92 115l38-28 38 28ZM163 161l38-28 42 28ZM235 123l38-30 38 30ZM304 176l40-28 42 28Z"/></g>
+<path d="M23 341L358 340" stroke="#f7f1df" stroke-width="8"/>
+<rect x="25" y="26" width="130" height="37" rx="18" fill="#ffffffed"/><text x="44" y="50" font-family="Arial,sans-serif" font-size="18" font-weight="bold" fill="#356791">🇵🇹 PORTO</text>
+<rect x="25" y="395" width="260" height="44" rx="15" fill="#ffffffeb" filter="url(#shadow)"/><text x="42" y="423" font-family="Arial,sans-serif" font-size="18" font-weight="bold" fill="#4b647d">Coffee &amp; new friends</text>
+</g>
+<g clip-path="url(#d)">
+<rect x="406" y="6" width="388" height="448" fill="url(#sky)"/><circle cx="728" cy="84" r="49" fill="#fef4cf"/>
+<path d="M406 280Q503 175 584 286T794 251V450H406Z" fill="#91bfc0"/>
+<path d="M406 301Q480 247 571 302T794 270V454H406Z" fill="#559f8b"/>
+<rect x="406" y="309" width="388" height="145" fill="url(#ocean)"/>
+<path d="M406 343Q480 333 565 345T794 340" fill="none" stroke="#d8fbf2" stroke-width="6"/>
+<path d="M406 386Q498 377 603 394T794 383" fill="none" stroke="#d8fbf2" stroke-width="4"/>
+<path d="M406 424Q485 409 570 431T794 422" fill="none" stroke="#d8fbf2" stroke-width="4"/>
+<g fill="#d2e1d4" stroke="#7eb6aa" stroke-width="2"><rect x="480" y="187" width="46" height="118" rx="5"/><rect x="539" y="152" width="45" height="150" rx="5"/><rect x="596" y="188" width="42" height="114" rx="5"/><rect x="655" y="141" width="51" height="161" rx="5"/><rect x="712" y="182" width="48" height="118" rx="5"/></g>
+<g fill="#90b4b0"><path d="M491 214h23v5h-23zM491 237h23v5h-23zM552 182h18v6h-18zM552 211h18v6h-18zM666 173h28v7h-28zM666 207h28v7h-28zM726 215h24v6h-24z"/></g>
+<path d="M447 328Q460 263 450 203" stroke="#775b4c" stroke-width="10" fill="none"/><path d="M451 205Q394 162 417 143Q454 151 451 205ZM452 205Q477 147 515 163Q513 190 452 205ZM451 203Q425 144 452 126Q480 147 451 203Z" fill="#409f86"/>
+<path d="M783 332Q763 245 777 197" stroke="#775b4c" stroke-width="10" fill="none"/><path d="M777 200Q729 154 748 145Q777 154 777 200ZM779 202Q790 144 813 158Q812 183 779 202Z" fill="#4e9e88"/>
+<rect x="427" y="26" width="145" height="37" rx="18" fill="#ffffffed"/><text x="445" y="50" font-family="Arial,sans-serif" font-size="18" font-weight="bold" fill="#356791">🇻🇳 DA NANG</text>
+<rect x="427" y="395" width="305" height="44" rx="15" fill="#ffffffeb" filter="url(#shadow)"/><text x="447" y="423" font-family="Arial,sans-serif" font-size="18" font-weight="bold" fill="#4b647d">Beach &amp; a new routine</text>
+</g>
+<g clip-path="url(#k)">
+<rect x="810" y="6" width="384" height="448" fill="url(#japan)"/><circle cx="1131" cy="85" r="40" fill="#fff4d5"/>
+<path d="M810 282Q910 196 982 264Q1092 187 1194 274V458H810Z" fill="#9cbea8"/>
+<path d="M810 328Q950 275 1088 336T1194 328V454H810Z" fill="#70a188"/>
+<path d="M933 259h151v152H933z" fill="#ead8bd" stroke="#806d69" stroke-width="3"/>
+<path d="M913 265l92-68 100 68Z" fill="#566a76"/><path d="M944 206h116v-21H944z" fill="#566a76"/>
+<path d="M948 296h56v88h-56zM1018 296h50v88h-50z" fill="#a5bac1" stroke="#607886" stroke-width="5"/>
+<g stroke="#6d7773" stroke-width="4"><path d="M975 296v88M1043 296v88M948 334h56M1018 334h50"/></g>
+<g fill="#f3bfc8" opacity=".96"><circle cx="872" cy="228" r="23"/><circle cx="897" cy="211" r="28"/><circle cx="923" cy="236" r="22"/><circle cx="1109" cy="201" r="28"/><circle cx="1138" cy="224" r="23"/><circle cx="1155" cy="201" r="25"/></g>
+<path d="M900 232v145M1130 222v165" stroke="#6f6c65" stroke-width="8"/>
+<path d="M810 398Q991 358 1194 399V460H810Z" fill="#d3c6ac"/>
+<path d="M882 395h241" stroke="#8b635c" stroke-width="9"/><path d="M911 394v-71M1093 394v-71" stroke="#9c6454" stroke-width="11"/><path d="M903 329h198" stroke="#9c6454" stroke-width="11"/><path d="M890 329l114-57 115 57" fill="none" stroke="#aa7463" stroke-width="11"/>
+<rect x="831" y="26" width="130" height="37" rx="18" fill="#ffffffed"/><text x="847" y="50" font-family="Arial,sans-serif" font-size="18" font-weight="bold" fill="#356791">🇯🇵 KYOTO</text>
+<rect x="832" y="395" width="290" height="44" rx="15" fill="#ffffffeb" filter="url(#shadow)"/><text x="851" y="423" font-family="Arial,sans-serif" font-size="18" font-weight="bold" fill="#4b647d">Culture &amp; discovery</text>
+</g>
+</svg>

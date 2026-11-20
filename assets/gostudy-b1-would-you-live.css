@@ -1,0 +1,75 @@
+/* Would You Live Here? · shared B1 workbook, lesson-only visual treatment. */
+body[data-dud-b1-premium] .lesson-cover{
+  display:block;width:100%;height:auto;max-height:280px;object-fit:cover;
+  border-radius:20px;border:1px solid #e1eaf4;margin:14px 0 20px;
+  box-shadow:0 9px 26px rgba(41,80,114,.11);
+}
+body[data-dud-b1-premium] .lesson-content>.source{
+  border:1px solid #e5edf7;border-radius:18px;background:#fcfdff;
+  padding:clamp(15px,2vw,22px);margin:15px 0;
+}
+body[data-dud-b1-premium] .lesson-content>.source:not(.b1-source-video) p{
+  color:#33455f;font-size:clamp(15px,1.15vw,17px);
+  line-height:1.77;margin:0 0 13px;letter-spacing:.003em;
+}
+body[data-dud-b1-premium] .lesson-content>.source:not(.b1-source-video) p:last-child{margin-bottom:0}
+body[data-dud-b1-premium] .travel-cards{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0;
+}
+body[data-dud-b1-premium] .travel-cards>div{
+  min-width:0;background:linear-gradient(155deg,#f2f8ff,#fefefe 75%);
+  border:1px solid #dce9f6;border-radius:17px;padding:15px 12px;
+  box-shadow:0 4px 16px rgba(43,95,152,.05);
+}
+body[data-dud-b1-premium] .travel-cards>div>span{font-size:26px;display:block;margin-bottom:5px}
+body[data-dud-b1-premium] .travel-cards>div>strong{
+  color:#244a72;font-weight:800;display:block;font-size:13px;line-height:1.4;
+}
+body[data-dud-b1-premium] .travel-cards>div>b{
+  display:block;color:#196fa6;font-size:15px;line-height:1.4;margin-top:6px;
+}
+body[data-dud-b1-premium] .travel-cards>div>small{
+  display:block;color:#5c7288;font-size:12px;line-height:1.45;margin-top:7px;
+}
+body[data-dud-b1-premium] .b1-source-video{
+  background:linear-gradient(135deg,#f7fbff,#edf6ff);
+  border:1px solid #cbdff4;
+  border-radius:19px;overflow:hidden;padding:16px;margin:16px 0;
+}
+body[data-dud-b1-premium] .b1-source-video-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;padding:1px 3px 12px}
+body[data-dud-b1-premium] .b1-source-video-header strong{font-size:16px;color:#1c4970}
+body[data-dud-b1-premium] .b1-source-video-header span{font-size:11px;color:#537c9e}
+body[data-dud-b1-premium] .b1-source-video-frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:15px;overflow:hidden;background:#dce9f5;border:1px solid #c3d8ed;}
+body[data-dud-b1-premium] .b1-source-video-frame iframe{width:100%;height:100%;border:0;display:block;}
+body[data-dud-b1-premium] .b1-source-video-open{margin:12px 3px 4px}
+body[data-dud-b1-premium] .b1-source-video-open a{
+  display:inline-flex;padding:11px 15px;background:#ecf6ff;border:1px solid #c4e2f6;
+  color:#176c9d;font-weight:750;text-decoration:none;border-radius:12px;font-size:14px;
+}
+body[data-dud-b1-premium] .b1-source-video-open a:hover{background:#dceffd}
+body[data-dud-b1-premium] .b1-source-video-note{font-size:12px;color:#637c96;margin:7px 3px 0}
+@media(max-width:760px){
+  body[data-dud-b1-premium] .travel-cards{grid-template-columns:1fr;gap:9px}
+  body[data-dud-b1-premium] .travel-cards>div{padding:13px 14px}
+  body[data-dud-b1-premium] .lesson-cover{max-height:250px}
+  body[data-dud-b1-premium] .b1-source-video{padding:10px}
+}
+
+body[data-dud-b1-premium] .b1-travel-widget{
+  margin:16px 0 20px;padding:18px 20px;
+  border:1px solid #cddff0;background:linear-gradient(145deg,#f0f8ff,#fff);
+  border-radius:19px;box-shadow:0 5px 18px rgba(30,95,150,.07)
+}
+body[data-dud-b1-premium] .b1-travel-widget h3{font-size:18px;letter-spacing:-.3px;margin:0 0 8px;color:#1d4e72}
+body[data-dud-b1-premium] .b1-travel-widget p{font-size:14px;line-height:1.6;color:#476480}
+body[data-dud-b1-premium] .b1-travel-radio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+body[data-dud-b1-premium] .b1-travel-radio label{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #d6e4f1;border-radius:13px;padding:11px;cursor:pointer;min-width:0;font-size:12px;font-weight:750;color:#315b80}
+body[data-dud-b1-premium] .b1-travel-radio input{flex:none;accent-color:#079cba;width:17px;height:17px}
+body[data-dud-b1-premium] .b1-travel-radio label:has(input:checked){border-color:#4fb0c7;background:#e8f8fb;box-shadow:0 0 0 1px #b0e4ed}
+body[data-dud-b1-premium] .b1-travel-widget .b1-travel-next{margin:12px 0 0;padding:11px 13px;border-radius:10px;background:#e9f3ff;color:#315d80}
+body[data-dud-b1-premium] .b1-travel-reveal{margin:10px 0;padding:10px 17px;border-radius:12px;font-weight:800;cursor:pointer}
+body[data-dud-b1-premium] .b1-travel-twist{margin-top:10px;padding:13px 16px;border:1px solid #e1d1a3;background:#fff9e9;border-radius:13px}
+body[data-dud-b1-premium] .b1-travel-twist[hidden]{display:none}
+body[data-dud-b1-premium] .b1-travel-twist strong{color:#856122}
+body[data-dud-b1-premium] .b1-travel-twist p{margin:5px 0 0;color:#624d2c}
+@media(max-width:640px){body[data-dud-b1-premium] .b1-travel-radio{grid-template-columns:1fr}body[data-dud-b1-premium] .b1-travel-widget{padding:14px}}

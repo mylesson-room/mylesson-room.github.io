@@ -1,0 +1,105 @@
+{
+  "key": "gostudy-general-english-b1-stories-01-homework-v1",
+  "title": "Homework · A Postcard From a New Home",
+  "level": "B1 · General English · Homework · 15–20 minutes",
+  "cabinet": "student-general-english-b1-stories.html",
+  "course": "general-english-b1-stories",
+  "contentVersion": "would-you-live-here-homework-20261120-v1",
+  "overview": {
+    "title": "A Postcard From a New Home",
+    "level": "B1",
+    "duration": 20,
+    "format": "Homework",
+    "goal": "Recall target expressions and write a friendly 80–100-word postcard from a fictional new home."
+  },
+  "steps": [
+    {
+      "id": "newhome-hw-recall",
+      "title": "01 · A quick memory check",
+      "minutes": 5,
+      "instruction": "Match these phrases to their meanings. Try without opening the lesson.",
+      "source": [
+        "Vocabulary from Would You Live Here?: settle in, feel at home, get used to, make friends, miss home, give it a try.",
+        "Check your answers, then write ONE sentence aloud using two of the expressions."
+      ],
+      "type": "match",
+      "items": [
+        [
+          "settle in",
+          [
+            "get comfortable in a new place",
+            "buy a plane ticket",
+            "visit only for a day"
+          ],
+          0,
+          "Settle in = become comfortable."
+        ],
+        [
+          "feel at home",
+          [
+            "feel hungry",
+            "feel welcome and comfortable",
+            "rent a large house"
+          ],
+          1,
+          "Feel at home is about comfort, not owning a property."
+        ],
+        [
+          "get used to",
+          [
+            "travel faster",
+            "go back home",
+            "become familiar with something new"
+          ],
+          2,
+          "Get used to + noun or -ing."
+        ],
+        [
+          "make friends",
+          [
+            "meet people and build friendships",
+            "book a hotel",
+            "work remotely"
+          ],
+          0,
+          "A new routine can help you make friends."
+        ],
+        [
+          "miss home",
+          [
+            "not remember the old city",
+            "wish you were with familiar people or places",
+            "become rich"
+          ],
+          1,
+          "Miss home = feel homesick."
+        ],
+        [
+          "give it a try",
+          [
+            "avoid something",
+            "repeat something forever",
+            "try something new"
+          ],
+          2,
+          "Give it a try = test the experience."
+        ]
+      ],
+      "teacherNotes": "5 min, optional quick oral follow-up. Old homework responses retained under their previous step IDs and the same protected progress key."
+    },
+    {
+      "id": "newhome-hw-postcard",
+      "title": "02 · A postcard from a new home",
+      "minutes": 15,
+      "instruction": "Imagine someone has spent one month living in another country. Write a friendly postcard to a friend (80–100 words). It can be fictional.",
+      "source": [
+        "Your postcard should include: ① where you live; ② what your normal weekday looks like; ③ one new thing you have got used to; ④ something you miss; ⑤ whether you want to stay longer and why.",
+        "Use at least THREE expressions from this lesson: settle in / feel at home / get used to / make friends / miss home / give it a try.",
+        "Start naturally: 'Hi Alex! I've been in Porto for a month now. At first ...'. Finish with a friendly question for your friend.",
+        "Check: 80–100 words, at least three expressions, used to / get used to correctly, and a clear ending."
+      ],
+      "type": "write",
+      "teacherNotes": "15 min. Mark for meaning, clarity and three target phrases. This is the separately published homework without video call."
+    }
+  ]
+}
