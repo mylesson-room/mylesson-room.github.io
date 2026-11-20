@@ -354,7 +354,13 @@
   }
   const roomSidebar = document.querySelector('.gostudy-room-sidebar');
   if (inRoom) document.querySelector('.header-right').append(toolbar);
-  else if (roomSidebar) roomSidebar.querySelector('.sections').before(toolbar);
+  else if (roomSidebar) {
+    // A B1 premium lesson puts section navigation inside a collapsed <details>.
+    // Dictionary controls must remain visible OUTSIDE that dropdown.
+    const sections=roomSidebar.querySelector('.b1-sections-menu') || roomSidebar.querySelector('.sections');
+    if (sections) sections.before(toolbar);
+    else roomSidebar.prepend(toolbar);
+  }
   else (side?.querySelector('.panel') || document.querySelector('header') || lesson).after(toolbar);
   translation=document.createElement('section');translation.className='glass-translation';translation.hidden=true;
   translation.setAttribute('aria-label','Перевод выделенного текста');
