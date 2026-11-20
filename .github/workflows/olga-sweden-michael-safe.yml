@@ -9,6 +9,8 @@ on:
       - 'sweden-a2-02-homework.html'
       - 'assets/gostudy-olga-michael.css'
       - 'assets/gostudy-olga-michael-shell.js'
+      - 'assets/gostudy-olga-jaas-video.js'
+      - 'supabase/functions/gostudy-jaas-sweden-token/index.ts'
       - 'scripts/check-olga-michael-source-preservation.cjs'
       - 'scripts/check-olga-michael-browser.cjs'
       - '.github/workflows/olga-sweden-michael-safe.yml'
