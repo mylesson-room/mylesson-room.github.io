@@ -43,6 +43,8 @@ async function checkVictoriaB2Methodology() {
   console.log('Victoria General English B2: revised 50-min lesson, 15-min homework and stable classroom routes verified');
 }
 
+function cabinethasOldHomeworkHistory(html) { return html.includes('country-house-a2-04.html') && html.includes('country-house-a2-04-homework.html'); }
+
 async function checkThreeProgressMeLessons() {
   const specs = [
     {course:'country-house',slug:'country-house-a2-04',title:'A Sunday Picnic Plan',level:'A2',words:6,stages:7},
@@ -79,8 +81,15 @@ async function checkThreeProgressMeLessons() {
       assert.ok(lesson.steps[1].items.some(item=>item[0]==='forecast range'));
       assert.ok(!lesson.steps.some(step => /role.play|board pitch|defend your plan/i.test(step.instruction)));
     }
-    assert.ok(cabinet.includes('"lesson":"'+spec.slug+'.html"'));
-    assert.ok(cabinet.includes('"homework":"'+spec.slug+'-homework.html"'));
+    if (spec.course === 'country-house') {
+      assert.ok(cabinet.includes('"lesson":"country-house-travel-a2-05.html"'),'Irina now opens the new A2+ lesson');
+      assert.ok(cabinet.includes('"homework":"country-house-travel-a2-05-homework.html"'),'Irina has the new 14-min homework');
+      assert.ok(cabinet.includes('A Sunday Picnic Plan') && cabinethasOldHomeworkHistory(cabinet),
+        'Previous lesson and historical homework URL must remain preserved');
+    } else {
+      assert.ok(cabinet.includes('"lesson":"'+spec.slug+'.html"'));
+      assert.ok(cabinet.includes('"homework":"'+spec.slug+'-homework.html"'));
+    }
     assert.ok(sync.includes(spec.slug+'.html') && sync.includes(spec.slug+'-homework.html'));
     for (const config of [lesson,practice]) for (const step of config.steps) {
       if (['choice','gap','match'].includes(step.type)) {
@@ -200,10 +209,10 @@ async function checkMigratedRooms(browser, origin) {
   for (const lesson of [
   {
     "course": "country-house",
-    "path": "country-house-a2-04.html",
+    "path": "country-house-travel-a2-05.html",
     "cab": "student-country-house.html",
     "student": "Ирина",
-    "title": "A Sunday Picnic Plan"
+    "title": "The Little Joys of Travelling"
   },
   {
     "course": "art-b1",
@@ -274,7 +283,17 @@ async function checkMigratedRooms(browser, origin) {
       ]);
       await tp.waitForURL(url => url.pathname === '/'+lesson.path && url.searchParams.get('classStudent') === studentId);
       for (const page of [sp,tp]) {
-        await page.getByText('Онлайн · общая комната',{exact:true}).waitFor();
+        if (lesson.course === 'country-house') {
+          // The new A2+ lesson uses Michael's compact collapsed chat, so its
+          // status lives in a hidden <details> until the user opens it.
+          await page.waitForFunction(()=>document.querySelector('#finance-live-status')?.textContent === 'Онлайн · общая комната');
+          const chat=page.locator('.lesson-chat-dropdown');
+          await chat.waitFor({state:'visible'});
+          await chat.locator('summary').click();
+          await chat.locator('#finance-live-status').getByText('Онлайн · общая комната').waitFor();
+        } else {
+          await page.getByText('Онлайн · общая комната',{exact:true}).waitFor();
+        }
         const tools = await page.locator('.video-workspace').boundingBox();
         const content = await page.locator('.lesson').boundingBox();
         assert.ok(tools.x+tools.width <= content.x+1,'video and chat should be to the left of the lesson');

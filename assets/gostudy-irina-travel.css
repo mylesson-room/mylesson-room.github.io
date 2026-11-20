@@ -1,0 +1,61 @@
+/* A2+ travel: use Michael's shared layout and controls. Only lesson-specific
+   typography / soft content cues belong here; no duplicate video/chat logic. */
+body[data-irina-travel] #lessonPages .activity-head::before{
+  content:"✦";display:grid;place-items:center;
+  width:54px;height:54px;flex:0 0 54px;
+  background:#fff;border:1px solid #d6e9fa;border-radius:14px;
+  color:#118eae;font-size:25px;
+  box-shadow:0 3px 11px #215c8617;
+}
+body[data-irina-travel] .hero::before{
+  content:"GENERAL ENGLISH  ·  A2+  ·  50 MIN";
+  display:block;margin:0 0 12px;color:#087b9d;
+  font-size:12px;font-weight:850;letter-spacing:.08em;
+}
+body[data-irina-travel] #lessonPages .article{
+  background:#f7fafc;border:1px solid #e2ebf3;
+  padding:clamp(18px,2.2vw,30px);
+  border-radius:18px;
+}
+body[data-irina-travel] #lessonPages .article p{
+  color:#263a53;line-height:1.82;
+  font-size:clamp(16px,1.1vw,18px);
+}
+body[data-irina-travel] #lessonPages .material-card{
+  background:#f8fbff;border:1px solid #dce9f5;border-radius:16px;
+  box-shadow:0 3px 12px #173c6b0a;
+}
+body[data-irina-travel] #lessonPages .material-card strong{
+  font-size:17px;color:#243553;
+}
+body[data-irina-travel] #lessonPages .material-card p{
+  color:#5a718c;line-height:1.55;
+}
+body[data-irina-travel] #lessonPages .lead{
+  font-size:16px;line-height:1.75;
+}
+/* Old homework stays in the historic file; new A2+ homework has no video/chat. */
+body[data-irina-travel-homework] .sidebar{display:none!important}
+body[data-irina-travel-homework] .lesson-divider{display:none!important}
+body[data-irina-travel-homework] .layout{
+  display:block!important;max-width:1100px;
+  margin-inline:auto;background:#eef4fc;
+}
+body[data-irina-travel-homework] .lesson{
+  width:100%;padding:15px 18px 25px;
+}
+body[data-irina-travel-homework] .lesson-content{max-width:1000px;margin-inline:auto}
+body[data-irina-travel-homework] .hero::before{
+  content:"HOMEWORK  ·  A2+  ·  14 MIN";
+  display:block;margin-bottom:10px;color:#087b9d;
+  font-size:12px;font-weight:800;letter-spacing:.08em;
+}
+@media(max-width:700px){
+  body[data-irina-travel] #lessonPages .activity-head::before{
+    width:42px;height:42px;flex-basis:42px;font-size:21px;
+  }
+  body[data-irina-travel-homework] .lesson{padding:9px 9px 20px}
+}
+@media print{
+  body[data-irina-travel] .sidebar,body[data-irina-travel-homework] .sidebar{display:none}
+}

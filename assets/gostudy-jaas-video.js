@@ -11,9 +11,10 @@
   const BASE = 'https://kawfqlohguwvmmplvrny.supabase.co';
   const ANON_KEY = 'sb_publishable_aAZxKwYpLcIXAjCiN5lBSg_qdFxvYwL';
   const b1Stories = document.body?.dataset?.jaasScope === 'b1-stories';
-  const endpoint = BASE + (b1Stories ? '/functions/v1/gostudy-jaas-b1-token' : '/functions/v1/gostudy-jaas-token');
+  const countryHouse = document.body?.dataset?.jaasScope === 'country-house';
+  const endpoint = BASE + (b1Stories ? '/functions/v1/gostudy-jaas-b1-token' : countryHouse ? '/functions/v1/gostudy-jaas-country-house-token' : '/functions/v1/gostudy-jaas-token');
   const appIdFormat = /^vpaas-magic-cookie-[A-Za-z0-9-]+$/;
-  const roomFormat = b1Stories ? /^gostudy-b1-stories-[0-9a-f]{32}$/ : /^gostudy-finance-[0-9a-f]{32}$/;
+  const roomFormat = b1Stories ? /^gostudy-b1-stories-[0-9a-f]{32}$/ : countryHouse ? /^gostudy-country-house-[0-9a-f]{32}$/ : /^gostudy-finance-[0-9a-f]{32}$/;
   const connect = document.createElement('button');
   connect.type = 'button';
   connect.className = 'call-btn jaas-connect';
@@ -188,7 +189,7 @@
   async function resolveStudentId(auth, accessToken) {
     // The B1 token endpoint validates the existing restricted B1 course RPC.
     // Do not look at the unrelated finance-room table for this lesson.
-    if (b1Stories) return auth.classroomStudent || null;
+    if (b1Stories || countryHouse) return auth.classroomStudent || null;
     // Teacher links normally include classStudent, but direct lesson URLs do not.
     // Find the single finance room the signed-in user can access via RLS.
     // Do not guess a room if the teacher has more than one.
