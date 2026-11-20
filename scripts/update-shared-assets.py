@@ -17,8 +17,8 @@ for path in sorted(ROOT.glob('*.html')):
     # The authorized B1 dashboard now loads Michael's actual shared
     # gostudy-v1-vocabulary.js only after the protected course access check.
     michael_dictionary = (
-        path.name == 'student-general-english-b1-stories.html'
-        and 'data-unified-b1-cabinet' in html
+        ('data-unified-b1-cabinet' in html or 'data-unified-legacy-cabinet' in html)
+        and path.name.startswith('student-')
         and 'assets/gostudy-v1-cabinet.css' in html
         and 'assets/gostudy-sync.js' in html
     )
