@@ -1,0 +1,62 @@
+/* Design 2 visual bridge for legacy workbook engines.
+   Based on the already-approved GoStudy shared lesson layout; no script or data changes.
+   Does not fake real camera/video or translator service capabilities.
+*/
+body[data-design2-legacy-michael] {
+  --ink:#213650;
+  --muted:#5a6b85;
+  --accent:#2169c5;
+  --stroke:#dce6f3;
+  --line:#dce6f3;
+  background:#f7f9fc;
+  color:var(--ink);
+}
+body[data-design2-legacy-michael] .gostudy-lesson-topbar {
+  min-height:64px;
+  background:#fff;
+  border-bottom:1px solid #dfe8f3;
+}
+body[data-design2-legacy-michael] .room,
+body[data-design2-legacy-michael] .room.wide {
+  max-width:none;
+  margin:auto;
+  padding:24px;
+  column-gap:22px;
+  grid-template-columns:minmax(265px,33.333%) minmax(0,1fr);
+}
+body[data-design2-legacy-michael] .room > .sheet {
+  background:#fff;
+  border:1px solid #e2eaf5;
+  border-radius:20px;
+  box-shadow:0 6px 22px #173c6809;
+  overflow:hidden;
+}
+body[data-design2-legacy-michael] .room > .side > .panel {
+  border-radius:17px;
+  background:#fff;
+}
+body[data-design2-legacy-michael] .room > .sheet .lesson-content {
+  background:#fff;
+  border-radius:0;
+}
+body[data-design2-legacy-michael] .room .activity-head,
+body[data-design2-legacy-michael] .room .lesson-meta {
+  background:linear-gradient(110deg,#e8f6ff 0%,#e4f0ff 100%);
+}
+body[data-design2-legacy-michael] .room button:focus-visible,
+body[data-design2-legacy-michael] .room a:focus-visible,
+body[data-design2-legacy-michael] .room input:focus-visible {
+  outline:3px solid #41a8d4;
+  outline-offset:2px;
+}
+@media (max-width:800px) {
+  body[data-design2-legacy-michael] .room,
+  body[data-design2-legacy-michael] .room.wide{
+    display:flex;
+    flex-direction:column;
+    padding:9px;
+    gap:12px;
+  }
+  body[data-design2-legacy-michael] .room>.side,
+  body[data-design2-legacy-michael] .room>.sheet {width:100%;min-width:0}
+}
