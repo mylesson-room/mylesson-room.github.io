@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GoStudy · Резервная копия старых уроков Ольги</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color:#243e60;background:#f3f7fd}
+*{box-sizing:border-box}body{margin:0;padding:18px}
+main{margin:30px auto;max-width:760px;background:#fff;border:1px solid #dce8f4;border-radius:20px;padding:26px;box-shadow:0 9px 33px #15396112}
+h1{font-size:26px}p,li{line-height:1.6}small{color:#587391}
+button{font:inherit;background:#216dcc;color:#fff;border:0;border-radius:12px;padding:14px 20px;cursor:pointer;font-weight:700}
+button:disabled{background:#96a9be;cursor:not-allowed}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #55b9e4;outline-offset:3px}
+input{font:inherit;display:block;width:100%;padding:14px;margin:8px 0 18px;border:1px solid #b7cae1;border-radius:10px}
+.output{background:#f5f9ff;border-radius:12px;padding:15px 17px;white-space:pre-line;overflow-wrap:anywhere}
+.warning{color:#8a451b;font-weight:600}a{color:#216dcc}
+</style></head><body><main>
+<p><a href="student-sweden.html">← Кабинет Sweden A2</a></p>
+<h1>Копия старых ответов и слов Ольги</h1>
+<p>Откройте эту страницу <strong>в том браузере и на том устройстве, на котором Ольга выполняла старые уроки</strong>. Если она занималась на нескольких устройствах, необходимо сохранить отдельную копию с каждого.</p>
+<p>Эта страница <strong>ничего не удаляет, не записывает в браузер и не отправляет на сервер</strong>. Экспортирует только четыре исторических ключа уроков Sweden A2, не копируя пароли или токены входа.</p>
+<section aria-labelledby="found"><h2 id="found">Что найдено</h2><p id="summary" role="status" class="output">Проверяем сохранённые материалы…</p></section>
+<button id="download" type="button" disabled>Скачать копию ответов и слов (.json)</button>
+<section><h2>Проверить скачанный файл</h2>
+<label for="backup">Выберите скачанный файл. Он будет проверен <strong>только на этом устройстве</strong>.</label>
+<input type="file" accept=".json,application/json" id="backup">
+<p id="verify" role="status" class="output">Пока файл не выбран.</p>
+</section>
+<p class="warning">Не присылайте этот файл посторонним: в нём могут быть личные ответы. Сохраните его до подтверждения успешного переноса данных.</p>
+<script>
+(()=>{
+'use strict';
+const KEYS=[
+'gostudy-sweden-a2-v2',
+'gostudy-sweden-a2-lesson02-v1',
+'gostudy-sweden-a2-homework01-v1',
+'gostudy-sweden-a2-homework02-v1'
+];
+const button=document.querySelector('#download'),summary=document.querySelector('#summary'),verify=document.querySelector('#verify'),input=document.querySelector('#backup');
+let data;
+const rows=KEYS.map(key=>{
+let value=null;
+try{value=localStorage.getItem(key);}catch(error){summary.textContent='Доступ к сохранённым данным браузера заблокирован: '+error.message;}
+let answers=0,words=0;
+if(value!==null){
+try{const parsed=JSON.parse(value);answers=Object.keys(parsed?.answers||{}).length;words=Array.isArray(parsed?.words)?parsed.words.length:0;}catch{}
+}
+return {key,value,answers,words};
+});
+const found=rows.filter(x=>x.value!==null);
+data={type:'gostudy-sweden-legacy-backup-v1',schema:1,origin:location.origin,exportedAt:null,values:Object.fromEntries(found.map(x=>[x.key,x.value]))};
+summary.textContent=rows.map((r,i)=>
+(i+1)+'. '+(r.value===null?'Нет данных в этом браузере':'Найдены')+' · Урок '+(i+1)+' · '+r.answers+' ответов · '+r.words+' слов'
+).join('\n')+'\nВсего разделов с данными: '+found.length+' из '+rows.length+'.';
+button.disabled=found.length===0;
+button.onclick=()=>{
+if(!found.length)return;
+data.exportedAt=new Date().toISOString();
+const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'});
+const url=URL.createObjectURL(blob),a=document.createElement('a');
+a.download='gostudy-olga-sweden-backup-'+new Date().toISOString().slice(0,10)+'.json';
+a.href=url;a.style.display='none';document.body.append(a);a.click();a.remove();
+setTimeout(()=>URL.revokeObjectURL(url),60000);
+verify.textContent='Копия скачана. Теперь выберите скачанный файл в поле ниже, чтобы проверить её целостность.';
+};
+input.onchange=async()=>{
+const file=input.files?.[0];
+if(!file)return;
+if(file.size>10*1024*1024){verify.textContent='Файл больше 10 МБ. Выберите правильную резервную копию.';return;}
+try{
+const obj=JSON.parse(await file.text());
+if(obj?.type!=='gostudy-sweden-legacy-backup-v1'||obj?.schema!==1||!obj?.values||typeof obj.values!=='object')
+throw Error('Это не резервная копия Sweden A2.');
+const otherKeys=Object.keys(obj.values).filter(k=>!KEYS.includes(k));
+if(otherKeys.length)throw Error('Незнакомые ключи в копии. Проверьте файл.');
+const corrupt=Object.entries(obj.values).filter(([key,val])=>typeof val!=='string');
+if(corrupt.length)throw Error('Некоторые значения повреждены.');
+const same=Object.entries(obj.values).filter(([key,val])=>localStorage.getItem(key)===val);
+const unmatched=Object.keys(obj.values).length-same.length;
+verify.textContent='Проверено: '+same.length+' раздел(ов) полностью совпадают с данными этого браузера.'+
+(unmatched?' Есть '+unmatched+' несовпадающих раздел(ов). Возможно, файл создан на другом устройстве или данные позже изменились.':
+' Все найденные значения сохранены точно.')+
+'\nФайл не импортировался и не изменил данные.';
+}catch(error){verify.textContent='Не удалось проверить файл: '+error.message;}
+};
+})();
+</script></main></body></html>
