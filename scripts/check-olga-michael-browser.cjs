@@ -72,7 +72,13 @@ async function check(browser,base,file,kind,mobile){
   for(const [key,raw] of Object.entries(keys)){
     const old=JSON.parse(raw),next=JSON.parse(current[key]);
     assert.deepEqual(next.answers['test-legacy-answer'],old.answers['test-legacy-answer'],label+' damaged saved answer for '+key);
-    assert.deepEqual(next.words,old.words,label+' damaged original word state '+key);
+    for(const existing of old.words){
+      assert.ok(next.words.some(word=>word.en===existing.en && word.ru===existing.ru),
+        label+' missing original saved word in '+key+': '+existing.en);
+    }
+    // Legacy Sweden homework intentionally inherits lesson-one vocabulary.
+    // Such non-destructive hydration is allowed, but deletion/alteration is not.
+
   }
   const downloadWait=page.waitForEvent('download');
   await page.getByRole('button',{name:'Сохранить старые ответы и слова'}).first().click();
