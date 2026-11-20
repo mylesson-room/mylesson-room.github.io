@@ -125,7 +125,7 @@ async function pageFor(browser,base,{file,mobile=false,role='student',assigned='
     }finally{await item.context.close();}
    }
   }
-  for(const assigned of ['sweden-a2-02.html','sweden-a2-03.html']){
+  for(const assigned of ['sweden-a2-02.html','sweden-a2-02-michael.html','sweden-a2-03.html']){
    const item=await pageFor(browser,base,{file:'student-sweden.html',assigned});
    try{
     await item.page.locator('a.lesson-card-link').waitFor({state:'visible',timeout:6000});
