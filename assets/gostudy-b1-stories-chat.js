@@ -83,6 +83,7 @@
         known.add(item.id);
       }
       primed=true;
+      chat.dataset.loaded='true';
       if(chat.open){unread=0;updateBadge();}
       else updateBadge();
       render(entries);
