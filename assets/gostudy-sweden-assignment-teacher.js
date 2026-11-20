@@ -11,6 +11,17 @@
   if(!form||!field||!save||!status)return;
   const allowed=new Set(['sweden-a2-02.html','sweden-a2-02-michael.html','sweden-a2-03.html']);
   let studentId=null,busy=false;
+  const join=document.createElement('a');
+  join.id='sweden-teacher-join';
+  join.hidden=true;
+  join.style.cssText='display:inline-flex;margin:16px 0;padding:12px 17px;border:1px solid #b4cfea;border-radius:12px;font-weight:700;';
+  join.textContent='Войти в текущий урок Ольги';
+  form.after(join);
+  function updateJoin(){
+    if(!studentId||!allowed.has(field.value)){join.hidden=true;return;}
+    join.href=field.value+'?classStudent='+encodeURIComponent(studentId);
+    join.hidden=false;
+  }
   const report=text=>{status.textContent=text;};
   async function api(path,options={}){
     const token=await auth.token();
@@ -40,6 +51,7 @@
       throw Error('Нет права изменять назначение.');
     if(!allowed.has(row.lesson_path))throw Error('В базе указан неизвестный урок.');
     field.value=row.lesson_path;
+    updateJoin();
     field.disabled=false;
     save.disabled=false;
     report('Текущее назначение загружено. Выбор сохраняется в защищённой базе и виден с любого устройства.');
@@ -54,6 +66,7 @@
       });
       if(!Array.isArray(response)||response.length!==1||response[0]?.lesson_path!==field.value)
         throw Error('Назначение не подтвердилось — обновите страницу.');
+      updateJoin();
       report('Сохранено: '+field.selectedOptions[0].textContent+'. Новый выбор появится у Ольги после обновления кабинета.');
     }catch(error){report('Ошибка сохранения: '+error.message);}
     finally{busy=false;save.disabled=false;field.disabled=false;}
