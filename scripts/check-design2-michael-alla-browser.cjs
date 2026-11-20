@@ -93,6 +93,37 @@ async function sample(browser,origin,{name,html,mobile,role='student'}){
       assert.ok(measure.sidebar.right<=measure.lesson.left+20,name+' sidebar must precede the exercise sheet');
     }
     await page.screenshot({path:path.join(imageDir,name+'.png'),fullPage:true,animations:'disabled'});
+
+    // Both lessons must open the same dictionary panel, not merely render its button.
+    await page.locator('#openLessonDictionary').click({timeout:6000});
+    await page.locator('#lessonDictionary[open]').waitFor({state:'visible',timeout:5000});
+    await page.locator('#lessonDictionary form[method="dialog"] button').click();
+    await page.locator('#lessonDictionary[open]').waitFor({state:'hidden',timeout:5000});
+
+    // Test selection/translation popup without calling the actual Google service.
+    const selected=await page.evaluate(()=>{
+      const scope=document.querySelector('#lessonPages .page.active .lead') ||
+        document.querySelector('#lessonPages .page.active .panel');
+      const walker=document.createTreeWalker(scope,NodeFilter.SHOW_TEXT);
+      let node;
+      while(node=walker.nextNode()){
+        if(node.textContent.trim().length<8)continue;
+        const start=node.textContent.search(/\\S/);
+        if(start<0)continue;
+        const r=document.createRange();
+        r.setStart(node,start);
+        r.setEnd(node,Math.min(start+7,node.textContent.length));
+        const sel=getSelection();sel.removeAllRanges();sel.addRange(r);
+        document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
+        return sel.toString();
+      }
+      return null;
+    });
+    assert.ok(selected?.trim().length>0,name+' must contain selectable lesson text');
+    await page.locator('#selectionTranslate.is-visible').waitFor({state:'visible',timeout:5000});
+    await page.keyboard.press('Escape');
+    assert.equal(await page.locator('#selectionTranslate.is-visible').count(),0,
+      name+' translation popup must close on Escape');
     await page.locator('#next').click({timeout:6000});
     await page.locator('#page-1.active').waitFor({state:'visible',timeout:6000});
     assert.deepEqual(failures.filter(msg=>/gostudy-vietnam-a2|gostudy-v1-lesson|gostudy-v1-workbook|gostudy-finance-live/.test(msg)),[],name+' workbook/render error');
