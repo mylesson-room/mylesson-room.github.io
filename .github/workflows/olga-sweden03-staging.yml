@@ -9,6 +9,10 @@ on:
       - 'teacher-sweden-assignment.html'
       - 'gostudy-teacher.html'
       - 'assets/gostudy-sweden*.js'
+      - 'assets/gostudy-v1-workbook.js'
+      - 'assets/gostudy-v1-lesson.js'
+      - 'assets/gostudy-v1-vocabulary.js'
+      - 'scripts/check-olga-cloud-vocabulary-browser.cjs'
       - 'docs/sql/olga-sweden-selection-review-only.sql'
       - 'scripts/check-olga-sweden03*.cjs'
       - '.github/workflows/olga-sweden03-staging.yml'
@@ -33,6 +37,10 @@ jobs:
         run: |
           export GOSTUDY_CHROME="$(command -v google-chrome)"
           node scripts/check-olga-sweden03-browser.cjs
+      - name: Two independent devices and server-acknowledged cloud vocabulary
+        run: |
+          export GOSTUDY_CHROME="$(command -v google-chrome)"
+          node scripts/check-olga-cloud-vocabulary-browser.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
