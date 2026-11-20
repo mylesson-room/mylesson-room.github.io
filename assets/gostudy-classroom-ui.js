@@ -37,6 +37,17 @@
       };
       apply(saved);
       room.append(divider);
+      // Michael's lesson sections are a compact dropdown rather than an
+      // always-open panel. Keep the same original navigation element/events.
+      const sections=room.querySelector('.sections');
+      if(sections){
+        const menu=document.createElement('details');
+        menu.className='b1-sections-menu';
+        const summary=document.createElement('summary');
+        summary.textContent='Разделы урока';
+        sections.before(menu);
+        menu.append(summary,sections);
+      }
       divider.addEventListener('pointerdown',event=>{
         if(event.button!==0)return;
         divider.setPointerCapture(event.pointerId);
