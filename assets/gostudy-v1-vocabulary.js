@@ -51,6 +51,8 @@ async function markLearned(word) {
 
 
 function loadSavedWords() {
+  if(document.body.dataset.cloudVocabulary === 'sweden-a2')
+    return window.GoStudySwedenCloudWords?.words() || [];
   // Authenticated Finance lessons keep their original real-time source.
   const legacy = document.body.dataset.vocabularySources;
   const storageKey = document.body.dataset.vocabularyKey || WORDS_STORAGE_KEY;
