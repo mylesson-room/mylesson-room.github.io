@@ -1573,6 +1573,9 @@
   function mountLessonHeader() {
     const oldHeader = document.querySelector('header');
     if (!oldHeader) return;
+    // Some protected lessons (including B1 Stories) already ship the approved
+    // shared header. Do not hide it and append a competing legacy header.
+    if (oldHeader.classList.contains('gostudy-lesson-topbar')) return;
     const course = document.querySelector('meta[name=gostudy-course]').content;
     const bar = document.createElement('header');
     bar.className = 'gostudy-lesson-topbar';
