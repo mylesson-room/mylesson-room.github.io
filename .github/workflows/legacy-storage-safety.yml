@@ -1,0 +1,21 @@
+name: Legacy browser data safety
+on:
+  pull_request:
+    paths:
+      - 'assets/gostudy-legacy-snapshot.js'
+      - 'assets/gostudy-legacy-snapshot-ui.js'
+      - 'legacy-data-safety.html'
+      - 'scripts/check-legacy-snapshot.cjs'
+      - '.github/workflows/legacy-storage-safety.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  local-storage-safety:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/check-legacy-snapshot.cjs
