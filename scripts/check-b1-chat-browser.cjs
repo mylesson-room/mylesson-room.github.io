@@ -124,6 +124,7 @@ async function setContext(browser,id,student){
         while((node=walker.nextNode())){
           const at=node.textContent.toLowerCase().indexOf(text.toLowerCase());
           if(at<0)continue;
+          node.parentElement?.scrollIntoView({block:'center',inline:'nearest'});
           const range=document.createRange();
           range.setStart(node,at);range.setEnd(node,at+text.length);
           const selection=window.getSelection();
