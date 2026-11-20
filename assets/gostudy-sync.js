@@ -638,6 +638,24 @@
         }
         throw new Error('Курс '+title+' не назначен этому аккаунту.');
       }
+      if (storiesCabinet && document.body.hasAttribute('data-unified-b1-cabinet')) {
+        // Same actual cabinet renderer and word-training component as Michael.
+        // Load them only AFTER the existing B1 access RPC succeeds.
+        const loadScript = src => new Promise((resolve,reject)=>{
+          const script=document.createElement('script');
+          script.src=src;script.onload=resolve;script.onerror=()=>reject(Error('Не удалось загрузить кабинет. Обновите страницу.'));
+          document.body.append(script);
+        });
+        await loadScript('assets/gostudy-v1-cabinet.js?v=b1-unified-20261120');
+        status.hidden = true;
+        content.hidden = true;
+        mountLesson();
+        await loadScript('assets/gostudy-v1-vocabulary.js?v=b1-unified-20261120');
+        // The course's existing cloud words are shared with lesson vocabulary;
+        // refresh the shared count after asynchronous initial progress sync.
+        window.dispatchEvent(new Event('pageshow'));
+        return;
+      }
       status.hidden = true;
       content.hidden = false;
       mountStudentHome();
