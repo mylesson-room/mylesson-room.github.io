@@ -20,7 +20,7 @@ body[data-dud-b1-premium] .gostudy-cabinet-back{
 body[data-dud-b1-premium] .room,
 body[data-dud-b1-premium] .room.wide{
   width:100%;max-width:none;margin:0;padding:16px 17px 0;
-  display:grid;grid-template-columns:minmax(270px,31%) minmax(0,1fr);
+  display:grid;grid-template-columns:minmax(270px,var(--b1-sidebar-width,31%)) 12px minmax(0,1fr);
   gap:14px;align-items:start;background:#f7f9fc;
 }
 body[data-dud-b1-premium] .room>.side{
@@ -29,7 +29,7 @@ body[data-dud-b1-premium] .room>.side{
   overflow-y:auto;scrollbar-gutter:stable;padding:1px 7px 18px 1px;
 }
 body[data-dud-b1-premium] .room>.sheet{
-  grid-column:2;grid-row:1;display:flex;flex-direction:column;
+  grid-column:3;grid-row:1;display:flex;flex-direction:column;
   box-sizing:border-box;min-width:0;height:calc(100dvh - 73px);
   min-height:430px;padding:0;overflow:hidden;background:#fff;
   border:1px solid #e0e6f0;border-bottom:0;border-radius:27px 27px 0 0;
@@ -186,4 +186,124 @@ body[data-dud-b1-premium] :is(button,a,summary):focus-visible{
   body[data-dud-b1-premium] .room>.sheet{height:auto;border:0;box-shadow:none}
   body[data-dud-b1-premium] .room>.sheet .step-nav{display:none}
   body[data-dud-b1-premium] .room>.sheet>.lesson-content{overflow:visible}
+}
+
+/* Adjustable video column, shared Michael behaviour; B1 course only. */
+body[data-dud-b1-premium] .b1-lesson-divider {
+  grid-column:2;grid-row:1;position:relative;align-self:stretch;
+  border:0;background:#e9eff7;border-radius:8px;
+  cursor:col-resize;touch-action:none;z-index:5;
+  min-height:260px;
+}
+body[data-dud-b1-premium] .b1-lesson-divider::before {
+  content:'';position:absolute;left:50%;top:46%;
+  transform:translate(-50%,-50%);width:4px;height:45px;
+  border-radius:8px;background:#b2c5df;
+}
+body[data-dud-b1-premium] .b1-lesson-divider:is(:hover,.is-dragging) {
+  background:#dcebf9;
+}
+body[data-dud-b1-premium] .b1-lesson-divider:focus-visible {
+  outline:3px solid #09b6d5;outline-offset:2px;
+}
+@media(max-width:800px){
+  body[data-dud-b1-premium] .b1-lesson-divider{display:none}
+}
+
+/* Exact premium header hierarchy approved on Michael, adapted to B1 data. */
+body[data-dud-b1-premium] .room>.sheet .b1-activity-head {
+  display:flex;align-items:center;gap:16px;
+  padding:16px 18px;margin:0 0 22px;
+  border:1px solid #d5e9f8;border-radius:19px;
+  background:linear-gradient(110deg,#e8f6ff,#e4f0ff);
+}
+body[data-dud-b1-premium] .room>.sheet .b1-activity-icon {
+  flex:0 0 54px;display:grid;place-items:center;
+  width:54px;height:54px;border:1px solid #d6e9fa;
+  border-radius:14px;background:#fff;color:#0c8eaf;
+  font-size:24px;box-shadow:0 3px 11px #215c8617;
+}
+body[data-dud-b1-premium] .room>.sheet .b1-activity-titles {
+  display:flex;flex-direction:column;gap:3px;min-width:0;
+}
+body[data-dud-b1-premium] .room>.sheet .b1-activity-head h1 {
+  margin:0;padding:0;background:transparent;border:0;
+  color:#242441;line-height:1.2;letter-spacing:-.025em;
+  font-size:var(--gostudy-ui-heading-size,clamp(25px,2.4vw,38px));
+  overflow-wrap:anywhere;
+}
+body[data-dud-b1-premium] .room>.sheet .b1-activity-time {
+  color:#627893;font-size:13px;font-weight:750;
+}
+/* Michael-inspired accordion navigation, retaining real B1 section buttons. */
+body[data-dud-b1-premium] .room>.side .b1-sections-menu {
+  margin-top:12px;border:1px solid #dce6f2;
+  border-radius:16px;background:#fff;
+  box-shadow:0 5px 16px #31516b0b;overflow:hidden;
+}
+body[data-dud-b1-premium] .room>.side .b1-sections-menu>summary {
+  display:flex;align-items:center;gap:9px;
+  cursor:pointer;list-style:none;min-height:50px;
+  padding:11px 15px;color:#243653;
+  font-size:15px;font-weight:800;
+}
+body[data-dud-b1-premium] .room>.side .b1-sections-menu>summary::-webkit-details-marker{display:none}
+body[data-dud-b1-premium] .room>.side .b1-sections-menu>summary::before {
+  content:'▸';font-size:15px;color:#0c9cbb;
+  transition:transform .15s ease;
+}
+body[data-dud-b1-premium] .room>.side .b1-sections-menu[open]>summary::before{transform:rotate(90deg)}
+body[data-dud-b1-premium] .room>.side .b1-sections-menu>.sections {
+  border:0;border-top:1px solid #e2eaf5;border-radius:0;
+  box-shadow:none;margin:0;max-height:min(49dvh,400px);
+}
+@media(max-width:540px) {
+  body[data-dud-b1-premium] .room>.sheet .b1-activity-head{
+    gap:10px;padding:12px;border-radius:14px;
+  }
+  body[data-dud-b1-premium] .room>.sheet .b1-activity-icon{
+    flex-basis:44px;width:44px;height:44px;font-size:21px;
+  }
+  body[data-dud-b1-premium] .room>.sheet .b1-activity-head h1{font-size:23px}
+}
+@media(prefers-reduced-motion:reduce) {
+  body[data-dud-b1-premium] .room>.side .b1-sections-menu>summary::before{transition:none}
+}
+
+/* Reuse Michael's emblem / Dictionary / home-navigation vocabulary. */
+body[data-dud-b1-premium] .gostudy-lesson-topbar {
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  height:57px;box-sizing:border-box;padding:5px clamp(15px,2vw,32px);
+}
+body[data-dud-b1-premium] .gostudy-b1-lesson-brand {
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:44px;min-width:55px;
+}
+body[data-dud-b1-premium] .gostudy-b1-lesson-brand img {
+  display:block;width:56px;height:42px;object-fit:contain;
+}
+body[data-dud-b1-premium] .gostudy-b1-lesson-actions {
+  display:flex;align-items:center;gap:12px;
+}
+body[data-dud-b1-premium] .gostudy-b1-lesson-dictionary,
+body[data-dud-b1-premium] .gostudy-b1-lesson-actions .gostudy-cabinet-back {
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border:0;min-height:42px;padding:9px 13px;background:#eaf7fd;
+  border-radius:14px;color:#078ab5;font-size:14px;font-weight:800;
+  text-decoration:none;cursor:pointer;
+}
+body[data-dud-b1-premium] .gostudy-b1-lesson-actions .gostudy-cabinet-back {
+  width:42px;min-width:42px;padding:0;
+}
+body[data-dud-b1-premium] .gostudy-b1-lesson-actions button:disabled {
+  opacity:.55;cursor:wait;
+}
+body[data-dud-b1-premium] .gostudy-b1-lesson-dictionary:hover,
+body[data-dud-b1-premium] .gostudy-b1-lesson-actions .gostudy-cabinet-back:hover {
+  background:#d9f0fa;
+}
+@media(max-width:460px) {
+  body[data-dud-b1-premium] .gostudy-lesson-topbar{padding:5px 13px;}
+  body[data-dud-b1-premium] .gostudy-b1-lesson-actions{gap:8px;}
+  body[data-dud-b1-premium] .gostudy-b1-lesson-dictionary{padding:9px 10px;}
 }

@@ -232,7 +232,14 @@
       ? '<details class="source"><summary>Карточка преподавателя</summary><p>'+escape(step.teacherNotes)+'</p></details>' : '';
     const studentDraft = !classroom && live?.viewing && step.type === 'write'
       ? '<blockquote class="gostudy-live-draft source" aria-label="Ответ ученика" hidden></blockquote>' : '';
-    frame.content.innerHTML = '<p class="label">'+escape(config.title)+'</p><h1 tabindex="-1">'+escape(step.title)+'</h1><p class="instruction">'+escape(step.instruction)+'</p>'+cover+renderVisual(step.visual)+source+audio+video+(exercise?'<section class="activity">'+exercise+'<button type="button" class="check cta">Проверить ответы</button><p role="status" class="result"></p></section>':'')+writing+studentDraft+(liveOverview && step.type === 'order' ? '<div class="source gostudy-live-order" hidden></div>' : '')+teacherNotes;
+    // The B1 premium lesson uses the same elevated section-header pattern as
+    // Michael. Exercise data and its cloud identifiers remain unchanged.
+    const heading = document.body.hasAttribute('data-dud-b1-premium')
+      ? '<div class="b1-activity-head"><span class="b1-activity-icon" aria-hidden="true">'+
+          ['✦','💬','Aa','✎','▤','◎','◇','★'][index%8]+
+          '</span><div class="b1-activity-titles"><h1 tabindex="-1">'+escape(step.title)+'</h1><span class="b1-activity-time">'+escape(step.minutes||'')+' мин</span></div></div>'
+      : '<h1 tabindex="-1">'+escape(step.title)+'</h1>';
+    frame.content.innerHTML = '<p class="label">'+escape(config.title)+'</p>'+heading+'<p class="instruction">'+escape(step.instruction)+'</p>'+cover+renderVisual(step.visual)+source+audio+video+(exercise?'<section class="activity">'+exercise+'<button type="button" class="check cta">Проверить ответы</button><p role="status" class="result"></p></section>':'')+writing+studentDraft+(liveOverview && step.type === 'order' ? '<div class="source gostudy-live-order" hidden></div>' : '')+teacherNotes;
     navigation.innerHTML = '<button type="button" class="back" '+(index===0?'disabled':'')+'>← Назад</button>'+(index+1===config.steps.length?'<a class="cta home-link" href="'+escape(config.cabinet)+'">В личный кабинет</a>':'<button type="button" class="cta next">Далее →</button>');
     if (classroom && (exercise || writing)) {
       const controls = document.createElement('div');

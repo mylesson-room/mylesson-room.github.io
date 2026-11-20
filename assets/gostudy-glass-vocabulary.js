@@ -1,5 +1,6 @@
 (() => {
   const course = document.body.dataset.vocabCourse;
+  const b1MichaelTranslator = document.body.hasAttribute('data-dud-b1-premium');
   const legacy = {
     'business-ai':['gostudy-business-ai-shared-v1','gostudy-business-ai-b2c1-v1'],
     'country-house':['gostudy-country-house-homework-a2-v1','gostudy-country-house-lesson-a2-v1','gostudy-country-house-lesson-02-a2-v1'],
@@ -353,9 +354,17 @@
     toolbar.append(button('Словарь',()=>open('words'),'glass-primary'),button('Тренировать слова',()=>open('cards')));
   }
   const roomSidebar = document.querySelector('.gostudy-room-sidebar');
+  if (!b1MichaelTranslator) {
   if (inRoom) document.querySelector('.header-right').append(toolbar);
-  else if (roomSidebar) roomSidebar.querySelector('.sections').before(toolbar);
+  else if (roomSidebar) {
+    // A B1 premium lesson puts section navigation inside a collapsed <details>.
+    // Dictionary controls must remain visible OUTSIDE that dropdown.
+    const sections=roomSidebar.querySelector('.b1-sections-menu') || roomSidebar.querySelector('.sections');
+    if (sections) sections.before(toolbar);
+    else roomSidebar.prepend(toolbar);
+  }
   else (side?.querySelector('.panel') || document.querySelector('header') || lesson).after(toolbar);
+  }
   translation=document.createElement('section');translation.className='glass-translation';translation.hidden=true;
   translation.setAttribute('aria-label','Перевод выделенного текста');
   translation.innerHTML='<div class="glass-title"><strong></strong><button type="button" aria-label="Закрыть перевод">×</button></div><label>Перевод<textarea rows="2"></textarea></label><p role="status"></p><div class="glass-actions"></div>';
@@ -390,7 +399,8 @@
   translated.oninput=()=>{++translationRun;translationStatus.textContent='';};
   let selecting=false, selectionTimer;
   function readSelection(){
-    if(selecting||dictionary.open)return;
+    // The B1 lesson uses the EXACT Michael selection popup instead.
+    if (b1MichaelTranslator || selecting || dictionary.open) return;
     const selection=window.getSelection();
     if(!selection||selection.isCollapsed||!lesson.contains(selection.anchorNode)||!lesson.contains(selection.focusNode))return;
     const text=selection.toString().trim().replace(/\s+/g,' ');
@@ -412,4 +422,5 @@
   document.addEventListener('pointercancel',()=>{selecting=false;});
   document.addEventListener('selectionchange',()=>{clearTimeout(selectionTimer);selectionTimer=setTimeout(readSelection,220);});
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!dictionary.open)closeTranslation();});
+  if (b1MichaelTranslator) window.GoStudyB1Glossary = {open, add};
 })();

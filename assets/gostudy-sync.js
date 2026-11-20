@@ -638,6 +638,42 @@
         }
         throw new Error('Курс '+title+' не назначен этому аккаунту.');
       }
+      if (storiesCabinet && document.body.hasAttribute('data-unified-b1-cabinet')) {
+        // Same actual cabinet renderer and word-training component as Michael.
+        // Load them only AFTER the existing B1 access RPC succeeds.
+        const loadScript = src => new Promise((resolve,reject)=>{
+          const script=document.createElement('script');
+          script.src=src;script.onload=resolve;script.onerror=()=>reject(Error('Не удалось загрузить кабинет. Обновите страницу.'));
+          document.body.append(script);
+        });
+        await loadScript('assets/gostudy-v1-cabinet.js?v=b1-unified-20261120');
+        status.hidden = true;
+        content.hidden = true;
+        mountLesson();
+        await loadScript('assets/gostudy-v1-vocabulary.js?v=b1-unified-20261120');
+        // Keep Michael's training UI, but read teacher-assigned words from
+        // the B1 course's existing protected RPC — never finance-room tables.
+        const refreshWords = async () => {
+          if (document.hidden) return;
+          try {
+            const words=await window.GoStudyWorkbookWords?.read();
+            if (!Array.isArray(words)) return;
+            const signature=JSON.stringify(words);
+            if (signature !== window.GoStudyB1AssignedSignature) {
+              window.GoStudyB1AssignedSignature=signature;
+              window.GoStudyB1AssignedWords=words;
+              document.dispatchEvent(new Event('b1-vocabulary-updated'));
+            }
+          }catch{}
+        };
+        refreshWords();
+        window.addEventListener('focus',refreshWords);
+        const timer=setInterval(refreshWords,20000);
+        window.addEventListener('pagehide',()=>clearInterval(timer),{once:true});
+        // Progress sync may finish after the initial cabinet render.
+        setTimeout(()=>window.dispatchEvent(new Event('pageshow')),1200);
+        return;
+      }
       status.hidden = true;
       content.hidden = false;
       mountStudentHome();
@@ -707,6 +743,24 @@
       if (classroomStudent === null) mountLesson();
       const vocabulary = document.createElement('script');
       vocabulary.src = status.dataset.vocabulary;
+      if (currentPage === 'general-english-b1-stories-01.html') {
+        const button=document.getElementById('b1LessonDictionary');
+        if(button){
+          button.disabled=true;
+          vocabulary.addEventListener('load',()=>{button.disabled=false;});
+          vocabulary.addEventListener('error',()=>{button.title='Словарь не загрузился. Обновите страницу.';});
+          button.addEventListener('click',()=>{
+            window.GoStudyB1Glossary?.open('words');
+          });
+        }
+        // Same Michael selection popup only after the B1 vocabulary store is
+        // fully initialized. No unrelated finance lesson components are loaded.
+        vocabulary.addEventListener('load',()=>{
+          const translator=document.createElement('script');
+          translator.src='assets/gostudy-b1-michael-selection.js?v=1';
+          document.body.append(translator);
+        },{once:true});
+      }
       document.body.append(vocabulary);
     } catch (error) {
       status.textContent = error.message || 'Не удалось открыть урок. Обновите страницу.';
@@ -1526,6 +1580,9 @@
   function mountLessonHeader() {
     const oldHeader = document.querySelector('header');
     if (!oldHeader) return;
+    // Some protected lessons (including B1 Stories) already ship the approved
+    // shared header. Do not hide it and append a competing legacy header.
+    if (oldHeader.classList.contains('gostudy-lesson-topbar')) return;
     const course = document.querySelector('meta[name=gostudy-course]').content;
     const bar = document.createElement('header');
     bar.className = 'gostudy-lesson-topbar';

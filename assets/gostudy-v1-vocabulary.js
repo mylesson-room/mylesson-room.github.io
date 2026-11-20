@@ -90,6 +90,15 @@ function loadSavedWords() {
       }catch{}
     }
   }
+  // The B1 cabinet uses Michael's vocabulary UI but retains the existing
+  // B1 course RPC for teacher-assigned words instead of finance-room storage.
+  if (document.body.hasAttribute('data-unified-b1-cabinet')) {
+    for (const word of window.GoStudyB1AssignedWords || []) {
+      if (typeof word?.en !== 'string' || !word.en.trim()) continue;
+      const en=word.en.trim(),ru=String(word.ru||'').trim();
+      combined.set(en.toLowerCase(),{en,ru});
+    }
+  }
   return [...combined.values()];
 }
 function updateVocabularyCount() {
@@ -204,6 +213,7 @@ practiceEl('#restartPractice').addEventListener('click',()=>{practiceIndex=0;dra
 window.addEventListener('pageshow',()=>{updateVocabularyCount();loadMastery();});
 document.addEventListener('finance-ready',loadMastery);
 document.addEventListener('finance-word',()=>{updateVocabularyCount();if(wordsDialog.open)openVocabulary();});
+document.addEventListener('b1-vocabulary-updated',()=>{updateVocabularyCount();if(wordsDialog.open)openVocabulary();});
 window.addEventListener('storage',event => {if(event.key === WORDS_STORAGE_KEY)updateVocabularyCount();});
 updateVocabularyCount();
 if (document.getElementById("importFinanceWords")) {

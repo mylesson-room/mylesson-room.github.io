@@ -1298,7 +1298,9 @@ async function main() {
     const source = await readFile('assets/gostudy-sync.js', 'utf8');
     const catalog = runInNewContext('('+source.match(/const classroomCatalog = ([^\n]+);/)[1]+')');
     const studentId = '11111111-1111-4111-8111-111111111111';
-    for (const [course, entry] of Object.entries(catalog)) {
+    // Run the changed B1 parity case first, then all other regressions.
+    const parityFirstCourses=Object.entries(catalog).sort(([a],[b])=>Number(b==='general_english_b1_stories')-Number(a==='general_english_b1_stories'));
+    for (const [course, entry] of parityFirstCourses) {
       if (['business_ai','country_house','art_b1'].includes(course)) continue; // Covered by the v1 classroom and methodology suites above.
       const current = entry.lessons.at(-1);
       const expected = new URL(current.lesson, origin).pathname;
@@ -1750,14 +1752,32 @@ async function main() {
           console.log('finance_b1: canonical cabinets, lesson tools, answers, chat, reload and vocabulary mastery verified');
           continue;
         }
-        const canonicalCabinet = course === 'travel_a2';
+        const canonicalCabinet = course === 'travel_a2' || course === 'general_english_b1_stories';
         const studentLink = canonicalCabinet ? sp.locator('.lesson-card-link') : sp.locator('.home-open-lesson');
         const teacherLink = tp.locator('.teacher-enter-class');
         await studentLink.waitFor();
         if (canonicalCabinet) {
-          assert.equal(await studentLink.getAttribute('href'),'positive-thinking-a2.html');
-          await sp.getByRole('button',{name:'Словарь',exact:true}).waitFor();
-          await sp.getByText('Positive Thinking').first().waitFor();
+          if (course === 'travel_a2') {
+            assert.equal(await studentLink.getAttribute('href'),'positive-thinking-a2.html');
+            await sp.getByRole('button',{name:'Словарь',exact:true}).waitFor();
+            await sp.getByText('Positive Thinking').first().waitFor();
+          } else {
+            // B1 Stories reuses Michael's actual cabinet JS/CSS after the
+            // protected destination RPC, not its old standalone dashboard.
+            assert.equal(await studentLink.getAttribute('href'),'general-english-b1-stories-01.html');
+            assert.equal(await sp.locator('.homework-link').getAttribute('href'),'general-english-b1-stories-01-homework.html');
+            await sp.getByText('A Small Plan That Went Wrong',{exact:true}).waitFor();
+            await sp.locator('.vocab-feature--practice').waitFor({state:'visible'});
+            await sp.getByRole('button',{name:/Словарь/}).first().click();
+            await sp.locator('#words[open]').waitFor();
+            await sp.locator('#practiceFromWords').waitFor({state:'visible'});
+            await sp.locator('#words form[method=dialog] button').click();
+            await sp.locator('#practiceCard').click();
+            await sp.locator('#practiceModes [data-mode="listen"]').waitFor();
+            await sp.locator('#practiceDialog form[method=dialog] button').click();
+            assert.equal(await sp.locator('#student-home').count(),0,'Old B1 cabinet renderer must be gone');
+            assert.equal(await sp.locator('.gostudy-cloud-bar:visible').count(),0,'Shared cabinet must not show legacy cloud bar');
+          }
         } else {
           const cabinetHeading = sp.locator('#student-home .home-lesson h2');
           await sp.evaluate(() => document.documentElement.style.setProperty('--gostudy-ui-heading-size','29px'));
@@ -1774,9 +1794,15 @@ async function main() {
           await page.locator('header.gostudy-lesson-topbar:visible').waitFor();
           assert.equal(await page.locator('header.gostudy-lesson-topbar:visible').count(), 1);
           assert.equal(await page.locator('.gostudy-cabinet-back:visible').count(), 1);
-          const dictionary = page.locator('.glass-lesson-tools button[aria-label="Открыть словарь"]');
+          const dictionary = course === 'general_english_b1_stories' ? page.locator('#b1LessonDictionary') : page.locator('.glass-lesson-tools button[aria-label="Открыть словарь"]');
           const sidebar = page.locator('.room > .side, .gostudy-shared-room > .gostudy-room-sidebar');
-          await sidebar.getByRole('button', {name:'Открыть словарь'}).waitFor();
+          if (course === 'general_english_b1_stories') {
+            await page.locator('#b1LessonDictionary:visible').waitFor();
+            assert.equal(await sidebar.getByRole('button',{name:'Открыть словарь'}).count(),0,
+              'B1 should not keep the obsolete floating dictionary');
+          } else {
+            await sidebar.getByRole('button', {name:'Открыть словарь'}).waitFor();
+          }
           assert.equal(await page.locator('.gostudy-classroom-back:visible').count(), 0);
           if (course === 'general_english_b1_stories') {
             await sidebar.locator('#lessonVideo .jaas-connect').waitFor({state:'visible'});
@@ -1793,6 +1819,73 @@ async function main() {
           assert.equal(await heading.evaluate(node => getComputedStyle(node).fontSize),'29px');
           await page.evaluate(() => document.documentElement.style.removeProperty('--gostudy-ui-heading-size'));
           assert.equal(await heading.evaluate(node => getComputedStyle(node).fontSize),originalFont);
+          if (course === 'general_english_b1_stories') {
+            const b1HeaderButton=page.locator('#b1LessonDictionary');
+            const headerDebug=await b1HeaderButton.evaluate(element=>{
+              const chain=[];let current=element;
+              while(current && chain.length<6) {
+                const style=getComputedStyle(current),box=current.getBoundingClientRect();
+                chain.push({tag:current.tagName,class:current.className,id:current.id,
+                  display:style.display,visibility:style.visibility,opacity:style.opacity,
+                  width:Math.round(box.width),height:Math.round(box.height),hidden:current.hidden});
+                current=current.parentElement;
+              }
+              return chain;
+            });
+            console.log('B1 header dictionary computed layout:',JSON.stringify(headerDebug));
+            await b1HeaderButton.waitFor({state:'visible'});
+            await page.locator('#b1LessonDictionary').click();
+            await page.locator('.glass-words[open]').waitFor();
+            await page.locator('.glass-words[open]').evaluate(dialog=>dialog.close());
+            // Michael parity: the dictionary is top-right ONLY, not a
+            // floating round book button, and selection uses his compact popup.
+            assert.equal(await page.locator('.glass-lesson-tools:visible').count(),0,'Legacy floating dictionary must be removed in B1');
+            assert.equal(await page.locator('.glass-translation:visible').count(),0,'Old sidebar translator must be gone');
+            await page.locator('#selectionTranslate').waitFor({state:'attached'});
+            const videoStyle=await page.locator('#lessonVideo .video-preview').evaluate(el=>{
+              const style=getComputedStyle(el);
+              return {minimum:style.minHeight,background:style.backgroundColor,display:style.display};
+            });
+            // Michael's *final* two-person preview CSS overrides his older
+            // decorative 355px rule with min-height:0 and #f7f8fa.
+            assert.equal(videoStyle.minimum,'0px','B1 must inherit Michael final two-tile preview layout');
+            assert.equal(videoStyle.background,'rgb(247, 248, 250)','B1 must use Michael final two-tile background');
+            assert.equal(videoStyle.display,'flex','Shared video layout must remain flex');
+            await page.evaluate(()=>{
+              const root=document.querySelector('.sheet .lesson-content');
+              const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+              let node;
+              while((node=walker.nextNode())){
+                const pos=node.textContent.toLowerCase().indexOf('describe');
+                if(pos<0)continue;
+                const range=document.createRange();range.setStart(node,pos);range.setEnd(node,pos+8);
+                const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);
+                document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
+                break;
+              }
+            });
+            const popup=page.locator('#selectionTranslate');
+            await popup.waitFor({state:'visible'});
+            assert.ok(await popup.evaluate(el=>el.getBoundingClientRect().width)<=340,'Michael translator must be compact');
+            assert.ok(await popup.evaluate(el=>getComputedStyle(el).position)==='fixed','Translator should float next to selection');
+            await page.keyboard.press('Escape');
+            await popup.waitFor({state:'hidden'});
+            const sectionsMenu=sidebar.locator('.b1-sections-menu');
+            await sectionsMenu.waitFor({state:'visible'});
+            assert.equal(await sectionsMenu.getAttribute('open'),null,'B1 sections default to Michael-style collapsed view');
+            await sectionsMenu.locator('summary').click();
+            await sectionsMenu.locator('.sections button').nth(1).click();
+            await page.locator('.sheet h1').filter({hasText:'Warm-up'}).waitFor();
+            await sectionsMenu.locator('.sections button').first().click();
+            await page.locator('.sheet h1').filter({hasText:'Lesson information'}).waitFor();
+            await sectionsMenu.locator('summary').click();
+            const divider=page.locator('.b1-lesson-divider');
+            await divider.waitFor({state:'visible'});
+            const oldWidth=Number(await divider.getAttribute('aria-valuenow'));
+            await divider.focus();
+            await divider.press('ArrowRight');
+            assert.ok(Number(await divider.getAttribute('aria-valuenow'))>oldWidth,'B1 split divider must be keyboard adjustable');
+          }
           if (await page.locator('.gostudy-shared-room').count()) {
             const first = sidebar.locator('.sections button').first();
             await first.waitFor();

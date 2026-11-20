@@ -14,7 +14,15 @@ for path in sorted(ROOT.glob('*.html')):
     original = html = path.read_text()
     if 'data-vocab-course=' not in html and 'data-finance-live' not in html and 'data-ielts-private-lesson' not in html and 'data-placement-' not in html and path.name not in {'login.html','gostudy-account.html','gostudy-teacher.html','gostudy-ui-kit.html'}:
         continue
-    if 'data-vocab-course=' in html and 'assets/gostudy-glass-vocabulary.js' not in html:
+    # The authorized B1 dashboard now loads Michael's actual shared
+    # gostudy-v1-vocabulary.js only after the protected course access check.
+    michael_dictionary = (
+        path.name == 'student-general-english-b1-stories.html'
+        and 'data-unified-b1-cabinet' in html
+        and 'assets/gostudy-v1-cabinet.css' in html
+        and 'assets/gostudy-sync.js' in html
+    )
+    if 'data-vocab-course=' in html and 'assets/gostudy-glass-vocabulary.js' not in html and not michael_dictionary:
         raise SystemExit(f'{path.name}: shared dictionary missing')
     if '<meta name="gostudy-current-lesson">' in html and 'assets/gostudy-lesson-room.css' not in html:
         styles = ('gostudy-lesson-room.css', 'business-ai-workbook.css?v=2', 'gostudy-color-workbook.css')

@@ -1,0 +1,82 @@
+/* Exact compact Michael translator affordance, scoped to protected B1 only.
+   Placement follows the selected text, never the tools/sidebar column. */
+body[data-dud-b1-premium] .glass-lesson-tools,
+body[data-dud-b1-premium] .glass-translation{display:none!important}
+body[data-dud-b1-premium] .selection-translate{
+  position:fixed;
+  z-index:150;
+  left:24px;top:100px;
+  box-sizing:border-box;
+  width:min(335px,calc(100vw - 20px));
+  max-height:min(80dvh,450px);
+  overflow-y:auto;
+  padding:9px 10px;
+  border:1px solid #e2e8f1;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 20px 65px #151e3650;
+  color:#192039;
+  font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  display:none;
+}
+body[data-dud-b1-premium] .selection-translate.is-visible{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 31px;
+  gap:7px;
+  align-items:start;
+}
+body[data-dud-b1-premium] .selection-translate #selectionTarget{
+  grid-column:1;
+  display:block;
+  width:100%;min-height:42px;max-height:115px;
+  box-sizing:border-box;
+  margin:0;padding:7px 9px;
+  border:1px solid #d4e2f0;border-radius:9px;
+  background:#fff;color:#192039;
+  font-size:14px;line-height:1.42;resize:vertical;
+}
+body[data-dud-b1-premium] .selection-translate .selection-tools{
+  display:flex;grid-column:2;grid-row:1;
+  justify-content:center;align-self:start;
+  position:static;margin:2px 0 0;
+}
+body[data-dud-b1-premium] .selection-translate .selection-tools button{
+  display:grid;place-items:center;width:30px;height:30px;
+  border:0;border-radius:7px;
+  background:#e9f5fb;color:#087faa;cursor:pointer;
+  font-size:18px;line-height:1;padding:0;
+}
+body[data-dud-b1-premium] .selection-translate .selection-tools button:disabled{
+  opacity:.45;cursor:not-allowed;
+}
+body[data-dud-b1-premium] .selection-translate #selectionStatus:not([hidden]),
+body[data-dud-b1-premium] .selection-translate #selectionRetry:not([hidden]),
+body[data-dud-b1-premium] .selection-translate #selectionGoogle:not([hidden]){
+  grid-column:1/-1;margin:0;justify-self:start;
+}
+body[data-dud-b1-premium] .selection-translate #selectionStatus[hidden],
+body[data-dud-b1-premium] .selection-translate #selectionRetry[hidden],
+body[data-dud-b1-premium] .selection-translate #selectionGoogle[hidden]{
+  display:none!important;
+}
+body[data-dud-b1-premium] .selection-translate #selectionStatus{
+  color:#5f7490;font-size:12px;
+}
+body[data-dud-b1-premium] .selection-translate #selectionRetry{
+  font:inherit;font-size:12px;padding:5px 8px;
+  border:1px solid #d0e0f3;border-radius:8px;
+  color:#2057a0;background:#f2f7ff;cursor:pointer;
+}
+body[data-dud-b1-premium] .selection-translate #selectionGoogle{
+  color:#087faa;font-size:13px;text-decoration:underline;
+}
+@media(max-width:680px){
+  body[data-dud-b1-premium] .selection-translate{
+    width:min(335px,calc(100vw - 20px));
+    max-height:55dvh;
+    box-shadow:0 13px 40px #151e3660;
+  }
+}
+@media print{
+  body[data-dud-b1-premium] .selection-translate{display:none!important}
+}

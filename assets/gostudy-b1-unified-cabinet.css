@@ -1,0 +1,23 @@
+/* B1 Stories / Michael cabinet: identical shared component, course-specific gate only.
+   No duplicate card/header styles: shared gostudy-v1-cabinet.css is the authority. */
+body[data-unified-b1-cabinet] .classroom-access,
+body[data-unified-b1-cabinet] .gostudy-cloud-bar {
+  display: none !important;
+}
+body[data-unified-b1-cabinet] #general-b1-cabinet {
+  display: none !important;
+}
+body[data-unified-b1-cabinet] .b1-cabinet-status {
+  box-sizing: border-box;
+  width: min(680px, calc(100% - 32px));
+  margin: 50px auto 0;
+  padding: 18px 24px;
+  border: 1px solid #dfebf5;
+  border-radius: 16px;
+  background: #f6faff;
+  color: #244263;
+  font: 600 16px/1.5 Manrope, Arial, sans-serif;
+}
+body[data-unified-b1-cabinet] .b1-cabinet-status[hidden] {
+  display: none !important;
+}
