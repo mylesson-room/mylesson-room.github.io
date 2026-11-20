@@ -209,3 +209,63 @@ body[data-dud-b1-premium] .b1-lesson-divider:focus-visible {
 @media(max-width:800px){
   body[data-dud-b1-premium] .b1-lesson-divider{display:none}
 }
+
+/* Exact premium header hierarchy approved on Michael, adapted to B1 data. */
+body[data-dud-b1-premium] .room>.sheet .b1-activity-head {
+  display:flex;align-items:center;gap:16px;
+  padding:16px 18px;margin:0 0 22px;
+  border:1px solid #d5e9f8;border-radius:19px;
+  background:linear-gradient(110deg,#e8f6ff,#e4f0ff);
+}
+body[data-dud-b1-premium] .room>.sheet .b1-activity-icon {
+  flex:0 0 54px;display:grid;place-items:center;
+  width:54px;height:54px;border:1px solid #d6e9fa;
+  border-radius:14px;background:#fff;color:#0c8eaf;
+  font-size:24px;box-shadow:0 3px 11px #215c8617;
+}
+body[data-dud-b1-premium] .room>.sheet .b1-activity-titles {
+  display:flex;flex-direction:column;gap:3px;min-width:0;
+}
+body[data-dud-b1-premium] .room>.sheet .b1-activity-head h1 {
+  margin:0;padding:0;background:transparent;border:0;
+  color:#242441;line-height:1.2;letter-spacing:-.025em;
+  font-size:clamp(25px,2.4vw,38px);
+  overflow-wrap:anywhere;
+}
+body[data-dud-b1-premium] .room>.sheet .b1-activity-time {
+  color:#627893;font-size:13px;font-weight:750;
+}
+/* Michael-inspired accordion navigation, retaining real B1 section buttons. */
+body[data-dud-b1-premium] .room>.side .b1-sections-menu {
+  margin-top:12px;border:1px solid #dce6f2;
+  border-radius:16px;background:#fff;
+  box-shadow:0 5px 16px #31516b0b;overflow:hidden;
+}
+body[data-dud-b1-premium] .room>.side .b1-sections-menu>summary {
+  display:flex;align-items:center;gap:9px;
+  cursor:pointer;list-style:none;min-height:50px;
+  padding:11px 15px;color:#243653;
+  font-size:15px;font-weight:800;
+}
+body[data-dud-b1-premium] .room>.side .b1-sections-menu>summary::-webkit-details-marker{display:none}
+body[data-dud-b1-premium] .room>.side .b1-sections-menu>summary::before {
+  content:'▸';font-size:15px;color:#0c9cbb;
+  transition:transform .15s ease;
+}
+body[data-dud-b1-premium] .room>.side .b1-sections-menu[open]>summary::before{transform:rotate(90deg)}
+body[data-dud-b1-premium] .room>.side .b1-sections-menu>.sections {
+  border:0;border-top:1px solid #e2eaf5;border-radius:0;
+  box-shadow:none;margin:0;max-height:min(49dvh,400px);
+}
+@media(max-width:540px) {
+  body[data-dud-b1-premium] .room>.sheet .b1-activity-head{
+    gap:10px;padding:12px;border-radius:14px;
+  }
+  body[data-dud-b1-premium] .room>.sheet .b1-activity-icon{
+    flex-basis:44px;width:44px;height:44px;font-size:21px;
+  }
+  body[data-dud-b1-premium] .room>.sheet .b1-activity-head h1{font-size:23px}
+}
+@media(prefers-reduced-motion:reduce) {
+  body[data-dud-b1-premium] .room>.side .b1-sections-menu>summary::before{transition:none}
+}
