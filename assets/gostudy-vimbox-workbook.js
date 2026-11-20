@@ -226,8 +226,18 @@
     const video = step.video && /^[A-Za-z0-9_-]{11}$/.test(step.video.youtubeId)
       ? '<div class="source"><div style="position:relative;width:100%;aspect-ratio:16/9;background:#10212b;border-radius:12px;overflow:hidden"><iframe title="'+escape(step.video.title||'Lesson video')+'" src="https://www.youtube-nocookie.com/embed/'+step.video.youtubeId+'?cc_load_policy=1" style="width:100%;height:100%;border:0" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" allowfullscreen></iframe></div><p><a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/watch?v='+step.video.youtubeId+'">Open video on YouTube if the player is unavailable</a></p></div>'
       : '';
+    // Licensed-source video link: do not copy the British Council media.
+    // The official page is attempted as an inline embed, with an always-visible
+    // fallback link because external sites may prevent framing.
+    const britishCouncilUrl = 'https://learnenglish.britishcouncil.org/free-resources/general/video-series/wots/flathunting/flathunting-scene-1';
+    const officialVideo = document.body.hasAttribute('data-dud-b1-premium') && step.video?.siteUrl === britishCouncilUrl
+      ? '<div class="source b1-source-video"><div class="b1-source-video-header"><strong>🎬 '+escape(step.video.title || 'British Council video')+'</strong><span>Official video + transcript · B1</span></div>'+
+        '<div class="b1-source-video-frame"><iframe src="'+britishCouncilUrl+'" title="British Council Flathunting Scene 1" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="fullscreen;picture-in-picture;autoplay" allowfullscreen></iframe></div>'+
+        '<p class="b1-source-video-open"><a href="'+britishCouncilUrl+'" target="_blank" rel="noopener noreferrer">▶ Open video on British Council (if the embedded player is blocked)</a></p>'+
+        '<p class="b1-source-video-note">Source: British Council LearnEnglish · Word on the Street. The original page includes the full video and transcript.</p></div>'
+      : '';
     const writing = step.type === 'write' ? '<label class="writing">Ваш ответ<textarea rows="6">'+escape(typeof answer==='string'?answer:'')+'</textarea></label><p class="draft-status" role="status"></p>' : '';
-    const cover = step.id === 'original-0' && config.cover ? '<img class="lesson-cover" src="'+escape(config.cover)+'" alt="'+escape(config.coverAlt || '')+'">' : '';
+    const cover = (step.id === 'original-0' || (index === 0 && document.body.hasAttribute('data-dud-b1-premium'))) && config.cover ? '<img class="lesson-cover" src="'+escape(config.cover)+'" alt="'+escape(config.coverAlt || '')+'">' : '';
     const teacherNotes = (live?.viewing || window.GoStudyFinanceAuth?.classroomStudent) && step.teacherNotes
       ? '<details class="source"><summary>Карточка преподавателя</summary><p>'+escape(step.teacherNotes)+'</p></details>' : '';
     const studentDraft = !classroom && live?.viewing && step.type === 'write'
@@ -239,7 +249,7 @@
           ['✦','💬','Aa','✎','▤','◎','◇','★'][index%8]+
           '</span><div class="b1-activity-titles"><h1 tabindex="-1">'+escape(step.title)+'</h1><span class="b1-activity-time">'+escape(step.minutes||'')+' мин</span></div></div>'
       : '<h1 tabindex="-1">'+escape(step.title)+'</h1>';
-    frame.content.innerHTML = '<p class="label">'+escape(config.title)+'</p>'+heading+'<p class="instruction">'+escape(step.instruction)+'</p>'+cover+renderVisual(step.visual)+source+audio+video+(exercise?'<section class="activity">'+exercise+'<button type="button" class="check cta">Проверить ответы</button><p role="status" class="result"></p></section>':'')+writing+studentDraft+(liveOverview && step.type === 'order' ? '<div class="source gostudy-live-order" hidden></div>' : '')+teacherNotes;
+    frame.content.innerHTML = '<p class="label">'+escape(config.title)+'</p>'+heading+'<p class="instruction">'+escape(step.instruction)+'</p>'+cover+renderVisual(step.visual)+source+audio+video+officialVideo+(exercise?'<section class="activity">'+exercise+'<button type="button" class="check cta">Проверить ответы</button><p role="status" class="result"></p></section>':'')+writing+studentDraft+(liveOverview && step.type === 'order' ? '<div class="source gostudy-live-order" hidden></div>' : '')+teacherNotes;
     navigation.innerHTML = '<button type="button" class="back" '+(index===0?'disabled':'')+'>← Назад</button>'+(index+1===config.steps.length?'<a class="cta home-link" href="'+escape(config.cabinet)+'">В личный кабинет</a>':'<button type="button" class="cta next">Далее →</button>');
     if (classroom && (exercise || writing)) {
       const controls = document.createElement('div');
