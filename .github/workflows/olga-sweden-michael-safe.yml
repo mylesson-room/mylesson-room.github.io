@@ -1,0 +1,41 @@
+name: Olga Sweden Michael safe migration checks
+on:
+  pull_request:
+    paths:
+      - 'student-sweden.html'
+      - 'sweden-a2.html'
+      - 'sweden-a2-01-homework.html'
+      - 'sweden-a2-02.html'
+      - 'sweden-a2-02-homework.html'
+      - 'assets/gostudy-olga-michael.css'
+      - 'assets/gostudy-olga-michael-shell.js'
+      - 'assets/gostudy-olga-jaas-video.js'
+      - 'supabase/functions/gostudy-jaas-sweden-token/index.ts'
+      - 'scripts/check-olga-michael-source-preservation.cjs'
+      - 'scripts/check-olga-michael-browser.cjs'
+      - '.github/workflows/olga-sweden-michael-safe.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  olga:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify original page data and Michael baseline preserved exactly
+        run: node scripts/check-olga-michael-source-preservation.cjs
+      - name: Install pinned isolated browser runner
+        run: npm install --no-save --no-package-lock playwright@1.58.2
+      - name: Verify 5 real Sweden HTML pages in Chrome desktop and mobile
+        run: |
+          export GOSTUDY_CHROME="$(command -v google-chrome)"
+          node scripts/check-olga-michael-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: olga-sweden-michael-browser-previews
+          path: artifacts/olga-michael
+          if-no-files-found: ignore
