@@ -163,6 +163,32 @@ window.addWord=i=>{
 const {makeWord} = window.GoStudyLessonControls;
 function saveVocabulary(word){
  if(!word)return false;
+ if(config.course === 'general-english-b1-stories'){
+   // One word must appear in Michael's lesson AND the existing B1 cabinet.
+   // Student words keep the original synced-progress key. Teacher-assigned
+   // words keep the existing authenticated course RPC and its seven records.
+   if(student) {
+     return (async()=>{
+       if(!window.GoStudyWorkbookWords?.add)throw Error('Назначение слова пока недоступно.');
+       await window.GoStudyWorkbookWords.add(word.en,word.ru);
+       window.GoStudyB1AssignedWords=await window.GoStudyWorkbookWords.read();
+       window.FinanceLive?.send('word',word);
+       drawWords();
+       return true;
+     })();
+   }
+   try{
+     const legacy=JSON.parse(stores.getItem(WORDS_KEY)||'{}')||{};
+     const words=Array.isArray(legacy.words)?legacy.words:[];
+     const match=words.findIndex(w=>String(w.en||'').toLowerCase()===word.en.toLowerCase());
+     if(match<0)words.push(word);else words[match]=word;
+     stores.setItem(WORDS_KEY,JSON.stringify({...legacy,words}));
+     window.FinanceLive?.send('word',word);
+     drawWords();
+     return true;
+   }catch(error){console.warn('B1 vocabulary save:',error.message);return false;}
+ }
+
  if(document.body.dataset.cloudVocabulary==='sweden-a2')
    return window.GoStudySwedenCloudWords?.save(word) || Promise.reject(Error('Облачный словарь недоступен.'));
  if(window.FinanceLive?.send("word",word))return true;
