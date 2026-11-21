@@ -50,7 +50,7 @@ const wait=async(fn,label)=>{for(let n=0;n<150;n++){if(await fn())return;await n
   try{
    const tp=await tc.newPage(),sp=await sc.newPage();for(const p of [tp,sp])p.on('pageerror',e=>errors.push(e.message));
    await tp.goto(base+'/ielts-reading-04.html?classStudent='+student);await sp.goto(base+'/ielts-reading-04.html');
-   for(const p of [tp,sp])await p.locator('#finance-live-status').getByText('Онлайн · общая комната',{exact:true}).waitFor();
+   for(const p of [tp,sp])await wait(()=>p.locator('#finance-live-status').textContent().then(text=>text==='Онлайн · общая комната'),'room connected');
    await wait(()=>Promise.resolve(events.some(e=>e.actor===student&&e.payload.action==='presence')),'student presence');
    await sp.locator('#reading-hypothesis').fill('Preserve my existing answer');
    await tp.locator('#openLessonDictionary').click();await tp.locator('#dictionaryAddForm').waitFor();
