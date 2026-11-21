@@ -82,7 +82,7 @@ const wait=async(fn,label)=>{const until=Date.now()+12000;while(Date.now()<until
     await panel.locator('.jaas-camera').click();
     assert.equal(await panel.locator('.jaas-camera').getAttribute('aria-label'),'Включить камеру');
     await page.evaluate(()=>{window.qaPreservedFrame=document.querySelector('#qa-jitsi-frame');});
-    await page.locator('#next').click();await page.locator('#page-1.active').waitFor();
+    await page.locator('#next').click();await page.locator('#lessonPages .page').nth(1).waitFor({state:'visible'});
     assert.equal(await page.evaluate(()=>document.querySelector('#qa-jitsi-frame')===qaPreservedFrame),true,'Page changes preserve active video frame');
     assert.equal(calls,1);
     await panel.locator('.jaas-size').click();
