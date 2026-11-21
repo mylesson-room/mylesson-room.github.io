@@ -638,7 +638,7 @@
         }
         throw new Error('Курс '+title+' не назначен этому аккаунту.');
       }
-      if ((storiesCabinet || generalB1Cabinet) && document.body.hasAttribute('data-unified-b1-cabinet')) {
+      if (((storiesCabinet || generalB1Cabinet) && document.body.hasAttribute('data-unified-b1-cabinet')) || (tiktokA2 && document.body.hasAttribute('data-unified-course-cabinet'))) {
         // Same actual cabinet renderer and word-training component as Michael.
         // Load them only AFTER the existing B1 access RPC succeeds.
         const loadScript = src => new Promise((resolve,reject)=>{
@@ -656,7 +656,10 @@
         const refreshWords = async () => {
           if (document.hidden) return;
           try {
-            const words=await window.GoStudyWorkbookWords?.read();
+            const words=tiktokA2
+              ? (await request('/rest/v1/rpc/gostudy_tiktok_a2_my_words',
+                  {method:'POST',body:{}},await token())).data
+              : await window.GoStudyWorkbookWords?.read();
             if (!Array.isArray(words)) return;
             const signature=JSON.stringify(words);
             if (signature !== window.GoStudyB1AssignedSignature) {
