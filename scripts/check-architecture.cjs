@@ -167,3 +167,33 @@ must(read('assets/gostudy-sync.js'),"data-unified-course-cabinet",'Gated TikTok 
 must(read('assets/gostudy-v1-vocabulary.js'),"data-unified-course-cabinet",'TikTok shared word adapter');
 must(read('assets/gostudy-v1-workbook.js'),"document.body.dataset.translateEngine === 'google-web-pilot'",'Google dictionary form');
 console.log('General B1 and TikTok shared cabinet / Google dictionary guards passed.');
+
+/* Migrate-only current A2 and B1 classroom content guard.
+   Never delete/rename historical answer keys or lose existing media. */
+for (const [path,expected,items] of [
+ ['general-english-b1-01.html','gostudy-general-english-b1-01-v1',4],
+ ['positive-thinking-a2.html','gostudy-positive-thinking-a2-v1',7],
+ ['tiktok-a2.html','gostudy-tiktok-a2-v1',5]
+]){
+ const html=read(path);
+ for(const term of ['assets/gostudy-v1-lesson.js','assets/gostudy-v1-exercises.js',
+    'assets/gostudy-v1-workbook.js','data-jaas-video-pilot',
+    'data-jaas-scope="classroom"','assets/gostudy-jaas-video.js',
+    'assets/gostudy-michael-chat.js','data-translate-engine="google-web-pilot"'])
+   must(html,term,'Current shared lesson '+path);
+ const json=JSON.parse(html.split('id="lesson-data">')[1].split('</script>')[0]);
+ assert.equal(json.key,expected,path+' must preserve saved answer key');
+ assert.equal(json.steps?.length,items,path+' must preserve lesson sections');
+ assert.equal(json.preserve,'cloud',path+' must preserve cloud progress');
+}
+const positive=JSON.parse(read('positive-thinking-a2.html').split('id="lesson-data">')[1].split('</script>')[0]);
+assert.equal(positive.steps.filter(step=>Boolean(step.video?.youtubeId)).length,1,'Travel A2 video removed');
+must(read('assets/gostudy-v1-exercises.js'),'youtube-nocookie.com/embed/','Shared exercises must render existing video');
+const tiktok=JSON.parse(read('tiktok-a2.html').split('id="lesson-data">')[1].split('</script>')[0]);
+const tiktokIds=tiktok.steps.flatMap(step=>[...step.html.matchAll(/data-exercise-field="([^"]+)"/g)].map(match=>match[1]));
+assert.deepEqual(tiktokIds,[
+ 'clip-recipe','clip-creator','clip-sister','listen-first','listen-recipe','listen-dinner',
+ 'frequency-usually','frequency-sometimes','frequency-never','video-pitch'
+],'TikTok original answer IDs changed');
+assert.ok(tiktok.steps.some(step=>step.html.includes('assets/tiktok-a2-listening.mp3')),'TikTok original audio lost');
+console.log('Migrate-only current A2 and B1 classroom content guard passed.');
