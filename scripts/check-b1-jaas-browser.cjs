@@ -34,7 +34,7 @@ async function exercise(browser,origin,mobile,fail){
    const url=new URL(route.request().url()),pathname=url.pathname;
    if(pathname.endsWith('/functions/v1/gostudy-jaas-classroom-token')){
     calls++;const request=route.request().postDataJSON();
-    assert.equal(request.studentId,studentId);assert.equal(request.course,course);assert.equal(request.lessonPath,lesson);
+    assert.equal(request.studentId,null,'Student joins own room without sending a target student ID');assert.equal(request.course,course);assert.equal(request.lessonPath,lesson);
     return fail?route.fulfill({status:403,json:{error:'Нет доступа к этому уроку (тест)'}}):
       route.fulfill({json:{appId,room:roomName,jwt:'synthetic-video-jwt'}});
    }
