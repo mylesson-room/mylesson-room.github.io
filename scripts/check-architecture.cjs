@@ -140,3 +140,17 @@ for (const needle of [
 ]) must(classroomVideoServer,needle,'Protected JaaS token function');
 cp.execFileSync(process.execPath,['--check','assets/gostudy-jaas-video.js'],{stdio:'pipe'});
 console.log('Shared classroom video contract passed for '+classroomVideoLessons.length+' current lessons.');
+
+/* Vietnam A2 signed video replacement guard: no old external Telemost fallback. */
+const vietnamVideoPage=read('my-trip-to-vietnam-a2.html');
+for (const needle of [
+  'data-jaas-video-pilot', 'data-jaas-scope="classroom"',
+  'data-classroom-course="vietnam-a2"',
+  'data-classroom-lesson="my-trip-to-vietnam-a2.html"',
+  'assets/gostudy-jaas-video.js'
+]) must(vietnamVideoPage,needle,'Vietnam A2 signed video');
+assert.ok(!vietnamVideoPage.includes('gostudy-alla-video-fallback'),
+  'Vietnam A2 must not use old Telemost fallback.');
+must(read('assets/gostudy-jaas-video.js'),
+  'window.GoStudyLesson?.privateRoom', 'Vietnam A2 protected video JWT');
+console.log('Vietnam A2 signed video replacement guard passed.');
