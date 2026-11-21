@@ -225,8 +225,8 @@
   async function resolveStudentId(auth, accessToken) {
     if (classroom) {
       if (auth.classroomStudent) return auth.classroomStudent;
-      const course = document.body.dataset.classroomCourse;
-      const lessonPath = document.body.dataset.classroomLesson;
+      const course = window.GoStudyLesson?.privateRoom?.course || document.body.dataset.classroomCourse;
+      const lessonPath = window.GoStudyLesson?.privateRoom?.lesson || document.body.dataset.classroomLesson;
       if (!course || !lessonPath) throw Error('Для видео не указан текущий урок.');
       const query = new URLSearchParams({
         select: 'student_id,teacher_id,course,lesson_path',
@@ -292,8 +292,8 @@
         },
         body: JSON.stringify(classroom ? {
           studentId,
-          course: document.body.dataset.classroomCourse,
-          lessonPath: document.body.dataset.classroomLesson,
+          course: window.GoStudyLesson?.privateRoom?.course || document.body.dataset.classroomCourse,
+          lessonPath: window.GoStudyLesson?.privateRoom?.lesson || document.body.dataset.classroomLesson,
         } : { studentId }),
         signal: AbortSignal.timeout(15000),
       });
