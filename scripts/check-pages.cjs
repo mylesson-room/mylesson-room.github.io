@@ -300,6 +300,11 @@ async function checkMigratedRooms(browser, origin) {
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth+1),'horizontal overflow');
       }
       await sp.getByRole('button',{name:'Continue',exact:true}).click();
+      // Student navigation must never move the teacher automatically.
+      await tp.locator('.page.active').first().waitFor();
+      assert.equal(await tp.locator('.page.active').first().getAttribute('data-page-index'),null);
+      assert.equal(await tp.locator('.page.active').first().evaluate(el=>[...el.parentElement.querySelectorAll('.page')].indexOf(el)),0,'teacher must remain on original page');
+      await tp.getByRole('button',{name:'Continue',exact:true}).click();
       if (lesson.course === 'art-b1') {
         const studentPicker = sp.locator('.page.active .definition-picker').first();
         const teacherPicker = tp.locator('.page.active .definition-picker').first();
@@ -320,7 +325,10 @@ async function checkMigratedRooms(browser, origin) {
       } else {
         const step = await sp.locator('#lesson-data').evaluate(node => JSON.parse(node.textContent).steps.findIndex(step => step.type === 'choice'));
         assert.ok(step >= 1);
-        for (let i=1;i<step;i++) await sp.getByRole('button',{name:'Continue',exact:true}).click();
+        for (let i=1;i<step;i++) {
+          await sp.getByRole('button',{name:'Continue',exact:true}).click();
+          await tp.getByRole('button',{name:'Continue',exact:true}).click();
+        }
         await tp.locator('.page.active fieldset .options label').first().waitFor();
         await sp.locator('.page.active fieldset .options label').first().click();
         await tp.locator('.page.active fieldset input[type=radio]:checked').first().waitFor();
