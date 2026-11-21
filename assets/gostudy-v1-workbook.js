@@ -411,8 +411,7 @@ document.addEventListener("finance-event",event=>{
   }
   if(kind==="page" && Number.isInteger(payload.page) && LESSONS[payload.page]){
     if (own && initial && (payload.action === "presence" || !payload.action)) restoredPage = payload.page;
-    if (workbook && config.followStudent !== false && !own && !initial && !teacher && FinanceLive.teacher() && payload.action !== 'move') go(payload.page);
-    if (payload.moveStudent && teacher && !own && !initial && !FinanceLive.teacher()) go(payload.page);
+    // Student navigation is presence only: teachers never follow a student's page.
     if(payload.action==="presence" && !teacher && FinanceLive.teacher()){
       latestStudentPage=payload.page;
       updateMoveStudentButton();
