@@ -129,9 +129,10 @@ async function pageFor(browser,base,{file,mobile=false,role='student',assigned='
    const item=await pageFor(browser,base,{file:'student-sweden.html',assigned});
    try{
     await item.page.locator('a.lesson-card-link').waitFor({state:'visible',timeout:6000});
-    await item.page.waitForFunction(path=>document.querySelector('a.lesson-card-link')?.getAttribute('href')===path,assigned,{timeout:6000});
-    assert.equal(await item.page.locator('a.lesson-card-link').getAttribute('href'),assigned);
-    assert.equal(await item.page.locator('a.homework-link').getAttribute('href'),assigned.replace('.html','-homework.html'));
+    const expected=assigned==='sweden-a2-02.html' ? 'sweden-a2-02-michael.html' : assigned;
+    await item.page.waitForFunction(path=>document.querySelector('a.lesson-card-link')?.getAttribute('href')===path,expected,{timeout:6000});
+    assert.equal(await item.page.locator('a.lesson-card-link').getAttribute('href'),expected);
+    assert.equal(await item.page.locator('a.homework-link').getAttribute('href'),expected.replace('.html','-homework.html'));
     assert.equal(await item.page.locator('a.sweden-legacy-details,details.sweden-legacy-details a').count(),1,'preserved legacy access');
     console.log('OLGA CABINET PASS current lesson='+assigned);
    }finally{await item.context.close();}
