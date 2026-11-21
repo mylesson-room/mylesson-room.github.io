@@ -72,7 +72,7 @@ const wait=async(fn,label)=>{const until=Date.now()+12000;while(Date.now()<until
     assert.equal(await panel.locator('iframe').count(),0);
     assert.ok(await panel.locator('.jaas-connect').isEnabled(),'Can retry after denied response');
    }else{
-    await panel.locator('.jaas-message').getByText('Вы в видеозвонке',{exact:true}).waitFor();
+    await wait(()=>panel.locator('.jaas-message').textContent().then(t=>t==='Вы в видеозвонке'),'conference joined status');
     assert.equal(await page.evaluate(()=>qaJitsi.opts.roomName),appId+'/'+videoRoom);
     assert.ok(await panel.locator('.jaas-mic').isEnabled());
     await panel.locator('.jaas-mic').click();
