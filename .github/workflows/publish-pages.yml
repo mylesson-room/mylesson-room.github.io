@@ -41,6 +41,19 @@ jobs:
           GOSTUDY_CHROME="$(command -v google-chrome)"
           export GOSTUDY_CHROME
           node scripts/check-irina-jaas-browser.cjs
+      - name: Olga Sweden signed video tokens, same room and role isolation
+        run: node scripts/check-jaas-sweden-token.cjs
+      - name: Olga video UI in desktop and mobile Chromium
+        run: |
+          GOSTUDY_CHROME="$(command -v google-chrome)"
+          export GOSTUDY_CHROME
+          node scripts/check-olga-sweden02-browser.cjs
+          node scripts/check-olga-sweden03-browser.cjs
+      - name: Olga real two-browser contexts (synthetic network) and teacher page control
+        run: |
+          GOSTUDY_CHROME="$(command -v google-chrome)"
+          export GOSTUDY_CHROME
+          node scripts/check-olga-two-roles-live.cjs
       - run: node scripts/check-template-contract.cjs
       - run: node scripts/check-positive-thinking-lesson.cjs
       - name: Check GoStudy in the runner's Chrome
