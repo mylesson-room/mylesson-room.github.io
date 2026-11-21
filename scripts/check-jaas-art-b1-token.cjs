@@ -1,4 +1,4 @@
-/* Art B1 A2 JaaS JWT auth, signing and room isolation. Synthetic no production data.
+/* Art B1 JaaS JWT auth, signing and room isolation. Synthetic no production data.
  * Independent of Michael's financial room. Uses ephemeral RSA key.
  */
 'use strict';
@@ -14,7 +14,7 @@ const vars={
  JAAS_APP_ID:appId,JAAS_KEY_ID:appId+'/qa',
  JAAS_PRIVATE_KEY:keyPair.privateKey.export({type:'pkcs8',format:'pem'})
 };
-const script=fs.readFileSync('supabase/functions/gostudy-jaas-sweden-token/index.ts','utf8');
+const script=fs.readFileSync('supabase/functions/gostudy-jaas-art-b1-token/index.ts','utf8');
 assert.ok(!script.includes('service_role')&&!script.includes('SUPABASE_SERVICE_ROLE_KEY'),
  'JaaS must not bypass course RLS with service-role credentials');
 const users={t:teacher,s:anastasia,o:outsider};
@@ -26,7 +26,7 @@ function handler(overrides={}){
    return actor?Response.json({id:actor}):Response.json({error:'unauthorized'},{status:401});
   }
   if(u.pathname.endsWith('/rest/v1/rpc/gostudy_my_destinations')){
-   const rows=actor===anastasia?[{course:'art-b1'}]:actor===teacher?[{course:'teacher'}]:[{course:'art-b1'}];
+   const rows=actor===anastasia?[{course:'art-b1'}]:actor===teacher?[{course:'teacher'}]:[{course:'none'}];
    return Response.json(rows);
   }
   if(u.pathname.endsWith('/rest/v1/rpc/gostudy_legacy_teacher_view')){
@@ -39,11 +39,11 @@ function handler(overrides={}){
   Deno:{env:{get:k=>({...vars,...overrides})[k]},serve:f=>{serve=f}},
   crypto:webcrypto,TextEncoder,Uint8Array,Response,URLSearchParams,
   AbortSignal,atob,btoa,Date,fetch:fetchMock,
- },{filename:'gostudy-jaas-sweden-token/index.ts'});
+ },{filename:'gostudy-jaas-art-b1-token/index.ts'});
  return serve;
 }
 const request=(who,body={studentId:null},origin='https://mylesson-room.github.io')=>
- new Request('https://example.supabase.co/functions/v1/gostudy-jaas-sweden-token',{
+ new Request('https://example.supabase.co/functions/v1/gostudy-jaas-art-b1-token',{
   method:'POST',
   headers:{Origin:origin,...(who?{Authorization:'Bearer '+who}:{})},
   body:JSON.stringify(body)
@@ -79,7 +79,7 @@ function decode(token){
  assert.equal(s.status,200,'Anastasia receives signed room');
  const teacherToken=await t.json(),studentToken=await s.json();
  assert.equal(teacherToken.room,studentToken.room,'Two participants must join SAME room');
- assert.equal(teacherToken.room,'gostudy-art-b1-'+anastasia.replace(/-/g,''),'Room isolated to Art B1 A2');
+ assert.equal(teacherToken.room,'gostudy-art-b1-'+anastasia.replace(/-/g,''),'Room isolated to Art B1');
  const tc=decode(teacherToken.jwt),sc=decode(studentToken.jwt);
  assert.equal(tc.claims.room,sc.claims.room,'JWT room identical');
  assert.equal(tc.claims.context.user.moderator,'true');
