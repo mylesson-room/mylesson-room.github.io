@@ -72,11 +72,13 @@
           content += '<figure class="unified-video"><iframe loading="lazy" title="British Council · Flathunting Scene 1" src="https://learnenglish.britishcouncil.org/free-resources/general/video-series/wots/flathunting/flathunting-scene-1" referrerpolicy="strict-origin-when-cross-origin" allow="fullscreen;picture-in-picture" allowfullscreen></iframe><figcaption><a target="_blank" rel="noopener noreferrer" href="https://learnenglish.britishcouncil.org/free-resources/general/video-series/wots/flathunting/flathunting-scene-1">Open the official video and transcript</a></figcaption></figure>';
         }
         if (step.cityChoices?.length) {
-          register(step.id,page,undefined,step.id);
-          content += '<fieldset class="unified-question" data-answer-row><legend>Choose your city</legend><div class="options">'+step.cityChoices.map((city,index)=>
-            '<label><input type="radio" name="'+escape(step.id)+'" data-exercise-field="'+escape(step.id)+'" value="'+escape(city)+'"> '+escape(city)+'</label>'
+          const cityKey = step.cityChoicesKey || step.id;
+          register(cityKey,page,undefined,cityKey);
+          content += '<fieldset class="unified-question" data-answer-row><legend>'+escape(step.cityChoicesLabel || 'Choose your city')+'</legend><div class="options">'+step.cityChoices.map(city=>
+            '<label><input type="radio" name="'+escape(cityKey)+'" data-exercise-field="'+escape(cityKey)+'" value="'+escape(city)+'"> '+escape(city)+'</label>'
           ).join('')+'</div></fieldset>';
         }
+        if (step.cityTwist) content += '<details class="tip"><summary>✨ Reveal a new detail</summary><p>'+escape(step.cityTwist)+'</p></details>';
         if (step.vocabularyActions && Array.isArray(lesson.lessonWords)) {
           content += '<div class="unified-vocabulary-actions">'+lesson.lessonWords.map((word,index)=>
             '<button type="button" data-lesson-word="'+index+'">+ '+escape(word.en)+'</button>'
@@ -206,6 +208,11 @@
       for (const [key,{step,slot}] of fields) {
         const answer = saved[step] ?? (/^original-\d+$/.test(step) ? saved[step.slice(9)] : undefined);
         let value = slot === undefined ? answer : answer?.[slot];
+        // B1's old relocation widget stored the city in the writing step ID.
+        // Restore its choice into a distinct field without dropping prior notes.
+        if(value === undefined && step === 'newhome-relocation-city' &&
+           ['Porto','Da Nang','Kyoto'].includes(saved['newhome-relocation']))
+          value = saved['newhome-relocation'];
         const options = controls.get(key) || [];
         if (options[0]?.type === 'checkbox' && typeof value === 'boolean') value = value ? 'true' : '';
         if (value === undefined) {
