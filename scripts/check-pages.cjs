@@ -1234,7 +1234,22 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     assert.equal(await guest.locator('main:visible').count(),0,'Outsider should not see student dashboard');
     await sp.locator('.lesson-card-link').click();
     await sp.waitForURL(/my-trip-to-vietnam-a2.html/);
-    await sp.locator('#lessonPages>.page.active').waitFor();
+    await sp.locator('#lessonPages>.page.active').waitFor({timeout:11000}).catch(async error=>{
+      const details=await sp.evaluate(()=>({
+        bodyClass:document.body.className,
+        status:document.querySelector('#finance-live-status')?.textContent,
+        access:document.querySelector('.classroom-access')?.textContent,
+        pageHidden:document.querySelector('#lessonPages')?.hidden,
+        pageBusy:document.querySelector('#lessonPages')?.getAttribute('aria-busy'),
+        loader:document.querySelector('#vietnam-loading')?.textContent,
+        liveLoaded:!!window.FinanceLive,
+        roomConnected:window.FinanceLive?.connected(),
+        hasLesson:!!window.GoStudyLesson,
+        privateRoom:!!window.GoStudyLesson?.privateRoom,
+      }));
+      console.error('VIETNAM TWO-ROLE DIAGNOSTICS',JSON.stringify(details));
+      throw error;
+    });
     await sp.waitForFunction(()=>document.querySelector('#finance-live-status')?.textContent?.trim()==='Онлайн · общая комната');
     assert.equal(await sp.locator('#lessonPages>.page').count(),7);
     const desktopListeningText=await sp.locator('#page-3').textContent();
