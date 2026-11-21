@@ -479,7 +479,11 @@ async function checkFinanceRoom(browser, origin) {
       window.getSelection().addRange(range);
       document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
     });
-    await tp.locator('#selectionTarget').fill('уточнённый прогноз');
+    // Allow asynchronous automatic translation to settle before manually editing.
+    await tp.waitForFunction(() => document.querySelector('#selectionStatus')?.textContent !== 'Переводим…');
+    const target=tp.locator('#selectionTarget');
+    await target.fill('уточнённый прогноз');
+    assert.equal(await target.inputValue(),'уточнённый прогноз','Manual translation input must be exact before saving');
     await tp.locator('#selectionSave').click();
     try {
       await tp.waitForFunction(() => window.FinanceLive.words().some(word => word.ru === 'уточнённый прогноз'),undefined,{timeout:4000});
