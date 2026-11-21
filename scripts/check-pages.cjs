@@ -1466,7 +1466,11 @@ async function main() {
           await tp.locator('.teacher-enter-class').click();
           for(const page of [sp,tp]){
             await page.waitForURL(url=>url.pathname===expected);
-            await page.locator('#finance-live-status').getByText('Онлайн · общая комната',{exact:true}).waitFor();
+            // Michael's approved chat is collapsed by default. The live
+            // status is allowed to be visually hidden inside that panel.
+            await page.waitForFunction(() =>
+              document.querySelector('#finance-live-status')?.textContent?.trim() === 'Онлайн · общая комната' &&
+              window.FinanceLive?.connected() === true);
             await page.locator('header .lesson-brand').waitFor();
             assert.equal(await page.locator('#lessonPages>.page').count(),e.pages);
             assert.equal(await page.locator('#lessonVideo .jaas-person-tile').count(),2);
