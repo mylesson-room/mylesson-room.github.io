@@ -66,11 +66,33 @@
             '" src="https://www.youtube-nocookie.com/embed/'+step.video.youtubeId+
             '" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></figure>';
         }
+        if (step.video?.siteUrl === 'https://learnenglish.britishcouncil.org/free-resources/general/video-series/wots/flathunting/flathunting-scene-1') {
+          // Preserve the original official British Council video and transcript.
+          // Some publishers refuse iframe embedding; the external link remains available.
+          content += '<figure class="unified-video"><iframe loading="lazy" title="British Council · Flathunting Scene 1" src="https://learnenglish.britishcouncil.org/free-resources/general/video-series/wots/flathunting/flathunting-scene-1" referrerpolicy="strict-origin-when-cross-origin" allow="fullscreen;picture-in-picture" allowfullscreen></iframe><figcaption><a target="_blank" rel="noopener noreferrer" href="https://learnenglish.britishcouncil.org/free-resources/general/video-series/wots/flathunting/flathunting-scene-1">Open the official video and transcript</a></figcaption></figure>';
+        }
+        if (step.cityChoices?.length) {
+          register(step.id,page,undefined,step.id);
+          content += '<fieldset class="unified-question" data-answer-row><legend>Choose your city</legend><div class="options">'+step.cityChoices.map((city,index)=>
+            '<label><input type="radio" name="'+escape(step.id)+'" data-exercise-field="'+escape(step.id)+'" value="'+escape(city)+'"> '+escape(city)+'</label>'
+          ).join('')+'</div></fieldset>';
+        }
+        if (step.vocabularyActions && Array.isArray(lesson.lessonWords)) {
+          content += '<div class="unified-vocabulary-actions">'+lesson.lessonWords.map((word,index)=>
+            '<button type="button" data-lesson-word="'+index+'">+ '+escape(word.en)+'</button>'
+          ).join('')+'</div>';
+        }
+        if (step.teacherNotes) {
+          content += '<details data-teacher-only hidden><summary>Карточка преподавателя</summary><p>'+escape(step.teacherNotes)+'</p></details>';
+        }
         content += exercise(step,page);
       }
       return '<section id="page-'+page+'" class="page"><div class="panel">'+
         '<div class="activity-head"><div class="activity-titles"><h2>'+escape(step.title)+'</h2></div></div>'+
         (step.instruction ? '<p class="lead">'+escape(step.instruction)+'</p>' : '')+content+'</div></section>';
+    });
+    document.addEventListener('finance-ready',()=> {
+      if (window.FinanceLive?.teacher()) document.querySelectorAll('[data-teacher-only]').forEach(el=>el.hidden=false);
     });
     const pages = document.getElementById('lessonPages');
     pages.innerHTML = panels.join('');
