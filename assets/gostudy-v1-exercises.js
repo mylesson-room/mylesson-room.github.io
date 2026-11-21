@@ -59,6 +59,13 @@
           content += '<section class="tip"><strong>'+escape(title || 'Listening')+'</strong><audio controls preload="metadata" src="'+escape(src)+'"></audio>'+
             (transcript ? '<details><summary>Transcript</summary><p>'+escape(Array.isArray(transcript) ? transcript.join('\n') : transcript)+'</p></details>' : '')+'</section>';
         }
+        // Preserve existing YouTube material when adapting legacy workbook steps.
+        // The ID is strictly validated; arbitrary URLs/HTML cannot be injected.
+        if (step.video && /^[A-Za-z0-9_-]{11}$/.test(step.video.youtubeId || '')) {
+          content += '<figure class="unified-video"><iframe loading="lazy" title="'+escape(step.video.title || 'Lesson video')+
+            '" src="https://www.youtube-nocookie.com/embed/'+step.video.youtubeId+
+            '" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></figure>';
+        }
         content += exercise(step,page);
       }
       return '<section id="page-'+page+'" class="page"><div class="panel">'+
