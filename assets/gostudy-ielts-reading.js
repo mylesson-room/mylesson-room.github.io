@@ -205,6 +205,8 @@ async function start(){
   };
   const script=document.createElement('script');script.type='application/json';script.id='lesson-data';script.textContent=JSON.stringify(cfg);document.body.append(script);
   await loadScript(document.body.dataset.lessonScript);
+  const signout=$('#gostudyAccessSignout'),headerTools=$('header .header-right');
+  if(signout&&headerTools)headerTools.append(signout);
   const bar=$('.hero');if(bar)bar.insertAdjacentHTML('beforeend','<p>'+esc(payload.subtitle||'IELTS Reading')+'</p><div class="hero-chips"><span>IELTS Academic</span><span>50 минут</span><span>12 вопросов</span></div>');
   const section=$('#gostudyLessonLoad');if(section)section.hidden=true;
   const accessLine=$('.classroom-access');if(accessLine)accessLine.hidden=true;
