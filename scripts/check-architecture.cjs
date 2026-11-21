@@ -145,14 +145,17 @@ console.log('Shared classroom video contract passed for '+classroomVideoLessons.
 const vietnamVideoPage=read('my-trip-to-vietnam-a2.html');
 for (const needle of [
   'data-jaas-video-pilot', 'data-jaas-scope="classroom"',
-  'data-classroom-course="vietnam-a2"',
-  'data-classroom-lesson="my-trip-to-vietnam-a2.html"',
+  'data-vietnam-lesson',
   'assets/gostudy-jaas-video.js'
 ]) must(vietnamVideoPage,needle,'Vietnam A2 signed video');
 assert.ok(!vietnamVideoPage.includes('gostudy-alla-video-fallback'),
   'Vietnam A2 must not use old Telemost fallback.');
 must(read('assets/gostudy-jaas-video.js'),
-  'window.GoStudyLesson?.privateRoom', 'Vietnam A2 protected video JWT');
+  'window.GoStudyLesson?.privateRoom?.course', 'Vietnam A2 video course must reuse authorized room');
+must(read('assets/gostudy-jaas-video.js'),
+  'window.GoStudyLesson?.privateRoom?.lesson', 'Vietnam A2 video lesson must reuse authorized room');
+assert.ok(!vietnamVideoPage.includes('data-classroom-course='),
+ 'Private Vietnam A2 must not activate the separate public classroom CSS gate');
 console.log('Vietnam A2 signed video replacement guard passed.');
 
 /* Two previously bespoke student cabinets must mount the common Michael UI
