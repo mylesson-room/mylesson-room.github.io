@@ -826,9 +826,15 @@ async function checkDariaPrivateRoom(browser,origin) {
     if(path.endsWith('/gostudy_classroom_send')){
       const {p_room,p_kind,p_payload}=req.postDataJSON();
       assert.equal(p_room,roomId);
-      assert.equal(p_kind,'chat');
+      assert.ok(['chat','page','word'].includes(p_kind));
+      if(p_kind==='page'){
+        assert.ok(['presence','move'].includes(p_payload.action));
+        assert.ok(Number.isInteger(p_payload.page)&&p_payload.page>=0&&p_payload.page<7);
+        if(p_payload.action==='move')assert.equal(role,'teacher');
+      }
       if(role==='outsider')return respond(200,false);
       events.push({seq:events.length+1,actor:user.id,kind:p_kind,payload:p_payload});
+      if(p_kind==='word')words.set(p_payload.en.toLowerCase(),{user_id:studentId,word_key:p_payload.en.toLowerCase(),english:p_payload.en,russian:p_payload.ru});
       return respond(200,true);
     }
     if(path.endsWith('/gostudy_progress')){
@@ -850,11 +856,12 @@ async function checkDariaPrivateRoom(browser,origin) {
   try{
     for(const session of [context,teacher,outsider]){
       await session.route('https://kawfqlohguwvmmplvrny.supabase.co/**',api);
-      await session.route('https://api.mymemory.translated.net/**',route=>{
+      await session.route('https://translate.googleapis.com/**',route=>{
         const request=new URL(route.request().url());
         translationRequests.push(request.searchParams.get('q'));
-        assert.equal(request.searchParams.get('langpair'),'en|ru');
-        return route.fulfill({json:{responseStatus:200,responseData:{translatedText:'искусственное освещение'}}});
+        assert.equal(request.searchParams.get('sl'),'en');
+        assert.equal(request.searchParams.get('tl'),'ru');
+        return route.fulfill({json:[[['искусственное освещение',request.searchParams.get('q'),null,null]]]});
       });
     }
     const page=await context.newPage();
@@ -904,7 +911,7 @@ async function checkDariaPrivateRoom(browser,origin) {
     }
     await sendMessage(page,teacherPage,'Сообщение ученицы');
     await sendMessage(teacherPage,page,'Ответ преподавателя');
-    assert.deepEqual(events.slice(1).map(event=>event.actor),[studentId,teacherId]);
+    assert.deepEqual(events.slice(1).filter(event=>event.kind==='chat').map(event=>event.actor),[studentId,teacherId]);
 
     const divider=page.locator('#lessonDivider');
     const box=await divider.boundingBox();
@@ -938,7 +945,7 @@ async function checkDariaPrivateRoom(browser,origin) {
       await participant.waitForFunction(()=>document.querySelector('#selectionTarget').value==='искусственное освещение');
     }
     await selectPhrase(page);
-    assert.ok(translationRequests.some(q=>q?.includes('artificial lighting')),'Context translation request must include the selected expression');
+    assert.ok(translationRequests.includes('artificial lighting'),'Google must translate the selected expression itself');
     await page.locator('#selectionSave').click();
     await page.locator('#selectionSave').getByText('✓').waitFor();
     await page.keyboard.press('Escape');
@@ -946,7 +953,10 @@ async function checkDariaPrivateRoom(browser,origin) {
     await teacherPage.setViewportSize({width:390,height:844});
     assert.equal(await teacherPage.locator('#lessonDivider').isVisible(),false);
     await selectPhrase(teacherPage,true);
-    assert.equal(await teacherPage.locator('#selectionSave').isVisible(),false);
+    assert.equal(await teacherPage.locator('#selectionSave').isVisible(),true,'Teacher can save translated words for Daria');
+    await teacherPage.locator('#selectionSave').click();
+    await teacherPage.locator('#selectionSave').getByText('✓').waitFor();
+    await teacherPage.keyboard.press('Escape');
 
     await page.locator('.lesson-section-menu summary').click();
     await page.locator('#lessonSections [data-page="2"]').click();
@@ -987,7 +997,7 @@ async function checkDariaPrivateRoom(browser,origin) {
       assert.equal(await pp.locator('.gostudy-ielts-passage').count(),0,'Private passage exposed to guest');
       assert.equal(await pp.locator('.layout:visible').count(),0,'Private classroom exposed before login');
     }finally{await guest.close();}
-    console.log('Daria IELTS: both roles, shared chat, split pane, contextual translation, cloud answers and vocabulary verified in browser mocks');
+    console.log('Daria IELTS: both roles, shared chat, split pane, shared Google selection, teacher word saving, cloud answers and vocabulary verified in browser mocks');
   }finally{await Promise.all([context.close(),teacher.close(),outsider.close()]);}
 }
 
