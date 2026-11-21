@@ -1492,6 +1492,12 @@ async function main() {
           await sp.locator('#page-0.active').waitFor();
           assert.equal(await sp.locator('[data-exercise-field="'+e.answer+'"]').inputValue(),e.value,
             'Teacher navigation must never clear existing student draft');
+          // Open the real approved collapsible chat in each role: its controls
+          // and messages must remain hidden until the participant expands it.
+          for(const page of [sp,tp]){
+            const chat=page.locator('#lessonVideo .lesson-chat-dropdown');
+            if(await chat.count()) await chat.locator('summary').click();
+          }
           await sp.locator('#finance-chat-form input').fill('Shared migration chat');
           await sp.locator('#finance-chat-form button').click();
           await tp.locator('#finance-messages').getByText('Shared migration chat',{exact:true}).waitFor();
