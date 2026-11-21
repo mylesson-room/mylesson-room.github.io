@@ -19,9 +19,9 @@ async function boot(){
   if(auth.userId()===row.teacher_id && !selected){const url=new URL(location.href);url.searchParams.set('classStudent',row.student_id);location.replace(url.href);return;}
   const config=row.lesson_payload;
   const node=document.createElement('script');node.type='application/json';node.id='lesson-data';node.textContent=JSON.stringify(config);document.body.append(node);
-  await loadScript('assets/gostudy-v1-lesson.js');
+  await loadScript(document.body.dataset.lessonScript);
   await loadScript('assets/gostudy-sync.js?v=michael-assignment-20261121');
-  await loadScript('assets/gostudy-v1-exercises.js');
+  await loadScript(document.body.dataset.exercisesScript);
   if(document.body.hasAttribute('data-homework-only')){
    const aside=document.querySelector('#lessonVideo'),divider=document.querySelector('#lessonDivider');
    // Keep the shared workbook's controls mounted while hiding the entire video area.
@@ -31,7 +31,7 @@ async function boot(){
    await loadScript('assets/gostudy-jaas-video.js?v=two-tiles-20261119-1');
    await loadScript('assets/gostudy-michael-chat.js?v=1');
   }
-  await loadScript('assets/gostudy-v1-workbook.js?v=page-authority-20261121-1');
+  await loadScript(document.body.dataset.workbookScript);
   document.querySelector('#gostudyLessonLoad')?.remove();
  }catch(error){booted=false;report(error.message);}
 }

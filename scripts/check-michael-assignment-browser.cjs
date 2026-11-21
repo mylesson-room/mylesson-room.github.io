@@ -85,6 +85,7 @@ const waitFor=async(fn,label,timeout=15000)=>{const end=Date.now()+timeout;while
   await teacher.page.locator('#page-0 textarea').waitFor();await student.page.locator('#page-0 textarea').waitFor();
   await waitFor(()=>teacher.page.locator('#finance-live-status').textContent().then(t=>t.includes('Онлайн')),'teacher connected');
   await waitFor(()=>student.page.locator('#finance-live-status').textContent().then(t=>t.includes('Онлайн')),'student connected');
+  await teacher.page.evaluate(()=>document.dispatchEvent(new Event('keyup')));
   assert.equal(await teacher.page.locator('.jaas-connect').count(),1,'shared video control exists');
   await student.page.locator('#page-0 textarea').fill('Verify the account before release.');
   await waitFor(()=>teacher.page.locator('#page-0 textarea').inputValue().then(v=>v==='Verify the account before release.'),'student answer visible to teacher');
