@@ -103,3 +103,40 @@ must(read('assets/gostudy-ielts-reading.js'),'await loadScript(document.body.dat
 must(read('assets/gostudy-jaas-video.js'),'gostudy-jaas-ielts-token','IELTS protected token route');
 cp.execFileSync(process.execPath,['--check','assets/gostudy-jaas-video.js'],{stdio:'pipe'});
 console.log('Daria shared video architecture guard passed.');
+
+/* Approved shared video + Michael classroom shell. The exact student room
+   is validated by Supabase RLS before a Jitsi JWT is issued. */
+const classroomVideoLessons=[
+  'business-ai-b2c1-03.html',
+  'general-english-b2-01.html',
+  'finance-b1-ai-20261118.html',
+  'first-sales-c1-03.html',
+  'korean-wave-b2-20261118.html',
+  'pharma-ai-evidence-c1-20261118.html'
+];
+for (const file of classroomVideoLessons) {
+  const source=read(file);
+  for (const needle of [
+    'data-jaas-video-pilot', 'data-jaas-scope="classroom"',
+    'assets/gostudy-jaas-video.css', 'assets/gostudy-jaas-video.js',
+    'assets/gostudy-michael-feed.css', 'assets/gostudy-michael-chat.js',
+    'data-classroom-course=', 'data-classroom-lesson=',
+    'data-translate-engine="google-web-pilot"',
+    'assets/gostudy-v1-lesson.js'
+  ]) must(source,needle,file);
+}
+const classroomVideoSource=read('assets/gostudy-jaas-video.js');
+for (const needle of [
+  'gostudy-jaas-classroom-token',
+  "lesson_path: 'eq.' + lessonPath",
+  'course: document.body.dataset.classroomCourse',
+  'lessonPath: document.body.dataset.classroomLesson'
+]) must(classroomVideoSource,needle,'Shared classroom video authorization');
+const classroomVideoServer=read('supabase/functions/gostudy-jaas-classroom-token/index.ts');
+for (const needle of [
+  '/auth/v1/user','gostudy_classroom_rooms',
+  'row.student_id === target','row.course === course',
+  'row.lesson_path === lessonPath','room.teacher_id === me'
+]) must(classroomVideoServer,needle,'Protected JaaS token function');
+cp.execFileSync(process.execPath,['--check','assets/gostudy-jaas-video.js'],{stdio:'pipe'});
+console.log('Shared classroom video contract passed for '+classroomVideoLessons.length+' current lessons.');
