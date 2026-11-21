@@ -353,6 +353,9 @@ async function checkMigratedRooms(browser, origin) {
         assert.ok(gap >= 0);
         await sp.locator('.lesson-section-menu summary').click();
         await sp.locator('#lessonSections button').nth(gap).click();
+        // Teacher remains on their own page until explicitly navigating there.
+        await tp.locator('.lesson-section-menu summary').click();
+        await tp.locator('#lessonSections button').nth(gap).click();
         const active = '.page.active';
         const picker = sp.locator(active+' .definition-picker').first();
         await picker.locator('summary').click();
