@@ -134,6 +134,10 @@ function readWords(){
         for (const removed of record.removed || []) words.delete(removed);
       } catch {}
     }
+    if (config.course === 'general-english-b1-stories') {
+      for (const word of window.GoStudyB1AssignedWords || []) if (word.en?.trim())
+        words.set(word.en.trim().toLowerCase(),{en:word.en,ru:word.ru});
+    }
     for (const word of window.FinanceLive?.words() || []) words.set(word.en.trim().toLowerCase(),word);
     return [...words.values()];
   }
@@ -380,6 +384,17 @@ function showWord(word){
   toast.hidden=false;
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>{toast.hidden=true},5000);
+}
+if (config.course === 'general-english-b1-stories') {
+  const refreshLegacyWords = async () => {
+    try {
+      const words = await window.GoStudyWorkbookWords?.read();
+      if (Array.isArray(words)) {window.GoStudyB1AssignedWords=words;drawWords();}
+    } catch(error) {console.warn('B1 existing dictionary read:',error.message);}
+  };
+  refreshLegacyWords();
+  document.addEventListener('b1-vocabulary-updated',drawWords);
+  window.addEventListener('focus',refreshLegacyWords);
 }
 document.addEventListener("finance-word",event=>{
   drawWords();
