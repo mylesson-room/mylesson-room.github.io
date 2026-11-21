@@ -9,9 +9,22 @@
   if(!picker||!profile||!current||!roster)return;
   const settings='teacher-sweden-assignment.html';
   const courseSelected=()=>picker.value.startsWith('sweden_a2:');
+  const lesson2='sweden-a2-02-michael.html';
+  function redirectOldTeacherLinks(root){
+    if(!root)return;
+    for(const link of root.querySelectorAll('a[href]')){
+      const href=link.getAttribute('href')||'';
+      if(!/^sweden-a2(?:-02)?\.html(?:[?#]|$)/.test(href))continue;
+      const url=new URL(href,location.href);
+      url.pathname=url.pathname.replace(/sweden-a2(?:-02)?\.html$/,lesson2);
+      link.href=url.href;
+    }
+  }
   function refreshProfile(){
     let link=profile.querySelector('#sweden-teacher-assign-link');
     if(!courseSelected()){link?.remove();return;}
+    redirectOldTeacherLinks(current);
+    redirectOldTeacherLinks(profile.querySelector('#teacher-classroom-lessons'));
     if(!link){
       link=document.createElement('a');
       link.id='sweden-teacher-assign-link';
@@ -29,6 +42,7 @@
       if(!enter)continue;
       const isSweden=/sweden-a2(?:-02(?:-michael)?)?\.html/i.test(enter.getAttribute('href')||'') || /sweden\s*[·-]\s*a2/i.test(info);
       if(!isSweden)continue;
+      redirectOldTeacherLinks(row);
       if(!row.querySelector('.sweden-switch-link')){
         const link=document.createElement('a');
         link.href=settings;
