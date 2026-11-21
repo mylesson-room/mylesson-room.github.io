@@ -66,6 +66,11 @@ jobs:
           GOSTUDY_CHROME="$(command -v google-chrome)"
           export GOSTUDY_CHROME
           node scripts/check-michael-assignment-browser.cjs
+      - name: Anastasia lesson assignment, private content and shared classroom
+        run: |
+          GOSTUDY_CHROME="$(command -v google-chrome)"
+          export GOSTUDY_CHROME
+          node scripts/check-anastasia-assignment-browser.cjs
       - run: node scripts/check-template-contract.cjs
       - run: node scripts/check-positive-thinking-lesson.cjs
       - name: Check GoStudy in the runner's Chrome

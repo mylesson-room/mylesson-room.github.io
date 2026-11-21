@@ -81,3 +81,16 @@ for(const path of changes){
  }
 }
 console.log('GoStudy architecture guard passed for '+pages.length+' active reference classrooms.');
+
+/* Anastasia's next lesson reuses the private shared loader and existing classroom. */
+for(const file of ['art-b1-04.html','art-b1-04-homework.html']){
+ const html=read(file);
+ for(const dependency of ['assets/gostudy-v1-lesson.css','assets/gostudy-private-access.js','assets/gostudy-finance-private-lesson.js','data-lesson-script="assets/gostudy-v1-lesson.js','data-exercises-script="assets/gostudy-v1-exercises.js','data-workbook-script="assets/gostudy-v1-workbook.js'])
+  must(html,dependency,file);
+ assert.ok(!html.includes('Artist Mira Lane'),'Private Art text leaked into a public shell');
+ assert.ok(html.includes('data-classroom-lesson="art-b1-03.html"'),'Existing Art room must retain vocabulary/chat');
+}
+for(const file of ['assets/gostudy-finance-assignment.js','assets/gostudy-finance-private-lesson.js'])
+ cp.execFileSync(process.execPath,['--check',file],{stdio:'pipe'});
+must(read('student-art-b1.html'),'id="lesson-assignment-settings"','Anastasia shared assignment settings');
+console.log('Anastasia private shared lesson and assignment guard passed.');

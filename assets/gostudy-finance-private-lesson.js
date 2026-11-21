@@ -1,4 +1,4 @@
-/* Private Michael lesson: content fetched through the existing JWT/RLS client. */
+/* Shared private lesson loader: content fetched through the existing JWT/RLS client. */
 (() => {
 'use strict';
 const auth=window.GoStudyPrivateAccess;
@@ -20,7 +20,7 @@ async function boot(){
   const config=row.lesson_payload;
   const node=document.createElement('script');node.type='application/json';node.id='lesson-data';node.textContent=JSON.stringify(config);document.body.append(node);
   await loadScript(document.body.dataset.lessonScript);
-  await loadScript('assets/gostudy-sync.js?v=michael-assignment-20261121');
+  await loadScript(document.body.dataset.syncScript || 'assets/gostudy-sync.js?v=michael-assignment-20261121');
   await loadScript(document.body.dataset.exercisesScript);
   if(document.body.hasAttribute('data-homework-only')){
    const aside=document.querySelector('#lessonVideo'),divider=document.querySelector('#lessonDivider');
@@ -30,6 +30,7 @@ async function boot(){
   }else{
    await loadScript('assets/gostudy-jaas-video.js?v=two-tiles-20261119-1');
    await loadScript('assets/gostudy-michael-chat.js?v=1');
+   if(document.body.dataset.extraLessonScript)await loadScript(document.body.dataset.extraLessonScript);
   }
   await loadScript(document.body.dataset.workbookScript);
   document.querySelector('#gostudyLessonLoad')?.remove();
