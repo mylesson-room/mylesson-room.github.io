@@ -130,6 +130,17 @@
     sizeButton.setAttribute('aria-pressed', String(!compact));
   }
   const getAuth = () => {
+    // Private A2 classroom: reuse the existing JWT and room authorization.
+    // No second login, local tokens or cross-student room guessing.
+    if (classroom && window.GoStudyLesson?.privateRoom) {
+      const auth = window.GoStudyPrivateAccess;
+      const room = window.GoStudyLesson.privateRoom;
+      if (!auth || !room) return null;
+      return {
+        userId: auth.userId, token: auth.token, request: auth.request,
+        classroomStudent: auth.userId() === room.teacher ? room.student : null,
+      };
+    }
     if (ieltsReading) {
       const auth = window.GoStudyPrivateAccess;
       if (!auth) return null;
