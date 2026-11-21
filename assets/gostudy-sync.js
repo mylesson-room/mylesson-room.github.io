@@ -1216,6 +1216,7 @@
   }
 
   function mountTeacher() {
+    window.GoStudyTeacherAuth={token,request,userId:()=>session?.user?.id};
     const login = document.getElementById('teacher-login');
     const dashboard = document.getElementById('teacher-dashboard');
     const message = document.getElementById('teacher-status');

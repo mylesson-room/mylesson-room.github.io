@@ -1,0 +1,7 @@
+/* Exact, readable teaching visuals for the Michael payment lesson. */
+.payment-visual{margin:24px 0}.payment-visual svg{display:block;width:100%;height:auto}.payment-visual figcaption{margin:10px 0;font-size:.9rem;line-height:1.5;color:#4a6081}
+.payment-evidence{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:24px 0}.payment-evidence article{padding:24px;border:1px solid #b7cce8;border-radius:18px;background:#f1f6ff;min-width:0}.payment-evidence article:nth-child(2){background:#edf8f5;border-color:#afd7ca}.payment-evidence p{line-height:1.8}.payment-evidence h3{font-size:1.35rem;line-height:1.4}.payment-evidence .case{font-size:.9rem;font-weight:800;letter-spacing:.04em}.payment-evidence strong{display:block;margin-top:12px}
+#michael-lesson-assignment select{max-width:100%;width:100%;font:inherit;min-height:48px;padding:10px}#michael-lesson-assignment .home-actions a{align-self:center}#michael-lesson-assignment [role=status]{line-height:1.6}
+@media(max-width:700px){.payment-evidence{grid-template-columns:1fr}.payment-evidence article{padding:18px}.payment-visual{overflow-x:auto}.payment-visual svg{min-width:520px}.payment-visual figcaption{max-width:90vw}}
+/* Keep the review queue legible without widening the mobile viewport. */
+@media(max-width:700px){.payment-visual svg{min-width:0}.payment-visual{overflow:visible}}

@@ -40,6 +40,8 @@
   function apply(events, initial) {
     for (const event of events) {
       cursor = event.seq;
+      // Page navigation is lesson-specific; vocabulary/chat remain shared.
+      if (event.kind === "page" && (event.payload?.lessonScope || "") !== (document.body.dataset.pageScope || "")) continue;
       if (event.kind === "word") {
         const word = event.payload;
         if (typeof word.en !== "string" || typeof word.ru !== "string" || !word.en.trim() || !word.ru.trim()) continue;
@@ -126,6 +128,7 @@
     missingLocalWords,
     send(kind, payload) {
       if (!room) return false;
+      if (kind === "page" && document.body.dataset.pageScope) payload={...payload,lessonScope:document.body.dataset.pageScope};
       const event = {id:crypto.randomUUID(),kind,payload};
       const post = async () => {
         try {
