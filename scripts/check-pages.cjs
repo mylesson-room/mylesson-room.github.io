@@ -1397,7 +1397,7 @@ async function main() {
             const requestUrl = new URL(url);
             const action = requestUrl.pathname.split('/').at(-1);
             const data = route.request().postDataJSON() || {};
-            if (['finance_b1','feed_b2','pharma_c1','first_sales','general_english_b1','travel_a2','tiktok_a2'].includes(course)) {
+            if (['finance_b1','feed_b2','pharma_c1','first_sales','general_english_b1','general_english_b1_stories','travel_a2','tiktok_a2'].includes(course)) {
               const actor = role === 'teacher' ? 'teacher' : studentId;
               if (action === 'gostudy_classroom_rooms' && requestUrl.searchParams.get('course') === 'eq.'+course.replaceAll('_','-')) {
                 return route.fulfill({json:[{id:course+'-room',student_id:studentId,teacher_id:'teacher'}]});
@@ -1457,12 +1457,13 @@ async function main() {
           await sp.waitForURL(url => url.pathname === '/student-general-english-b1-stories.html');
         } else await sp.goto(origin + (course === 'pharma_c1' ? '/student-pharma.html' : '/student-' + course.replaceAll('_', '-') + '.html'));
         await tp.goto(origin + '/gostudy-teacher.html');
-        if (['general_english_b1','travel_a2','tiktok_a2'].includes(course)) {
+        if (['general_english_b1','general_english_b1_stories','travel_a2','tiktok_a2'].includes(course)) {
           // These three live lessons now use Michael's canonical classroom.
           // Preserve the existing student URL, section count, saved answer IDs,
           // audio/video, and a two-role live collaboration scenario.
           const expectations={
             general_english_b1:{pages:4,key:'gostudy-general-english-b1-01-v1',section:3,answer:'weekend-decision',value:'I can meet on Saturday at ten.'},
+            general_english_b1_stories:{pages:8,key:'gostudy-general-english-b1-stories-01-v1',section:6,answer:'newhome-relocation',value:'I recommend Porto because she can make friends.'},
             travel_a2:{pages:7,key:'gostudy-positive-thinking-a2-v1',section:6,answer:'pt-speaking',value:'I will call back tomorrow.'},
             tiktok_a2:{pages:5,key:'gostudy-tiktok-a2-v1',section:4,answer:'video-pitch',value:'My funny dog is sleeping.'}
           };
