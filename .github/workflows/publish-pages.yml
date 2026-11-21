@@ -41,6 +41,8 @@ jobs:
           GOSTUDY_CHROME="$(command -v google-chrome)"
           export GOSTUDY_CHROME
           node scripts/check-irina-jaas-browser.cjs
+      - name: Anastasia Art B1 signed video tokens, same room and outsider denial
+        run: node scripts/check-jaas-art-b1-token.cjs
       - name: Olga Sweden signed video tokens, same room and role isolation
         run: node scripts/check-jaas-sweden-token.cjs
       - name: Olga video UI in desktop and mobile Chromium
