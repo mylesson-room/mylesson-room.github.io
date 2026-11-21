@@ -129,8 +129,8 @@ const classroomVideoSource=read('assets/gostudy-jaas-video.js');
 for (const needle of [
   'gostudy-jaas-classroom-token',
   "lesson_path: 'eq.' + lessonPath",
-  'course: document.body.dataset.classroomCourse',
-  'lessonPath: document.body.dataset.classroomLesson'
+  'course: window.GoStudyLesson?.privateRoom?.course || document.body.dataset.classroomCourse',
+  'lessonPath: window.GoStudyLesson?.privateRoom?.lesson || document.body.dataset.classroomLesson'
 ]) must(classroomVideoSource,needle,'Shared classroom video authorization');
 const classroomVideoServer=read('supabase/functions/gostudy-jaas-classroom-token/index.ts');
 for (const needle of [
