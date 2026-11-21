@@ -1,5 +1,5 @@
 /* Olga Sweden A2: display only the current teacher-assigned lesson.
- * Fails closed to existing Lesson 02; preserves every historical localStorage key.
+ * Defaults to new-design Lesson 02; preserves every historical localStorage key.
  */
 (() => {
   'use strict';
@@ -46,8 +46,8 @@
     document.head.append(script);
   }
   function show(path){
-    const selected=lessons[path] || lessons['sweden-a2-02.html'];
-    const key=lessons[path]?path:'sweden-a2-02.html';
+    const key=path==='sweden-a2-03.html' ? path : 'sweden-a2-02-michael.html';
+    const selected=lessons[key];
     if(document.body.dataset.classroomLesson!==key && liveLoaded){
       // Existing room subscription is tied to the previous assignment.
       // Refresh first; never silently connect to the wrong lesson's event stream.
@@ -65,11 +65,11 @@
     if(title)title.textContent='Домашнее задание · '+selected.title;
     status.textContent='Текущий урок: '+selected.title;
   }
-  show('sweden-a2-02.html');
+  show('sweden-a2-02-michael.html');
   async function refresh(){
     const auth=window.GoStudyFinanceAuth;
     if(!auth?.userId()){
-      status.textContent='Для проверки назначения войдите в свой аккаунт GoStudy. Пока доступен урок 2.';
+      status.textContent='Для проверки назначения войдите в свой аккаунт GoStudy. Пока доступен урок 2 в новом дизайне.';
       return;
     }
     try{
@@ -80,11 +80,11 @@
       const response=await auth.request(query,{},token);
       if(!response.ok || !Array.isArray(response.data))throw Error('Не удалось прочитать назначение.');
       const row=response.data[0];
-      if(!row){status.textContent='Пока назначен урок 2.';return;}
+      if(!row){status.textContent='Пока назначен урок 2 в новом дизайне.';return;}
       if(!Object.hasOwn(lessons,row.lesson_path))throw Error('Неизвестный урок в назначении.');
       show(row.lesson_path);
     }catch(error){
-      status.textContent='Нет связи с назначениями: пока доступен урок 2. Обновите страницу позже.';
+      status.textContent='Нет связи с назначениями: пока доступен урок 2 в новом дизайне. Обновите страницу позже.';
       console.warn('Sweden assignment read:',error.message);
     }finally{
       // A single course-scoped real-time subscription provides the same shared
