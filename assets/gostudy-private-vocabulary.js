@@ -5,7 +5,8 @@ const auth=window.GoStudyPrivateAccess;
 const key=document.body.dataset.vocabularyKey||'gostudy-ielts-reading-01-v1';
 const owner=document.body.dataset.vocabularyOwner;
 if(!auth||!owner)return;
-let initialized=false,busy=false,uploadTimer=null;
+let initialized=false,busy=false,refreshing=false,uploadTimer=null;
+const liveVocabulary=document.body.hasAttribute('data-vocabulary-live');
 const norm=s=>String(s||'').trim().toLocaleLowerCase('en');
 const read=()=>{try{const record=JSON.parse(localStorage.getItem(key)||'{}')||{};return record;}catch{return {};}};
 const list=()=>{const record=read();return Array.isArray(record.words)?record.words.filter(w=>w&&typeof w.en==='string'&&w.en.trim()):[];};
@@ -20,7 +21,7 @@ function merge(remote){
  for(const item of remote||[]){const w=clean({en:item.english,ru:item.russian});if(w.en)combined.set(norm(w.en),w);}
  for(const value of local){const w=clean(value),id=norm(w.en);if(!id)continue;
  const existing=combined.get(id);
- if(!existing||w.ru.length>=existing.ru.length)combined.set(id,w);}
+ if(!existing||(!liveVocabulary&&w.ru.length>=existing.ru.length))combined.set(id,w);}
  const next=[...combined.values()],old=local.map(clean);
  const changed=JSON.stringify(next)!==JSON.stringify(old);
  if(changed){
@@ -48,9 +49,12 @@ function schedule(){
  uploadTimer=setTimeout(push,700);
 }
 async function refresh(){
- if(!auth.userId())return;
- const result=await auth.request('/rest/v1/gostudy_vocabulary_items?select=word_key,english,russian&user_id=eq.'+encodeURIComponent(owner)+'&order=updated_at.desc');
- if(result.ok)merge(result.data||[]);
+ if(!auth.userId()||refreshing||busy)return;
+ refreshing=true;
+ try{
+  const result=await auth.request('/rest/v1/gostudy_vocabulary_items?select=word_key,english,russian&user_id=eq.'+encodeURIComponent(owner)+'&order=updated_at.desc');
+  if(result.ok)merge(result.data||[]);
+ }finally{refreshing=false;}
 }
 async function open(){
  if(initialized||!auth.userId())return;initialized=true;
