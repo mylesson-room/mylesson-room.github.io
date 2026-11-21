@@ -9,7 +9,7 @@
   const save=form?.querySelector('button[type=submit]');
   const status=document.querySelector('#sweden-assignment-status');
   if(!form||!field||!save||!status)return;
-  const allowed=new Set(['sweden-a2-02.html','sweden-a2-02-michael.html','sweden-a2-03.html']);
+  const allowed=new Set(['sweden-a2-02-michael.html','sweden-a2-03.html']);
   let studentId=null,busy=false;
   const join=document.createElement('a');
   join.id='sweden-teacher-join';
@@ -51,8 +51,9 @@
     const row=rows[0];
     if(row.teacher_id!==auth.userId() || row.student_id!==studentId)
       throw Error('Нет права изменять назначение.');
-    if(!allowed.has(row.lesson_path))throw Error('В базе указан неизвестный урок.');
-    field.value=row.lesson_path;
+    const chosen=row.lesson_path==='sweden-a2-02.html' ? 'sweden-a2-02-michael.html' : row.lesson_path;
+    if(!allowed.has(chosen))throw Error('В базе указан неизвестный урок.');
+    field.value=chosen;
     updateJoin();
     field.disabled=false;
     save.disabled=false;
