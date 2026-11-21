@@ -54,7 +54,6 @@ async function scenario(browser,base,lesson,role,mobile){
   await page.waitForFunction(()=>document.querySelector('#lessonVideo .jaas-message')?.textContent.includes('Synthetic protected room: denied'),null,{timeout:12000});
   assert.equal(videoRequests,1,'Must call protected Art B1 video token endpoint');
   assert.equal(requestStudent,role==='teacher'?student:null,'Teacher selects Anastasia; student uses own account');
-  const panel=await video.evaluate(el=>el);
   await page.locator('#next').click();
   await page.locator('#page-1.active').waitFor();
   assert.ok(await video.isVisible(),'Persistent video panel after page navigation');
