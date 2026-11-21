@@ -638,7 +638,7 @@
         }
         throw new Error('Курс '+title+' не назначен этому аккаунту.');
       }
-      if (storiesCabinet && document.body.hasAttribute('data-unified-b1-cabinet')) {
+      if ((storiesCabinet || generalB1Cabinet) && document.body.hasAttribute('data-unified-b1-cabinet')) {
         // Same actual cabinet renderer and word-training component as Michael.
         // Load them only AFTER the existing B1 access RPC succeeds.
         const loadScript = src => new Promise((resolve,reject)=>{
