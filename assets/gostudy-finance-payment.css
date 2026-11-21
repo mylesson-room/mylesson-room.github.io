@@ -5,3 +5,4 @@
 @media(max-width:700px){.payment-evidence{grid-template-columns:1fr}.payment-evidence article{padding:18px}.payment-visual{overflow-x:auto}.payment-visual svg{min-width:520px}.payment-visual figcaption{max-width:90vw}}
 /* Keep the review queue legible without widening the mobile viewport. */
 @media(max-width:700px){.payment-visual svg{min-width:0}.payment-visual{overflow:visible}}
+.payment-mobile-queue{display:none}@media(max-width:700px){.payment-visual svg{display:none}.payment-mobile-queue{display:grid;gap:12px}.payment-mobile-queue article{display:grid;gap:6px;padding:20px;background:#18294e;color:white;border-radius:16px}.payment-mobile-queue span{font-size:1rem;color:#c9ddff}}
