@@ -1240,7 +1240,8 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     const desktopListeningText=await sp.locator('#page-3').textContent();
     assert.ok(!/Your teacher reads the conversation twice|No audio file is included in the original PDF/.test(desktopListeningText),'Desktop Vietnam lesson must not render the removed Important notice');
     assert.equal(await sp.locator('#page-3').getByText('Important',{exact:true}).count(),0,'Desktop listening page must have no Important banner');
-    assert.equal(await sp.locator('a.call-btn').getAttribute('href'),'https://telemost.yandex.ru/');
+    await sp.locator('#lessonVideo button.jaas-connect.call-btn').waitFor({state:'visible'});
+          assert.equal(await sp.locator('#lessonVideo .jaas-person-tile').count(),2,'Approved two-tile JaaS preview must replace old Telemost link');
     assert.equal(await sp.locator('#selectionTranslate').count(),1);
     await sp.locator('[data-exercise-field="vnm-welcome-note"]').fill('I prefer travelling with family.');
     await sp.locator('#next').click();
@@ -1497,7 +1498,8 @@ async function main() {
             await page.getByRole('button',{name:'Dictionary',exact:true}).waitFor();
           }
           assert.equal(await sp.locator('#lessonPages>.page').count(),8);
-          assert.equal(await sp.locator('a.call-btn').getAttribute('href'),'https://telemost.yandex.ru/');
+          await sp.locator('#lessonVideo button.jaas-connect.call-btn').waitFor({state:'visible'});
+          assert.equal(await sp.locator('#lessonVideo .jaas-person-tile').count(),2,'Approved two-tile JaaS preview must replace old Telemost link');
           assert.equal(await sp.locator('#selectionTranslate').count(),1);
           const lesson=await sp.locator('#lesson-data').evaluate(node=>JSON.parse(node.textContent));
           assert.equal(lesson.cabinet,'student-first-sales.html');
@@ -1596,7 +1598,8 @@ async function main() {
             await page.getByRole('heading',{name:'Can AI Really Invent New Medicines?'}).first().waitFor();
           }
           assert.equal(await sp.locator('#lessonPages>.page').count(),8);
-          assert.equal(await sp.locator('a.call-btn').getAttribute('href'),'https://telemost.yandex.ru/');
+          await sp.locator('#lessonVideo button.jaas-connect.call-btn').waitFor({state:'visible'});
+          assert.equal(await sp.locator('#lessonVideo .jaas-person-tile').count(),2,'Approved two-tile JaaS preview must replace old Telemost link');
           assert.equal(await sp.locator('#selectionTranslate').count(),1);
           const lesson=await sp.locator('#lesson-data').evaluate(node=>JSON.parse(node.textContent));
           assert.equal(lesson.durationMinutes,50);
@@ -1706,7 +1709,8 @@ async function main() {
             });
             assert.match(await page.locator('#page-1 iframe').getAttribute('src'), /UTAKCFPYdOo\?end=180$/);
           }
-          assert.equal(await sp.locator('a.call-btn').getAttribute('href'),'https://telemost.yandex.ru/');
+          await sp.locator('#lessonVideo button.jaas-connect.call-btn').waitFor({state:'visible'});
+          assert.equal(await sp.locator('#lessonVideo .jaas-person-tile').count(),2,'Approved two-tile JaaS preview must replace old Telemost link');
           await sp.locator('#selectionTranslate').waitFor({state:'attached'});
           const outsider = await browser.newContext();
           try {
