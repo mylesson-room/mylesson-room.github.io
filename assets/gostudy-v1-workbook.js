@@ -173,6 +173,17 @@ function saveVocabulary(word){
 }
 async function translateVocabulary(source,signal){
  const from=/[А-Яа-яЁё]/.test(source)?"ru":"en",to=from==="ru"?"en":"ru";
+ // The approved Michael/Google mode must also apply to the dictionary form,
+ // not only the selection popup. Retain the old provider for archived lessons.
+ if(document.body.dataset.translateEngine === 'google-web-pilot'){
+  const params=new URLSearchParams({client:'gtx',sl:from,tl:to,dt:'t',q:source});
+  const response=await fetch('https://translate.googleapis.com/translate_a/single?'+params,{signal});
+  if(!response.ok)throw Error('Google Translate unavailable');
+  const data=await response.json();
+  const value=Array.isArray(data?.[0])?data[0].map(part=>Array.isArray(part)?part[0]:'').filter(Boolean).join('').trim():'';
+  if(!value)throw Error('Google Translate unavailable');
+  return value;
+ }
  const response=await fetch("https://api.mymemory.translated.net/get?"+new URLSearchParams({q:source,langpair:from+"|"+to}),{signal});
  if(!response.ok)throw Error("Translation unavailable");
  const data=await response.json(),value=String(data?.responseData?.translatedText||"").trim();
