@@ -6,6 +6,7 @@ const auth=window.GoStudyPrivateAccess;
 const owner=document.body.dataset.vocabularyOwner;
 const isStudent=()=>auth.userId()===owner;
 const progressKey=()=>isStudent()?LOCAL:LOCAL+':'+auth.userId();
+let latestStudentPage=null,liveReady=false,toastTimer=null;
 let booted=false,payload=null,state={page:0,answers:{},prediction:'',reflection:'',checked:false},revision=0,timer=null,writing=false,dirty=false,retries=0;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const normalize=s=>String(s??'').toLowerCase().trim().replace(/\s+/g,' ');
@@ -71,9 +72,13 @@ function makePages(){
 function drawNav(){
  const n=$('#lessonSections');if(!n)return;
  n.innerHTML=pages.map((p,i)=>'<button data-page="'+i+'" type="button"><span class="num">'+String(i+1).padStart(2,'0')+'</span>'+esc(p.label)+'</button>').join('');
- n.addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(b)go(Number(b.dataset.page));});
- $('#back').addEventListener('click',()=>go(state.page-1));
- $('#next').addEventListener('click',()=>go(state.page+1));
+ n.addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(b)navigate(Number(b.dataset.page));});
+ $('#back').addEventListener('click',()=>navigate(state.page-1));
+ $('#next').addEventListener('click',()=>navigate(state.page+1));
+ $('#moveStudent').addEventListener('click',()=>{
+  if(!window.FinanceLive?.teacher())return;
+  FinanceLive.send('page',{action:'move',page:state.page});
+ });
 }
 function go(index,scroll=true){
  state.page=Math.max(0,Math.min(pages.length-1,index));
@@ -82,8 +87,17 @@ function go(index,scroll=true){
  const b=$('#back'),n=$('#next');b.disabled=state.page===0;n.disabled=state.page===pages.length-1;n.textContent=state.page===pages.length-2?'Словарь →':'Продолжить →';
  const menu=$('.lesson-section-menu');if(menu)menu.open=false;
  if(scroll)window.scrollTo({top:0,behavior:'auto'});
+ updateMoveStudentButton();
  save();
 }
+function updateMoveStudentButton(){
+ const button=$('#moveStudent');
+ if(button)button.hidden=!(liveReady&&window.FinanceLive?.teacher()&&latestStudentPage!==state.page);
+}
+function sendPresence(){
+ if(liveReady)window.FinanceLive?.send('page',{action:'presence',page:state.page});
+}
+function navigate(index){go(index);sendPresence();}
 function renderFeedback(){
  let score=0;
  const keyList=$('#reading-key-list');keyList.replaceChildren();
@@ -108,14 +122,53 @@ function clearFeedback(){
 function savedWords(){
  try{const p=JSON.parse(localStorage.getItem(WORD_KEY)||'{}')||{};return Array.isArray(p.words)?p.words:[];}catch{return [];}
 }
-function addWord(en,ru){
- if(!isStudent())return false;
+function storeWord(en,ru){
  try{
-  const p=JSON.parse(localStorage.getItem(WORD_KEY)||'{}')||{};const list=Array.isArray(p.words)?p.words:[];
-  if(!list.some(w=>normalize(w.en)===normalize(en)))list.push({en,ru});
-  p.words=list;localStorage.setItem(WORD_KEY,JSON.stringify(p));
+  const record=JSON.parse(localStorage.getItem(WORD_KEY)||'{}')||{};
+  const list=Array.isArray(record.words)?record.words:[];
+  const index=list.findIndex(w=>normalize(w.en)===normalize(en));
+  if(index<0)list.push({en,ru});else list[index]={...list[index],en,ru};
+  record.words=list;localStorage.setItem(WORD_KEY,JSON.stringify(record));
   renderWords();document.dispatchEvent(new Event('gostudy-vocabulary-updated'));return true;
  }catch{return false;}
+}
+function addWord(en,ru){
+ const word=window.GoStudyLessonControls.makeWord(en,ru);
+ if(!word)return false;
+ if(window.FinanceLive?.connected())return FinanceLive.send('word',word);
+ if(isStudent())return storeWord(word.en,word.ru);
+ const status=$('#finance-activity');if(status)status.textContent='Слово не отправлено. Дождитесь подключения к комнате.';
+ return false;
+}
+function wordToast(word){
+ const toast=$('#finance-toast');if(!toast)return;
+ const title=document.createElement('strong'),meaning=document.createElement('span');
+ title.textContent=word.en;meaning.textContent=word.ru;toast.replaceChildren(title,meaning);toast.hidden=false;
+ clearTimeout(toastTimer);toastTimer=setTimeout(()=>{toast.hidden=true;},5000);
+}
+function bindLive(){
+ document.addEventListener('finance-ready',()=>{
+  liveReady=true;updateMoveStudentButton();renderWords();
+  $('#dictionaryAddForm').hidden=false;
+  sendPresence();
+ });
+ document.addEventListener('finance-word',event=>{
+  const word=event.detail?.word;
+  if(!word||typeof word.en!=='string'||typeof word.ru!=='string')return;
+  storeWord(word.en,word.ru);
+  if(event.detail.notify)wordToast(word);
+ });
+ document.addEventListener('finance-event',event=>{
+  const {kind,payload,teacher,own,initial}=event.detail;
+  if(kind!=='page'||!Number.isInteger(payload?.page)||!pages[payload.page])return;
+  if(payload.action==='presence'&&!teacher&&window.FinanceLive?.teacher()){
+   latestStudentPage=payload.page;updateMoveStudentButton();
+   const status=$('#finance-activity');if(status)status.textContent='Дарья: '+pages[payload.page].label;
+  }
+  if(payload.action==='move'&&teacher&&!own&&!initial&&isStudent()){
+   go(payload.page);sendPresence();
+  }
+ });
 }
 function renderWords(){
  const list=savedWords(), container=$('#reading-words'),dict=$('#myWords');
@@ -126,8 +179,8 @@ function renderWords(){
    const b=document.createElement('strong');b.textContent=en;const info=document.createElement('p');info.textContent=ru;
    const button=document.createElement('button');button.type='button';
    const added=list.some(w=>normalize(w.en)===normalize(en));
-   button.textContent=added?'✓ Добавлено':'+ В словарь';button.disabled=added;button.onclick=()=>addWord(en,ru);
-   div.append(b,info);if(isStudent())div.append(button);container.append(div);
+   button.textContent=added?'✓ Добавлено':'+ В словарь';button.disabled=added||(!isStudent()&&!liveReady);button.onclick=()=>addWord(en,ru);
+   div.append(b,info,button);container.append(div);
   }
  }
  if(dict){dict.replaceChildren();for(const word of list){const row=document.createElement('div');row.className='term';const strong=document.createElement('strong');strong.textContent=word.en;const p=document.createElement('p');p.textContent=word.ru;row.append(strong,p);dict.append(row);}}
@@ -151,17 +204,35 @@ function bind(){
  $('#reading-clear').addEventListener('click',()=>{if(!confirm('Очистить ответы только IELTS Reading 04?'))return;state.answers={};state.checked=false;for(const node of document.querySelectorAll('.gostudy-ielts-question select,.gostudy-ielts-question input'))node.value='';clearFeedback();save();});
  const dictBtn=$('#openLessonDictionary'), dialog=$('#lessonDictionary');
  if(dictBtn&&dialog)dictBtn.addEventListener('click',()=>{renderWords();dialog.showModal();});
+ const source=$('#dictionarySource'),translation=$('#dictionaryTranslation');
+ let translationTimer,translationRequest,translationSequence=0;
+ source.addEventListener('input',()=>{
+  clearTimeout(translationTimer);translationRequest?.abort();
+  const text=source.value.trim(),sequence=++translationSequence;translation.value='';
+  if(!text)return;
+  translationTimer=setTimeout(async()=>{
+   translationRequest=new AbortController();
+   const from=/[А-Яа-яЁё]/.test(text)?'ru':'en',to=from==='en'?'ru':'en';
+   try{
+    const response=await fetch('https://translate.googleapis.com/translate_a/single?'+new URLSearchParams({client:'gtx',sl:from,tl:to,dt:'t',q:text}),{signal:translationRequest.signal});
+    if(!response.ok)throw Error('Translation unavailable');
+    const result=await response.json();
+    if(sequence===translationSequence&&!translation.value)translation.value=(result?.[0]||[]).map(part=>part?.[0]||'').join('');
+   }catch(error){if(error.name!=='AbortError')console.warn('Dictionary translation unavailable');}
+  },350);
+ });
  const form=$('#dictionaryAddForm');
  form.hidden=!isStudent();
- if(isStudent())form.addEventListener('submit',e=>{
+ form.addEventListener('submit',e=>{
   e.preventDefault();
   const word=window.GoStudyLessonControls.makeWord($('#dictionarySource').value,$('#dictionaryTranslation').value);
-  if(word&&addWord(word.en,word.ru))form.reset();
+  if(word&&addWord(word.en,word.ru)){clearTimeout(translationTimer);translationRequest?.abort();translationSequence++;form.reset();}
  });
  const controls=window.GoStudyLessonControls;
  controls.bindDivider();
  controls.bindChat();
- controls.bindTranslation(window.GoStudyLesson,isStudent()?word=>addWord(word.en,word.ru):null);
+ controls.bindTranslation(window.GoStudyLesson,word=>addWord(word.en,word.ru));
+ bindLive();
  go(Number.isInteger(state.page)?state.page:0,false);
  if(state.checked)renderFeedback();
  renderWords();

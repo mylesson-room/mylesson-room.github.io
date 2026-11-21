@@ -12,6 +12,7 @@ const list=()=>{const record=read();return Array.isArray(record.words)?record.wo
 const clean=word=>({en:String(word?.en||'').trim().slice(0,150),ru:String(word?.ru||'').trim().slice(0,500)});
 const notify=()=>{
  document.dispatchEvent(new Event('gostudy-vocabulary-sync'));
+ if(document.body.hasAttribute('data-vocabulary-live'))document.dispatchEvent(new Event('b1-vocabulary-updated'));
  try{if(typeof updateVocabularyCount==='function')updateVocabularyCount();}catch(e){}
 };
 function merge(remote){
@@ -46,6 +47,11 @@ function schedule(){
  clearTimeout(uploadTimer);
  uploadTimer=setTimeout(push,700);
 }
+async function refresh(){
+ if(!auth.userId())return;
+ const result=await auth.request('/rest/v1/gostudy_vocabulary_items?select=word_key,english,russian&user_id=eq.'+encodeURIComponent(owner)+'&order=updated_at.desc');
+ if(result.ok)merge(result.data||[]);
+}
 async function open(){
  if(initialized||!auth.userId())return;initialized=true;
  try{
@@ -60,4 +66,8 @@ document.addEventListener('gostudy-private-authorized',open);
 document.addEventListener('gostudy-vocabulary-updated',()=>{notify();schedule();});
 window.addEventListener('storage',event=>{if(event.key===key)notify();});
 auth.ready.then(ok=>{if(ok)open();});
+if(document.body.hasAttribute('data-vocabulary-live')){
+ setInterval(()=>{if(initialized&&!document.hidden)refresh().catch(()=>{});},4000);
+ window.addEventListener('online',()=>refresh().catch(()=>{}));
+}
 })();

@@ -29,6 +29,11 @@ jobs:
           GOSTUDY_CHROME="$(command -v google-chrome)"
           export GOSTUDY_CHROME
           node scripts/check-b1-jaas-browser.cjs
+      - name: Daria teacher vocabulary, Google selection and two-role page control
+        run: |
+          GOSTUDY_CHROME="$(command -v google-chrome)"
+          export GOSTUDY_CHROME
+          node scripts/check-ielts-collaboration-browser.cjs
       - name: Daria IELTS video signing and role isolation
         run: node scripts/check-jaas-ielts-token.cjs
       - name: Daria IELTS shared video controls on desktop and mobile
