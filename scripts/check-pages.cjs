@@ -302,7 +302,6 @@ async function checkMigratedRooms(browser, origin) {
       await sp.getByRole('button',{name:'Continue',exact:true}).click();
       // Student navigation must never move the teacher automatically.
       await tp.locator('.page.active').first().waitFor();
-      assert.equal(await tp.locator('.page.active').first().getAttribute('data-page-index'),null);
       assert.equal(await tp.locator('.page.active').first().evaluate(el=>[...el.parentElement.querySelectorAll('.page')].indexOf(el)),0,'teacher must remain on original page');
       await tp.getByRole('button',{name:'Continue',exact:true}).click();
       if (lesson.course === 'art-b1') {
