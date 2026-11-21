@@ -148,6 +148,11 @@ async function checkGeneralB2Room(browser, origin) {
         const url = new URL(request.url());
         assert.equal(request.headers().authorization,'Bearer test-'+role);
         if (url.pathname.endsWith('/gostudy_classroom_rooms')) {
+          // The teacher-wide Art assignment selector has its own role tests.
+          // This fixture supplies only the room under test, not Anastasia's roster.
+          if (url.searchParams.get('course') === 'eq.art-b1' &&
+              url.searchParams.get('select') === 'student_id,teacher_id')
+            return route.fulfill({json:[]});
           if (url.searchParams.get('course') === 'eq.english-placement') return route.fulfill({json:[]});
           assert.equal(url.searchParams.get('course'),'eq.general-english-b2');
           return route.fulfill({json:[{id:roomId,teacher_id:teacherId,student_id:studentId,student_label:'Виктория'}]});
@@ -244,6 +249,11 @@ async function checkMigratedRooms(browser, origin) {
           const request = route.request();
           const url = new URL(request.url());
           if (url.pathname.endsWith('/gostudy_classroom_rooms')) {
+          // The teacher-wide Art assignment selector has its own role tests.
+          // This fixture supplies only the room under test, not Anastasia's roster.
+          if (url.searchParams.get('course') === 'eq.art-b1' &&
+              url.searchParams.get('select') === 'student_id,teacher_id')
+            return route.fulfill({json:[]});
             if (!url.searchParams.has('lesson_path')) return route.fulfill({json:[]});
             assert.equal(url.searchParams.get('course'),'eq.'+lesson.course);
             assert.equal(url.searchParams.get('student_id'),'eq.'+studentId);
