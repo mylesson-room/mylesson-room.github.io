@@ -1374,9 +1374,9 @@ async function main() {
             const requestUrl = new URL(url);
             const action = requestUrl.pathname.split('/').at(-1);
             const data = route.request().postDataJSON() || {};
-            if (course === 'finance_b1' || course === 'feed_b2' || course === 'pharma_c1' || course === 'first_sales') {
+            if (['finance_b1','feed_b2','pharma_c1','first_sales','general_english_b1','travel_a2','tiktok_a2'].includes(course)) {
               const actor = role === 'teacher' ? 'teacher' : studentId;
-              if (action === 'gostudy_classroom_rooms' && requestUrl.searchParams.get('course') === 'eq.'+(course === 'feed_b2' ? 'feed-b2' : course === 'pharma_c1' ? 'pharma-c1' : course === 'first_sales' ? 'first-sales' : 'finance-b1')) {
+              if (action === 'gostudy_classroom_rooms' && requestUrl.searchParams.get('course') === 'eq.'+course.replaceAll('_','-')) {
                 return route.fulfill({json:[{id:course+'-room',student_id:studentId,teacher_id:'teacher'}]});
               }
               if (action === 'gostudy_classroom_events') {
@@ -1434,6 +1434,50 @@ async function main() {
           await sp.waitForURL(url => url.pathname === '/student-general-english-b1-stories.html');
         } else await sp.goto(origin + (course === 'pharma_c1' ? '/student-pharma.html' : '/student-' + course.replaceAll('_', '-') + '.html'));
         await tp.goto(origin + '/gostudy-teacher.html');
+        if (['general_english_b1','travel_a2','tiktok_a2'].includes(course)) {
+          // These three live lessons now use Michael's canonical classroom.
+          // Preserve the existing student URL, section count, saved answer IDs,
+          // audio/video, and a two-role live collaboration scenario.
+          const expectations={
+            general_english_b1:{pages:4,key:'gostudy-general-english-b1-01-v1',section:3,answer:'weekend-decision',value:'I can meet on Saturday at ten.'},
+            travel_a2:{pages:7,key:'gostudy-positive-thinking-a2-v1',section:6,answer:'pt-speaking',value:'I will call back tomorrow.'},
+            tiktok_a2:{pages:5,key:'gostudy-tiktok-a2-v1',section:4,answer:'video-pitch',value:'My funny dog is sleeping.'}
+          };
+          const e=expectations[course];
+          await sp.locator('.lesson-card-link').waitFor();
+          assert.equal(await sp.locator('.lesson-card-link').getAttribute('href'),current.lesson);
+          await sp.locator('.lesson-card-link').click();
+          await tp.locator('.teacher-enter-class').click();
+          for(const page of [sp,tp]){
+            await page.waitForURL(url=>url.pathname===expected);
+            await page.locator('#finance-live-status').getByText('Онлайн · общая комната',{exact:true}).waitFor();
+            await page.locator('header .lesson-brand').waitFor();
+            assert.equal(await page.locator('#lessonPages>.page').count(),e.pages);
+            assert.equal(await page.locator('#lessonVideo .jaas-person-tile').count(),2);
+            assert.equal(await page.locator('#selectionTranslate').count(),1);
+            const rendered=await page.locator('#lesson-data').evaluate(node=>JSON.parse(node.textContent));
+            assert.equal(rendered.key,e.key,'Original progress key must remain unchanged');
+          }
+          if(course==='tiktok_a2')
+            assert.equal(await sp.locator('audio[src="assets/tiktok-a2-listening.mp3"]').count(),1);
+          if(course==='travel_a2')
+            assert.equal(await sp.locator('iframe[src*="youtube-nocookie.com/embed/Un1Weap2e60"]').count(),1);
+          for(let n=0;n<e.section;n++) await sp.locator('#next').click();
+          await sp.locator('[data-exercise-field="'+e.answer+'"]').fill(e.value);
+          await tp.waitForFunction(({key,value})=>
+            document.querySelector('[data-exercise-field="'+key+'"]')?.value===value,
+            {key:e.answer,value:e.value});
+          await tp.locator('#moveStudent').waitFor({state:'visible'});
+          await tp.locator('#moveStudent').click();
+          await sp.locator('#page-0.active').waitFor();
+          assert.equal(await sp.locator('[data-exercise-field="'+e.answer+'"]').inputValue(),e.value,
+            'Teacher navigation must never clear existing student draft');
+          await sp.locator('#finance-chat-form input').fill('Shared migration chat');
+          await sp.locator('#finance-chat-form button').click();
+          await tp.locator('#finance-messages').getByText('Shared migration chat',{exact:true}).waitFor();
+          console.log(course+': Michael shell, old progress key, exercises and media, teacher/student answers, chat and explicit page move verified');
+          continue;
+        }
         if (course === 'first_sales') {
           await sp.locator('#assignment[aria-disabled="true"]').waitFor();
           assert.equal(await sp.locator('.lesson-card-link').getAttribute('href'),'first-sales-c1-03.html');
