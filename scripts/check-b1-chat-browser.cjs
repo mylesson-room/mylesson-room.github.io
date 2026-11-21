@@ -75,7 +75,7 @@ async function contextFor(browser,id,isStudent){
   await sp.locator('#dictionaryTranslation').fill('квартира');
   await sp.locator('#dictionaryAddForm button').click();
   await sp.locator('#myWords').getByText(/apartment/).waitFor({timeout:10000});
-  assert.ok((await sp.evaluate(()=>localStorage.getItem('gostudy-vocabulary-general-english-b1-stories-v1')||'')).includes('apartment'));
+  assert.ok((await sp.evaluate(()=>window.GoStudyStorage.getItem('gostudy-vocabulary-general-english-b1-stories-v1')||'')).includes('apartment'));
   await tp.locator('#openLessonDictionary').click();
   await tp.locator('#dictionarySource').fill('settle in');
   await tp.locator('#dictionaryTranslation').fill('освоиться');
