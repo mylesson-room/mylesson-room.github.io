@@ -154,3 +154,16 @@ assert.ok(!vietnamVideoPage.includes('gostudy-alla-video-fallback'),
 must(read('assets/gostudy-jaas-video.js'),
   'window.GoStudyLesson?.privateRoom', 'Vietnam A2 protected video JWT');
 console.log('Vietnam A2 signed video replacement guard passed.');
+
+/* Two previously bespoke student cabinets must mount the common Michael UI
+   only after the existing authenticated course-destination check. */
+for (const file of ['student-general-english-b1.html','student-tiktok-a2.html']) {
+ const source=read(file);
+ for (const needle of ['id="cabinet-settings"','assets/gostudy-v1-cabinet.css','assets/gostudy-sync.js'])
+   must(source,needle,file);
+}
+must(read('assets/gostudy-sync.js'),"((storiesCabinet || generalB1Cabinet)",'Gated general B1 shared cabinet');
+must(read('assets/gostudy-sync.js'),"data-unified-course-cabinet",'Gated TikTok shared cabinet');
+must(read('assets/gostudy-v1-vocabulary.js'),"data-unified-course-cabinet",'TikTok shared word adapter');
+must(read('assets/gostudy-v1-workbook.js'),"document.body.dataset.translateEngine === 'google-web-pilot'",'Google dictionary form');
+console.log('General B1 and TikTok shared cabinet / Google dictionary guards passed.');
