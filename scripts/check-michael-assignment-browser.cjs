@@ -104,6 +104,8 @@ const waitFor=async(fn,label,timeout=15000)=>{const end=Date.now()+timeout;while
   await student.page.locator('#openLessonDictionary').click();
   await waitFor(()=>student.page.locator('#myWords').textContent().then(t=>t.includes('verification')),'shared word visible');
   await student.page.locator('#lessonDictionary form[method=dialog] button').click();
+  await teacher.page.locator('.lesson-chat-toggle').click();
+  await student.page.locator('.lesson-chat-toggle').click();
   await teacher.page.locator('#finance-chat-form input').fill('Please check the supplier.');
   await teacher.page.locator('#finance-chat-form button').click();
   await waitFor(()=>student.page.locator('#finance-messages').textContent().then(t=>t.includes('Please check the supplier.')),'shared chat');
