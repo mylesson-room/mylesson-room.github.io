@@ -15,13 +15,16 @@
   const swedenA2 = document.body?.dataset?.jaasScope === 'sweden-a2';
   const artB1 = document.body?.dataset?.jaasScope === 'art-b1';
   const ieltsReading = document.body?.dataset?.jaasScope === 'ielts-reading';
-  const endpoint = BASE + (b1Stories ? '/functions/v1/gostudy-jaas-b1-token' :
+  const classroom = document.body?.dataset?.jaasScope === 'classroom';
+  const endpoint = BASE + (classroom ? '/functions/v1/gostudy-jaas-classroom-token' :
+    b1Stories ? '/functions/v1/gostudy-jaas-b1-token' :
     countryHouse ? '/functions/v1/gostudy-jaas-country-house-token' :
     swedenA2 ? '/functions/v1/gostudy-jaas-sweden-token' :
     artB1 ? '/functions/v1/gostudy-jaas-art-b1-token' :
     ieltsReading ? '/functions/v1/gostudy-jaas-ielts-token' : '/functions/v1/gostudy-jaas-token');
   const appIdFormat = /^vpaas-magic-cookie-[A-Za-z0-9-]+$/;
-  const roomFormat = b1Stories ? /^gostudy-b1-stories-[0-9a-f]{32}$/ :
+  const roomFormat = classroom ? /^gostudy-classroom-[a-z][a-z0-9-]{1,48}-[0-9a-f]{32}$/ :
+    b1Stories ? /^gostudy-b1-stories-[0-9a-f]{32}$/ :
     countryHouse ? /^gostudy-country-house-[0-9a-f]{32}$/ :
     swedenA2 ? /^gostudy-sweden-a2-[0-9a-f]{32}$/ :
     artB1 ? /^gostudy-art-b1-[0-9a-f]{32}$/ :
@@ -209,6 +212,30 @@
     return scriptPromise;
   }
   async function resolveStudentId(auth, accessToken) {
+    if (classroom) {
+      if (auth.classroomStudent) return auth.classroomStudent;
+      const course = document.body.dataset.classroomCourse;
+      const lessonPath = document.body.dataset.classroomLesson;
+      if (!course || !lessonPath) throw Error('Для видео не указан текущий урок.');
+      const query = new URLSearchParams({
+        select: 'student_id,teacher_id,course,lesson_path',
+        course: 'eq.' + course,
+        lesson_path: 'eq.' + lessonPath,
+      });
+      const result = await auth.request('/rest/v1/gostudy_classroom_rooms?' + query, {}, accessToken);
+      if (!result.ok || !Array.isArray(result.data))
+        throw Error('Не удалось проверить доступ к видеокомнате.');
+      const me = auth.userId();
+      const rooms = result.data.filter(room =>
+        room.course === course && room.lesson_path === lessonPath &&
+        (room.student_id === me || room.teacher_id === me)
+      );
+      if (rooms.length !== 1)
+        throw Error(rooms.length
+          ? 'Откройте урок через кабинет преподавателя, выбрав ученика.'
+          : 'Видеокомната не назначена этому аккаунту.');
+      return rooms[0].student_id === me ? null : rooms[0].student_id;
+    }
     // The B1 token endpoint validates the existing restricted B1 course RPC.
     // Do not look at the unrelated finance-room table for this lesson.
     if (b1Stories || countryHouse || swedenA2 || artB1 || ieltsReading) return auth.classroomStudent || null;
@@ -252,7 +279,11 @@
           Authorization: 'Bearer ' + token,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ studentId }),
+        body: JSON.stringify(classroom ? {
+          studentId,
+          course: document.body.dataset.classroomCourse,
+          lessonPath: document.body.dataset.classroomLesson,
+        } : { studentId }),
         signal: AbortSignal.timeout(15000),
       });
       const data = await response.json().catch(() => ({}));
