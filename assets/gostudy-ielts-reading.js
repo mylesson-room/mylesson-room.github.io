@@ -209,6 +209,7 @@ async function start(){
   const section=$('#gostudyLessonLoad');if(section)section.hidden=true;
   const accessLine=$('.classroom-access');if(accessLine)accessLine.hidden=true;
   bind();
+  if(document.body.dataset.videoScript)await loadScript(document.body.dataset.videoScript);
   loadScript(document.body.dataset.liveScript).catch(()=>{
    $('#finance-live-status').textContent='Не удалось подключить чат. Обновите страницу.';
   });

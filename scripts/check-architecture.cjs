@@ -94,3 +94,12 @@ for(const file of ['assets/gostudy-finance-assignment.js','assets/gostudy-financ
  cp.execFileSync(process.execPath,['--check',file],{stdio:'pipe'});
 must(read('student-art-b1.html'),'id="lesson-assignment-settings"','Anastasia shared assignment settings');
 console.log('Anastasia private shared lesson and assignment guard passed.');
+
+/* Daria uses the approved shared video adapter after private lesson authorization. */
+const dariaPage=read('ielts-reading-04.html');
+for(const token of ['assets/gostudy-jaas-video.css','data-jaas-video-pilot','data-jaas-scope="ielts-reading"','data-video-script="assets/gostudy-jaas-video.js'])
+ must(dariaPage,token,'Daria shared video');
+must(read('assets/gostudy-ielts-reading.js'),'await loadScript(document.body.dataset.videoScript)','IELTS private video bootstrap');
+must(read('assets/gostudy-jaas-video.js'),'gostudy-jaas-ielts-token','IELTS protected token route');
+cp.execFileSync(process.execPath,['--check','assets/gostudy-jaas-video.js'],{stdio:'pipe'});
+console.log('Daria shared video architecture guard passed.');

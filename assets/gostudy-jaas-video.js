@@ -14,15 +14,18 @@
   const countryHouse = document.body?.dataset?.jaasScope === 'country-house';
   const swedenA2 = document.body?.dataset?.jaasScope === 'sweden-a2';
   const artB1 = document.body?.dataset?.jaasScope === 'art-b1';
+  const ieltsReading = document.body?.dataset?.jaasScope === 'ielts-reading';
   const endpoint = BASE + (b1Stories ? '/functions/v1/gostudy-jaas-b1-token' :
     countryHouse ? '/functions/v1/gostudy-jaas-country-house-token' :
     swedenA2 ? '/functions/v1/gostudy-jaas-sweden-token' :
-    artB1 ? '/functions/v1/gostudy-jaas-art-b1-token' : '/functions/v1/gostudy-jaas-token');
+    artB1 ? '/functions/v1/gostudy-jaas-art-b1-token' :
+    ieltsReading ? '/functions/v1/gostudy-jaas-ielts-token' : '/functions/v1/gostudy-jaas-token');
   const appIdFormat = /^vpaas-magic-cookie-[A-Za-z0-9-]+$/;
   const roomFormat = b1Stories ? /^gostudy-b1-stories-[0-9a-f]{32}$/ :
     countryHouse ? /^gostudy-country-house-[0-9a-f]{32}$/ :
     swedenA2 ? /^gostudy-sweden-a2-[0-9a-f]{32}$/ :
-    artB1 ? /^gostudy-art-b1-[0-9a-f]{32}$/ : /^gostudy-finance-[0-9a-f]{32}$/;
+    artB1 ? /^gostudy-art-b1-[0-9a-f]{32}$/ :
+    ieltsReading ? /^gostudy-ielts-reading-[0-9a-f]{32}$/ : /^gostudy-finance-[0-9a-f]{32}$/;
   const connect = document.createElement('button');
   connect.type = 'button';
   connect.className = 'call-btn jaas-connect';
@@ -123,7 +126,18 @@
     sizeButton.setAttribute('aria-label', compact ? 'Увеличить видео' : 'Свернуть видео');
     sizeButton.setAttribute('aria-pressed', String(!compact));
   }
-  const getAuth = () => b1Stories ? window.GoStudyB1VideoAuth : window.GoStudyFinanceAuth;
+  const getAuth = () => {
+    if (ieltsReading) {
+      const auth = window.GoStudyPrivateAccess;
+      if (!auth) return null;
+      const owner = document.body.dataset.vocabularyOwner;
+      return {
+        userId: auth.userId, token: auth.token, request: auth.request,
+        classroomStudent: auth.userId() === owner ? null : owner
+      };
+    }
+    return b1Stories ? window.GoStudyB1VideoAuth : window.GoStudyFinanceAuth;
+  };
   // Video authorization lives in the Supabase token endpoint, not in the
   // independent live-chat transport. Never silently disable the button.
   const hasSession = () => Boolean(getAuth()?.userId());
@@ -197,7 +211,7 @@
   async function resolveStudentId(auth, accessToken) {
     // The B1 token endpoint validates the existing restricted B1 course RPC.
     // Do not look at the unrelated finance-room table for this lesson.
-    if (b1Stories || countryHouse || swedenA2 || artB1) return auth.classroomStudent || null;
+    if (b1Stories || countryHouse || swedenA2 || artB1 || ieltsReading) return auth.classroomStudent || null;
     // Teacher links normally include classStudent, but direct lesson URLs do not.
     // Find the single finance room the signed-in user can access via RLS.
     // Do not guess a room if the teacher has more than one.
