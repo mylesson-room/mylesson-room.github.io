@@ -52,7 +52,7 @@ async function contextFor(browser,id,isStudent){
   await Promise.all([sp.goto(origin+'/'+lesson),tp.goto(origin+'/'+lesson+'?classStudent='+studentId)]);
   const studentChat=sp.locator('.lesson-chat-dropdown'),teacherChat=tp.locator('.lesson-chat-dropdown');
   await Promise.all([studentChat.waitFor(),teacherChat.waitFor()]);
-  await Promise.all([sp,tp].map(p=>p.getByText('Онлайн · общая комната',{exact:true}).first().waitFor({timeout:12000})));
+  await Promise.all([sp,tp].map(p=>p.waitForFunction(()=>document.querySelector('#finance-live-status')?.textContent?.trim()==='Онлайн · общая комната' && window.FinanceLive?.connected()===true)));
   await studentChat.locator('summary').click();
   await sp.locator('#finance-chat-form input').fill('Hello from the student');
   await sp.locator('#finance-chat-form button').click();
