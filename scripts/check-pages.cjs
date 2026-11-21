@@ -1348,6 +1348,13 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
   }
 }
 
+// Approved lesson chat is intentionally collapsed until the learner opens it.
+async function openApprovedLessonChat(page) {
+  const dropdown=page.locator('#lessonVideo .lesson-chat-dropdown');
+  if(await dropdown.count() && !(await dropdown.evaluate(node=>node.open)))
+    await dropdown.locator('summary').click();
+}
+
 async function main() {
   await checkVictoriaB2Methodology();
   await checkThreeProgressMeLessons();
@@ -1518,7 +1525,9 @@ async function main() {
           await tp.locator('.teacher-student-row').filter({hasText:'Test student'}).getByRole('link',{name:/Войти в класс/}).click();
           for(const page of [sp,tp]){
             await page.waitForURL(url=>url.pathname===expected);
-            await page.locator('#finance-live-status').getByText('Онлайн · общая комната',{exact:true}).waitFor();
+            await page.waitForFunction(() =>
+              document.querySelector('#finance-live-status')?.textContent?.trim() === 'Онлайн · общая комната' &&
+              window.FinanceLive?.connected() === true);
             await page.getByRole('heading',{name:'From Discovery to Value: The Follow-Up That Wins Trust'}).first().waitFor();
             await page.getByRole('button',{name:'Dictionary',exact:true}).waitFor();
           }
@@ -1565,6 +1574,7 @@ async function main() {
           await sp.locator('#page-2 #fs3-match-1 summary').click();
           await sp.locator('#page-2 #fs3-match-1 button[data-choice="D"]').click();
           await sp.locator('#page-2 .feedback.good').first().filter({hasText:'Correct'}).waitFor();
+          await Promise.all([sp,tp].map(openApprovedLessonChat));
           await sp.locator('#finance-chat-form input').fill('First Sales C1 continuation test');
           await sp.locator('#finance-chat-form button').click();
           await tp.locator('#finance-messages').getByText('First Sales C1 continuation test',{exact:true}).waitFor();
@@ -1619,7 +1629,9 @@ async function main() {
           await tp.locator('.teacher-student-row').filter({hasText:'Test student'}).getByRole('link',{name:/Войти в класс/}).click();
           for (const page of [sp,tp]) {
             await page.waitForURL(url=>url.pathname===expected);
-            await page.locator('#finance-live-status').getByText('Онлайн · общая комната',{exact:true}).waitFor();
+            await page.waitForFunction(() =>
+              document.querySelector('#finance-live-status')?.textContent?.trim() === 'Онлайн · общая комната' &&
+              window.FinanceLive?.connected() === true);
             await page.getByRole('heading',{name:'Can AI Really Invent New Medicines?'}).first().waitFor();
           }
           assert.equal(await sp.locator('#lessonPages>.page').count(),8);
@@ -1674,6 +1686,7 @@ async function main() {
           await sp.locator('#back').click();
           await sp.locator('#back').click();
           await sp.locator('#page-3.active').waitFor();
+          await Promise.all([sp,tp].map(openApprovedLessonChat));
           await sp.locator('#finance-chat-form input').fill('Pharma C1 evidence review test');
           await sp.locator('#finance-chat-form button').click();
           await tp.locator('#finance-messages').getByText('Pharma C1 evidence review test',{exact:true}).waitFor();
@@ -1722,7 +1735,9 @@ async function main() {
           await tp.locator('.teacher-enter-class').click();
           for (const page of [sp,tp]) {
             await page.waitForURL(url => url.pathname === expected);
-            await page.locator('#finance-live-status').getByText('Онлайн · общая комната',{exact:true}).waitFor();
+            await page.waitForFunction(() =>
+              document.querySelector('#finance-live-status')?.textContent?.trim() === 'Онлайн · общая комната' &&
+              window.FinanceLive?.connected() === true);
             await page.getByRole('heading',{name:'Korean Wave: Who Influences Whom?'}).first().waitFor();
           }
           assert.equal(await sp.locator('#lessonPages>.page').count(),8);
@@ -1763,6 +1778,7 @@ async function main() {
           await choice.locator('summary').click();
           await choice.getByRole('button',{name:/break into the mainstream/}).click();
           await sp.locator('#page-2 .feedback').first().filter({hasText:'Correct'}).waitFor();
+          await Promise.all([sp,tp].map(openApprovedLessonChat));
           await sp.locator('#finance-chat-form input').fill('Korean Wave classroom test');
           await sp.locator('#finance-chat-form button').click();
           await tp.locator('#finance-messages').getByText('Korean Wave classroom test',{exact:true}).waitFor();
@@ -1838,7 +1854,9 @@ async function main() {
           for (const page of [sp,tp]) {
             await page.waitForURL(url => url.pathname === expected);
             await page.locator('header .lesson-brand').waitFor();
-            await page.locator('#finance-live-status').getByText('Онлайн · общая комната',{exact:true}).waitFor();
+            await page.waitForFunction(() =>
+              document.querySelector('#finance-live-status')?.textContent?.trim() === 'Онлайн · общая комната' &&
+              window.FinanceLive?.connected() === true);
           }
           assert.equal(await sp.locator('#lessonPages>.page').count(),6);
           await sp.locator('[data-exercise-field="warm1"]').fill('I check my balance.');
@@ -1853,6 +1871,7 @@ async function main() {
           await sp.locator('[data-exercise-field="gap0"]').fill('fraud');
           await sp.getByRole('button',{name:'Check answers'}).click();
           await sp.getByText('1 / 6 correct',{exact:true}).waitFor();
+          await Promise.all([sp,tp].map(openApprovedLessonChat));
           await sp.locator('#finance-chat-form input').fill('Finance B1 test chat');
           await sp.locator('#finance-chat-form button').click();
           await tp.locator('#finance-messages').getByText('Finance B1 test chat',{exact:true}).waitFor();
