@@ -353,7 +353,7 @@
      const schedule=()=>{clearTimeout(timer);timer=setTimeout(selectionOpen,90);};
      document.addEventListener('mouseup',e=>{if(!pop.contains(e.target))schedule()});
      document.addEventListener('touchend',e=>{if(!pop.contains(e.target))setTimeout(selectionOpen,230)},{passive:true});
-     document.addEventListener('keyup',e=>{if(e.key==='Shift'||e.key.startsWith('Arrow'))schedule()});
+     document.addEventListener('keyup',e=>{if(e.key==='Shift'||(typeof e.key==='string'&&e.key.startsWith('Arrow')))schedule()});
      document.addEventListener('scroll',locate,true);window.addEventListener('resize',locate);
      document.addEventListener('keydown',e=>{if(e.key==='Escape')hide()});
      document.addEventListener('pointerdown',e=>{if(pop.classList.contains('is-visible')&&!pop.contains(e.target))hide()});
