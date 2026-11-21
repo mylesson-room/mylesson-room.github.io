@@ -26,7 +26,7 @@ const show=ok=>{
 };
 function json(raw){try{return JSON.parse(raw||'null');}catch{return null;}}
 function getStored(){
- const teacherEntry=(config.room && selectedStudent) ||
+ const teacherEntry=((config.room || config.preferTeacherForPreview) && selectedStudent) ||
   (document.body.hasAttribute('data-ielts-private-lesson') && selectedStudent===document.body.dataset.vocabularyOwner);
  const teacher=[teacherKey,json(localStorage.getItem(teacherKey))];
  const list=[

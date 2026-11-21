@@ -27,7 +27,8 @@ const waitFor=async(fn,label,timeout=15000)=>{const end=Date.now()+timeout;while
   await ctx.addInitScript(({user,TEACHER})=>{
    if(user){const session={access_token:user,refresh_token:'synthetic',expires_at:Date.now()+3600000,user:{id:user,email:user===TEACHER?'teacher@example.test':'student@example.test'}};
     localStorage.setItem(user===TEACHER?'gostudy-teacher-session-v1':'gostudy-student-session-v1',JSON.stringify(session));
-    sessionStorage.setItem('gostudy-cloud-session-v1',JSON.stringify(session));}
+    sessionStorage.setItem('gostudy-cloud-session-v1',JSON.stringify(session));
+    if(user===TEACHER){const other={...session,access_token:'e4f31916-6d4c-49c8-9b80-0e2a233fc6c6',user:{id:'e4f31916-6d4c-49c8-9b80-0e2a233fc6c6'}};localStorage.setItem('gostudy-student-session-v1',JSON.stringify(other));sessionStorage.setItem('gostudy-cloud-session-v1',JSON.stringify(other));}}
    localStorage.setItem('qa-preserve','keep existing data');
   },{user,TEACHER});
   await ctx.route('**/*',async route=>{
