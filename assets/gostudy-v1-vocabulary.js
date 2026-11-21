@@ -94,7 +94,7 @@ function loadSavedWords() {
   }
   // The B1 cabinet uses Michael's vocabulary UI but retains the existing
   // B1 course RPC for teacher-assigned words instead of finance-room storage.
-  if (document.body.hasAttribute('data-unified-b1-cabinet')) {
+  if (document.body.hasAttribute('data-unified-b1-cabinet') || document.body.hasAttribute('data-unified-course-cabinet')) {
     for (const word of window.GoStudyB1AssignedWords || []) {
       if (typeof word?.en !== 'string' || !word.en.trim()) continue;
       const en=word.en.trim(),ru=String(word.ru||'').trim();
