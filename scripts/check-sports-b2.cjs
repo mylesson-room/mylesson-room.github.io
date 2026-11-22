@@ -9,6 +9,21 @@ const cabinet='student-sports-b2.html',course='sports-b2';
 const student='11111111-1111-4111-8111-111111111111',teacher='22222222-2222-4222-8222-222222222222';
 const roomId='33333333-3333-4333-8333-333333333333';
 const events=[],records=new Map();
+const fakeJitsi=`window.JitsiMeetExternalAPI=class {
+ constructor(domain,options) {
+  window.__savvaCallStarts=(window.__savvaCallStarts||0)+1;
+  window.__savvaCallRoom=options.roomName;
+  this.events={};
+  this.iframe=document.createElement('iframe');
+  this.iframe.src='about:blank';
+  options.parentNode.appendChild(this.iframe);
+  setTimeout(()=>this.events.videoConferenceJoined?.(),35);
+ }
+ addEventListener(name,handler){this.events[name]=handler}
+ executeCommand(){}
+ dispose(){window.__savvaCallDisposed=(window.__savvaCallDisposed||0)+1;this.iframe.remove()}
+};`;
+
 const mime={html:'text/html',css:'text/css',js:'application/javascript',svg:'image/svg+xml',json:'application/json'};
 const serve=createServer(async(req,res)=>{
  const name=decodeURIComponent(new URL(req.url,'http://127.0.0.1').pathname),filename=path.resolve(root,'.'+name);
@@ -84,6 +99,13 @@ async function createContext(browser,id){
  await context.route('https://*.supabase.co/**',route=>{
   const url=new URL(route.request().url()),name=url.pathname,verb=route.request().method();
   const body=verb==='GET'?{}:(route.request().postDataJSON()||{});
+  if(name.endsWith('/functions/v1/gostudy-jaas-classroom-token')) {
+   assert.equal(body.course,course);
+   assert.equal(body.lessonPath,lesson);
+   if(id===student)assert.equal(body.studentId,null);
+   else assert.equal(body.studentId,student);
+   return route.fulfill({json:{appId:'vpaas-magic-cookie-synthetic',room:'gostudy-classroom-sports-b2-'+student.replace(/-/g,''),jwt:'signed-test-token'}});
+  }
   if(name.endsWith('/gostudy_classroom_rooms')){
    return route.fulfill({json:[{id:roomId,teacher_id:teacher,student_id:student,student_label:'Савва',course,lesson_path:lesson}]});
   }
@@ -105,7 +127,8 @@ async function createContext(browser,id){
   return route.fulfill({json:[]});
  });
  await context.route('https://translate.googleapis.com/**',route=>route.fulfill({json:[[["апелляция","appeal"]]]}));
- await context.route('https://8x8.vc/**',route=>route.abort());
+ await context.route('https://8x8.vc/**',route=>route.request().url().endsWith('/external_api.js')
+  ?route.fulfill({status:200,contentType:'application/javascript',body:fakeJitsi}):route.abort());
  return context;
 }
 (async()=>{
@@ -128,6 +151,14 @@ async function createContext(browser,id){
    assert.equal(await page.locator('#selectionTranslate').count(),1);
    assert.equal(await page.locator('.lesson-chat-dropdown').count(),1);
   }
+  // Both teacher and student enter the same signed video room; the iframe
+  // must persist while the teacher moves the student between lesson pages.
+  for(const p of [sp,tp]){
+   await p.locator('#lessonVideo .jaas-connect').click();
+   await p.locator('#lessonVideo .jaas-frame iframe').waitFor({state:'attached',timeout:9000});
+   assert.equal(await p.evaluate(()=>window.__savvaCallRoom),'vpaas-magic-cookie-synthetic/gostudy-classroom-sports-b2-'+student.replace(/-/g,''));
+   await p.evaluate(()=>window.__savvaVideoIframe=document.querySelector('#lessonVideo .jaas-frame iframe'));
+  }
   await verifyPhotoLoading(sp,8,'Savva main lesson');
   await sp.locator('#next').click();await sp.locator('#next').click();
   await sp.locator('input[name="academy-04-real-world:0"][value="0"]').check();
@@ -138,6 +169,11 @@ async function createContext(browser,id){
   await tp.locator('#moveStudent').waitFor({state:'visible',timeout:12000});
   await tp.locator('#moveStudent').click();
   await sp.locator('#page-1.active').waitFor();
+  for(const p of [sp,tp]){
+   assert.equal(await p.evaluate(()=>window.__savvaVideoIframe===document.querySelector('#lessonVideo .jaas-frame iframe')),true,'Video iframe cannot be remounted when teacher moves student');
+   assert.equal(await p.evaluate(()=>window.__savvaCallStarts),1,'Video session cannot reconnect on page change');
+  }
+
   assert.equal(await sp.locator('input[name="academy-04-real-world:0"][value="0"]').isChecked(),true);
   const chat=sp.locator('.lesson-chat-dropdown');await chat.locator('summary').click();
   await sp.locator('#finance-chat-form input').fill('Football academy: protect education');
