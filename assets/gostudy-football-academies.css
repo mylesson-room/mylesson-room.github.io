@@ -43,3 +43,19 @@ body[data-classroom-course="sports-b2"] .gostudy-verified-sources ul{
 body[data-classroom-course="sports-b2"] .gostudy-verified-sources a{
  color:#276da4;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere;
 }
+
+/* Editorial photos are teaching material: the source label is followed by a
+   question that asks for evidence-based B2 language, not an invented claim. */
+body[data-classroom-course="sports-b2"] .gostudy-real-photo figcaption{flex-wrap:wrap}
+body[data-classroom-course="sports-b2"] .gostudy-real-photo .gostudy-photo-question{
+  flex:0 0 100%; margin:5px 0 0; padding:11px 14px;
+  border:1px solid #d5e8f8; border-radius:12px;
+  background:linear-gradient(125deg,#f7fcff,#eef7ff);
+  color:#174e7a; font:700 12px/1.6 'Manrope',system-ui,sans-serif;
+  letter-spacing:0;
+}
+@media(max-width:650px){
+ body[data-classroom-course="sports-b2"] .gostudy-real-photo .gostudy-photo-question{
+   font-size:11px;line-height:1.55;padding:10px 11px;
+ }
+}
