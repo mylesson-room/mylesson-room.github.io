@@ -15,18 +15,9 @@
       const cards = (rows,className) => '<div class="'+className+'">'+rows.map(row =>
         '<section class="material-card"><strong>'+escape(row[0])+' '+escape(row[1])+'</strong><p>'+row.slice(2).map(escape).join('<br>')+'</p></section>'
       ).join('')+'</div>';
-      const photo = data.photo && /^assets\\/sports-b2-photos\\/[a-z0-9-]+\\.jpg$/.test(String(data.photo.src||'')) ? (() => {
-        const p=data.photo;
-        const photoSource='https://commons.wikimedia.org/wiki/File:'+encodeURIComponent(p.file.replaceAll(' ','_'));
-        return '<figure class="gostudy-real-photo">'+
-          '<div class="gostudy-real-photo__frame"><img src="'+escape(p.src)+'" alt="'+escape(p.alt)+'" loading="lazy" decoding="async" width="1024" height="550">'+
-          '<div class="gostudy-real-photo__overlay"><small>REAL PHOTOGRAPH · BARCELONA</small><strong>'+escape(p.headline)+'</strong></div></div>'+
-          '<figcaption><span class="gostudy-real-photo__prompt">'+escape(p.prompt)+'</span>'+
-          '<small>Illustrative real-event photo, not the fictional athletes or incident. <a target="_blank" rel="noopener noreferrer" href="'+photoSource+'">Jorge Jaramillo / JJxFile</a> · <a target="_blank" rel="noopener noreferrer" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a></small></figcaption></figure>';
-      })() : '';
-      if (data.kind === 'cards') return photo+cards(data.cards,'case-column');
-      if (data.kind === 'route') return photo+cards(data.stops,'case-column');
-      return photo+'<div class="tip"><strong>'+escape(data.icon)+' '+escape(data.title)+'</strong><p>'+escape(data.detail)+'</p></div>';
+      if (data.kind === 'cards') return cards(data.cards,'case-column');
+      if (data.kind === 'route') return cards(data.stops,'case-column');
+      return '<div class="tip"><strong>'+escape(data.icon)+' '+escape(data.title)+'</strong><p>'+escape(data.detail)+'</p></div>';
     }
     function exercise(step, page) {
       if (step.type === 'choice' || step.type === 'match' || step.type === 'gap') {
