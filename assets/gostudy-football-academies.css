@@ -32,3 +32,14 @@ body[data-classroom-course="sports-b2"] .article p{margin:0 0 15px}
  body[data-classroom-course="sports-b2"] .gostudy-real-photo figcaption a{white-space:normal}
  body[data-classroom-course="sports-b2"] .case-column{grid-template-columns:1fr}
 }
+
+body[data-classroom-course="sports-b2"] .gostudy-verified-sources{
+ border-top:1px solid #dce8f0; margin:18px 0 22px; padding:13px 0 0; font-size:12px;
+}
+body[data-classroom-course="sports-b2"] .gostudy-verified-sources strong{color:#325776;font-weight:800}
+body[data-classroom-course="sports-b2"] .gostudy-verified-sources ul{
+ display:flex;flex-wrap:wrap;gap:6px 14px;list-style:none;margin:9px 0;padding:0;
+}
+body[data-classroom-course="sports-b2"] .gostudy-verified-sources a{
+ color:#276da4;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere;
+}
