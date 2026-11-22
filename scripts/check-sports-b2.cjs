@@ -186,6 +186,23 @@ async function createContext(browser,id){
    await p.evaluate(()=>window.__savvaVideoIframe=document.querySelector('#lessonVideo .jaas-frame iframe'));
   }
   await verifyPhotoLoading(sp,8,'Savva main lesson');
+  // Select an actual word within the lesson, verify Michael's Google popup,
+  // then store the translated expression using its '+' action.
+  await sp.evaluate(()=>{
+    const p=document.querySelector('#page-0 .article p');
+    const node=p?.firstChild;
+    if(!node||!node.textContent.includes('talent'))throw Error('Selection text absent');
+    const at=node.textContent.indexOf('talent'),r=document.createRange();
+    r.setStart(node,at);r.setEnd(node,at+6);
+    const sel=window.getSelection();sel.removeAllRanges();sel.addRange(r);
+    p.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
+  });
+  await sp.locator('#selectionTranslate.is-visible').waitFor({timeout:9000});
+  await sp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value.length>0,{timeout:9000});
+  assert.equal(await sp.locator('#selectionTarget').inputValue(),'апелляция','Google selection translation must use Michael shared implementation');
+  await sp.locator('#selectionSave').click();
+  await sp.locator('#selectionStatus').getByText(/Слово сохранено/).waitFor({timeout:9000});
+
   await sp.locator('#next').click();await sp.locator('#next').click();
   await sp.locator('input[name="academy-04-real-world:0"][value="0"]').check();
   await tp.locator('#next').click();await tp.locator('#next').click();
