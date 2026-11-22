@@ -18,6 +18,11 @@ jobs:
         with:
           node-version: 22
       - run: python3 scripts/update-shared-assets.py
+      - name: Check shared JavaScript syntax
+        run: |
+          node --check assets/gostudy-sync.js
+          node --check assets/gostudy-v1-exercises.js
+          node --check scripts/check-sports-b2.cjs
       - run: npm install --no-save --no-package-lock playwright@1.58.2
       - name: Test actual video button click and touch on desktop and mobile
         run: |
