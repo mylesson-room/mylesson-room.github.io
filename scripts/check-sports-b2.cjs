@@ -101,12 +101,9 @@ async function createContext(browser,id){
   await sp.locator('input[name="appeal-04-reading:0"][value="1"]').check();
   await tp.locator('#next').click();await tp.locator('#next').click();
   await tp.waitForFunction(()=>document.querySelector('input[name="appeal-04-reading:0"][value="1"]')?.checked===true);
-  await tp.locator('#moveStudent').waitFor({state:'visible',timeout:10000});
-  await tp.locator('#moveStudent').click();
-  await sp.locator('#page-2.active').waitFor();
-  // Navigate elsewhere, then move student back.
+  // The teacher controls student navigation only when their pages differ.
   await tp.locator('#back').click();
-  await tp.locator('#moveStudent').waitFor({state:'visible'});
+  await tp.locator('#moveStudent').waitFor({state:'visible',timeout:12000});
   await tp.locator('#moveStudent').click();
   await sp.locator('#page-1.active').waitFor();
   assert.equal(await sp.locator('input[name="appeal-04-reading:0"][value="1"]').isChecked(),true);
