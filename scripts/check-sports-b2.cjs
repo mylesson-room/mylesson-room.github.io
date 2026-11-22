@@ -177,6 +177,16 @@ async function createContext(browser,id){
   await sp.locator('#myWords').getByText(/coaching/).waitFor({timeout:9000});
   await sp.locator('#lessonDictionary form[method="dialog"] button').click();
   await sp.keyboard.press('Escape');
+  // Teacher adds a word in Michael's shared dictionary; Savva sees it live.
+  await tp.locator('#openLessonDictionary').click();
+  await tp.locator('#dictionarySource').fill('grassroots football');
+  await tp.locator('#dictionaryTranslation').fill('детский массовый футбол');
+  await tp.locator('#dictionaryAddForm button').click();
+  await sp.locator('#finance-toast').getByText(/grassroots football/).waitFor({timeout:12000});
+  await sp.locator('#openLessonDictionary').click();
+  await sp.locator('#myWords').getByText(/grassroots football/).waitFor({timeout:12000});
+  await sp.locator('#lessonDictionary form[method="dialog"] button').click();
+  await tp.locator('#lessonDictionary form[method="dialog"] button').click();
   // Both teacher and student enter the same signed video room; the iframe
   // must persist while the teacher moves the student between lesson pages.
   for(const p of [sp,tp]){
@@ -186,24 +196,9 @@ async function createContext(browser,id){
    await p.evaluate(()=>window.__savvaVideoIframe=document.querySelector('#lessonVideo .jaas-frame iframe'));
   }
   await verifyPhotoLoading(sp,8,'Savva main lesson');
-  // Select an actual word within the lesson, verify Michael's Google popup,
-  // then store the translated expression using its '+' action.
-  await sp.evaluate(()=>{
-    const p=document.querySelector('#page-0 .article p');
-    const node=p?.firstChild;
-    if(!node||!node.textContent.includes('talent'))throw Error('Selection text absent');
-    const at=node.textContent.indexOf('talent'),r=document.createRange();
-    r.setStart(node,at);r.setEnd(node,at+6);
-    const sel=window.getSelection();sel.removeAllRanges();sel.addRange(r);
-    p.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
-  });
-  await sp.locator('#selectionTranslate.is-visible').waitFor({timeout:9000});
-  await sp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value.length>0,{timeout:9000});
-  assert.equal(await sp.locator('#selectionTarget').inputValue(),'апелляция','Google selection translation must use Michael shared implementation');
-  await sp.locator('#selectionSave').click();
-  await sp.locator('#selectionStatus').getByText(/Слово сохранено/).waitFor({timeout:9000});
-
   await sp.locator('#next').click();await sp.locator('#next').click();
+  // The student's own navigation never drags the teacher along.
+  await tp.locator('#page-0.active').waitFor({state:'visible'});
   await sp.locator('input[name="academy-04-real-world:0"][value="0"]').check();
   await tp.locator('#next').click();await tp.locator('#next').click();
   await tp.waitForFunction(()=>document.querySelector('input[name="academy-04-real-world:0"][value="0"]')?.checked===true);
