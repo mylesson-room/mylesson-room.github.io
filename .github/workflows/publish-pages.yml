@@ -46,6 +46,11 @@ jobs:
           GOSTUDY_CHROME="$(command -v google-chrome)"
           export GOSTUDY_CHROME
           node scripts/check-b1-chat-browser.cjs
+      - name: Savva Barcelona Race B2 methodology and Michael classroom
+        run: |
+          GOSTUDY_CHROME="$(command -v google-chrome)"
+          export GOSTUDY_CHROME
+          node scripts/check-sports-b2.cjs
       - name: Check Irina A2+ lesson quality and legacy-data safety
         run: node scripts/check-irina-a2-travel.cjs
       - name: Test Irina protected JaaS video (teacher, student, mobile)
