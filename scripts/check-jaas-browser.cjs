@@ -113,7 +113,19 @@ async function exercise(browser, origin, opts) {
       assert.equal(await button.isEnabled(),true,'Button must recover from errors');
       assert.equal(await page.locator('.jaas-frame').count(),0);
     } else {
-      await page.locator('.jaas-frame iframe').waitFor({state:'attached',timeout:6500});
+      try {
+        await page.locator('.jaas-frame iframe').waitFor({state:'attached',timeout:12000});
+      } catch (error) {
+        console.error('MICHAEL JaaS setup diagnostics:', await page.evaluate(()=>({
+          videoStatus:document.querySelector('.jaas-message')?.textContent,
+          liveStatus:document.querySelector('#finance-live-status')?.textContent,
+          signedIn:window.GoStudyFinanceAuth?.userId?.(),
+          hasFinanceAuth:!!window.GoStudyFinanceAuth,
+          scripts:[...document.scripts].filter(x=>x.src.includes('jaas')).map(x=>x.src)
+        })));
+        console.error('BROWSER ERRORS',errors);
+        throw error;
+      }
       await page.waitForFunction(() => document.querySelector('.video-state')?.textContent === 'Вы в видеозвонке',{timeout:6500});
       assert.equal(await page.evaluate(() => window.__lastJitsiRoom),appId+'/'+roomName);
       assert.equal(await page.evaluate(() => window.__lastJitsiOptions.interfaceConfigOverwrite.TILE_VIEW_MAX_COLUMNS),1,'Participants must stack vertically in Jitsi tile view');
