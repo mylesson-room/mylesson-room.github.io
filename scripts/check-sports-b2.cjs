@@ -8,7 +8,7 @@ const lesson='barcelona-appeal-b2-04.html',homework='barcelona-appeal-b2-04-home
 const cabinet='student-sports-b2.html',course='sports-b2';
 const student='11111111-1111-4111-8111-111111111111',teacher='22222222-2222-4222-8222-222222222222';
 const roomId='33333333-3333-4333-8333-333333333333';
-const events=[],records=new Map();
+const events=[],records=new Map(),googleRequests=[];
 const fakeJitsi=`window.JitsiMeetExternalAPI=class {
  constructor(domain,options) {
   window.__savvaCallStarts=(window.__savvaCallStarts||0)+1;
@@ -126,7 +126,11 @@ async function createContext(browser,id){
   if(name.endsWith('/rpc/gostudy_my_destinations'))return route.fulfill({json:[{course:id===student?course:'teacher'}]});
   return route.fulfill({json:[]});
  });
- await context.route('https://translate.googleapis.com/**',route=>route.fulfill({json:[[["апелляция","appeal"]]]}));
+ await context.route('https://translate.googleapis.com/**',route=>{
+   const u=new URL(route.request().url());
+   googleRequests.push({q:u.searchParams.get('q'),sl:u.searchParams.get('sl'),tl:u.searchParams.get('tl')});
+   return route.fulfill({status:200,json:[[["тренировка","training"]]]});
+ });
  await context.route('https://8x8.vc/**',route=>route.request().url().endsWith('/external_api.js')
   ?route.fulfill({status:200,contentType:'application/javascript',body:fakeJitsi}):route.abort());
  return context;
@@ -151,6 +155,28 @@ async function createContext(browser,id){
    assert.equal(await page.locator('#selectionTranslate').count(),1);
    assert.equal(await page.locator('.lesson-chat-dropdown').count(),1);
   }
+  // Actual text selection, Google RU translation and '+' saved-word control,
+  // not just the presence of an empty translator component.
+  await sp.evaluate(()=>{
+    const p=document.querySelector('#page-0 .article p');
+    if(!p?.firstChild)throw Error('Opening paragraph missing');
+    const node=p.firstChild,index=node.textContent.indexOf('coaching');
+    if(index<0)throw Error('Missing coaching phrase');
+    const r=document.createRange();
+    r.setStart(node,index);r.setEnd(node,index+'coaching'.length);
+    const selection=window.getSelection();
+    selection.removeAllRanges();selection.addRange(r);
+    document.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
+  });
+  await sp.locator('#selectionTranslate.is-visible').waitFor({timeout:9000});
+  await sp.waitForFunction(()=>document.querySelector('#selectionTarget')?.value.includes('тренировка'),{timeout:9000});
+  assert.ok(googleRequests.some(r=>r.q?.includes('coaching')&&r.sl==='en'&&r.tl==='ru'),'Michael translator must call Google EN→RU');
+  await sp.locator('#selectionSave').click();
+  await sp.waitForFunction(()=>document.querySelector('#selectionSave')?.textContent==='✓',{timeout:9000});
+  await sp.locator('#openLessonDictionary').click();
+  await sp.locator('#myWords').getByText(/coaching/).waitFor({timeout:9000});
+  await sp.locator('#lessonDictionary form[method="dialog"] button').click();
+  await sp.keyboard.press('Escape');
   // Both teacher and student enter the same signed video room; the iframe
   // must persist while the teacher moves the student between lesson pages.
   for(const p of [sp,tp]){
