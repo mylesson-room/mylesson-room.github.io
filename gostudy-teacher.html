@@ -43,6 +43,12 @@
       <a href="login.html">Общая ссылка на вход</a>
     </details>
       <div id="teacher-student-list"></div>
+      <!-- Пока учётная запись Саввы не создана, преподаватель может открыть урок для просмотра. -->
+      <div id="teacher-savva-pending" class="teacher-student-row" aria-label="Савва, урок B2" style="margin-top:12px">
+        <span class="teacher-avatar" aria-hidden="true">С</span>
+        <div style="flex:1;min-width:0"><strong>Савва</strong><small style="display:block">Sport & Travel · B2 · Football Academies</small><small style="display:block;color:#8a6870">Просмотр урока · аккаунт ученика ещё не подключён</small></div>
+        <a class="teacher-enter-class" href="barcelona-appeal-b2-04.html" aria-label="Открыть урок Саввы для просмотра">→ Открыть урок</a>
+      </div>
       <select id="teacher-student" hidden aria-label="Ученик"></select>
     </div>
     <details id="teacher-profile"><summary>Карточка ученика</summary>
@@ -76,5 +82,24 @@
 <script src="assets/gostudy-sweden-teacher-shortcut.js?v=20261121-3"></script>
 <script type="application/json" id="lesson-assignment-settings">[{"id":"anastasia","name":"Анастасия","toName":"Анастасии","ofName":"Анастасии","profileCourse":"art_b1","cabinet":"student-art-b1.html","studentId":"d4f4980a-e17b-4bf6-9541-425c48fc2c0e","roomQuery":"/rest/v1/gostudy_classroom_rooms?select=student_id,teacher_id&course=eq.art-b1&lesson_path=eq.art-b1-03.html","table":"gostudy_art_lesson_selection","initial":"art-b1-03.html","lessons":{"art-b1-03.html":{"title":"The Gallery Makeover","homework":"art-b1-03-homework.html","label":"Текущий урок · Art & Mosaics · B1"},"art-b1-04.html":{"title":"The Story Behind the Mosaic","homework":"art-b1-04-homework.html","label":"Урок 4 · история мозаики и подписи к работам"}}}]</script>
 <script src="assets/gostudy-finance-assignment.js?v=1"></script>
+<script>
+/* Не дублируем Савву после появления настоящего аккаунта и класса в списке. */
+(() => {
+  const list = document.getElementById('teacher-student-list');
+  const preview = document.getElementById('teacher-savva-pending');
+  const search = document.getElementById('teacher-student-search');
+  function refresh() {
+    const enrolled = [...list.querySelectorAll('.teacher-student-row')].some(
+      row => /савва|savva\.50\.ryabkov@yandex\.ru/i.test(row.textContent)
+    );
+    const query = (search?.value || '').trim().toLowerCase();
+    const match = !query || 'савва savva.50.ryabkov@yandex.ru sport travel b2 football academies'.includes(query);
+    preview.hidden = enrolled || !match;
+  }
+  new MutationObserver(refresh).observe(list,{childList:true,subtree:true});
+  search?.addEventListener('input',refresh);
+  refresh();
+})();
+</script>
 </body>
 </html>
