@@ -47,7 +47,7 @@
       <div id="teacher-savva-pending" class="teacher-student-row" aria-label="Савва, урок B2" style="margin-top:12px">
         <span class="teacher-avatar" aria-hidden="true">С</span>
         <div style="flex:1;min-width:0"><strong>Савва</strong><small style="display:block">Sport & Travel · B2 · Football Academies</small><small style="display:block;color:#8a6870">Просмотр урока · аккаунт ученика ещё не подключён</small></div>
-        <a class="teacher-enter-class" href="barcelona-appeal-b2-04.html" aria-label="Открыть урок Саввы для просмотра">→ Открыть урок</a>
+        <a class="teacher-enter-class" href="https://daniilkhlynov1-sys.github.io/gostudy/barcelona-appeal-b2-04.html" aria-label="Открыть урок Саввы на старом сайте">→ Открыть урок</a>
       </div>
       <select id="teacher-student" hidden aria-label="Ученик"></select>
     </div>
@@ -85,6 +85,23 @@
 <script>
 /* Не дублируем Савву после появления настоящего аккаунта и класса в списке. */
 (() => {
+  const pending = document.getElementById('teacher-savva-pending');
+  const enrollment = document.createElement('button');
+  enrollment.type='button';
+  enrollment.className='teacher-student-profile';
+  enrollment.textContent='Подключить';
+  enrollment.title='Создать аккаунт Саввы через защищённый вход преподавателя';
+  enrollment.addEventListener('click', () => {
+    const details=document.getElementById('teacher-add-student');
+    details.hidden=false; details.open=true;
+    const form=details.querySelector('form');
+    form.elements.email.value='savva.50.ryabkov@yandex.ru';
+    form.elements.course.value='sports_b2';
+    form.elements.course.dispatchEvent(new Event('change'));
+    form.elements.password.focus();
+    details.scrollIntoView({behavior:'smooth',block:'center'});
+  });
+  pending?.append(enrollment);
   const list = document.getElementById('teacher-student-list');
   const preview = document.getElementById('teacher-savva-pending');
   const search = document.getElementById('teacher-student-search');
