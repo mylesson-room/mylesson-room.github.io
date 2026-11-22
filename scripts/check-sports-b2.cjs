@@ -138,7 +138,7 @@ async function createContext(browser,id){
   assert.equal(await sp.locator('.gostudy-real-photo img').count(),2,'real photography on both homework pages');
 
   await sp.locator('#next').click();
-  await sp.locator('[data-exercise-field="academy-04-hw-pitch"]').fill('Our academy would borrow Ajax's talent pathway and Right to Dream's approach to holistic development.');
+  await sp.locator('[data-exercise-field="academy-04-hw-pitch"]').fill("Our academy would borrow Ajax's talent pathway and Right to Dream's approach to holistic development.");
   const stored=await sp.evaluate(()=>JSON.parse(window.GoStudyStorage.getItem('gostudy-sports-b2-football-academies-04-homework-v1')||'{}'));
   assert.ok(JSON.stringify(stored.answers).includes('Our academy'));
   assert.deepEqual(errors.filter(s=>/gostudy-v1|gostudy-finance-live|gostudy-jaas-video/.test(s)),[]);
