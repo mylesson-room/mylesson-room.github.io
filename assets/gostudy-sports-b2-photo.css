@@ -1,0 +1,98 @@
+/* Savva Barcelona Race · genuine documentary photography on every page.
+   Follows Michael's cards, spacing, typography and responsive layout. */
+body[data-classroom-course="sports-b2"] .gostudy-real-photo{
+  margin:16px 0 22px;
+  border:1px solid #d6e5f4;
+  border-radius:23px;
+  background:linear-gradient(160deg,#fff,#f4f9ff);
+  overflow:hidden;
+  box-shadow:0 13px 35px rgba(18,64,123,.08);
+}
+body[data-classroom-course="sports-b2"] .gostudy-real-photo__frame{
+  position:relative;
+  width:100%;
+  height:clamp(175px,24vw,290px);
+  min-height:175px;
+  background:linear-gradient(125deg,#d7e7f6,#abc3d9);
+  overflow:hidden;
+}
+body[data-classroom-course="sports-b2"] .gostudy-real-photo__frame::after{
+  content:"";
+  position:absolute;
+  inset:35% 0 0;
+  pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(5,24,51,.76));
+}
+body[data-classroom-course="sports-b2"] .gostudy-real-photo img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center 42%;
+}
+body[data-classroom-course="sports-b2"] .gostudy-real-photo__overlay{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:5px;
+  position:absolute;
+  z-index:1;
+  left:clamp(18px,3vw,31px);
+  bottom:clamp(16px,2vw,28px);
+  right:20px;
+  color:#fff;
+  text-shadow:0 2px 14px rgba(3,11,26,.48);
+}
+body[data-classroom-course="sports-b2"] .gostudy-real-photo__overlay small{
+  font:800 10px/1.4 'Manrope',system-ui,sans-serif;
+  letter-spacing:.14em;
+  color:#dcf2ff;
+}
+body[data-classroom-course="sports-b2"] .gostudy-real-photo__overlay strong{
+  font:800 clamp(21px,2.8vw,30px)/1.19 'Manrope',system-ui,sans-serif;
+  letter-spacing:-.035em;
+}
+body[data-classroom-course="sports-b2"] .gostudy-real-photo figcaption{
+  margin:0;
+  display:grid;
+  gap:7px;
+  padding:15px clamp(17px,2.7vw,27px);
+  background:#f5f9fe;
+}
+body[data-classroom-course="sports-b2"] .gostudy-real-photo__prompt{
+  font:700 14px/1.55 'Manrope',system-ui,sans-serif;
+  color:#173a61;
+}
+body[data-classroom-course="sports-b2"] .gostudy-real-photo figcaption small{
+  font:500 10px/1.55 'Manrope',system-ui,sans-serif;
+  color:#72879c;
+}
+body[data-classroom-course="sports-b2"] .gostudy-real-photo figcaption a{
+  color:#3473b3;
+  text-underline-offset:2px;
+}
+body[data-classroom-course="sports-b2"] .case-column{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:11px;
+  margin:0 0 20px;
+}
+body[data-classroom-course="sports-b2"] .case-column .material-card{
+  min-width:0;
+  margin:0;
+  padding:16px;
+}
+@media(max-width:650px){
+ body[data-classroom-course="sports-b2"] .gostudy-real-photo{border-radius:17px;margin:11px 0 17px}
+ body[data-classroom-course="sports-b2"] .gostudy-real-photo__frame{height:190px}
+ body[data-classroom-course="sports-b2"] .gostudy-real-photo__overlay{left:15px;bottom:15px}
+ body[data-classroom-course="sports-b2"] .gostudy-real-photo figcaption{padding:12px 15px}
+ body[data-classroom-course="sports-b2"] .gostudy-real-photo__prompt{font-size:13px}
+ body[data-classroom-course="sports-b2"] .case-column{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+ body[data-classroom-course="sports-b2"] .gostudy-real-photo *,
+ body[data-classroom-course="sports-b2"] .gostudy-real-photo *::before{
+   animation:none!important;transition:none!important;
+ }
+}
