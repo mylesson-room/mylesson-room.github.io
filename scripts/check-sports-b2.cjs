@@ -24,10 +24,22 @@ function verifyStatic(){
  assert.equal(lessonData.steps.length,8);
  assert.equal(lessonData.steps.reduce((total,s)=>total+s.minutes,0),50);
  assert.equal(lessonData.lessonWords.length,8);
+ assert.equal(lessonData.title,"Inside the World's Football Academies");
+ assert.ok(lessonData.steps.flatMap(step=>step.source||[]).join(' ').includes('Ajax'));
+ assert.ok(lessonData.steps.flatMap(step=>step.source||[]).join(' ').includes('Right to Dream'));
+ assert.equal(new Set(lessonData.steps.map(s=>s.photo?.src)).size,8,'each page must have a different real photo');
+ for(const data of [lessonData,hwData]){
+   for(const step of data.steps){
+     assert.match(step.photo?.src||'',/^https:\/\//,'every page needs a real photo URL');
+     assert.match(step.photo?.source||'',/^https:\/\//,'attribution links required');
+     assert.ok(step.photo?.alt && step.photo?.credit,'accessible attribution required');
+   }
+ }
+
  assert.equal(hwData.steps.length,2);
  assert.equal(hwData.steps.reduce((total,s)=>total+s.minutes,0),20);
- assert.equal(lessonData.key,'gostudy-sports-b2-barcelona-04-v1');
- assert.equal(hwData.key,'gostudy-sports-b2-barcelona-04-homework-v1');
+ assert.equal(lessonData.key,'gostudy-sports-b2-football-academies-04-v1');
+ assert.equal(hwData.key,'gostudy-sports-b2-football-academies-04-homework-v1');
  for(const data of [lessonData,hwData]){
   const seen=new Set();
   for(const step of data.steps){assert.ok(step.id);assert.ok(!seen.has(step.id));seen.add(step.id);
@@ -93,39 +105,43 @@ async function createContext(browser,id){
    await page.waitForFunction(()=>window.FinanceLive?.connected()===true,{timeout:15000});
    assert.equal(await page.locator('#lessonPages > .page').count(),8);
    assert.equal(await page.locator('#lessonVideo .jaas-person-tile').count(),2);
+   assert.equal(await page.locator('.gostudy-real-photo img').count(),8,'real photography on each lesson page');
+
    assert.equal(await page.locator('a[href*="telemost"]').count(),0);
    assert.equal(await page.locator('#selectionTranslate').count(),1);
    assert.equal(await page.locator('.lesson-chat-dropdown').count(),1);
   }
   await sp.locator('#next').click();await sp.locator('#next').click();
-  await sp.locator('input[name="appeal-04-reading:0"][value="1"]').check();
+  await sp.locator('input[name="academy-04-real-world:0"][value="0"]').check();
   await tp.locator('#next').click();await tp.locator('#next').click();
-  await tp.waitForFunction(()=>document.querySelector('input[name="appeal-04-reading:0"][value="1"]')?.checked===true);
+  await tp.waitForFunction(()=>document.querySelector('input[name="academy-04-real-world:0"][value="0"]')?.checked===true);
   // The teacher controls student navigation only when their pages differ.
   await tp.locator('#back').click();
   await tp.locator('#moveStudent').waitFor({state:'visible',timeout:12000});
   await tp.locator('#moveStudent').click();
   await sp.locator('#page-1.active').waitFor();
-  assert.equal(await sp.locator('input[name="appeal-04-reading:0"][value="1"]').isChecked(),true);
+  assert.equal(await sp.locator('input[name="academy-04-real-world:0"][value="0"]').isChecked(),true);
   const chat=sp.locator('.lesson-chat-dropdown');await chat.locator('summary').click();
-  await sp.locator('#finance-chat-form input').fill('Barcelona appeal: we need evidence');
+  await sp.locator('#finance-chat-form input').fill('Football academy: protect education');
   await sp.locator('#finance-chat-form button').click();
   const tcChat=tp.locator('.lesson-chat-dropdown');await tcChat.locator('summary').click();
-  await tp.locator('#finance-messages li').filter({hasText:'Barcelona appeal: we need evidence'}).waitFor({timeout:12000});
+  await tp.locator('#finance-messages li').filter({hasText:'Football academy: protect education'}).waitFor({timeout:12000});
   await sp.locator('#openLessonDictionary').click();
-  await sp.locator('#dictionarySource').fill('file an appeal');
-  await sp.locator('#dictionaryTranslation').fill('подать апелляцию');
+  await sp.locator('#dictionarySource').fill('talent pathway');
+  await sp.locator('#dictionaryTranslation').fill('путь развития таланта');
   await sp.locator('#dictionaryAddForm button').click();
-  await sp.locator('#myWords').getByText(/file an appeal/).waitFor();
+  await sp.locator('#myWords').getByText(/talent pathway/).waitFor();
   await sp.locator('#lessonDictionary form[method="dialog"] button').click();
   await sp.goto(base+'/'+homework);
   await sp.waitForFunction(()=>window.FinanceLive?.connected()===true,{timeout:12000});
   assert.equal(await sp.locator('#lessonPages>.page').count(),2);
+  assert.equal(await sp.locator('.gostudy-real-photo img').count(),2,'real photography on both homework pages');
+
   await sp.locator('#next').click();
-  await sp.locator('[data-exercise-field="appeal-04-hw-email"]').fill('Dear Clara, I appreciate your correction, but the public notice should have explained the mistake.');
-  const stored=await sp.evaluate(()=>JSON.parse(window.GoStudyStorage.getItem('gostudy-sports-b2-barcelona-04-homework-v1')||'{}'));
-  assert.ok(JSON.stringify(stored.answers).includes('Dear Clara'));
+  await sp.locator('[data-exercise-field="academy-04-hw-pitch"]').fill('Our academy would borrow Ajax's talent pathway and Right to Dream's approach to holistic development.');
+  const stored=await sp.evaluate(()=>JSON.parse(window.GoStudyStorage.getItem('gostudy-sports-b2-football-academies-04-homework-v1')||'{}'));
+  assert.ok(JSON.stringify(stored.answers).includes('Our academy'));
   assert.deepEqual(errors.filter(s=>/gostudy-v1|gostudy-finance-live|gostudy-jaas-video/.test(s)),[]);
-  console.log('Sport B2: eight pages, 50 minutes, shared video, live answers, teacher page control, chat, vocabulary, homework and cloud keys PASS');
+  console.log('Football Academies B2: eight pages, 50 minutes, shared video, live answers, teacher page control, chat, vocabulary, homework and cloud keys PASS');
  }finally{await sc?.close();await tc?.close();await browser.close();serve.close()}
 })().catch(e=>{console.error(e);serve.close();process.exitCode=1});
