@@ -10,7 +10,7 @@
 <script src="assets/gostudy-v1-vocabulary.js?v=1"></script>
 <script src="assets/gostudy-finance-live.js?v=classroom-1"></script>
 <script>
-function refreshSportsWords(){if(typeof updateVocabularyCount==='function')updateVocabularyCount();if(window.wordsDialog?.open&&typeof openVocabulary==='function')openVocabulary();}
+function refreshSportsWords(){if(typeof updateVocabularyCount==='function')updateVocabularyCount();if(wordsDialog?.open&&typeof openVocabulary==='function')openVocabulary();}
 document.addEventListener('finance-ready',e=>{const label=e.detail?.student_label;if(label){document.querySelector('.profile span').textContent=label;document.querySelector('.avatar').textContent=label[0].toUpperCase();document.querySelector('.hello h1').textContent='Хев а найс дей, '+label+'!';}refreshSportsWords();});
 document.addEventListener('finance-word',refreshSportsWords);
 window.GoStudyV1Progress?.ready?.then(refreshSportsWords);
