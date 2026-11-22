@@ -59,6 +59,12 @@
         }
         content += visual(step.visual);
         if (step.source?.length) content += '<article class="article">'+step.source.map(paragraph=>'<p>'+escape(paragraph)+'</p>').join('')+'</article>';
+        if (Array.isArray(step.references) && step.references.length) {
+          content += '<aside class="gostudy-verified-sources" aria-label="Verified academy sources"><strong>Verified real-world sources</strong><ul>'+
+            step.references.filter(ref=>/^https:\/\//.test(ref.url||'')).map(ref=>
+              '<li><a href="'+escape(ref.url)+'" target="_blank" rel="noopener noreferrer">'+escape(ref.name)+'</a></li>'
+            ).join('')+'</ul></aside>';
+        }
         if (step.audio) {
           const {src,title,transcript} = step.audio;
           content += '<section class="tip"><strong>'+escape(title || 'Listening')+'</strong><audio controls preload="metadata" src="'+escape(src)+'"></audio>'+
