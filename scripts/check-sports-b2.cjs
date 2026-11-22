@@ -157,6 +157,8 @@ async function createContext(browser,id){
   }
   // Actual text selection, Google RU translation and '+' saved-word control,
   // not just the presence of an empty translator component.
+  // Model an actual touch selection: text must first be visible in mobile viewport.
+  await sp.locator('#page-0 .article p').first().scrollIntoViewIfNeeded();
   await sp.evaluate(()=>{
     const p=document.querySelector('#page-0 .article p');
     if(!p?.firstChild)throw Error('Opening paragraph missing');
