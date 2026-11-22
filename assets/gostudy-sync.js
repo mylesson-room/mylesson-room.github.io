@@ -1235,7 +1235,7 @@
     const lessonLabels = new Map([
       ['gostudy-travel-disruptions-b2-v1','Урок 1 · When the trip goes off plan'],
       ['gostudy-sports-b2-football-academies-04-v1','Урок 04 · Football Academies'],
-      ['gostudy-sports-b2-football-academies-04-homework-v1','Домашняя 04 · Academy Director's Report'],
+      ['gostudy-sports-b2-football-academies-04-homework-v1',"Домашняя 04 · Academy Director's Report"],
       ['gostudy-travel-b2-02-v1','Урок 2 · The case of the missing suitcase'],
       ['gostudy-travel-b2-03-v1','Урок 3 · A Room That Wasn’t There'],
       ['gostudy-travel-b2-04-v1','Урок 4 · The Last Connection'],
