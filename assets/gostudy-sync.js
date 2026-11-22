@@ -1315,7 +1315,7 @@
     const addStudentStatus = document.getElementById('teacher-add-student-status');
     if (addStudentForm) {
       for (const [id,name] of courses) {
-        if (id === financeCourse || id === generalB2 || id === placement || ['country_house','business_ai','general_english_b1','general_english_b1_stories','sports_b2'].includes(id)) continue;
+        if (id === financeCourse || id === generalB2 || id === placement || ['country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(id)) continue;
         const option = document.createElement('option');
         option.value = id;
         option.textContent = name;
