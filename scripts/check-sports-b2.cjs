@@ -57,6 +57,23 @@ function verifyStatic(){
  assert.match(shared,/sportsB2Keys/);assert.match(shared,/sports_b2/);
  return lessonData;
 }
+async function verifyPhotoLoading(page, expected, label) {
+ const results=await page.locator('.gostudy-real-photo img').evaluateAll(async images=>{
+   return Promise.all(images.map(img=>new Promise(resolve=>{
+     const done=(status)=>resolve({src:img.getAttribute('src'),status,width:img.naturalWidth});
+     if(img.complete)return done(img.naturalWidth>0?'ok':'broken');
+     const timer=setTimeout(()=>done('timeout'),12000);
+     img.addEventListener('load',()=>{clearTimeout(timer);done('ok')},{once:true});
+     img.addEventListener('error',()=>{clearTimeout(timer);done('broken')},{once:true});
+     img.loading='eager';
+   })));
+ });
+ assert.equal(results.length,expected,label+' must have a real photograph on every page');
+ const bad=results.filter(r=>r.status!=='ok'||r.width<100);
+ if(bad.length)console.error(label+' FAILED PHOTO SOURCES:',bad);
+ assert.deepEqual(bad,[],label+' contains broken photographs');
+ console.log(label+' images loaded: '+results.length);
+}
 async function createContext(browser,id){
  const context=await browser.newContext({viewport:id===student?{width:390,height:844}:{width:1280,height:800}});
  await context.addInitScript(({id})=>{
@@ -111,6 +128,7 @@ async function createContext(browser,id){
    assert.equal(await page.locator('#selectionTranslate').count(),1);
    assert.equal(await page.locator('.lesson-chat-dropdown').count(),1);
   }
+  await verifyPhotoLoading(sp,8,'Savva main lesson');
   await sp.locator('#next').click();await sp.locator('#next').click();
   await sp.locator('input[name="academy-04-real-world:0"][value="0"]').check();
   await tp.locator('#next').click();await tp.locator('#next').click();
@@ -136,6 +154,7 @@ async function createContext(browser,id){
   await sp.waitForFunction(()=>window.FinanceLive?.connected()===true,{timeout:12000});
   assert.equal(await sp.locator('#lessonPages>.page').count(),2);
   assert.equal(await sp.locator('.gostudy-real-photo img').count(),2,'real photography on both homework pages');
+  await verifyPhotoLoading(sp,2,'Savva homework');
 
   await sp.locator('#next').click();
   await sp.locator('[data-exercise-field="academy-04-hw-pitch"]').fill("Our academy would borrow Ajax's talent pathway and Right to Dream's approach to holistic development.");
