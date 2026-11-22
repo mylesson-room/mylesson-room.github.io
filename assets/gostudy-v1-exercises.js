@@ -52,6 +52,11 @@
       let content = step.html || '';
       if (!step.html) {
         if (page === 0 && lesson.cover) content += '<img class="unified-cover" src="'+escape(lesson.cover)+'" alt="'+escape(lesson.coverAlt || '')+'">';
+        if (step.photo?.src && /^https:\/\//.test(step.photo.src)) {
+          const credit = step.photo.credit || 'Real football photograph';
+          const source = step.photo.source || step.photo.src;
+          content += '<figure class="gostudy-real-photo"><img src="'+escape(step.photo.src)+'" alt="'+escape(step.photo.alt || credit)+'" loading="'+(page===0?'eager':'lazy')+'" referrerpolicy="no-referrer" decoding="async"><figcaption><span>'+escape(step.photo.caption || '')+'</span><a href="'+escape(source)+'" rel="noopener noreferrer" target="_blank">'+escape(credit)+'</a></figcaption></figure>';
+        }
         content += visual(step.visual);
         if (step.source?.length) content += '<article class="article">'+step.source.map(paragraph=>'<p>'+escape(paragraph)+'</p>').join('')+'</article>';
         if (step.audio) {
