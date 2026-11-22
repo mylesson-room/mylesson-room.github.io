@@ -18,8 +18,6 @@ jobs:
         with:
           node-version: 22
       - run: python3 scripts/update-shared-assets.py
-      - name: Download and verify licensed real Barcelona photos for Savva
-        run: python3 scripts/fetch-sports-b2-photos.py
       - run: npm install --no-save --no-package-lock playwright@1.58.2
       - name: Test actual video button click and touch on desktop and mobile
         run: |
