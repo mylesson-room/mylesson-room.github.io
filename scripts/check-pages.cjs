@@ -154,6 +154,7 @@ async function checkGeneralB2Room(browser, origin) {
               url.searchParams.get('select') === 'student_id,teacher_id')
             return route.fulfill({json:[]});
           if (url.searchParams.get('course') === 'eq.english-placement') return route.fulfill({json:[]});
+          if (url.searchParams.get('course') === 'eq.sports-b2') return route.fulfill({json:[]});
           assert.equal(url.searchParams.get('course'),'eq.general-english-b2');
           return route.fulfill({json:[{id:roomId,teacher_id:teacherId,student_id:studentId,student_label:'Виктория'}]});
         }
