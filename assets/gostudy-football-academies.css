@@ -1,0 +1,34 @@
+/* Football Academies B2: editorial photography on every lesson and homework page.
+   Scoped to photo content; Michael's controls/layout stay shared. */
+body[data-classroom-course="sports-b2"] .gostudy-real-photo {
+  margin:0 0 22px; background:#eef4f8; border:1px solid #dbe6ee;
+  border-radius:20px; overflow:hidden; box-shadow:0 9px 28px #253a5210;
+}
+body[data-classroom-course="sports-b2"] .gostudy-real-photo img {
+ display:block; width:100%; height:clamp(215px,28vw,350px); object-fit:cover; object-position:center;
+ color:#38506c; font-size:14px; background:linear-gradient(125deg,#e5eff5,#fafdfd);
+}
+body[data-classroom-course="sports-b2"] .gostudy-real-photo figcaption {
+ display:flex;align-items:center;justify-content:space-between;gap:10px;
+ padding:10px 15px;color:#566b80;font-size:11px;line-height:1.55;
+}
+body[data-classroom-course="sports-b2"] .gostudy-real-photo figcaption span {font-weight:700;flex:1}
+body[data-classroom-course="sports-b2"] .gostudy-real-photo figcaption a {
+ color:#2778b8;text-decoration:underline;text-underline-offset:2px;white-space:nowrap;
+}
+body[data-classroom-course="sports-b2"] .case-column {
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:18px 0 22px;
+}
+body[data-classroom-course="sports-b2"] .material-card {
+ padding:15px 16px; border-radius:15px; background:#f5faff;border:1px solid #e1ecf7;
+}
+body[data-classroom-course="sports-b2"] .material-card strong{color:#183f68;font-weight:800}
+body[data-classroom-course="sports-b2"] .material-card p{color:#4d657d;font-size:13px;line-height:1.65;margin:8px 0 0}
+body[data-classroom-course="sports-b2"] .article{font-size:15px;line-height:1.76}
+body[data-classroom-course="sports-b2"] .article p{margin:0 0 15px}
+@media(max-width:650px){
+ body[data-classroom-course="sports-b2"] .gostudy-real-photo img{height:215px}
+ body[data-classroom-course="sports-b2"] .gostudy-real-photo figcaption{display:grid;gap:3px;font-size:10px}
+ body[data-classroom-course="sports-b2"] .gostudy-real-photo figcaption a{white-space:normal}
+ body[data-classroom-course="sports-b2"] .case-column{grid-template-columns:1fr}
+}
