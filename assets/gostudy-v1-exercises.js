@@ -55,7 +55,8 @@
         if (step.photo?.src && /^https:\/\//.test(step.photo.src)) {
           const credit = step.photo.credit || 'Real football photograph';
           const source = step.photo.source || step.photo.src;
-          content += '<figure class="gostudy-real-photo"><img src="'+escape(step.photo.src)+'" alt="'+escape(step.photo.alt || credit)+'" loading="'+(page===0?'eager':'lazy')+'" referrerpolicy="no-referrer" decoding="async"><figcaption><span>'+escape(step.photo.caption || '')+'</span><a href="'+escape(source)+'" rel="noopener noreferrer" target="_blank">'+escape(credit)+'</a></figcaption></figure>';
+          content += '<figure class="gostudy-real-photo"><img src="'+escape(step.photo.src)+'" alt="'+escape(step.photo.alt || credit)+'" loading="'+(page===0?'eager':'lazy')+'" referrerpolicy="no-referrer" decoding="async"><figcaption><span>'+escape(step.photo.caption || '')+'</span><a href="'+escape(source)+'" rel="noopener noreferrer" target="_blank">'+escape(credit)+'</a>'+
+            (step.photo.prompt ? '<p class="gostudy-photo-question">'+escape(step.photo.prompt)+'</p>' : '')+'</figcaption></figure>';
         }
         content += visual(step.visual);
         if (step.source?.length) content += '<article class="article">'+step.source.map(paragraph=>'<p>'+escape(paragraph)+'</p>').join('')+'</article>';
