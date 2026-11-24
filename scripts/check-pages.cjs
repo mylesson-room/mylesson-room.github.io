@@ -1398,6 +1398,12 @@ async function main() {
             const requestUrl = new URL(url);
             const action = requestUrl.pathname.split('/').at(-1);
             const data = route.request().postDataJSON() || {};
+            if (course === 'sports_b2' && action === 'gostudy_classroom_rooms' && requestUrl.searchParams.get('course') === 'eq.sports-b2') {
+              return route.fulfill({json:[{
+                id:'sports-b2-room', student_id:studentId, teacher_id:'teacher',
+                student_label:'Савва', course:'sports-b2', lesson_path:current.lesson
+              }]});
+            }
             if (['finance_b1','feed_b2','pharma_c1','first_sales','general_english_b1','general_english_b1_stories','travel_a2','tiktok_a2'].includes(course)) {
               const actor = role === 'teacher' ? 'teacher' : studentId;
               if (action === 'gostudy_classroom_rooms' && requestUrl.searchParams.get('course') === 'eq.'+course.replaceAll('_','-')) {
@@ -1453,11 +1459,30 @@ async function main() {
         }
         const sp = await student.newPage();
         const tp = await teacher.newPage();
-        if (course === 'general_english_b1_stories') {
+        if (course === 'sports_b2') {
+          await sp.goto(origin + '/login.html');
+          await sp.waitForURL(url => url.pathname === '/student-sports-b2.html');
+        } else if (course === 'general_english_b1_stories') {
           await sp.goto(origin + '/student-travel-b2.html');
           await sp.waitForURL(url => url.pathname === '/student-general-english-b1-stories.html');
         } else await sp.goto(origin + (course === 'pharma_c1' ? '/student-pharma.html' : '/student-' + course.replaceAll('_', '-') + '.html'));
         await tp.goto(origin + '/gostudy-teacher.html');
+        if (course === 'sports_b2') {
+          const studentLink = sp.locator('.lesson-card-link');
+          const homeworkLink = sp.locator('.homework-link');
+          const teacherRow = tp.locator('#teacher-student-list .teacher-student-row').filter({hasText:'Савва'});
+          const teacherLink = teacherRow.getByRole('link',{name:/Войти в класс/});
+          await Promise.all([studentLink.waitFor(), homeworkLink.waitFor(), teacherLink.waitFor()]);
+          assert.equal(await studentLink.getAttribute('href'),current.lesson);
+          assert.equal(await homeworkLink.getAttribute('href'),current.homework);
+          assert.equal(await teacherLink.getAttribute('href'),current.lesson+'?classStudent='+studentId);
+          assert.equal(await tp.locator('#teacher-student-count').textContent(),'Количество учеников 1');
+          await tp.locator('#teacher-savva-pending').waitFor({state:'hidden'});
+          await Promise.all([studentLink.click(), teacherLink.click()]);
+          for (const page of [sp,tp]) await page.waitForURL(url => url.pathname === expected);
+          console.log('Savva: shared login, student lesson and homework links, teacher count and course entry verified');
+          continue; // The dedicated Sports B2 suite exercises the lesson and homework.
+        }
         if (['general_english_b1','general_english_b1_stories','travel_a2','tiktok_a2'].includes(course)) {
           // These three live lessons now use Michael's canonical classroom.
           // Preserve the existing student URL, section count, saved answer IDs,
