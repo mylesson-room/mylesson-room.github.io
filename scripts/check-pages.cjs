@@ -1472,7 +1472,7 @@ async function main() {
           await sp.locator('.lesson-card-link').waitFor();
           assert.equal(await sp.locator('.lesson-card-link').getAttribute('href'),current.lesson);
           await sp.locator('.lesson-card-link').click();
-          await tp.locator('.teacher-enter-class').click();
+          await tp.locator('#teacher-student-list .teacher-enter-class').click();
           for(const page of [sp,tp]){
             await page.waitForURL(url=>url.pathname===expected);
             // Michael's approved chat is collapsed by default. The live
@@ -1734,7 +1734,7 @@ async function main() {
           await sp.locator('#assignment[aria-disabled="true"]').waitFor();
           assert.equal(await sp.locator('.lesson-card-link').getAttribute('href'),'korean-wave-b2-20261118.html');
           await sp.locator('.lesson-card-link').click();
-          await tp.locator('.teacher-enter-class').click();
+          await tp.locator('#teacher-student-list .teacher-enter-class').click();
           for (const page of [sp,tp]) {
             await page.waitForURL(url => url.pathname === expected);
             await page.waitForFunction(() =>
@@ -1852,7 +1852,7 @@ async function main() {
           }
           await sp.locator('#assignment[aria-disabled="true"]').waitFor();
           await sp.locator('.lesson-card-link').click();
-          await tp.locator('.teacher-enter-class').click();
+          await tp.locator('#teacher-student-list .teacher-enter-class').click();
           for (const page of [sp,tp]) {
             await page.waitForURL(url => url.pathname === expected);
             await page.locator('header .lesson-brand').waitFor();
@@ -1901,7 +1901,7 @@ async function main() {
         }
         const canonicalCabinet = course === 'travel_a2' || course === 'general_english_b1_stories';
         const studentLink = canonicalCabinet ? sp.locator('.lesson-card-link') : sp.locator('.home-open-lesson');
-        const teacherLink = tp.locator('.teacher-enter-class');
+        const teacherLink = tp.locator('#teacher-student-list .teacher-enter-class');
         await studentLink.waitFor();
         if (canonicalCabinet) {
           if (course === 'travel_a2') {
