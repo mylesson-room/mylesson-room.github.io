@@ -115,10 +115,22 @@
     button.setAttribute('aria-label', title);
     button.title = title;
   }
+  let audioAvailable = true;
+  let micPending = false;
+  async function readActualAudio(instance = api) {
+    if (!instance || instance !== api || typeof instance.isAudioMuted !== 'function') return;
+    try {
+      const muted = await instance.isAudioMuted();
+      if (instance === api && typeof muted === 'boolean') {
+        audioMuted = muted;
+        updateMedia();
+      }
+    } catch {}
+  }
   function updateMedia() {
     setMediaButton(micButton, audioMuted, 'audio');
     setMediaButton(cameraButton, videoMuted, 'video');
-    micButton.disabled = !api || !meeting;
+    micButton.disabled = !api || !meeting || micPending;
     cameraButton.disabled = !api || !meeting;
   }
   const mobile = () => window.matchMedia?.('(max-width: 800px)').matches ?? false;
@@ -184,6 +196,8 @@
     api = null;
     meeting = false;
     audioMuted = true;
+    audioAvailable = true;
+    micPending = false;
     videoMuted = false;
     try { previous?.dispose(); } catch {}
     frame?.remove();
@@ -319,7 +333,7 @@
         configOverwrite: {
           startWithAudioMuted: true,
           prejoinPageEnabled: true,
-          toolbarButtons: ['settings'],
+          toolbarButtons: ['microphone', 'camera', 'settings'],
           disableDeepLinking: true,
         },
         interfaceConfigOverwrite: {
@@ -334,6 +348,7 @@
         meeting = true;
         status('Вы в видеозвонке');
         updateMedia();
+        void readActualAudio(api);
         // Ask Jitsi to show local + remote participants as a single-column gallery.
         // Jitsi owns the actual video rendering inside its secure iframe.
         try { api?.executeCommand?.('toggleTileView'); } catch {}
@@ -341,6 +356,15 @@
       api.addEventListener('audioMuteStatusChanged', event => {
         if (typeof event?.muted === 'boolean') audioMuted = event.muted;
         updateMedia();
+      });
+      api.addEventListener('audioAvailabilityChanged', event => {
+        audioAvailable = event?.available !== false;
+        if (!audioAvailable) status('Микрофон недоступен. Проверьте разрешение браузера и выбранный микрофон в настройках Jitsi.');
+        void readActualAudio(api);
+      });
+      api.addEventListener('micError', () => {
+        status('Не удалось получить звук с микрофона. Проверьте разрешение браузера и настройки звука.');
+        void readActualAudio(api);
       });
       api.addEventListener('videoMuteStatusChanged', event => {
         if (typeof event?.muted === 'boolean') videoMuted = event.muted;
@@ -366,10 +390,26 @@
       if (!api && !busy) join();
     }
   });
-  micButton.addEventListener('click', () => {
-    if (!api || !meeting) return;
-    try { api.executeCommand('toggleAudio'); }
-    catch { status('Не получилось переключить микрофон. Проверьте разрешения браузера.'); }
+  micButton.addEventListener('click', async () => {
+    if (!api || !meeting || micPending) return;
+    const instance = api;
+    micPending = true;
+    updateMedia();
+    try {
+      await readActualAudio(instance);
+      if (instance !== api) return;
+      const wasMuted = audioMuted;
+      instance.executeCommand('toggleAudio');
+      // Commands are asynchronous: do not pretend that a click proves unmute.
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      if (instance !== api) return;
+      await readActualAudio(instance);
+      if (wasMuted && audioMuted) status('Микрофон остался выключен. Проверьте разрешение и попробуйте кнопку микрофона внутри видеозвонка.');
+      else if (!audioAvailable) status('Микрофон недоступен. Проверьте выбранное устройство.');
+    } catch { status('Не получилось переключить микрофон. Проверьте разрешения браузера.'); }
+    finally {
+      if (instance === api) { micPending = false; updateMedia(); }
+    }
   });
   cameraButton.addEventListener('click', () => {
     if (!api || !meeting) return;
