@@ -1951,7 +1951,7 @@ async function main() {
             // protected destination RPC, not its old standalone dashboard.
             assert.equal(await studentLink.getAttribute('href'),'general-english-b1-stories-01.html');
             assert.equal(await sp.locator('.homework-link').getAttribute('href'),'general-english-b1-stories-01-homework.html');
-            await sp.getByText('A Postcard From a New Home',{exact:true}).waitFor();
+            await sp.getByText('Settling Into Life Abroad',{exact:true}).waitFor();
             await sp.locator('.vocab-feature--practice').waitFor({state:'visible'});
             await sp.getByRole('button',{name:/Словарь/}).first().click();
             await sp.locator('#words[open]').waitFor();
@@ -2182,12 +2182,13 @@ async function main() {
           assert.equal(studentConfig.vocabulary.length,6,'B1 active vocabulary cap');
           assert.equal(await tp.locator('body').getAttribute('data-dud-b1-premium'),'','Premium styling must activate for both roles');
           await sp.goto(origin + '/' + current.homework);
-          await sp.getByRole('heading',{name:'01 · A quick memory check',exact:true}).waitFor();
+          await sp.getByRole('heading',{name:'01 · Three ways to talk about habits',exact:true}).waitFor();
           assert.equal(await sp.locator('body').getAttribute('data-dud-b1-premium'),null,'Old homework design stays untouched');
           const homeworkConfig = await sp.locator('#lesson-data').evaluate(node=>JSON.parse(node.textContent));
           assert.equal(homeworkConfig.key,current.homeworkKey,'The protected homework progress key must remain stable');
-          assert.equal(homeworkConfig.contentVersion,'would-you-live-here-homework-20261120-v1');
-          assert.equal(homeworkConfig.steps.length,2,'New homework must contain two activities');
+          assert.equal(homeworkConfig.contentVersion,'settling-in-used-to-20261124-v1');
+          assert.equal(homeworkConfig.steps.length,4,'New homework must contain four activities');
+          assert.equal(homeworkConfig.steps.reduce((n,step)=>n+step.minutes,0),25);
         }
         console.log(course + ': both cabinets open the current lesson and shared dictionary');
       } catch (error) { throw new Error(course + ': ' + error.message, {cause: error}); }
