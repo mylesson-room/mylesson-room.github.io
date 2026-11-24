@@ -86,6 +86,10 @@ async function checkThreeProgressMeLessons() {
       assert.ok(cabinet.includes('"homework":"country-house-travel-a2-05-homework.html"'),'Irina has the new 14-min homework');
       assert.ok(cabinet.includes('A Sunday Picnic Plan') && cabinethasOldHomeworkHistory(cabinet),
         'Previous lesson and historical homework URL must remain preserved');
+    } else if (spec.course === 'art-b1') {
+      assert.ok(cabinet.includes('"lesson":"art-b1-05.html"'),'Anastasia opens the new lesson');
+      assert.ok(cabinet.includes('"homework":"art-b1-05-homework.html"'),'Anastasia opens the new homework');
+      assert.ok(cabinet.includes('["art-b1-03.html","The Gallery Makeover"]'),'Historical lesson remains available');
     } else {
       assert.ok(cabinet.includes('"lesson":"'+spec.slug+'.html"'));
       assert.ok(cabinet.includes('"homework":"'+spec.slug+'-homework.html"'));
@@ -286,12 +290,21 @@ async function checkMigratedRooms(browser, origin) {
       for (const [page,label] of [[sp,'student'],[tp,'teacher']]) page.on('pageerror',error=>errors.push(label+': '+error.message));
       await Promise.all([sp.goto(origin+'/'+lesson.cab),tp.goto(origin+'/gostudy-teacher.html')]);
       const card = sp.locator('.lesson-card');
-      await card.getByRole('heading',{name:lesson.title}).waitFor();
-      assert.equal(await card.getAttribute('href'),lesson.path);
-      await Promise.all([
-        card.click(),
-        tp.locator('.teacher-student-row').filter({hasText:lesson.student}).getByRole('link',{name:/Войти в класс/}).click(),
-      ]);
+      const artHistory = lesson.course === 'art-b1';
+      const activeTitle = artHistory ? 'Can We Save the Past?' : lesson.title;
+      const activePath = artHistory ? 'art-b1-05.html' : lesson.path;
+      await card.getByRole('heading',{name:activeTitle}).waitFor();
+      assert.equal(await card.getAttribute('href'),activePath);
+      const teacherEntry = tp.locator('.teacher-student-row').filter({hasText:lesson.student}).getByRole('link',{name:/Войти в класс/});
+      if (artHistory) {
+        await teacherEntry.waitFor();
+        assert.equal(new URL(await teacherEntry.getAttribute('href'),origin).pathname,'/'+activePath);
+        assert.equal(await sp.locator('.homework-link').getAttribute('href'),'art-b1-05-homework.html');
+        // Historical exercise and room regression below still runs on lesson 03.
+        await Promise.all([sp.goto(origin+'/'+lesson.path),tp.goto(origin+'/'+lesson.path+'?classStudent='+studentId)]);
+      } else {
+        await Promise.all([card.click(),teacherEntry.click()]);
+      }
       await tp.waitForURL(url => url.pathname === '/'+lesson.path && url.searchParams.get('classStudent') === studentId);
       for (const page of [sp,tp]) {
         if (lesson.course === 'country-house') {
