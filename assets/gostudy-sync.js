@@ -715,10 +715,10 @@
         if (nextLesson.key !== storiesKeys[1] || nextLesson.steps?.length !== 8 || nextLesson.steps.reduce((minutes,step)=>minutes+Number(step.minutes||0),0) !== 50 || nextLesson.vocabulary?.length !== 6) throw new Error('Ошибка проверки содержания урока.');
         response.data = nextLesson;
       } else if (currentPage === 'general-english-b1-stories-01-homework.html') {
-        const homeworkFile = await fetch('assets/gostudy-b1-stories-new-homework-20261120.json?v=2', {cache:'no-store'});
+        const homeworkFile = await fetch('assets/gostudy-b1-stories-new-homework-20261120.json?v=3', {cache:'no-store'});
         if (!homeworkFile.ok) throw new Error('Не удалось загрузить новое домашнее задание. Обновите страницу.');
         const nextHomework = await homeworkFile.json();
-        if (nextHomework.key !== storiesKeys[2] || nextHomework.steps?.length !== 4 || nextHomework.steps.reduce((minutes,step)=>minutes+Number(step.minutes||0),0) !== 25) throw new Error('Ошибка проверки домашнего задания.');
+        if (nextHomework.key !== storiesKeys[2] || nextHomework.steps?.length !== 6 || nextHomework.steps.reduce((minutes,step)=>minutes+Number(step.minutes||0),0) !== 35) throw new Error('Ошибка проверки домашнего задания.');
         response.data = nextHomework;
       }
       if (classroomStudent !== null) {
