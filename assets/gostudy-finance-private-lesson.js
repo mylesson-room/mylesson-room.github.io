@@ -21,6 +21,16 @@ async function boot(){
   const node=document.createElement('script');node.type='application/json';node.id='lesson-data';node.textContent=JSON.stringify(config);document.body.append(node);
   await loadScript(document.body.dataset.lessonScript);
   await loadScript(document.body.dataset.syncScript || 'assets/gostudy-sync.js?v=michael-assignment-20261121');
+  // The new private Art lesson has already authenticated this exact student/teacher pair.
+  // Use the same verified session for JaaS and the live workbook; never re-read a
+  // potentially stale second teacher session or refresh the same token twice.
+  if(document.body.dataset.lessonSlug==='art-conservation-b1-05' ||
+     document.body.dataset.lessonSlug==='art-conservation-b1-05-homework'){
+   window.GoStudyFinanceAuth={
+    userId:auth.userId,token:auth.token,request:auth.request,
+    classroomStudent:auth.userId()===row.teacher_id?row.student_id:null
+   };
+  }
   await loadScript(document.body.dataset.exercisesScript);
   if(document.body.hasAttribute('data-homework-only')){
    const aside=document.querySelector('#lessonVideo'),divider=document.querySelector('#lessonDivider');
