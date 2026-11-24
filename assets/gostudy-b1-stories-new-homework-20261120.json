@@ -1,237 +1,150 @@
 {
   "key": "gostudy-general-english-b1-stories-01-homework-v1",
-  "title": "Homework · Settling Into Life Abroad",
-  "level": "B1 · General English · Homework · 25 minutes",
+  "title": "Homework · Old Habits, New Habits",
+  "level": "B1 · General English · Homework · 30–35 minutes",
   "cabinet": "student-general-english-b1-stories.html",
   "course": "general-english-b1-stories",
-  "contentVersion": "settling-in-used-to-20261124-v1",
+  "contentVersion": "old-habits-new-habits-20261124-v1",
   "overview": {
-    "title": "Settling Into Life Abroad",
+    "title": "Old Habits, New Habits",
     "level": "B1",
-    "duration": 25,
+    "duration": 35,
     "format": "Homework",
-    "goal": "Describe past habits, familiar routines and adaptation; revise a friendly email."
+    "goal": "Distinguish former habits, familiar routines and adaptation, then use all three constructions independently."
   },
   "steps": [
     {
-      "id": "settling-hw-grammar-20261124",
-      "title": "01 · Three ways to talk about habits",
+      "id": "habits-hw-20261124-meaning",
+      "title": "01 · What does it really mean?",
       "minutes": 5,
-      "instruction": "Read the examples. Choose the meaning of each sentence.",
+      "instruction": "Choose the correct interpretation.",
+      "visual": {
+        "kind": "cards",
+        "cards": [
+          [
+            "PAST",
+            "used to + verb",
+            "I used to sleep until noon.",
+            "Раньше, но не сейчас"
+          ],
+          [
+            "NOW",
+            "be used to + noun / -ing",
+            "I'm used to getting up early.",
+            "Уже привычно"
+          ],
+          [
+            "CHANGE",
+            "get used to + noun / -ing",
+            "I'm getting used to my new schedule.",
+            "Привыкаю"
+          ]
+        ]
+      },
       "source": [
-        "USED TO + base verb: a past habit or state that is no longer true. I used to live in Moscow, but now I live abroad.",
-        "BE USED TO + noun / verb-ing: something is familiar now. I am used to the hot weather. I am used to working remotely.",
-        "GET USED TO + noun / verb-ing: the process of becoming familiar. I am getting used to the heat. It took me a week to get used to waking up early.",
-        "Negative: I didn't use to swim. I'm not used to the traffic yet. Note: after be/get used to, use -ing or a noun."
+        "Remember: after did / didn't, write use to + base verb."
       ],
       "type": "choice",
       "items": [
         [
-          "I used to take the bus to work.",
+          "Sarah used to work at weekends.",
           [
-            "It was a past habit that has changed.",
-            "It is a familiar routine now.",
-            "I am adapting to it."
+            "Working at weekends is normal for her now.",
+            "She worked at weekends in the past, but doesn't anymore.",
+            "She is learning to work at weekends."
           ],
-          0,
-          "Used to + base verb describes a former habit."
+          1
         ],
         [
-          "I'm used to working in the evenings.",
+          "Mark is used to speaking in public.",
           [
-            "I stopped working in the evenings.",
-            "Working in the evenings feels normal.",
-            "Working in the evenings is still new."
+            "He feels comfortable speaking in public.",
+            "He no longer speaks in public.",
+            "He has just started speaking in public."
           ],
-          1,
-          "Be used to + -ing describes familiarity."
+          0
         ],
         [
-          "I'm getting used to the traffic.",
+          "Helen is getting used to living alone.",
           [
-            "I no longer experience traffic.",
-            "Traffic has always felt normal.",
-            "Traffic is becoming more familiar."
+            "She lived alone in the past.",
+            "Living alone is becoming more comfortable for her.",
+            "She has always lived alone."
           ],
-          2,
-          "Get used to describes adaptation."
+          1
+        ],
+        [
+          "It took me six months to get used to my new routine.",
+          [
+            "I eventually became comfortable with it.",
+            "I stopped following my routine.",
+            "I still haven't adapted to it."
+          ],
+          0
         ]
       ],
-      "teacherNotes": "5 min. Ask for one original example for each meaning; check the base verb vs -ing."
+      "teacherNotes": "Keys: 1B, 2A, 3B, 4A."
     },
     {
-      "id": "settling-hw-forms-20261124",
-      "title": "02 · Choose the correct form",
+      "id": "habits-hw-20261124-forms",
+      "title": "02 · Complete the sentences",
+      "minutes": 6,
+      "instruction": "Choose the construction and put the verb in brackets into the correct form. Type only the missing words; use full forms (am, not 'm).",
+      "html": "<div class=\"tip\"><strong>Form focus</strong><p>Past habit → base verb. Familiarity or adaptation → noun / verb-ing.</p></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-gap-0\">1. When I was younger, I ___ (spend) hours playing computer games.</label><input type=\"text\" id=\"habits-hw-20261124-gap-0\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-gap-0\" data-expected=\"used to spend\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-gap-1\">2. I'm a nurse, so I ___ (work) at night. It doesn't bother me.</label><input type=\"text\" id=\"habits-hw-20261124-gap-1\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-gap-1\" data-expected=\"am used to working\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-gap-2\">3. I've recently started a new job. I'm still ___ (wake up) at 6 a.m.</label><input type=\"text\" id=\"habits-hw-20261124-gap-2\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-gap-2\" data-expected=\"getting used to waking up\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-gap-3\">4. My brother didn't ___ (like) vegetables, but now he loves them.</label><input type=\"text\" id=\"habits-hw-20261124-gap-3\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-gap-3\" data-expected=\"use to like\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-gap-4\">5. It took her several weeks to ___ (drive) on the left.</label><input type=\"text\" id=\"habits-hw-20261124-gap-4\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-gap-4\" data-expected=\"get used to driving\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-gap-5\">6. Are you ___ (deal with) difficult customers?</label><input type=\"text\" id=\"habits-hw-20261124-gap-5\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-gap-5\" data-expected=\"used to dealing with\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-gap-6\">7. We ___ (have) a dog when I was a child.</label><input type=\"text\" id=\"habits-hw-20261124-gap-6\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-gap-6\" data-expected=\"used to have\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-gap-7\">8. I don't think I'll ever ___ (work) in a noisy office.</label><input type=\"text\" id=\"habits-hw-20261124-gap-7\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-gap-7\" data-expected=\"get used to working\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><details data-teacher-only hidden><summary>Карточка преподавателя · Keys</summary><p>1. used to spend · 2. am used to working · 3. getting used to waking up · 4. use to like · 5. get used to driving · 6. used to dealing with · 7. used to have · 8. get used to working</p></details>"
+    },
+    {
+      "id": "habits-hw-20261124-detective",
+      "title": "03 · Be a grammar detective",
+      "minutes": 6,
+      "instruction": "Each sentence contains one mistake. Rewrite it correctly. Your teacher will review your corrections.",
+      "html": "<div class=\"tip\"><strong>Look for three things</strong><p>Did / didn't · base verb · verb-ing after be/get used to.</p></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-correct-0\">1. I used to going to the gym every morning.</label><input type=\"text\" id=\"habits-hw-20261124-correct-0\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-correct-0\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-correct-1\">2. She is used to work under pressure.</label><input type=\"text\" id=\"habits-hw-20261124-correct-1\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-correct-1\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-correct-2\">3. Did you used to watch cartoons as a child?</label><input type=\"text\" id=\"habits-hw-20261124-correct-2\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-correct-2\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-correct-3\">4. I'm getting used to speak English every day.</label><input type=\"text\" id=\"habits-hw-20261124-correct-3\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-correct-3\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-correct-4\">5. He didn't used to drink coffee.</label><input type=\"text\" id=\"habits-hw-20261124-correct-4\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-correct-4\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-correct-5\">6. They are used to wake up early.</label><input type=\"text\" id=\"habits-hw-20261124-correct-5\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-correct-5\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-correct-6\">7. You will get used to live on your own.</label><input type=\"text\" id=\"habits-hw-20261124-correct-6\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-correct-6\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><details data-teacher-only hidden><summary>Карточка преподавателя · Keys</summary><p>1. I used to go to the gym every morning. · 2. She is used to working under pressure. · 3. Did you use to watch cartoons as a child? · 4. I'm getting used to speaking English every day. · 5. He didn't use to drink coffee. · 6. They are used to waking up early. · 7. You will get used to living on your own.</p></details>"
+    },
+    {
+      "id": "habits-hw-20261124-situations",
+      "title": "04 · From uncomfortable to normal",
       "minutes": 7,
-      "instruction": "Complete each sentence with the best option. Read it aloud after checking.",
-      "type": "gap",
-      "items": [
-        [
-          "Before moving abroad, I ___ in an office, but now I work remotely.",
-          [
-            "am used to working",
-            "used to work",
-            "am getting used to working"
-          ],
-          1,
-          "A former habit: used to + work."
-        ],
-        [
-          "After three months here, I ___ the hot weather. It feels normal now.",
-          [
-            "am used to",
-            "used to",
-            "am getting use to"
-          ],
-          0,
-          "Be used to + noun."
-        ],
-        [
-          "I've only been here for a week. I'm still ___ eating dinner later.",
-          [
-            "used to eat",
-            "get used to",
-            "getting used to"
-          ],
-          2,
-          "The adaptation is in progress."
-        ],
-        [
-          "I didn't ___ swim in the sea, but now I do it every day.",
-          [
-            "used to",
-            "use to",
-            "get used to"
-          ],
-          1,
-          "Didn't + use to + base verb."
-        ],
-        [
-          "I'm not used to ___ so early.",
-          [
-            "waking up",
-            "wake up",
-            "woke up"
-          ],
-          0,
-          "Be used to + -ing."
-        ],
-        [
-          "It took me a month to get used to ___ remotely.",
-          [
-            "work",
-            "worked",
-            "working"
-          ],
-          2,
-          "Get used to + -ing."
-        ],
-        [
-          "I ___ the noise now; it doesn't bother me anymore.",
-          [
-            "used to",
-            "am used to",
-            "am used to hear"
-          ],
-          1,
-          "Familiarity now: be used to + noun."
-        ],
-        [
-          "At first, the traffic was stressful, but I gradually ___ it.",
-          [
-            "got used to",
-            "used to drive",
-            "was used to driving"
-          ],
-          0,
-          "Got used to = became familiar."
-        ]
-      ],
-      "teacherNotes": "7 min. Score /8; revisit any confusion about past habit vs process vs state."
+      "instruction": "Write three sentences for each fictional person, one using each target construction.",
+      "html": "<section class=\"material-card\" style=\"margin-bottom:20px;padding:16px\"><figure style=\"margin:0 0 12px\"><img src=\"https://images.pexels.com/photos/4240579/pexels-photo-4240579.jpeg?auto=compress&cs=tinysrgb&w=1000\" alt=\"Woman working on a laptop at a home office desk\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;max-height:230px;object-fit:cover;border-radius:12px\"><figcaption><a href=\"https://www.pexels.com/photo/woman-working-in-home-office-4240579/\" target=\"_blank\" rel=\"noopener noreferrer\">Photo: Pexels · illustrative image</a></figcaption></figure><h3>Situation A — Emma</h3><p><strong>Before:</strong> worked in an office.<br><strong>Now:</strong> feels comfortable working from home.<br><strong>Still adapting:</strong> still adapting to organising her own schedule.</p><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-person-0\">Write all three sentences</label><textarea id=\"habits-hw-20261124-person-0\" rows=\"3\" data-exercise-field=\"habits-hw-20261124-person-0\" placeholder=\"Your answer\"></textarea><small data-grade class=\"feedback\"></small></div></section><section class=\"material-card\" style=\"margin-bottom:20px;padding:16px\"><figure style=\"margin:0 0 12px\"><img src=\"https://images.pexels.com/photos/8430610/pexels-photo-8430610.jpeg?auto=compress&cs=tinysrgb&w=1000\" alt=\"Man preparing fresh vegetables in a kitchen\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;max-height:230px;object-fit:cover;border-radius:12px\"><figcaption><a href=\"https://www.pexels.com/photo/man-cooking-in-the-kitchen-8430610/\" target=\"_blank\" rel=\"noopener noreferrer\">Photo: Pexels · illustrative image</a></figcaption></figure><h3>Situation B — James</h3><p><strong>Before:</strong> ate fast food every day.<br><strong>Now:</strong> feels comfortable cooking at home.<br><strong>Still adapting:</strong> still adapting to planning meals in advance.</p><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-person-1\">Write all three sentences</label><textarea id=\"habits-hw-20261124-person-1\" rows=\"3\" data-exercise-field=\"habits-hw-20261124-person-1\" placeholder=\"Your answer\"></textarea><small data-grade class=\"feedback\"></small></div></section><section class=\"material-card\" style=\"margin-bottom:20px;padding:16px\"><figure style=\"margin:0 0 12px\"><img src=\"https://images.pexels.com/photos/8636598/pexels-photo-8636598.jpeg?auto=compress&cs=tinysrgb&w=1000\" alt=\"Woman presenting to colleagues in a meeting\" loading=\"lazy\" decoding=\"async\" style=\"width:100%;max-height:230px;object-fit:cover;border-radius:12px\"><figcaption><a href=\"https://www.pexels.com/photo/a-woman-giving-presentation-to-colleagues-8636598/\" target=\"_blank\" rel=\"noopener noreferrer\">Photo: Pexels · illustrative image</a></figcaption></figure><h3>Situation C — Anna</h3><p><strong>Before:</strong> avoided public speaking.<br><strong>Now:</strong> feels comfortable giving short presentations.<br><strong>Still adapting:</strong> still adapting to speaking in front of large audiences.</p><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-person-2\">Write all three sentences</label><textarea id=\"habits-hw-20261124-person-2\" rows=\"3\" data-exercise-field=\"habits-hw-20261124-person-2\" placeholder=\"Your answer\"></textarea><small data-grade class=\"feedback\"></small></div></section><details data-teacher-only hidden><summary>Карточка преподавателя · Keys</summary><p>Emma used to work in an office. She's used to working from home. She's getting used to organising her own schedule. James used to eat fast food every day. He's used to cooking at home. He's getting used to planning meals in advance. Anna used to avoid public speaking. She's used to giving short presentations. She's getting used to speaking in front of large audiences.</p></details>"
     },
     {
-      "id": "settling-hw-edit-20261124",
-      "title": "03 · Make your English sound natural",
+      "id": "habits-hw-20261124-translation",
+      "title": "05 · Translate into English",
+      "minutes": 6,
+      "instruction": "Pay attention to the difference between past habits, familiarity and adaptation. Your teacher will accept equivalent natural translations.",
+      "html": "<div class=\"tip\"><strong>Think before translating</strong><p>Раньше → used to. Уже привыкла → be used to. Привыкаю → get used to.</p></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-translate-0\">1. Раньше я часто опаздывала.</label><input type=\"text\" id=\"habits-hw-20261124-translate-0\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-translate-0\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-translate-1\">2. Я привыкла работать самостоятельно.</label><input type=\"text\" id=\"habits-hw-20261124-translate-1\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-translate-1\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-translate-2\">3. Я постепенно привыкаю к новому расписанию.</label><input type=\"text\" id=\"habits-hw-20261124-translate-2\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-translate-2\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-translate-3\">4. Мне потребовалось два месяца, чтобы привыкнуть к новой работе.</label><input type=\"text\" id=\"habits-hw-20261124-translate-3\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-translate-3\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-translate-4\">5. Раньше ты часто путешествовала?</label><input type=\"text\" id=\"habits-hw-20261124-translate-4\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-translate-4\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-translate-5\">6. Я ещё не привыкла выступать перед большой аудиторией.</label><input type=\"text\" id=\"habits-hw-20261124-translate-5\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-translate-5\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><div class=\"gap-item unified-gap\" data-answer-row><label class=\"field-label\" for=\"habits-hw-20261124-translate-6\">7. Думаю, ты быстро привыкнешь к этому.</label><input type=\"text\" id=\"habits-hw-20261124-translate-6\" autocomplete=\"off\" data-exercise-field=\"habits-hw-20261124-translate-6\" placeholder=\"Your answer\"><small data-grade class=\"feedback\"></small></div><details data-teacher-only hidden><summary>Карточка преподавателя · Keys</summary><p>1. I used to be late a lot. · 2. I'm used to working independently. · 3. I'm gradually getting used to my new schedule. · 4. It took me two months to get used to my new job. · 5. Did you use to travel a lot? · 6. I'm not used to speaking in front of large audiences yet. · 7. I think you'll get used to it quickly.</p></details>"
+    },
+    {
+      "id": "habits-hw-20261124-reflection",
+      "title": "06 · How have you changed?",
       "minutes": 5,
-      "instruction": "Choose the natural correction. Pay attention to spelling, prepositions and verb patterns.",
-      "type": "choice",
-      "items": [
-        [
-          "Describe your new town.",
-          [
-            "There is nice here.",
-            "It's nice here.",
-            "It nice here."
-          ],
-          1,
-          "It's nice here: use it + is."
-        ],
-        [
-          "Describe your work schedule.",
-          [
-            "I work six hours a day.",
-            "I work six ours in day.",
-            "I work six hours in a day every."
-          ],
-          0,
-          "Hours; a day."
-        ],
-        [
-          "Describe a current afternoon habit.",
-          [
-            "I used to go to swim in afternoons.",
-            "I am use to swim in afternoon.",
-            "I usually go swimming in the afternoon."
-          ],
-          2,
-          "Usually + present simple for a current habit; go swimming."
-        ],
-        [
-          "Describe what you enjoy.",
-          [
-            "I enjoy to live here.",
-            "I enjoy living here.",
-            "I injoy living here."
-          ],
-          1,
-          "Enjoy + -ing."
-        ],
-        [
-          "Explain why you like the climate.",
-          [
-            "Because of the warm weather.",
-            "Because of the warm weaver.",
-            "Because warm weather."
-          ],
-          0,
-          "Weather is the climate condition; because of + noun phrase."
-        ],
-        [
-          "End a friendly email.",
-          [
-            "Send me a massage.",
-            "Send me message.",
-            "Send me a message."
-          ],
-          2,
-          "Message = a written communication; massage = body treatment."
-        ]
-      ],
-      "teacherNotes": "5 min. These are targeted language repairs based on previous homework; explain that used to go is correct only when the past habit has stopped."
-    },
-    {
-      "id": "settling-hw-email-20261124",
-      "title": "04 · Write an email from your new home",
-      "minutes": 8,
-      "instruction": "Write a new friendly email to a friend (80–100 words). Describe life abroad now compared with before. Use true or imagined details.",
-      "source": [
-        "Include: where you live and how long you have been there; a past habit that changed; a routine that feels normal now; one thing you are still adapting to; your future plans and a friendly question.",
-        "Use all THREE forms: I used to + base verb; I'm used to + noun / -ing; I'm getting used to + noun / -ing.",
-        "Use at least two lesson expressions: settle in, feel at home, make friends, miss home, give it a try.",
-        "Check before submitting: hours, weather, message, enjoy + -ing, a day, in the afternoon. Keep the tone friendly."
-      ],
+      "instruction": "Write a short personal reflection (70–100 words) about how your habits have changed over the years.",
       "type": "write",
-      "teacherNotes": "8 min. Mark /10: meaning and coverage 3, three grammar patterns 3, vocabulary 2, accuracy and cohesion 2. Compare with the previous saved letter, without replacing it."
+      "source": [
+        "Include two things you used to do; two things you are used to doing now; one thing you are getting used to; and one thing you think you will never get used to.",
+        "Start: Over the past few years, some of my habits have changed...",
+        "Check: used to + base verb; be/get used to + noun or -ing; 70–100 words."
+      ],
+      "visual": {
+        "kind": "cards",
+        "cards": [
+          [
+            "2",
+            "Before",
+            "Things you used to do"
+          ],
+          [
+            "2",
+            "Now",
+            "Things you are used to doing"
+          ],
+          [
+            "1 + 1",
+            "Change",
+            "Getting used to / will never get used to"
+          ]
+        ]
+      },
+      "teacherNotes": "Assess meaning and correct use of six target sentences, coherence and 70–100 words. Accept natural variants."
     }
   ]
 }
