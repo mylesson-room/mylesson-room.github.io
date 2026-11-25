@@ -594,3 +594,80 @@ body:is([data-premium-feed="michael-v1"],[data-dud-b1-premium]) #lessonVideo .ja
 @media(prefers-reduced-motion:reduce) {
   body:is([data-premium-feed="michael-v1"],[data-dud-b1-premium]) #lessonVideo .jaas-control-bar button{transition:none}
 }
+
+.jaas-mobile-grip, .jaas-mobile-targets { display: none; }
+@media (max-width: 800px) {
+  body[data-jaas-mobile-panel].jaas-video-active #lessonVideo .video-workspace.jaas-on-call {
+    top: var(--jaas-panel-top, auto);
+    bottom: auto;
+    inset-block-start: var(--jaas-panel-top, max(64px, env(safe-area-inset-top)));
+    width: min(420px, calc(100vw - 16px));
+    height: min(50dvh, 420px);
+    max-height: 50dvh;
+  }
+  body[data-jaas-mobile-panel].jaas-video-active #lessonVideo .video-workspace.jaas-on-call.jaas-compact {
+    width: min(164px, 48vw);
+    height: min(25dvh, 184px);
+    max-height: 25dvh;
+  }
+  body[data-jaas-mobile-panel].jaas-video-active #lessonVideo .jaas-on-call .video-top { display: none; }
+  body[data-jaas-mobile-panel][data-premium-feed].jaas-video-active #lessonVideo .jaas-on-call .jaas-frame {
+    flex: 1 1 auto;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    border-radius: 0;
+  }
+  body[data-jaas-mobile-panel][data-premium-feed].jaas-video-active #lessonVideo .jaas-on-call .jaas-control-bar {
+    flex: 0 0 auto;
+    min-height: 36px;
+    gap: 5px;
+    padding: 2px 4px;
+    flex-wrap: nowrap;
+  }
+  body[data-jaas-mobile-panel] #lessonVideo .jaas-on-call .jaas-mobile-grip {
+    display: grid;
+    flex: 0 0 23px;
+    place-items: center;
+    background: #26374f;
+    cursor: grab;
+    touch-action: none;
+  }
+  body[data-jaas-mobile-panel] #lessonVideo .jaas-mobile-grip::before {
+    content: "";
+    width: 29px;
+    height: 4px;
+    border-radius: 8px;
+    background: #c3d0df;
+  }
+  body[data-jaas-mobile-panel] #lessonVideo .jaas-on-call .jaas-size { top: 0; right: 4px; }
+  body[data-jaas-mobile-panel].jaas-video-active #lessonVideo .jaas-on-call .jaas-size[hidden],
+  body[data-jaas-mobile-panel].jaas-video-active #lessonVideo .jaas-mobile-ready .jaas-size {
+    display: none !important;
+  }
+  body[data-jaas-mobile-panel] #lessonVideo .jaas-mobile-ready .jaas-mobile-targets {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  body[data-jaas-mobile-panel] #lessonVideo .jaas-mobile-targets button {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    flex: 1 1 0;
+    min-height: 0;
+    background: transparent;
+    color: #fff;
+    border: 0;
+    border-radius: 0;
+    padding: 6px 10px;
+    text-shadow: 0 1px 4px #000;
+    cursor: pointer;
+  }
+  body[data-jaas-mobile-panel] #lessonVideo .jaas-mobile-targets button:focus-visible {
+    outline: 2px solid #77deff;
+    outline-offset: -2px;
+  }
+}

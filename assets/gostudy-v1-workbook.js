@@ -31,7 +31,29 @@ function save(){
     try { localStorage.setItem(STORAGE,JSON.stringify(state)); } catch {}
   }
 }
-function setValue(k,v){state.values[k]=v;save();sendAnswer(k,v)}
+const stableWriting = document.body.hasAttribute('data-stable-writing');
+const editorId = stableWriting ? crypto.randomUUID() : null;
+const writingFields = new Map();
+const localEdits = new Map();
+const deferredAnswers = new Map();
+
+function bindWritingField(key, control) {
+  if (!stableWriting) return;
+  writingFields.set(key, control);
+  control.addEventListener('blur', () => {
+    if (!deferredAnswers.has(key)) return;
+    const value = deferredAnswers.get(key);
+    deferredAnswers.delete(key);
+    if (!localEdits.has(key)) applyAnswer(key, value, false);
+  });
+}
+function setValue(k,v){
+  if (writingFields.has(k)) {
+    localEdits.set(k, v);
+    deferredAnswers.delete(k);
+  }
+  state.values[k]=v;save();sendAnswer(k,v);
+}
 function getValue(k){return state.values[k]??""}
 function go(n){
   state.page=Math.max(0,Math.min(n,LESSONS.length-1));
@@ -106,10 +128,10 @@ if ($("#vocab")) {
 if ($("#reading")) $("#reading").innerHTML=READING.map((x,i)=>'<div class="question-item"><strong>'+(i+1)+'. '+esc(x[0])+'</strong>'+x[1].map((s,j)=>'<label><input type="radio" name="read'+i+'" value="'+j+'">'+esc(s)+'</label>').join("")+'<span class="result" id="rf'+i+'"></span></div>').join("");
 document.querySelectorAll("#reading input").forEach(x=>{x.checked=getValue(x.name)===x.value;x.onchange=()=>{setValue(x.name,x.value);gradeSection("read", true)}});
 if ($("#gaps")) $("#gaps").innerHTML=GAPS.map((x,i)=>'<div class="gap-item"><label for="gap'+i+'">'+(i+1)+'. '+esc(x[0])+'</label><input id="gap'+i+'" autocomplete="off" data-key="gap'+i+'" placeholder="Type the missing expression"><small class="feedback" id="gf'+i+'"></small></div>').join("");
-document.querySelectorAll("#gaps input").forEach((x,i)=>{x.value=getValue("gap"+i);x.oninput=()=>{setValue("gap"+i,x.value);if(x.value.trim().toLowerCase().replace(/\s+/g," ")===GAPS[i][1])gradeSection("gap",true)};x.onblur=()=>gradeSection("gap",true);x.onkeydown=event=>{if(event.key==="Enter"){event.preventDefault();gradeSection("gap",true)}}});
+document.querySelectorAll("#gaps input").forEach((x,i)=>{x.value=getValue("gap"+i);bindWritingField("gap"+i,x);x.oninput=()=>{setValue("gap"+i,x.value);if(x.value.trim().toLowerCase().replace(/\s+/g," ")===GAPS[i][1])gradeSection("gap",true)};x.onblur=()=>gradeSection("gap",true);x.onkeydown=event=>{if(event.key==="Enter"){event.preventDefault();gradeSection("gap",true)}}});
 document.querySelectorAll("#decision input").forEach(x=>{x.checked=getValue("decision")===x.value;x.onchange=()=>{setValue("decision",x.value);$("#decisionAdvice").textContent=advice[x.value]}});
 if(advice[getValue("decision")])$("#decisionAdvice").textContent=advice[getValue("decision")];
-document.querySelectorAll("[data-save]").forEach(x=>{x.value=getValue(x.dataset.save);x.oninput=()=>{setValue(x.dataset.save,x.value);if(x.id==="homework")updateWords()}});
+document.querySelectorAll("[data-save]").forEach(x=>{x.value=getValue(x.dataset.save);bindWritingField(x.dataset.save,x);x.oninput=()=>{setValue(x.dataset.save,x.value);if(x.id==="homework")updateWords()}});
 function updateWords(){
   const homework = $("#homework");
   if (!homework) return;
@@ -139,7 +161,7 @@ function readWords(){
         words.set(word.en.trim().toLowerCase(),{en:word.en,ru:word.ru});
     }
     for (const word of window.FinanceLive?.words() || []) words.set(word.en.trim().toLowerCase(),word);
-    return [...words.values()];
+    return [...words.values()].filter(word => !window.FinanceLive?.hasRemovedWord?.(word.en));
   }
   if(window.FinanceLive?.connected())return FinanceLive.words();
   if(config.privateRoom || document.body.dataset.classroomCourse)return [];
@@ -149,7 +171,27 @@ function readWords(){
   } catch { return []; }
 }
 $("#openLessonDictionary").addEventListener("click",()=>{drawWords();$("#lessonDictionary").showModal()});
-function drawWords(){let w=readWords();$("#wordCountSidebar").textContent=w.length;$("#myWords").innerHTML=w.slice().reverse().map(x=>'<small><b>'+esc(x.en)+'</b> — '+esc(x.ru)+'</small>').join("")||'<small>No words saved yet.</small>'}
+function drawWords(){
+  const words = readWords();
+  const list = $("#myWords");
+  $("#wordCountSidebar").textContent = words.length;
+  if (!document.body.hasAttribute('data-word-actions') || !window.GoStudyWordActions || !words.length) {
+    list.innerHTML = words.slice().reverse().map(word => '<small><b>'+esc(word.en)+'</b> — '+esc(word.ru)+'</small>').join("") || '<small>No words saved yet.</small>';
+    return;
+  }
+  const status = $("#lessonDictionaryActionStatus") || document.createElement('p');
+  status.id = 'lessonDictionaryActionStatus';
+  status.setAttribute('role', 'status');
+  if (!status.isConnected) list.after(status);
+  list.replaceChildren(...words.slice().reverse().map(word => {
+    const text = document.createElement('span');
+    text.className = 'word-action-copy';
+    const term = document.createElement('b');
+    term.textContent = word.en;
+    text.append(term, ' — ' + (word.ru || ''));
+    return GoStudyWordActions.buildRow(word,text,status);
+  }));
+}
 window.addWord=i=>{
   if(document.body.dataset.cloudVocabulary==='sweden-a2'){
     const word=VOCAB[i];
@@ -300,6 +342,7 @@ function sendAnswer(key,value){
   const field = workbook?.fields.get(key);
   const wireKey = answerNamespace + key;
   const payload = field ? {page:field.page,key:wireKey,value} : {key:wireKey,value};
+  if (writingFields.has(key)) payload.editor = editorId;
   const typing = field ? workbook.controls.get(key)?.[0]?.matches('textarea,input[type=text]') :
     /^(gap\d+|decisionNotes|roleNotes|finalOpinion|homework)$/.test(key);
   if (!typing) {
@@ -326,13 +369,22 @@ function redrawAnswer(key){
   }
   document.querySelectorAll("input,textarea").forEach(input => {
     if (input.type === "radio" && input.name === key) input.checked = input.value === getValue(key);
-    if (input.dataset.save === key || input.id === key) input.value = getValue(key);
+    if ((input.dataset.save === key || input.id === key) && input.value !== getValue(key))
+      input.value = getValue(key);
   });
   if(key==="decision") $("#decisionAdvice").textContent=advice[getValue(key)]||"";
   if(key==="homework") updateWords();
 }
-function clearSection(page){
+function clearSection(page, preserveEditing = false){
   sections[page]?.forEach(key=>{
+    if (preserveEditing && localEdits.has(key)) return;
+    const control = writingFields.get(key);
+    if (preserveEditing && control && document.activeElement === control) {
+      deferredAnswers.set(key, '');
+      return;
+    }
+    localEdits.delete(key);
+    deferredAnswers.delete(key);
     clearTimeout(pending.get(key)?.timer);
     pending.delete(key);
     delete state.values[key];
@@ -373,7 +425,9 @@ if (workbook) {
         continue;
       }
       const type = control.matches('textarea,input[type=text]') ? 'input' : 'change';
-      control.addEventListener(type,()=> {
+      if (type === 'input') bindWritingField(key, control);
+      control.addEventListener(type,event=> {
+        if (stableWriting && event.isComposing) return;
         const value = control.type === 'checkbox' ? (control.checked ? 'true' : '') : control.value;
         setExerciseValue(key,value);
       });
@@ -428,7 +482,7 @@ document.addEventListener("finance-word",event=>{
 });
 document.addEventListener("finance-connect",()=>{
   replaying = true;
-  if (!workbook) sections.forEach((keys,page)=>{if(keys.length)clearSection(page)});
+  if (!workbook) sections.forEach((keys,page)=>{if(keys.length)clearSection(page, true)});
 });
 document.addEventListener("finance-ready",()=>{
   if(FinanceLive.teacher()) {
@@ -440,25 +494,34 @@ document.addEventListener("finance-ready",()=>{
   sendPagePresence();
   updateMoveStudentButton();
   drawWords();
+  for (const [key,value] of localEdits) if (!pending.has(key)) sendAnswer(key,value);
 });
+function applyAnswer(key, value, animate) {
+  if (state.values[key] === value && writingFields.has(key)) return;
+  state.values[key] = value;
+  redrawAnswer(key);
+  const type = Object.keys(checks).find(name=>key.startsWith(name) && /^\d+$/.test(key.slice(name.length)));
+  if(workbook && workbook.grade(workbook.fields.get(key).page,getValue,animate)) celebrate();
+  if(type) gradeSection(type,animate);
+  save();
+}
 document.addEventListener("finance-event",event=>{
   const {kind,payload,initial,own,teacher}=event.detail;
   const role=teacher?"Преподаватель":"Ученик";
   const rawKey = typeof payload?.key === "string" ? payload.key : "";
   const key = answerNamespace && rawKey.startsWith(answerNamespace) ? rawKey.slice(answerNamespace.length) : answerNamespace ? "" : rawKey;
   if(kind==="answer" && allowedKeys.has(key) && (workbook ? workbook.valid(key,payload.value) : typeof payload.value==="string")){
-    if(!pending.has(key)){
-      state.values[key]=payload.value;
-      redrawAnswer(key);
-      const type=Object.keys(checks).find(name=>key.startsWith(name) && /^\d+$/.test(key.slice(name.length)));
-      if(workbook && workbook.grade(workbook.fields.get(key).page,getValue,!initial && !own)) celebrate();
-      if(type) gradeSection(type,!initial && !own);
-      save();
+    const control = writingFields.get(key);
+    if (control && own && !initial && payload.editor === editorId) {
+      if (!pending.has(key) && payload.value === localEdits.get(key)) localEdits.delete(key);
+    } else if (!pending.has(key) && !localEdits.has(key)) {
+      if (control && document.activeElement === control) deferredAnswers.set(key, payload.value);
+      else applyAnswer(key, payload.value, !initial && !own);
     }
     if(!initial && !own) $("#finance-activity").textContent=role+" изменил ответ";
   }
   if(kind==="reset" && (payload.namespace || "") === answerNamespace && Number.isInteger(payload.page) && sections[payload.page]){
-    clearSection(payload.page);
+    if (!stableWriting || !own || initial) clearSection(payload.page, stableWriting);
     if(!initial && !own) $("#finance-activity").textContent=role+" сбросил задание";
   }
   if(kind==="page" && Number.isInteger(payload.page) && LESSONS[payload.page]){

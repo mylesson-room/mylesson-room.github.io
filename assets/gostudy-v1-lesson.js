@@ -349,6 +349,10 @@
       pop.classList.add('is-visible');locate();translate();
      }
      target.addEventListener('input',()=>{edited=true;saveBtn.disabled=!canSave();});
+     if (document.body.hasAttribute('data-word-actions') && window.GoStudyWordActions) {
+      const audio = GoStudyWordActions.audio(() => phrase, () => from === 'ru' ? 'ru-RU' : 'en-GB');
+      saveBtn.after(audio);
+     }
      retry.addEventListener('click',()=>{edited=false;translate();});
      const schedule=()=>{clearTimeout(timer);timer=setTimeout(selectionOpen,90);};
      document.addEventListener('mouseup',e=>{if(!pop.contains(e.target))schedule()});

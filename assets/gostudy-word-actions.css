@@ -1,0 +1,28 @@
+.word-action-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.word-action-copy {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.word-action {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  cursor: pointer;
+  background: transparent;
+  color: #176690;
+}
+.word-action-audio svg { width: 19px; height: 19px; }
+.word-action-remove { color: #536377; font: 18px/1 sans-serif; }
+.word-action:hover { background: #e9f5fb; }
+.word-action:disabled { cursor: wait; opacity: .55; }
+body[data-word-actions] .selection-translate .selection-tools { flex-direction: column; }
+.selection-translate .selection-tools .word-action-audio { display: inline-grid; }

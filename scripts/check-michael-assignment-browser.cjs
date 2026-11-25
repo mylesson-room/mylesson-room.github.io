@@ -90,7 +90,12 @@ const waitFor=async(fn,label,timeout=15000)=>{const end=Date.now()+timeout;while
   await student.page.locator('#page-0 textarea').fill('Verify the account before release.');
   await waitFor(()=>teacher.page.locator('#page-0 textarea').inputValue().then(v=>v==='Verify the account before release.'),'student answer visible to teacher');
   await teacher.page.locator('#page-0 textarea').fill('Check the known contact number.');
-  await waitFor(()=>student.page.locator('#page-0 textarea').inputValue().then(v=>v==='Check the known contact number.'),'teacher answer visible to student');
+  await waitFor(()=>events.some(event => event.actor === TEACHER &&
+    event.payload?.value === 'Check the known contact number.'),'teacher edit sent to the room');
+  assert.equal(await student.page.locator('#page-0 textarea').inputValue(),'Verify the account before release.',
+    'Remote edits must not rewrite a focused answer field');
+  await student.page.locator('#page-0 textarea').blur();
+  await waitFor(()=>student.page.locator('#page-0 textarea').inputValue().then(v=>v==='Check the known contact number.'),'teacher answer visible when student leaves the field');
   await student.page.reload();await student.page.locator('#page-0 textarea').waitFor();
   await waitFor(()=>student.page.locator('#page-0 textarea').inputValue().then(v=>v==='Check the known contact number.'),'answer restored after reload');
   await teacher.page.locator('#next').click();

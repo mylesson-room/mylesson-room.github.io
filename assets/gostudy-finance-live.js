@@ -15,6 +15,7 @@
     student_id:"eq."+(privateRoom?.student || selectedStudent || user),
   });
   const words = new Map();
+  const removedWords = new Set();
   let room;
   let cursor = 0;
   let caughtUp = false;
@@ -46,6 +47,13 @@
         const word = event.payload;
         if (typeof word.en !== "string" || typeof word.ru !== "string" || !word.en.trim() || !word.ru.trim()) continue;
         const key = word.en.trim().toLowerCase();
+        if (word.removed === true) {
+          words.delete(key);
+          removedWords.add(key);
+          document.dispatchEvent(new CustomEvent("finance-word", {detail:{word,notify:false}}));
+          continue;
+        }
+        removedWords.delete(key);
         const added = !words.has(key);
         words.set(key, {...word,learned:words.get(key)?.learned||Boolean(word.learned)});
         document.dispatchEvent(new CustomEvent("finance-word", {detail:{word,notify:added && !initial}}));
@@ -112,7 +120,7 @@
   }
   function missingLocalWords() {
     if (room?.student_id !== auth.userId() || !room) return [];
-    return localWords().filter(word => word.ru && !words.has(word.en.toLowerCase()));
+    return localWords().filter(word => word.ru && !words.has(word.en.toLowerCase()) && !removedWords.has(word.en.toLowerCase()));
   }
   window.FinanceLive = {
     connected: () => Boolean(room),
@@ -120,13 +128,21 @@
     words() {
       const combined = new Map();
       if (!room || room.student_id === auth.userId()) {
-        for (const word of localWords()) combined.set(word.en.toLowerCase(),word);
+        for (const word of localWords()) {
+          const key = word.en.toLowerCase();
+          if (!removedWords.has(key)) combined.set(key,word);
+        }
       }
       for (const [key,word] of words) combined.set(key,word);
       return [...combined.values()];
     },
     missingLocalWords,
-    send(kind, payload) {
+    hasRemovedWord: en => removedWords.has(en.trim().toLowerCase()),
+    removeWord(word) {
+      if (!caughtUp) return Promise.reject(Error("Словарь ещё подключается."));
+      return this.send("word", {en:word.en,ru:word.ru || word.en,removed:true}, true);
+    },
+    send(kind, payload, awaitSave = false) {
       if (!room) return false;
       if (kind === "page" && document.body.dataset.pageScope) payload={...payload,lessonScope:document.body.dataset.pageScope};
       const event = {id:crypto.randomUUID(),kind,payload};
@@ -142,15 +158,16 @@
           if (error.status !== 409) throw error;
         }
       };
-      writes = writes.then(async () => {
+      const saved = writes.then(async () => {
         try { await post(); }
         catch (error) {
           if (error.status && error.status < 500) throw error;
           await post();
         }
         await pull(!caughtUp);
-      }).catch(error => show(error.message || "Изменение не отправилось."));
-      return true;
+      });
+      writes = saved.catch(error => show(error.message || "Изменение не отправилось."));
+      return awaitSave ? saved : true;
     }
   };
   if (auth.userId()) {

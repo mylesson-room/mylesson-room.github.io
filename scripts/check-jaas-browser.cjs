@@ -35,9 +35,13 @@ const fakeExternalApi = `
       this.iframe = document.createElement('iframe');
       this.iframe.src = 'about:blank';
       options.parentNode.append(this.iframe);
-      setTimeout(() => this.events.videoConferenceJoined?.(), 50);
+      setTimeout(() => this.events.videoConferenceJoined?.({id:'my-video'}), 50);
     }
     addEventListener(event, handler) { this.events[event] = handler; }
+    getParticipantsInfo() {
+      return [{participantId:'their-video',displayName:'Преподаватель'}];
+    }
+    pinParticipant(id) { window.__jitsiPinned = id; }
     executeCommand(command) {
       window.__jitsiCommands.push(command);
       if (command === 'toggleAudio') {
@@ -52,14 +56,62 @@ const fakeExternalApi = `
     dispose() { window.__jitsiDisposed = (window.__jitsiDisposed || 0) + 1; this.iframe.remove(); }
   };
 `;
+async function checkLessonControls(page, events) {
+  await page.locator('#back').click();
+  await page.locator('#page-0 .questions li').first().evaluate(item => {
+    const node = item.firstChild;
+    const phrase = 'financial future';
+    const start = node.textContent.indexOf(phrase);
+    const range = document.createRange();
+    range.setStart(node,start);
+    range.setEnd(node,start+phrase.length);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    item.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));
+  });
+  const popup=page.locator('#selectionTranslate');
+  const play=popup.getByRole('button',{name:'Прослушать',exact:true});
+  await play.waitFor();
+  assert.ok((await play.boundingBox()).y > (await popup.locator('#selectionSave').boundingBox()).y);
+  await play.click();
+  assert.equal(await page.evaluate(()=>window.__pronunciation.at(-1)),'financial future');
+  await page.keyboard.press('Escape');
+  await page.locator('#openLessonDictionary').click();
+  await page.getByRole('button',{name:'Прослушать: liquidity'}).click();
+  assert.equal(await page.evaluate(()=>window.__pronunciation.at(-1)),'liquidity');
+  await page.getByRole('button',{name:'Удалить из словаря: liquidity'}).click();
+  await page.getByRole('button',{name:'Прослушать: liquidity'}).waitFor({state:'detached'});
+  assert.ok(events.some(event=>event.payload?.removed===true && event.payload.en==='liquidity'));
+  await page.reload();
+  await page.waitForFunction(()=>document.querySelector('#finance-live-status')?.textContent.includes('Онлайн'));
+  await page.locator('#openLessonDictionary').click();
+  assert.equal(await page.getByRole('button',{name:'Прослушать: liquidity'}).count(),0);
+  await page.keyboard.press('Escape');
+  await page.locator('#lessonSections button').nth(4).evaluate(button=>button.click());
+  const answer=page.locator('#decisionNotes');
+  await answer.pressSequentially('AI can flag unusual payments.');
+  await answer.evaluate(el=>el.setSelectionRange(7,7));
+  await answer.pressSequentially('quickly ');
+  await answer.press('Backspace');
+  await answer.press('Space');
+  events.push({seq:events.length+1,actor:teacherId,kind:'answer',payload:{key:'decisionNotes',value:'An earlier edit'}});
+  await page.waitForTimeout(1250);
+  assert.equal(await answer.inputValue(),'AI can quickly flag unusual payments.');
+  assert.equal(await answer.evaluate(el=>el.selectionStart),15);
+  assert.ok(events.some(event=>event.payload?.value==='AI can quickly flag unusual payments.'));
+}
+
 async function exercise(browser, origin, opts) {
   const { mobile, fail } = opts;
   const context = await browser.newContext({
     viewport: mobile ? { width:390, height:844 } : { width:1365, height:850 },
     isMobile:mobile, hasTouch:mobile
   });
+  const events = [{seq:1,actor:studentId,kind:'word',payload:{en:'liquidity',ru:'ликвидность'}}];
   try {
     await context.addInitScript(({id}) => {
+      window.__pronunciation = [];
+      speechSynthesis.speak = utterance => window.__pronunciation.push(utterance.text);
       const s = JSON.stringify({user:{id},access_token:'synthetic-jwt',expires_at:Date.now()+3600000});
       sessionStorage.setItem('gostudy-cloud-session-v1',s);
       localStorage.setItem('gostudy-student-session-v1',s);
@@ -72,8 +124,14 @@ async function exercise(browser, origin, opts) {
           : route.fulfill({status:200,json:{appId,room:roomName,jwt:'synthetic-video-jwt'}});
       if (url.pathname.endsWith('/gostudy_finance_room'))
         return route.fulfill({json:[{teacher_id:teacherId,student_id:studentId}]});
-      if (url.pathname.endsWith('/gostudy_finance_events'))
-        return route.fulfill({json:[]});
+      if (url.pathname.endsWith('/gostudy_finance_events')) {
+        if (route.request().method()==='POST') {
+          events.push({...route.request().postDataJSON(),seq:events.length+1,actor:studentId});
+          return route.fulfill({json:[]});
+        }
+        const since=Number(url.searchParams.get('seq')?.slice(3) || 0);
+        return route.fulfill({json:events.filter(event => event.seq > since)});
+      }
       if (url.pathname.endsWith('/auth/v1/user'))
         return route.fulfill({json:{id:studentId}});
       return route.fulfill({json:[]});
@@ -129,7 +187,7 @@ async function exercise(browser, origin, opts) {
       await page.waitForFunction(() => document.querySelector('.video-state')?.textContent === 'Вы в видеозвонке',{timeout:6500});
       assert.equal(await page.evaluate(() => window.__lastJitsiRoom),appId+'/'+roomName);
       assert.equal(await page.evaluate(() => window.__lastJitsiOptions.interfaceConfigOverwrite.TILE_VIEW_MAX_COLUMNS),1,'Participants must stack vertically in Jitsi tile view');
-      await page.waitForFunction(() => window.__jitsiCommands.includes('toggleTileView'));
+      await page.waitForFunction(() => window.__jitsiCommands.includes('setTileView'));
       const microphone = page.locator('#lessonVideo .jaas-mic');
       const camera = page.locator('#lessonVideo .jaas-camera');
       const endCall = page.locator('#lessonVideo .jaas-leave');
@@ -154,15 +212,34 @@ async function exercise(browser, origin, opts) {
       if (mobile) {
         assert.equal(await page.locator('.jaas-compact').count(),1,'Mobile floating player not compact');
         assert.equal(await page.locator('.jaas-frame').isVisible(),true,'Video hidden on mobile');
-        await page.locator('#lessonVideo .jaas-size').click();
+        const floating = page.locator('.video-workspace.jaas-on-call');
+        assert.ok((await floating.boundingBox()).height <= 844/4,'Compact player exceeds one quarter of the screen');
+        assert.equal(await page.evaluate(() => window.__jitsiPinned),'their-video');
+        await page.getByRole('button',{name:'Показать обоих участников'}).tap();
         assert.equal(await page.locator('.jaas-compact').count(),0,'Mobile should be able to expand without reconnecting');
-        await page.locator('#lessonVideo .jaas-size').click();
-        assert.equal(await page.locator('.jaas-compact').count(),1,'Mobile should be able to collapse without reconnecting');
+        assert.ok(Math.abs((await floating.boundingBox()).height-844/2)<=3);
+        await page.getByRole('button',{name:'Оставить в мини-окне: Вы'}).tap();
+        assert.equal(await page.evaluate(() => window.__jitsiPinned),'my-video','Tapping self must select the local tile');
+        assert.equal(await page.locator('.jaas-compact').count(),1,'Selecting a video must collapse the panel');
+        const grip=await page.locator('.jaas-mobile-grip').boundingBox();
+        const y=grip.y+grip.height/2;
+        const x=grip.x+grip.width/2;
+        const top=(await floating.boundingBox()).y;
+        assert.equal(await page.evaluate(({x,y}) =>
+          document.elementFromPoint(x,y)?.classList.contains('jaas-mobile-grip'),{x,y}),true,'Grip must be tappable');
+        const touch = await context.newCDPSession(page);
+        await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
+        for (const offset of [30,60,90,120,150])
+          await touch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x,y:y+offset}]});
+        await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+        assert.ok((await floating.boundingBox()).y>=top+140,'Dragging must move the panel vertically');
+        assert.equal(await page.evaluate(() => window.__savedJitsiIframe === document.querySelector('.jaas-frame iframe')),true);
       }
       await endCall.click();
       assert.equal(await page.locator('.jaas-frame').count(),0,'Hangup must dispose media iframe');
       assert.equal(await button.isEnabled(),true,'Should be able to restart after hangup');
       assert.equal(await page.locator('.jaas-person-tile').count(),2,'Pre-call tiles must return after hanging up');
+      if (!mobile) await checkLessonControls(page,events);
     }
     assert.deepEqual(errors.filter(x=>x.includes('gostudy-jaas-video.js')),[],'JavaScript video adapter error');
     await page.close();
