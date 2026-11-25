@@ -232,6 +232,11 @@
     window.GoStudyFinanceAuth = {token, request, userId: () => session?.user?.id, classroomStudent};
     if (!document.body.hasAttribute("data-preserve-workbook-progress")) return;
   }
+  if (currentPage === 'student-travel-a2.html' && session && window.GoStudyWordActions) {
+    const lesson = classroomCatalog.travel_a2.lessons.at(-1).lesson;
+    window.GoStudyFinanceAuth = {token, request, userId: () => session?.user?.id, classroomStudent};
+    GoStudyWordActions.connectCabinet('travel-a2',lesson);
+  }
   async function push(key, accessToken) {
     const current = readRecord(key);
     if (!current.dirty || conflicts.has(key)) return;
