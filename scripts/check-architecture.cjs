@@ -201,8 +201,7 @@ assert.deepEqual(tiktokIds,[
 assert.ok(tiktok.steps.some(step=>step.html.includes('assets/tiktok-a2-listening.mp3')),'TikTok original audio lost');
 console.log('Migrate-only current A2 and B1 classroom content guard passed.');
 
-/* Assigned TikTok homework no-video guard: original writing and vocabulary
-   stay available through the shared shell, without camera or token requests. */
+/* Assigned TikTok future-forms homework uses the shared shell without video. */
 const tiktokHomeworkPage=read('tiktok-a2-homework.html');
 for(const needle of [
  'data-design2-homework','assets/gostudy-design2-homework.css',
@@ -214,8 +213,11 @@ for(const needle of [
 assert.ok(!tiktokHomeworkPage.includes('data-jaas-video-pilot'),'Homework must not start video');
 const tiktokHomework=JSON.parse(tiktokHomeworkPage.split('id="lesson-data">')[1].split('</script>')[0]);
 assert.equal(tiktokHomework.key,'gostudy-tiktok-a2-homework-v1');
-assert.equal(tiktokHomework.steps.length,2);
-assert.deepEqual(tiktokHomework.steps.flatMap(step=>
- [...step.html.matchAll(/data-exercise-field="([^"]+)"/g)].map(hit=>hit[1])),
- ['home-save','home-skip','home-follow','home-feed']);
+assert.deepEqual(tiktokHomework.steps.map(step=>[step.id,step.minutes]),[
+ ['future-hw-20261124-meaning',5],['future-hw-20261124-predict',4],
+ ['future-hw-20261124-choice',6],['future-hw-20261124-dialogue',5],
+ ['future-hw-20261124-correct',5],['future-hw-20261124-translate',5],
+ ['future-hw-20261124-write',5]
+]);
+assert.equal(tiktokHomework.steps.at(-1).type,'write');
 console.log('Assigned TikTok homework no-video guard passed.');

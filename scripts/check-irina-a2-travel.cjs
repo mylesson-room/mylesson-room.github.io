@@ -35,8 +35,9 @@ for(const config of [lesson,homework]) {
 }
 assert.ok(!/\bmission\b|\bquest\b|\brole.play\b|\bcrisis\b|\bdisaster\b/i.test(JSON.stringify(lesson.steps)),
   'No missions, crises or forced role-play');
-assert.equal(homework.durationMinutes,14);
-assert.deepEqual(homework.steps.map(s=>s.minutes),[4,4,6]);
+assert.equal(homework.durationMinutes,22);
+assert.deepEqual(homework.steps.map(s=>s.minutes),[4,4,5,4,5]);
+assert.deepEqual(homework.steps.map(s=>s.type),['gap','choice','gap','choice','write']);
 assert.ok(homework.steps.some(s=>s.type==='write'));
 assert.equal(legacy.key,'gostudy-country-house-a2-04-v1');
 assert.equal(legacyHomework.key,'gostudy-country-house-a2-04-homework-v1');
@@ -53,4 +54,4 @@ assert.ok(file('country-house-travel-a2-05.html').includes('data-premium-feed="m
 assert.ok(file('country-house-travel-a2-05.html').includes('data-translate-engine="google-web-pilot"'));
 assert.ok(file('country-house-travel-a2-05.html').includes('data-jaas-scope="country-house"'));
 assert.ok(file('supabase/functions/gostudy-jaas-country-house-token/index.ts').includes('gostudy_country_house_teacher_view'));
-console.log('IRINA A2+ PASS — 50-minute lesson, 8 stages, 6 recycled expressions, 144-word reading, explicit grammar, 14-minute homework, old keys intact, shared Michael components');
+console.log('IRINA A2+ PASS — 50-minute lesson, 8 stages, 6 recycled expressions, 144-word reading, explicit grammar, 22-minute homework, old keys intact, shared Michael components');
