@@ -642,7 +642,10 @@ body:is([data-premium-feed="michael-v1"],[data-dud-b1-premium]) #lessonVideo .ja
     background: #c3d0df;
   }
   body[data-jaas-mobile-panel] #lessonVideo .jaas-on-call .jaas-size { top: 0; right: 4px; }
-  body[data-jaas-mobile-panel].jaas-video-active #lessonVideo .jaas-on-call .jaas-size[hidden] { display: none !important; }
+  body[data-jaas-mobile-panel].jaas-video-active #lessonVideo .jaas-on-call .jaas-size[hidden],
+  body[data-jaas-mobile-panel].jaas-video-active #lessonVideo .jaas-mobile-ready .jaas-size {
+    display: none !important;
+  }
   body[data-jaas-mobile-panel] #lessonVideo .jaas-mobile-ready .jaas-mobile-targets {
     position: absolute;
     inset: 0;
