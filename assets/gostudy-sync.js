@@ -653,7 +653,7 @@
         status.hidden = true;
         content.hidden = true;
         mountLesson();
-        await loadScript('assets/gostudy-v1-vocabulary.js?v=b1-unified-20261120');
+        await loadScript('assets/gostudy-v1-vocabulary.js?v=classroom-controls-1');
         if (window.GoStudyWordActions) {
           const lesson = classroomCatalog[catalogCourse]?.lessons.at(-1)?.lesson?.split(/[?#]/)[0];
           if (lesson) {

@@ -21,7 +21,8 @@ def classroom_controls(html):
         if 'assets/gostudy-word-actions.js' not in html:
             shared = (
                 '<link rel="stylesheet" href="assets/gostudy-word-actions.css">\n'
-                '<script src="assets/gostudy-word-actions.js"></script>\n'
+                '<script src="assets/gostudy-word-actions.js" '
+                'data-finance-live-src="assets/gostudy-finance-live.js"></script>\n'
             )
             html = html.replace('</head>', shared + '</head>', 1)
     if 'gostudy-v1-workbook.js' in html:

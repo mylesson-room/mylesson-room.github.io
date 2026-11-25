@@ -1,4 +1,5 @@
 (() => {
+  const liveScript = document.currentScript?.dataset.financeLiveSrc || 'assets/gostudy-finance-live.js';
   const speaker = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h4l5-4v14l-5-4H3zM16 9a4 4 0 0 1 0 6m3-9a8 8 0 0 1 0 12"/></svg>';
   function button(label, content, action, className) {
     const control = document.createElement('button');
@@ -82,13 +83,12 @@
     }
     body.setAttribute('data-word-actions-room','');
     const transport = document.createElement('script');
-    transport.src = 'assets/gostudy-finance-live.js';
+    transport.src = liveScript;
     document.head.append(transport);
   }
   document.addEventListener('gostudy-private-authorized', () => {
     const body = document.body;
     if (!document.getElementById('cabinet-settings')) return;
-    if (body.hasAttribute('data-placement-cabinet')) connectCabinet('vietnam-a2','my-trip-to-vietnam-a2.html');
     if (body.hasAttribute('data-ielts-reading')) connectCabinet('ielts-reading','ielts-reading-04.html');
   });
   window.GoStudyWordActions = {
