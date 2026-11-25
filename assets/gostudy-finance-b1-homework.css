@@ -1,0 +1,63 @@
+[data-finance-homework] #lessonVideo,
+[data-finance-homework] #lessonDivider,
+[data-finance-homework] #moveStudent {
+  display: none;
+}
+
+[data-finance-homework] .finance-homework-photo {
+  margin: 0 0 20px;
+}
+
+[data-finance-homework] .finance-homework-photo img {
+  display: block;
+  width: 100%;
+  height: clamp(160px, 30vw, 285px);
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+[data-finance-homework] .bank-statement {
+  margin: 0 0 22px;
+  padding: clamp(10px, 3vw, 22px);
+  border: 1px solid #b8d7db;
+  border-radius: 16px;
+  background: #f1fafb;
+  color: #17374a;
+}
+
+[data-finance-homework] .bank-statement table {
+  width: 100%;
+  margin: 12px 0;
+  border-collapse: collapse;
+  font-size: clamp(12px, 2.3vw, 16px);
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-finance-homework] .bank-statement th,
+[data-finance-homework] .bank-statement td {
+  padding: 8px 4px;
+  border-bottom: 1px solid #c5e0e4;
+  overflow-wrap: anywhere;
+}
+
+[data-finance-homework] .bank-statement td:first-child,
+[data-finance-homework] .bank-statement td:nth-child(3) {
+  white-space: nowrap;
+}
+
+[data-finance-homework] .finance-homework-cabinet {
+  display: inline-block;
+  margin-top: 12px;
+}
+
+[data-finance-homework] .conditional-choice {
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 8px;
+  margin: 4px 2px;
+}
+
+[data-finance-homework]:has(#lessonPages .page:last-child.active) #next {
+  display: none;
+}
