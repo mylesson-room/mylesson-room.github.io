@@ -271,11 +271,13 @@
     const previous = api;
     api = null;
     meeting = false;
-    participants.clear();
-    selfId = selectedId = panelTop = drag = null;
-    tileTargets.replaceChildren();
-    workspace.style.removeProperty('--jaas-panel-top');
-    workspace.classList.remove('jaas-mobile-ready');
+    if (mobilePanel) {
+      participants.clear();
+      selfId = selectedId = panelTop = drag = null;
+      tileTargets.replaceChildren();
+      workspace.style.removeProperty('--jaas-panel-top');
+      workspace.classList.remove('jaas-mobile-ready');
+    }
     audioMuted = true;
     audioAvailable = true;
     micPending = false;
