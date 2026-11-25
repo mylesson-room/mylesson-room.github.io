@@ -35,9 +35,13 @@ const fakeExternalApi = `
       this.iframe = document.createElement('iframe');
       this.iframe.src = 'about:blank';
       options.parentNode.append(this.iframe);
-      setTimeout(() => this.events.videoConferenceJoined?.(), 50);
+      setTimeout(() => this.events.videoConferenceJoined?.({id:'my-video'}), 50);
     }
     addEventListener(event, handler) { this.events[event] = handler; }
+    getParticipantsInfo() {
+      return [{participantId:'their-video',displayName:'Преподаватель'}];
+    }
+    pinParticipant(id) { window.__jitsiPinned = id; }
     executeCommand(command) {
       window.__jitsiCommands.push(command);
       if (command === 'toggleAudio') {
@@ -129,7 +133,7 @@ async function exercise(browser, origin, opts) {
       await page.waitForFunction(() => document.querySelector('.video-state')?.textContent === 'Вы в видеозвонке',{timeout:6500});
       assert.equal(await page.evaluate(() => window.__lastJitsiRoom),appId+'/'+roomName);
       assert.equal(await page.evaluate(() => window.__lastJitsiOptions.interfaceConfigOverwrite.TILE_VIEW_MAX_COLUMNS),1,'Participants must stack vertically in Jitsi tile view');
-      await page.waitForFunction(() => window.__jitsiCommands.includes('toggleTileView'));
+      await page.waitForFunction(() => window.__jitsiCommands.includes('setTileView'));
       const microphone = page.locator('#lessonVideo .jaas-mic');
       const camera = page.locator('#lessonVideo .jaas-camera');
       const endCall = page.locator('#lessonVideo .jaas-leave');
@@ -154,10 +158,25 @@ async function exercise(browser, origin, opts) {
       if (mobile) {
         assert.equal(await page.locator('.jaas-compact').count(),1,'Mobile floating player not compact');
         assert.equal(await page.locator('.jaas-frame').isVisible(),true,'Video hidden on mobile');
-        await page.locator('#lessonVideo .jaas-size').click();
+        const floating = page.locator('.video-workspace.jaas-on-call');
+        assert.ok((await floating.boundingBox()).height <= 844/4,'Compact player exceeds one quarter of the screen');
+        assert.equal(await page.evaluate(() => window.__jitsiPinned),'their-video');
+        await page.getByRole('button',{name:'Показать обоих участников'}).tap();
         assert.equal(await page.locator('.jaas-compact').count(),0,'Mobile should be able to expand without reconnecting');
-        await page.locator('#lessonVideo .jaas-size').click();
-        assert.equal(await page.locator('.jaas-compact').count(),1,'Mobile should be able to collapse without reconnecting');
+        assert.ok(Math.abs((await floating.boundingBox()).height-844/2)<=3);
+        await page.getByRole('button',{name:'Оставить в мини-окне: Вы'}).tap();
+        assert.equal(await page.evaluate(() => window.__jitsiPinned),'my-video','Tapping self must select the local tile');
+        assert.equal(await page.locator('.jaas-compact').count(),1,'Selecting a video must collapse the panel');
+        const grip=await page.locator('.jaas-mobile-grip').boundingBox();
+        const y=grip.y+grip.height/2;
+        const x=grip.x+grip.width/2;
+        const top=(await floating.boundingBox()).y;
+        await page.mouse.move(x,y);
+        await page.mouse.down();
+        await page.mouse.move(x,y+150,{steps:5});
+        await page.mouse.up();
+        assert.ok((await floating.boundingBox()).y>=top+140,'Dragging must move the panel vertically');
+        assert.equal(await page.evaluate(() => window.__savedJitsiIframe === document.querySelector('.jaas-frame iframe')),true);
       }
       await endCall.click();
       assert.equal(await page.locator('.jaas-frame').count(),0,'Hangup must dispose media iframe');

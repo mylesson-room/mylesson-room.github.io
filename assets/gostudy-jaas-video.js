@@ -134,12 +134,88 @@
     cameraButton.disabled = !api || !meeting;
   }
   const mobile = () => window.matchMedia?.('(max-width: 800px)').matches ?? false;
+  const mobilePanel = document.body.hasAttribute('data-jaas-mobile-panel');
+  const participants = new Map();
+  let selfId = null;
+  let selectedId = null;
+  let panelTop = null;
+  let drag = null;
+  const grip = document.createElement('div');
+  grip.className = 'jaas-mobile-grip';
+  grip.setAttribute('aria-hidden', 'true');
+  const tileTargets = document.createElement('div');
+  tileTargets.className = 'jaas-mobile-targets';
+  if (mobilePanel) workspace.prepend(grip);
+
+  function positionPanel(top) {
+    if (!mobilePanel || !mobile() || !api) return;
+    const viewport = window.visualViewport;
+    const min = (viewport?.offsetTop || 0) + 8;
+    const max = (viewport?.height || innerHeight) + min - workspace.offsetHeight - 16;
+    panelTop = Math.round(Math.min(Math.max(min, top), Math.max(min, max)));
+    workspace.style.setProperty('--jaas-panel-top', panelTop + 'px');
+  }
   function setCompact(next) {
     compact = Boolean(next);
     workspace.classList.toggle('jaas-compact', compact);
     sizeButton.textContent = compact ? 'Увеличить' : 'Свернуть';
     sizeButton.setAttribute('aria-label', compact ? 'Увеличить видео' : 'Свернуть видео');
     sizeButton.setAttribute('aria-pressed', String(!compact));
+    if (mobilePanel && mobile() && meeting) {
+      const id = selectedId || [...participants.keys()].find(key => key !== selfId) || selfId;
+      api.executeCommand('setTileView', !compact);
+      if (compact && id) {
+        api.pinParticipant?.(id);
+        api.setLargeVideoParticipant?.(id);
+      }
+      drawTileTargets();
+    }
+    if (panelTop !== null) positionPanel(panelTop);
+  }
+  function drawTileTargets() {
+    if (!frame || !mobilePanel || !meeting) return;
+    tileTargets.replaceChildren();
+    if (compact) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.setAttribute('aria-label', 'Показать обоих участников');
+      button.addEventListener('click', () => setCompact(false));
+      tileTargets.append(button);
+      return;
+    }
+    for (const [id, name] of participants) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.setAttribute('aria-label', 'Оставить в мини-окне: ' + name);
+      button.textContent = name;
+      button.addEventListener('click', () => {
+        selectedId = id;
+        setCompact(true);
+      });
+      tileTargets.append(button);
+    }
+  }
+  if (mobilePanel) {
+    grip.addEventListener('pointerdown', event => {
+      if (!mobile() || event.button !== 0) return;
+      drag = {id:event.pointerId, y:event.clientY, top:workspace.getBoundingClientRect().top};
+      grip.setPointerCapture(event.pointerId);
+    });
+    grip.addEventListener('pointermove', event => {
+      if (drag?.id === event.pointerId) positionPanel(drag.top + event.clientY - drag.y);
+    });
+    for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+      grip.addEventListener(event, () => { drag = null; });
+    }
+    window.visualViewport?.addEventListener('resize', () => {
+      if (panelTop !== null) positionPanel(panelTop);
+    });
+    window.addEventListener('resize', () => {
+      if (api && meeting) {
+        if (mobile()) setCompact(compact);
+        else api.executeCommand('setTileView', true);
+      }
+    });
   }
   const getAuth = () => {
     // Private A2 classroom: reuse the existing JWT and room authorization.
@@ -195,6 +271,11 @@
     const previous = api;
     api = null;
     meeting = false;
+    participants.clear();
+    selfId = selectedId = panelTop = drag = null;
+    tileTargets.replaceChildren();
+    workspace.style.removeProperty('--jaas-panel-top');
+    workspace.classList.remove('jaas-mobile-ready');
     audioMuted = true;
     audioAvailable = true;
     micPending = false;
@@ -335,6 +416,10 @@
           prejoinPageEnabled: true,
           toolbarButtons: ['microphone', 'camera', 'settings'],
           disableDeepLinking: true,
+          ...(mobilePanel && mobile() ? {
+            filmstrip: {disabled:true},
+            disableSelfView: false,
+          } : {}),
         },
         interfaceConfigOverwrite: {
           TILE_VIEW_MAX_COLUMNS: 1,
@@ -343,15 +428,43 @@
       });
       workspace.classList.add('jaas-on-call');
       document.body.classList.add('jaas-video-active');
-      setCompact(mobile());
-      api.addEventListener('videoConferenceJoined', () => {
+      setCompact(mobile() && !mobilePanel);
+      if (mobilePanel) {
+        frame.append(tileTargets);
+        api.addEventListener('participantJoined', ({id, displayName}) => {
+          if (!id || id === selfId) return;
+          participants.set(id, displayName || 'Собеседник');
+          if (meeting && mobile()) setCompact(compact);
+        });
+        api.addEventListener('participantLeft', ({id}) => {
+          participants.delete(id);
+          if (selectedId === id) selectedId = null;
+          if (meeting && mobile()) setCompact(compact);
+        });
+      }
+      api.addEventListener('videoConferenceJoined', (event = {}) => {
         meeting = true;
         status('Вы в видеозвонке');
         updateMedia();
         void readActualAudio(api);
         // Ask Jitsi to show local + remote participants as a single-column gallery.
         // Jitsi owns the actual video rendering inside its secure iframe.
-        try { api?.executeCommand?.('toggleTileView'); } catch {}
+        if (mobilePanel) {
+          selfId = event.id;
+          const remote = [...participants];
+          participants.clear();
+          if (selfId) participants.set(selfId, 'Вы');
+          for (const [id,name] of remote) if (id !== selfId) participants.set(id,name);
+          for (const entry of api.getParticipantsInfo?.() || []) {
+            const id = entry.participantId;
+            if (id && id !== selfId) participants.set(id,entry.displayName || 'Собеседник');
+          }
+          workspace.classList.add('jaas-mobile-ready');
+          if (mobile()) setCompact(true);
+          else api.executeCommand('setTileView', true);
+        } else {
+          try { api?.executeCommand?.('toggleTileView'); } catch {}
+        }
       });
       api.addEventListener('audioMuteStatusChanged', event => {
         if (typeof event?.muted === 'boolean') audioMuted = event.muted;

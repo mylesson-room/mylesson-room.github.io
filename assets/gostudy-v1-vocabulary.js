@@ -111,13 +111,23 @@ function openVocabulary() {
   const words = masteryEnabled ? loadSavedWords().filter(word=>wordTab==='learned' ? isLearned(word) : !isLearned(word)) : loadSavedWords();
   if(masteryEnabled)document.querySelectorAll('[data-word-tab]').forEach(button=>{button.setAttribute('aria-pressed',String(button.dataset.wordTab===wordTab));button.style.background=button.dataset.wordTab===wordTab?'#dbeaff':'#f4f8fe';});
   wordsList.replaceChildren();
+  const status = document.querySelector('#wordsActionStatus') || document.createElement('p');
+  status.id = 'wordsActionStatus';
+  status.setAttribute('role', 'status');
+  if (!status.isConnected && document.body.hasAttribute('data-word-actions')) wordsList.after(status);
   for (const word of words.slice().reverse()) {
     const item = document.createElement('li');
     const en = document.createElement('strong');
     en.textContent = word.en;
     const ru = document.createElement('span');
     ru.textContent = ' — ' + (word.ru || 'перевод не указан');
-    item.append(en,ru);wordsList.append(item);
+    if (document.body.hasAttribute('data-word-actions') && window.GoStudyWordActions) {
+      const text = document.createElement('span');
+      text.className = 'word-action-copy';
+      text.append(en,ru);
+      item.append(GoStudyWordActions.buildRow(word,text,status));
+    } else item.append(en,ru);
+    wordsList.append(item);
   }
   document.querySelector('#wordsEmpty').hidden = words.length !== 0;
   document.querySelector('#wordsTotal').textContent = masteryEnabled ? 'На изучении: '+activeWords().length+' · Изучено: '+loadSavedWords().filter(isLearned).length : 'Сохранено: ' + words.length;
