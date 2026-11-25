@@ -83,7 +83,7 @@ async function checkThreeProgressMeLessons() {
     }
     if (spec.course === 'country-house') {
       assert.ok(cabinet.includes('"lesson":"country-house-travel-a2-05.html"'),'Irina now opens the new A2+ lesson');
-      assert.ok(cabinet.includes('"homework":"country-house-travel-a2-05-homework.html"'),'Irina has the new 14-min homework');
+      assert.ok(cabinet.includes('"homework":"country-house-travel-a2-05-homework.html"'),'Irina has the assigned travel homework');
       assert.ok(cabinet.includes('A Sunday Picnic Plan') && cabinethasOldHomeworkHistory(cabinet),
         'Previous lesson and historical homework URL must remain preserved');
     } else if (spec.course === 'art-b1') {
@@ -1882,13 +1882,18 @@ async function main() {
           const guest = await browser.newPage();
           try {
             await guest.goto(origin+'/student-finance-b1.html');
+            await guest.getByRole('link',{name:'Открыть домашнее задание'}).click();
+            await guest.waitForURL('**/finance-b1-ai-20261118-homework.html');
+            await guest.locator('#gostudyAccessGate').waitFor();
+            assert.equal(await guest.locator('#lessonPages').count(),0);
+            await guest.goBack();
             await guest.getByRole('link',{name:'Открыть урок',exact:true}).click();
             await guest.locator('.classroom-access').getByRole('link',{name:'Войти в GoStudy'}).waitFor();
             assert.equal(await guest.locator('#lessonPages').isVisible(),false);
           } finally {
             await guest.close();
           }
-          await sp.locator('#assignment[aria-disabled="true"]').waitFor();
+          assert.equal(await sp.locator('#assignment').getAttribute('href'),'finance-b1-ai-20261118-homework.html');
           await sp.locator('.lesson-card-link').click();
           await tp.locator('#teacher-student-list .teacher-enter-class').click();
           for (const page of [sp,tp]) {
