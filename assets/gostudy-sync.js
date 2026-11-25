@@ -232,6 +232,11 @@
     window.GoStudyFinanceAuth = {token, request, userId: () => session?.user?.id, classroomStudent};
     if (!document.body.hasAttribute("data-preserve-workbook-progress")) return;
   }
+  if (currentPage === 'student-travel-a2.html' && session && window.GoStudyWordActions) {
+    const lesson = classroomCatalog.travel_a2.lessons.at(-1).lesson;
+    window.GoStudyFinanceAuth = {token, request, userId: () => session?.user?.id, classroomStudent};
+    GoStudyWordActions.connectCabinet('travel-a2',lesson);
+  }
   async function push(key, accessToken) {
     const current = readRecord(key);
     if (!current.dirty || conflicts.has(key)) return;
@@ -653,7 +658,14 @@
         status.hidden = true;
         content.hidden = true;
         mountLesson();
-        await loadScript('assets/gostudy-v1-vocabulary.js?v=b1-unified-20261120');
+        await loadScript('assets/gostudy-v1-vocabulary.js?v=classroom-controls-1');
+        if (window.GoStudyWordActions) {
+          const lesson = classroomCatalog[catalogCourse]?.lessons.at(-1)?.lesson?.split(/[?#]/)[0];
+          if (lesson) {
+            window.GoStudyFinanceAuth = {token, request, userId:() => session?.user?.id, classroomStudent};
+            GoStudyWordActions.connectCabinet(catalogCourse.replaceAll('_','-'),lesson);
+          }
+        }
         // Keep Michael's training UI, but read teacher-assigned words from
         // the B1 course's existing protected RPC — never finance-room tables.
         const refreshWords = async () => {

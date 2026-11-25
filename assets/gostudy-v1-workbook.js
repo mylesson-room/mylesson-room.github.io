@@ -141,6 +141,16 @@ function updateWords(){
 updateWords();
 window.copyHomework=()=>navigator.clipboard.writeText($("#homework").value).then(()=>alert("Email copied")).catch(()=>alert("Copy unavailable in this browser"));
 function readWords(){
+  return readStoredWords().filter(word=>!window.GoStudyWordActions?.hidden(word,WORDS_KEY,stores));
+}
+async function removeLessonWord(word) {
+  if (window.FinanceLive?.connected()) await FinanceLive.removeWord(word);
+  else if (config.privateRoom || document.body.dataset.classroomCourse || document.body.dataset.financeLive !== undefined) {
+    throw Error('Словарь ещё подключается.');
+  } else GoStudyWordActions.hide(word,WORDS_KEY,stores);
+  drawWords();
+}
+function readStoredWords(){
   // Sweden A2 uses authenticated Supabase as its ONLY source of vocabulary.
   // Do not display historical browser-local words: the owner has waived them.
   if (document.body.dataset.cloudVocabulary === 'sweden-a2')
@@ -189,7 +199,7 @@ function drawWords(){
     const term = document.createElement('b');
     term.textContent = word.en;
     text.append(term, ' — ' + (word.ru || ''));
-    return GoStudyWordActions.buildRow(word,text,status);
+    return GoStudyWordActions.buildRow(word,text,status,removeLessonWord);
   }));
 }
 window.addWord=i=>{
@@ -199,12 +209,28 @@ window.addWord=i=>{
       .catch(error=>{console.warn('Sweden word save:',error.message); alert(error.message)});
     return;
   }
-  let words=readWords(),w=VOCAB[i];if(window.FinanceLive?.send("word",{en:w[0],ru:w[2]})||document.body.dataset.classroomCourse)return;if(!words.some(x=>x.en.toLowerCase()===w[0].toLowerCase())){words.push({en:w[0],ru:w[2]});try{let obj=JSON.parse(localStorage.getItem(WORDS_KEY)||"{}");obj.words=words;localStorage.setItem(WORDS_KEY,JSON.stringify(obj))}catch(e){alert("Vocabulary saving unavailable")}}drawWords()};
+  const word = VOCAB[i];
+  if (!word) return;
+  const entry = {en:word[0],ru:word[2]};
+  const words = readStoredWords();
+  window.GoStudyWordActions?.restore(entry,WORDS_KEY,stores);
+  if (window.FinanceLive?.send("word",entry) || document.body.dataset.classroomCourse) return;
+  if (!words.some(item => item.en.toLowerCase() === entry.en.toLowerCase())) {
+    try {
+      const record = JSON.parse(localStorage.getItem(WORDS_KEY) || '{}');
+      record.words = [...words,entry];
+      localStorage.setItem(WORDS_KEY,JSON.stringify(record));
+    } catch { alert("Vocabulary saving unavailable"); }
+  }
+  drawWords();
+};
+
 
 
 const {makeWord} = window.GoStudyLessonControls;
 function saveVocabulary(word){
  if(!word)return false;
+ window.GoStudyWordActions?.restore(word,WORDS_KEY,stores);
  if(config.course === 'general-english-b1-stories'){
    // One word must appear in Michael's lesson AND the existing B1 cabinet.
    // Student words keep the original synced-progress key. Teacher-assigned
@@ -521,7 +547,7 @@ document.addEventListener("finance-event",event=>{
     if(!initial && !own) $("#finance-activity").textContent=role+" изменил ответ";
   }
   if(kind==="reset" && (payload.namespace || "") === answerNamespace && Number.isInteger(payload.page) && sections[payload.page]){
-    if (!stableWriting || !own || initial) clearSection(payload.page, stableWriting);
+    if (!stableWriting || !own || initial) clearSection(payload.page, stableWriting && initial);
     if(!initial && !own) $("#finance-activity").textContent=role+" сбросил задание";
   }
   if(kind==="page" && Number.isInteger(payload.page) && LESSONS[payload.page]){

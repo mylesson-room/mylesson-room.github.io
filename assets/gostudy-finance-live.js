@@ -1,5 +1,5 @@
 (() => {
-  const privateRoom = window.GoStudyLesson?.privateRoom;
+  const privateRoom = window.GoStudyLesson?.privateRoom || window.GoStudyWordActions?.cabinetRoom?.();
   const auth = privateRoom ? window.GoStudyPrivateAccess : window.GoStudyFinanceAuth;
   if (!auth) return;
   const status = document.querySelector("#finance-live-status");

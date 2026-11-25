@@ -85,7 +85,9 @@ const wait=async(fn,label)=>{const until=Date.now()+12000;while(Date.now()<until
     await page.locator('#next').click();await page.locator('#lessonPages .page').nth(1).waitFor({state:'visible'});
     assert.equal(await page.evaluate(()=>document.querySelector('#qa-jitsi-frame')===qaPreservedFrame),true,'Page changes preserve active video frame');
     assert.equal(calls,1);
-    await panel.locator('.jaas-size').click();
+    if (mobile && await page.locator('body[data-jaas-mobile-panel]').count())
+        await page.getByRole('button',{name:'Показать обоих участников'}).click();
+      else await panel.locator('.jaas-size').click();
     assert.equal(await panel.locator('iframe').count(),1);
     await panel.locator('.jaas-leave').click();
     assert.equal(await panel.locator('iframe').count(),0);

@@ -611,7 +611,8 @@ body:is([data-premium-feed="michael-v1"],[data-dud-b1-premium]) #lessonVideo .ja
     max-height: 25dvh;
   }
   body[data-jaas-mobile-panel].jaas-video-active #lessonVideo .jaas-on-call .video-top { display: none; }
-  body[data-jaas-mobile-panel][data-premium-feed].jaas-video-active #lessonVideo .jaas-on-call .jaas-frame {
+  body[data-jaas-mobile-panel][data-jaas-video-pilot].jaas-video-active #lessonVideo .jaas-on-call .jaas-frame,
+  body[data-jaas-mobile-panel][data-jaas-video-pilot].jaas-video-active #lessonVideo .jaas-on-call.jaas-compact .jaas-frame {
     flex: 1 1 auto;
     width: 100%;
     height: auto;
@@ -619,7 +620,7 @@ body:is([data-premium-feed="michael-v1"],[data-dud-b1-premium]) #lessonVideo .ja
     margin: 0;
     border-radius: 0;
   }
-  body[data-jaas-mobile-panel][data-premium-feed].jaas-video-active #lessonVideo .jaas-on-call .jaas-control-bar {
+  body[data-jaas-mobile-panel][data-jaas-video-pilot].jaas-video-active #lessonVideo .jaas-on-call .jaas-control-bar {
     flex: 0 0 auto;
     min-height: 36px;
     gap: 5px;

@@ -124,6 +124,7 @@ function savedWords(){
 }
 function storeWord(en,ru){
  try{
+  window.GoStudyWordActions?.restore({en},WORD_KEY,localStorage);
   const record=JSON.parse(localStorage.getItem(WORD_KEY)||'{}')||{};
   const list=Array.isArray(record.words)?record.words:[];
   const index=list.findIndex(w=>normalize(w.en)===normalize(en));
@@ -155,6 +156,12 @@ function bindLive(){
  document.addEventListener('finance-word',event=>{
   const word=event.detail?.word;
   if(!word||typeof word.en!=='string'||typeof word.ru!=='string')return;
+  if (word.removed === true) {
+   window.GoStudyWordActions?.hide(word,WORD_KEY,localStorage);
+   renderWords();
+   return;
+  }
+  window.GoStudyWordActions?.restore(word,WORD_KEY,localStorage);
   storeWord(word.en,word.ru);
   if(event.detail.notify)wordToast(word);
  });
@@ -171,7 +178,7 @@ function bindLive(){
  });
 }
 function renderWords(){
- const list=savedWords(), container=$('#reading-words'),dict=$('#myWords');
+ const list=savedWords().filter(word=>!window.GoStudyWordActions?.hidden(word,WORD_KEY,localStorage)), container=$('#reading-words'),dict=$('#myWords');
  if(container){
   container.replaceChildren();
   for(const [en,ru] of payload.words){
@@ -183,7 +190,23 @@ function renderWords(){
    div.append(b,info,button);container.append(div);
   }
  }
- if(dict){dict.replaceChildren();for(const word of list){const row=document.createElement('div');row.className='term';const strong=document.createElement('strong');strong.textContent=word.en;const p=document.createElement('p');p.textContent=word.ru;row.append(strong,p);dict.append(row);}}
+ if(dict){
+  dict.replaceChildren();
+  const status=document.querySelector('#finance-activity');
+  for(const word of list){
+   const row=document.createElement('div');row.className='term';
+   const text=document.createElement('span');text.className='word-action-copy';
+   const strong=document.createElement('strong');strong.textContent=word.en;
+   text.append(strong,' — '+word.ru);
+   if(window.GoStudyWordActions)row.append(GoStudyWordActions.buildRow(word,text,status,async item=>{
+    if (window.FinanceLive?.connected()) await FinanceLive.removeWord(item);
+    else if (isStudent()) GoStudyWordActions.hide(item,WORD_KEY,localStorage);
+    else throw Error('Словарь ещё подключается.');
+    renderWords();
+   }));else row.append(text);
+   dict.append(row);
+  }
+ }
  const counter=$('#wordCountSidebar');if(counter)counter.textContent=String(list.length);
 }
 function bind(){

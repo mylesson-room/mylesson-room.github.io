@@ -70,8 +70,10 @@ async function exercise(browser,origin,mobile,fail){
     assert.equal(await page.evaluate(()=>window.__oldVideo===document.querySelector('#lessonVideo .jaas-frame iframe')),true);
     assert.equal(await page.evaluate(()=>window.__b1Starts),1);
     if(mobile){
-      assert.equal(await page.locator('#lessonVideo .jaas-compact').count(),1);
-      await page.locator('#lessonVideo .jaas-size').click();
+      await page.locator('#lessonVideo .jaas-compact').waitFor({state:'attached'});
+      if (await page.locator('body[data-jaas-mobile-panel]').count())
+        await page.getByRole('button',{name:'Показать обоих участников'}).click();
+      else await page.locator('#lessonVideo .jaas-size').click();
       assert.equal(await page.locator('#lessonVideo .jaas-compact').count(),0);
     }
     await page.locator('#lessonVideo .jaas-leave').click();

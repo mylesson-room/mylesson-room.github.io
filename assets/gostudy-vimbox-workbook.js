@@ -29,6 +29,7 @@
   const sections = document.querySelector('.sections');
   const live = window.GoStudyTravelAnswers;
   let roomSync;
+  const deferredDrafts = new Map();
   if (classroom) {
     if (live?.viewing) {
       try { state.answers = await live.read(); } catch { /* The current room still opens when historical progress is unavailable. */ }
@@ -44,11 +45,16 @@
         if (key === step.id && ((step.type === 'write' && typeof value === 'string') ||
           (step.type === 'order' && Array.isArray(value) && value.length === step.items.length &&
             value.every(item => Number.isInteger(item) && item >= 0 && item < value.length) && new Set(value).size === value.length))) {
+          const draft = index === page && sheet.querySelector('textarea');
+          if (draft && typeof value === 'string' && draft === document.activeElement) {
+            deferredDrafts.set(step.id,value);
+            return;
+          }
           state.answers[step.id] = value;
           if (index === page && !initial) {
-            const draft = sheet.querySelector('textarea');
-            if (draft && typeof value === 'string') draft.value = value;
-            else render();
+            if (draft && typeof value === 'string') {
+              if (draft.value !== value) draft.value = value;
+            } else render();
           }
         } else if (key.startsWith(step.id+':') && ['choice','match','gap'].includes(step.type)) {
           const slot = Number(key.slice(step.id.length+1));
@@ -324,12 +330,23 @@
     const next = sheet.querySelector('.next');
     if (next) next.onclick = () => go(index+1);
     const draft = sheet.querySelector('textarea');
-    if (draft) draft.oninput = () => {
-      state.answers[step.id] = draft.value;
-      save();
-      roomSync?.answer(index,step.id,draft.value,true);
-      sheet.querySelector('.draft-status').textContent = 'Ответ сохранён';
-    };
+    if (draft) {
+      draft.oninput = () => {
+        deferredDrafts.delete(step.id);
+        state.answers[step.id] = draft.value;
+        save();
+        roomSync?.answer(index,step.id,draft.value,true);
+        sheet.querySelector('.draft-status').textContent = 'Ответ сохранён';
+      };
+      draft.onblur = () => {
+        if (!deferredDrafts.has(step.id)) return;
+        const value = deferredDrafts.get(step.id);
+        deferredDrafts.delete(step.id);
+        if (draft.value !== value) draft.value = value;
+        state.answers[step.id] = value;
+        save();
+      };
+    }
     // Only exercise fields should be processed as numbered answers.
     // B1 city selector radios are separate speaking choices, not MCQ inputs.
     sheet.querySelectorAll('[data-question] input,[data-question] select').forEach(input => {

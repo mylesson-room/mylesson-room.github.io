@@ -66,6 +66,13 @@ async function open(){
   if(auth.userId()===owner)schedule();
  }catch(error){console.warn('Vocabulary cloud unavailable, retaining local data:',error.message);}
 }
+window.GoStudyPrivateVocabulary = {
+ async remove(word) {
+  if (auth.userId()!==owner) throw Error('Откройте свой словарь, чтобы удалить слово.');
+  window.GoStudyWordActions.hide(word,key,localStorage);
+  notify();
+ }
+};
 document.addEventListener('gostudy-private-authorized',open);
 document.addEventListener('gostudy-vocabulary-updated',()=>{notify();schedule();});
 window.addEventListener('storage',event=>{if(event.key===key)notify();});

@@ -26,3 +26,14 @@
 .word-action:disabled { cursor: wait; opacity: .55; }
 body[data-word-actions] .selection-translate .selection-tools { flex-direction: column; }
 .selection-translate .selection-tools .word-action-audio { display: inline-grid; }
+
+body[data-word-actions] .glass-translation .glass-actions {
+  flex-direction: column;
+  align-items: flex-end;
+}
+.glass-words .glass-list .glass-shared-word-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+}
