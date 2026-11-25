@@ -100,6 +100,7 @@ const waitFor=async(fn,label,timeout=15000)=>{const end=Date.now()+timeout;while
   await student.page.locator('#page-0 textarea').fill('Describe the glass and ceramic tiles.');
   await waitFor(()=>teacher.page.locator('#page-0 textarea').inputValue().then(v=>v==='Describe the glass and ceramic tiles.'),'student answer visible to teacher');
   await teacher.page.locator('#page-0 textarea').fill('Explain the artist’s inspiration.');
+  await student.page.locator('#page-0 textarea').blur();
   await waitFor(()=>student.page.locator('#page-0 textarea').inputValue().then(v=>v==='Explain the artist’s inspiration.'),'teacher answer visible to student');
   await student.page.reload();await student.page.locator('#page-0 textarea').waitFor();
   await waitFor(()=>student.page.locator('#page-0 textarea').inputValue().then(v=>v==='Explain the artist’s inspiration.'),'answer restored after reload');

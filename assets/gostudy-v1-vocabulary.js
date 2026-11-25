@@ -51,12 +51,25 @@ async function markLearned(word) {
 
 
 function loadSavedWords() {
+  return readSavedWords().filter(word => !window.GoStudyWordActions?.hidden(word,WORDS_STORAGE_KEY));
+}
+async function removeCabinetWord(word) {
+  if (window.FinanceLive?.connected()) await FinanceLive.removeWord(word);
+  else if (document.body.hasAttribute('data-word-actions-room')) throw Error('Словарь ещё подключается.');
+  else if (window.GoStudyPrivateVocabulary?.remove) await GoStudyPrivateVocabulary.remove(word);
+  else GoStudyWordActions.hide(word,WORDS_STORAGE_KEY);
+  updateVocabularyCount();
+  if(wordsDialog.open)openVocabulary();
+}
+function readSavedWords() {
   if(document.body.dataset.cloudVocabulary === 'sweden-a2')
     return window.GoStudySwedenCloudWords?.words() || [];
   // Authenticated Finance lessons keep their original real-time source.
   const legacy = document.body.dataset.vocabularySources;
   const storageKey = document.body.dataset.vocabularyKey || WORDS_STORAGE_KEY;
-  if (legacy && window.FinanceLive?.connected()) {
+  const roomCabinet = document.body.hasAttribute('data-word-actions-room');
+  const classroomWords = window.FinanceLive?.connected();
+  if (legacy && classroomWords) {
     const combined = new Map();
     const read = (store,key) => {
       try {
@@ -73,8 +86,8 @@ function loadSavedWords() {
     for (const word of FinanceLive.words()) combined.set(word.en.trim().toLowerCase(),word);
     return [...combined.values()].map(word => ({en:word.en.trim(),ru:String(word.ru || '').trim()}));
   }
-  if (window.FinanceLive?.connected()) return FinanceLive.words();
-  if (document.body.dataset.classroomCourse || document.body.dataset.liveCourse) return [];
+  if (classroomWords && !roomCabinet) return FinanceLive.words();
+  if (!roomCabinet && (document.body.dataset.classroomCourse || document.body.dataset.liveCourse)) return [];
   // For historic course dashboards, the same canonical vocabulary UI reads
   // all previously used lesson keys without changing or deleting their data.
   const keys = [...new Set([...(legacy ? legacy.split(/\s+/).filter(Boolean) : []), storageKey])];
@@ -101,6 +114,9 @@ function loadSavedWords() {
       combined.set(en.toLowerCase(),{en,ru});
     }
   }
+  if (roomCabinet && classroomWords) {
+    for (const word of FinanceLive.words()) combined.set(word.en.trim().toLowerCase(),word);
+  }
   return [...combined.values()];
 }
 function updateVocabularyCount() {
@@ -125,7 +141,7 @@ function openVocabulary() {
       const text = document.createElement('span');
       text.className = 'word-action-copy';
       text.append(en,ru);
-      item.append(GoStudyWordActions.buildRow(word,text,status));
+      item.append(GoStudyWordActions.buildRow(word,text,status,removeCabinetWord));
     } else item.append(en,ru);
     wordsList.append(item);
   }
@@ -223,10 +239,14 @@ practiceEl('#revealWord').addEventListener('click',()=>{const word=practiceWords
 practiceEl('#nextWord').addEventListener('click',()=>{practiceIndex++;drawPractice();});
 practiceEl('#restartPractice').addEventListener('click',()=>{practiceIndex=0;drawPractice();});
 window.addEventListener('pageshow',()=>{updateVocabularyCount();loadMastery();});
-document.addEventListener('finance-ready',loadMastery);
+document.addEventListener('finance-ready',()=>{
+  updateVocabularyCount();
+  if(wordsDialog.open)openVocabulary();
+  loadMastery();
+});
 document.addEventListener('finance-word',()=>{updateVocabularyCount();if(wordsDialog.open)openVocabulary();});
 document.addEventListener('b1-vocabulary-updated',()=>{updateVocabularyCount();if(wordsDialog.open)openVocabulary();});
-window.addEventListener('storage',event => {if(event.key === WORDS_STORAGE_KEY)updateVocabularyCount();});
+window.addEventListener('storage',event => {if(event.key === WORDS_STORAGE_KEY){updateVocabularyCount();if(wordsDialog.open)openVocabulary();}});
 updateVocabularyCount();
 if (document.getElementById("importFinanceWords")) {
   const importButton = document.querySelector("#importFinanceWords");

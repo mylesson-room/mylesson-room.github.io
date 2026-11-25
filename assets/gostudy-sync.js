@@ -654,6 +654,13 @@
         content.hidden = true;
         mountLesson();
         await loadScript('assets/gostudy-v1-vocabulary.js?v=b1-unified-20261120');
+        if (window.GoStudyWordActions) {
+          const lesson = classroomCatalog[catalogCourse]?.lessons.at(-1)?.lesson?.split(/[?#]/)[0];
+          if (lesson) {
+            window.GoStudyFinanceAuth = {token, request, userId:() => session?.user?.id, classroomStudent};
+            GoStudyWordActions.connectCabinet(catalogCourse.replaceAll('_','-'),lesson);
+          }
+        }
         // Keep Michael's training UI, but read teacher-assigned words from
         // the B1 course's existing protected RPC — never finance-room tables.
         const refreshWords = async () => {

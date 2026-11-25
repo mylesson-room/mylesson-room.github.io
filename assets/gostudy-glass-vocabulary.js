@@ -162,7 +162,7 @@
     for (const word of assigned) if (!all.has(norm(word.en))) all.set(norm(word.en),word);
     if (inRoom) for (const word of window.FinanceLive?.words() || []) all.set(norm(word.en),word);
     const removed = new Set(hiddenWords());
-    return [...all.values()].filter(word=>!removed.has(norm(word.en)));
+    return [...all.values()].filter(word=>!removed.has(norm(word.en)) && !window.GoStudyWordActions?.hidden(word,key,storage));
   }
   async function add(a,b) {
     a=a.trim(); b=b.trim();
@@ -191,7 +191,9 @@
   }
   async function removeWord(word) {
     const id=norm(word.en);
-    if(classMode){
+    if (inRoom && window.FinanceLive?.connected()) {
+      await FinanceLive.removeWord(word);
+    } else if(classMode){
       await shared.remove(word.en);
       assigned=assigned.filter(item=>norm(item.en)!==id);
     }else{
@@ -269,9 +271,15 @@
       },'glass-word-remove');
       remove.setAttribute('aria-label','Удалить '+word.en);
       remove.title='Удалить';
-      actions.append(button('Озвучить',()=>speak(word.en)));
-      if (!classMode || shared?.canRemoveAssigned !== false) actions.append(remove);
-      row.append(content,actions);
+      if (window.GoStudyWordActions) {
+        row.classList.add('glass-shared-word-row');
+        row.append(GoStudyWordActions.audio(word.en),content);
+        if (inRoom || !classMode || shared?.canRemoveAssigned !== false) row.append(remove);
+      } else {
+        actions.append(button('Озвучить',()=>speak(word.en)));
+        if (!classMode || shared?.canRemoveAssigned !== false) actions.append(remove);
+        row.append(content,actions);
+      }
       list.append(row);
     }
   }
@@ -466,13 +474,18 @@
   });
   const translated=by(translation,'textarea'), translationStatus=by(translation,'p');
   by(translation,'.glass-title button').onclick=closeTranslation;
-  by(translation,'.glass-actions').append(icon('🔊','Озвучить',()=>speak(selected)),icon(inRoom ? '+' : '♥',classMode || needsClass?'Добавить ученику':'В словарь',async event=>{
+  const translationActions = by(translation,'.glass-actions');
+  translationActions.append(icon(window.GoStudyWordActions || inRoom ? '+' : '♥',classMode || needsClass?'Добавить ученику':'В словарь',async event=>{
     const control=event.currentTarget, run=translationRun;
     control.disabled=true;
     try { if(!await add(selected,translated.value)) throw Error('Добавьте перевод, чтобы сохранить слово.'); if(run===translationRun)translationStatus.textContent=classMode?'Слово добавлено ученице.':'Добавлено в словарь.'; }
     catch(error){if(run===translationRun)translationStatus.textContent=error.message;}
     finally{control.disabled=false;}
   },'glass-heart'));
+  const pronunciation = window.GoStudyWordActions?.audio(() => selected, () => russian.test(selected) ? 'ru-RU' : 'en-GB') ||
+    icon('🔊','Озвучить',()=>speak(selected));
+  if (window.GoStudyWordActions) translationActions.append(pronunciation);
+  else translationActions.prepend(pronunciation);
   translated.oninput=()=>{++translationRun;translationStatus.textContent='';};
   let selecting=false, selectionTimer;
   function readSelection(){

@@ -10,9 +10,35 @@ ASSET = re.compile(r'(assets/(?:gostudy-(?:[a-z-]+|v1-[a-z-]+)|business-ai-workb
 def digest(url):
     return hashlib.sha256((ROOT / url).read_bytes()).hexdigest()[:12]
 
+def classroom_controls(html):
+    dictionary = any(name in html for name in (
+        'gostudy-v1-lesson.js', 'gostudy-v1-workbook.js', 'gostudy-v1-vocabulary.js',
+        'gostudy-glass-vocabulary.js', 'data-unified-b1-cabinet', 'data-unified-course-cabinet',
+    ))
+    attributes = []
+    if dictionary:
+        attributes.append('data-word-actions')
+        if 'assets/gostudy-word-actions.js' not in html:
+            shared = (
+                '<link rel="stylesheet" href="assets/gostudy-word-actions.css">\n'
+                '<script src="assets/gostudy-word-actions.js"></script>\n'
+            )
+            html = html.replace('</head>', shared + '</head>', 1)
+    if 'gostudy-v1-workbook.js' in html:
+        attributes.append('data-stable-writing')
+    if 'data-jaas-video-pilot' in html and 'data-homework-only' not in html:
+        attributes.append('data-jaas-mobile-panel')
+    return re.sub(r'<body(?=\s|>)[^>]*>', lambda match:
+                  match[0][:-1] + ''.join(' ' + attribute for attribute in attributes
+                                         if attribute not in match[0]) + '>', html, count=1)
+
+
 for path in sorted(ROOT.glob('*.html')):
-    original = html = path.read_text()
+    original = path.read_text()
+    html = classroom_controls(original)
     if 'data-vocab-course=' not in html and 'data-finance-live' not in html and 'data-ielts-private-lesson' not in html and 'data-placement-' not in html and path.name not in {'login.html','gostudy-account.html','gostudy-teacher.html','gostudy-ui-kit.html'}:
+        if html != original:
+            path.write_text(ASSET.sub(lambda match: f'{match[1]}?v={digest(match[1])}', html))
         continue
     # Course-restricted cabinets mount Michael's shared vocabulary dynamically
     # only after the existing Supabase enrollment/role check succeeds.
