@@ -1,0 +1,22 @@
+name: Telegram private lesson compatibility
+on:
+  pull_request:
+    paths:
+      - 'assets/gostudy-private-access.js'
+      - 'assets/gostudy-vietnam-a2.js'
+      - 'my-trip-to-vietnam-a2*.html'
+      - 'scripts/check-telegram-private-loading.cjs'
+      - '.github/workflows/telegram-private-loading.yml'
+  workflow_dispatch:
+jobs:
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-save --no-package-lock playwright@1.58.2
+      - run: npx playwright install --with-deps chromium webkit
+      - run: node scripts/check-telegram-private-loading.cjs

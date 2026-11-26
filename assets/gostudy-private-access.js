@@ -50,9 +50,14 @@ function clearSession(){
 }
 async function raw(path,opts={},bearer){
  const headers={apikey:publishableKey,...(bearer?{Authorization:'Bearer '+bearer}:{}),...(opts.body!==undefined?{'Content-Type':'application/json'}:{}),...(opts.headers||{})};
- const response=await fetch(project+path,{method:opts.method||'GET',headers,body:opts.body!==undefined?JSON.stringify(opts.body):undefined,signal:AbortSignal.timeout(14000)});
- const data=response.status===204?null:await response.json().catch(()=>null);
- return {ok:response.ok,status:response.status,data};
+ // Older embedded WebViews may support AbortController but not AbortSignal.timeout.
+ const controller=typeof AbortController==='function'?new AbortController():null;
+ const timer=controller?setTimeout(()=>controller.abort(),14000):null;
+ try {
+  const response=await fetch(project+path,{method:opts.method||'GET',headers,body:opts.body!==undefined?JSON.stringify(opts.body):undefined,...(controller?{signal:controller.signal}:{})});
+  const data=response.status===204?null:await response.json().catch(()=>null);
+  return {ok:response.ok,status:response.status,data};
+ } finally {if(timer!==null)clearTimeout(timer);}
 }
 async function token(){
  if(!session)throw Error('Войдите в GoStudy.');
@@ -92,7 +97,7 @@ async function verify(){
   user=u;show(true);text('');
   document.dispatchEvent(new CustomEvent('gostudy-private-authorized',{detail:{userId:u.id}}));
   return true;
- }catch(error){user=null;show(false);text('Войдите по email и паролю.');return false;}
+ }catch(error){user=null;show(false);text('Не удалось проверить вход. Проверьте подключение и обновите страницу.');return false;}
 }
 const api=window.GoStudyPrivateAccess={
  ready,room:()=>room,userId:()=>user?.id||null,token,request,getUser:()=>user
