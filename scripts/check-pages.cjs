@@ -1941,6 +1941,7 @@ async function main() {
           await sp.reload();
           await sp.locator('#page-1.active [data-exercise-field="gap0"]').waitFor();
           assert.equal(await sp.locator('[data-exercise-field="gap0"]').inputValue(),'fraud');
+          await tp.locator('#lessonDictionary form[method="dialog"] button').click();
           for (const page of [sp,tp]) {
             await page.locator('.lesson-section-menu summary').click();
             await page.locator('#lessonSections button').nth(6).click();
