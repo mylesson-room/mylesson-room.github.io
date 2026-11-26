@@ -416,7 +416,8 @@
         configOverwrite: {
           startWithAudioMuted: true,
           prejoinPageEnabled: true,
-          toolbarButtons: ['microphone', 'camera', 'settings'],
+          // Fluenvia renders the call controls below the iframe.
+          toolbarButtons: [],
           disableDeepLinking: true,
           ...(mobilePanel && mobile() ? {
             filmstrip: {disabled:true},
@@ -474,7 +475,7 @@
       });
       api.addEventListener('audioAvailabilityChanged', event => {
         audioAvailable = event?.available !== false;
-        if (!audioAvailable) status('Микрофон недоступен. Проверьте разрешение браузера и выбранный микрофон в настройках Jitsi.');
+        if (!audioAvailable) status('Микрофон недоступен. Проверьте разрешение браузера и выбранный микрофон в настройках устройства.');
         void readActualAudio(api);
       });
       api.addEventListener('micError', () => {

@@ -18,7 +18,7 @@
   document.body.setAttribute('data-jaas-video-pilot', '');
   document.body.dataset.jaasScope = 'b1-stories';
   const script = document.createElement('script');
-  script.src = 'assets/gostudy-jaas-video.js?v=b1-stories-20261120-1';
+  script.src = 'assets/gostudy-jaas-video.js?v=call-controls-20261126';
   script.onerror = () => {
     const state = oldPanel.querySelector('.video-state');
     if (state) state.textContent = 'Видео не загрузилось. Обновите страницу.';

@@ -174,6 +174,10 @@ const unpack = token => {
     assert.ok(connect, 'Connect button must be rendered');
     assert.equal(connect.disabled, false, 'Connect must be usable without FinanceLive');
     await connect.listeners.click();
+    if (joined) {
+      assert.equal(joined.options.configOverwrite.toolbarButtons.length, 0,
+        'Jitsi controls must stay off the video in both layouts');
+    }
     if (joined && mobile) {
       assert.equal(workspace.classList.contains('jaas-compact'), true, 'Mobile starts in persistent mini-player');
       assert.equal(documentStub.body.classList.contains('jaas-video-active'), true, 'Mobile dock stays on screen');
