@@ -10,7 +10,7 @@ const must=(src,needle,reason)=>assert.ok(src.includes(needle),reason+' — miss
 const pages=[
  {cabinet:'student-business-ai-finance.html',lesson:'business-ai-finance-b2-02.html'},
  {cabinet:'student-finance-b1.html',lesson:'finance-b1-ai-20261118.html'},
- {cabinet:'student-feed-b2.html',lesson:'korean-wave-b2-20261118.html'},
+ {cabinet:'student-feed-b2.html',lesson:'feed-b2-holiday-destination.html'},
  {cabinet:'student-pharma.html',lesson:'pharma-ai-evidence-c1-20261118.html'},
  {cabinet:'student-first-sales.html',lesson:'first-sales-c1-03.html'},
  {cabinet:'student-english-placement.html',lesson:'english-placement.html',private:true,client:'assets/gostudy-placement.js',workbook:true},

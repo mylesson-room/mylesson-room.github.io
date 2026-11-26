@@ -1416,6 +1416,16 @@ async function main() {
                 student_label:'Савва', course:'sports-b2', lesson_path:current.lesson
               }]});
             }
+            if (course === 'feed_b2' && action === 'user') {
+              return route.fulfill({json:{id:role === 'student' ? studentId : 'teacher'}});
+            }
+            if (course === 'feed_b2' && action === 'gostudy_private_lessons' &&
+                requestUrl.searchParams.get('slug') === 'eq.emilia-holiday-destination-b2') {
+              return route.fulfill({json:[{student_id:studentId,teacher_id:'teacher',lesson_payload:{
+                key:current.lessonKey,title:current.title,cabinet:'student-feed-b2.html',
+                wordsKey:'gostudy-feed-b2-v1',steps:[{id:'opening',title:'Opening discussion',html:'<p>Holiday destinations</p>'}]
+              }}]});
+            }
             if (course === 'finance_b1' && action === 'gostudy_private_lessons' &&
                 requestUrl.searchParams.get('slug') === 'eq.finance-b1-ai-payment-checks') {
               return route.fulfill({json:[{lesson_payload:{
@@ -1781,11 +1791,16 @@ async function main() {
         }
         if (course === 'feed_b2') {
           await sp.locator('#assignment[aria-disabled="true"]').waitFor();
-          assert.equal(await sp.locator('.lesson-card-link').getAttribute('href'),'korean-wave-b2-20261118.html');
+          assert.equal(await sp.locator('.lesson-card-link').getAttribute('href'),current.lesson);
           await sp.locator('.lesson-card-link').click();
           await tp.locator('#teacher-student-list .teacher-enter-class').click();
           for (const page of [sp,tp]) {
             await page.waitForURL(url => url.pathname === expected);
+            await page.getByRole('heading',{name:current.title,exact:true}).first().waitFor();
+          }
+          const koreanWave = origin + '/korean-wave-b2-20261118.html';
+          await Promise.all([sp.goto(koreanWave),tp.goto(koreanWave+'?classStudent='+studentId)]);
+          for (const page of [sp,tp]) {
             await page.waitForFunction(() =>
               document.querySelector('#finance-live-status')?.textContent?.trim() === 'Онлайн · общая комната' &&
               window.FinanceLive?.connected() === true);
@@ -1875,7 +1890,7 @@ async function main() {
           await mobile.setViewportSize({width:390,height:844});
           await mobile.goto(origin+'/student-feed-b2.html');
           assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),'Feed B2 mobile cabinet overflow');
-          await mobile.locator('.lesson-card-link').click();
+          await mobile.goto(koreanWave);
           await mobile.locator('#lessonPages>.page.active').waitFor();
           assert.ok(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),'Feed B2 mobile lesson overflow');
           await mobile.locator('.lesson-section-menu summary').click();
