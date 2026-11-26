@@ -1416,6 +1416,18 @@ async function main() {
                 student_label:'Савва', course:'sports-b2', lesson_path:current.lesson
               }]});
             }
+            if (course === 'finance_b1' && action === 'gostudy_private_lessons' &&
+                requestUrl.searchParams.get('slug') === 'eq.finance-b1-ai-payment-checks') {
+              return route.fulfill({json:[{lesson_payload:{
+                key:current.lessonKey,
+                steps:[
+                  {id:'finance-b1-extra-vocabulary',title:'Flagged or declined?',type:'choice',
+                    items:[['The payment still needs a check.',['flagged','declined'],0]]},
+                  {id:'finance-b1-extra-video',title:'A Message That Looks Real'},
+                  {id:'finance-b1-extra-reading',title:'One Card, Two Payments'},
+                ],
+              }}]});
+            }
             if (['finance_b1','feed_b2','pharma_c1','first_sales','general_english_b1','general_english_b1_stories','travel_a2','tiktok_a2'].includes(course)) {
               const actor = role === 'teacher' ? 'teacher' : studentId;
               if (action === 'gostudy_classroom_rooms' && requestUrl.searchParams.get('course') === 'eq.'+course.replaceAll('_','-')) {
@@ -1902,7 +1914,8 @@ async function main() {
               document.querySelector('#finance-live-status')?.textContent?.trim() === 'Онлайн · общая комната' &&
               window.FinanceLive?.connected() === true);
           }
-          assert.equal(await sp.locator('#lessonPages>.page').count(),6);
+          assert.equal(await sp.locator('#lessonPages>.page').count(),9);
+          assert.equal(await tp.locator('#lessonPages>.page').count(),9);
           await sp.locator('[data-exercise-field="warm1"]').fill('I check my balance.');
           await sp.locator('[data-exercise-field="warm2a"]').check();
           await tp.waitForFunction(() => document.querySelector('[data-exercise-field="warm1"]')?.value === 'I check my balance.'
@@ -1928,6 +1941,17 @@ async function main() {
           await sp.reload();
           await sp.locator('#page-1.active [data-exercise-field="gap0"]').waitFor();
           assert.equal(await sp.locator('[data-exercise-field="gap0"]').inputValue(),'fraud');
+          await tp.locator('#lessonDictionary form[method="dialog"] button').click();
+          for (const page of [sp,tp]) {
+            await page.locator('.lesson-section-menu summary').click();
+            await page.locator('#lessonSections button').nth(6).click();
+          }
+          const extraChoice = '[data-exercise-field="finance-b1-extra-vocabulary:0"][value="0"]';
+          await sp.locator(extraChoice).check();
+          await tp.waitForFunction(selector => document.querySelector(selector)?.checked,extraChoice);
+          await sp.reload();
+          await sp.locator('#page-6.active').waitFor();
+          assert.ok(await sp.locator(extraChoice).isChecked(),'Extra answer survives reload');
           await sp.goto(origin+'/student-finance-b1.html');
           await sp.locator('#openWords').click();
           await sp.locator('#words').getByText('fraud',{exact:true}).waitFor();
