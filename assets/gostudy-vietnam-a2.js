@@ -18,6 +18,16 @@
     booted=true;
     const message=document.getElementById('vietnam-loading');
     if(message){message.hidden=false;message.textContent='Открываем материалы…';}
+    let syncTimer;
+    const retryMessage = text => {
+      if(!message)return;
+      message.hidden=false;
+      message.textContent=text+' ';
+      const retry=document.createElement('button');
+      retry.type='button';retry.textContent='Повторить загрузку';
+      retry.addEventListener('click',()=>location.reload());
+      message.append(retry);
+    };
     try {
       const raw=document.getElementById('vietnam-content');
       const payload=JSON.parse(raw.textContent);
@@ -32,6 +42,12 @@
       });
       body.append(config);
       await loadScript(body.dataset.lessonScript);
+      const pages=document.getElementById('lessonPages');
+      if(pages && message){
+        pages.before(message);
+        message.style.cssText='padding:16px;margin:12px 0;background:#fff;border:1px solid #d8e5ee;border-radius:12px;color:#243b53;';
+      }
+      syncTimer=setTimeout(()=>retryMessage('Материалы ещё не загрузились. Проверьте подключение. Ответы защищены до окончания синхронизации.'),20000);
       // UI-only enhancements load after the authorized lesson shell exists.
       // Optional scripts must never prevent private lessons/homework from opening.
       for(const source of [body.dataset.premiumChatScript,body.dataset.videoPreviewScript].filter(Boolean)){
@@ -48,12 +64,12 @@
       const signout=document.getElementById('gostudyAccessSignout');
       if(signout)document.querySelector('.header-right')?.append(signout);
       await loadScript(body.dataset.exercisesScript);
-      const pages=document.getElementById('lessonPages');
       // A private workbook must not accept edits until its remote answer history
       // has been read. The shared workbook intentionally suppresses writes while
       // synchronizing; displaying its fields early would silently lose edits.
       if(pages){pages.inert=true;pages.hidden=true;pages.setAttribute('aria-busy','true');}
       document.addEventListener('finance-ready',()=>{
+        clearTimeout(syncTimer);
         if(pages){pages.inert=false;pages.hidden=false;pages.removeAttribute('aria-busy');}
         if(message)message.hidden=true;
       },{once:true});
@@ -61,7 +77,8 @@
       document.querySelector('.classroom-access')?.setAttribute('hidden','');
     }catch(error){
       console.error('Vietnam A2 lesson loading failed',error);
-      if(message)message.textContent='Не удалось открыть урок. Обновите страницу или войдите через GoStudy.';
+      clearTimeout(syncTimer);
+      retryMessage('Не удалось открыть материалы урока.');
     }
   }
   document.addEventListener('gostudy-private-authorized',boot,{once:true});
