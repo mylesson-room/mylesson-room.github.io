@@ -44,7 +44,7 @@ assert.equal(legacyHomework.key,'gostudy-country-house-a2-04-homework-v1');
 assert.notEqual(lesson.key,legacy.key);
 assert.equal(lesson.wordsKey,legacy.wordsKey);
 assert.ok(cabinet.includes('"lesson":"country-house-travel-a2-05.html"'));
-assert.ok(cabinet.includes('"homework":"country-house-travel-a2-05-homework.html"'));
+assert.ok(cabinet.includes('"homework":"country-house-travel-a2-05-homework-02.html"'));
 assert.ok(cabinet.includes('country-house-a2-04-homework.html'));
 assert.ok(cabinet.includes('assets/gostudy-v1-cabinet.css')&&cabinet.includes('assets/gostudy-v1-cabinet.js'));
 for(const href of ['country-house-travel-a2-05.html','country-house-travel-a2-05-homework.html'])
