@@ -94,7 +94,10 @@ async function sample(browser,origin,{name,html,mobile,role='student'}){
       assert.ok(measure.sidebar.width>250&&measure.lesson.width>500,name+' desktop needs left video / right exercises');
       assert.ok(measure.sidebar.right<=measure.lesson.left+20,name+' sidebar must precede the exercise sheet');
     }
-    if(name.startsWith('alla')){
+    if(name.includes('homework')){
+      assert.equal(await page.locator('#lessonVideo').isVisible(),false,name+' homework must hide classroom sidebar');
+      assert.equal(await page.locator('#lessonVideo .jaas-connect').count(),0,name+' homework must not initialize video');
+    }else if(name.startsWith('alla')){
       // The same Michael chat UI must wrap (not replace) the real chat handlers.
       const dropdown=page.locator('#lessonVideo .lesson-chat-dropdown');
       await dropdown.waitFor({state:'attached',timeout:6000});
