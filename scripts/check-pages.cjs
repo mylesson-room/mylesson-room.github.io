@@ -36,9 +36,10 @@ async function checkVictoriaB2Methodology() {
   assert.ok(lesson.pages[5].includes('Real-life discussion') && !lesson.pages[5].includes('Resident A'),'Speaking must be an authentic discussion');
   assert.ok(lesson.pages[6].includes('Wrap-up') && lesson.pages[6].includes('trade-off'),'Check lesson outcomes');
   for (const selector of ['id="vocab"','id="reading"','id="gaps"','id="decision"','id="homework"','id="roleNotes"']) assert.ok(lesson.pages.some(page=>page.includes(selector)),selector);
-  assert.ok(student.includes('"lesson":"general-english-b2-01.html"'),'Student URL unchanged');
-  assert.ok(student.includes('"homework":"general-english-b2-01.html#homework"'),'Homework URL unchanged');
-  assert.ok(teacher.includes("lesson:'general-english-b2-01.html'"),'Teacher URL unchanged');
+  assert.ok(student.includes('"lesson":"general-english-b2-02.html"'),'Student cabinet opens the assigned new lesson');
+  assert.ok(student.includes('"homework":"general-english-b2-02-homework.html"'),'Student cabinet opens the separate new homework');
+  assert.ok(teacher.includes("lesson:'general-english-b2-01.html'"),'Previous lesson remains in the catalog');
+  assert.ok(teacher.includes("lesson:'general-english-b2-02.html'"),'Teacher catalog includes the new assignment');
   assert.ok(teacher.includes('gostudy-general-english-b2-01-v2'),'Revision tracked');
   console.log('Victoria General English B2: revised 50-min lesson, 15-min homework and stable classroom routes verified');
 }
@@ -180,11 +181,9 @@ async function checkGeneralB2Room(browser, origin) {
     const tp = await teacher.newPage();
     await Promise.all([sp.goto(origin+'/student-general-english-b2.html'),tp.goto(origin+'/gostudy-teacher.html')]);
     await sp.getByRole('heading',{name:/Виктория/}).waitFor();
-    await Promise.all([
-      sp.getByRole('link',{name:'Открыть урок 1 General English B2'}).click(),
-      tp.locator('.teacher-student-row').filter({hasText:'Виктория'}).getByRole('link',{name:/Войти в класс/}).click(),
-    ]);
-    await tp.waitForURL(lessonUrl+'?classStudent='+studentId);
+    assert.equal(await sp.getByRole('link',{name:'Открыть урок 2 General English B2'}).getAttribute('href'),'general-english-b2-02.html');
+    assert.equal(await tp.locator('.teacher-student-row').filter({hasText:'Виктория'}).getByRole('link',{name:/Войти в класс/}).getAttribute('href'),'general-english-b2-02.html?classStudent='+studentId);
+    await Promise.all([sp.goto(lessonUrl),tp.goto(lessonUrl+'?classStudent='+studentId)]);
     for (const page of [sp,tp]) {
       await page.getByRole('heading',{name:'The Hidden Cost of Convenience'}).waitFor();
       await page.getByRole('button',{name:'Continue',exact:true}).click();
