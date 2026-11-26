@@ -187,6 +187,8 @@ async function exercise(browser, origin, opts) {
       await page.waitForFunction(() => document.querySelector('.video-state')?.textContent === 'Вы в видеозвонке',{timeout:6500});
       assert.equal(await page.evaluate(() => window.__lastJitsiRoom),appId+'/'+roomName);
       assert.equal(await page.evaluate(() => window.__lastJitsiOptions.interfaceConfigOverwrite.TILE_VIEW_MAX_COLUMNS),1,'Participants must stack vertically in Jitsi tile view');
+      assert.deepEqual(await page.evaluate(() => window.__lastJitsiOptions.configOverwrite.toolbarButtons),
+        mobile ? [] : ['microphone', 'camera', 'settings'], 'The Jitsi toolbar must stay off the mobile video');
       await page.waitForFunction(() => window.__jitsiCommands.includes('setTileView'));
       const microphone = page.locator('#lessonVideo .jaas-mic');
       const camera = page.locator('#lessonVideo .jaas-camera');
@@ -213,11 +215,24 @@ async function exercise(browser, origin, opts) {
         assert.equal(await page.locator('.jaas-compact').count(),1,'Mobile floating player not compact');
         assert.equal(await page.locator('.jaas-frame').isVisible(),true,'Video hidden on mobile');
         const floating = page.locator('.video-workspace.jaas-on-call');
+        const video = page.locator('.jaas-frame iframe');
+        const checkDock = async () => {
+          const videoBounds = await video.boundingBox();
+          for (const control of [microphone, camera, endCall]) {
+            const bounds = await control.boundingBox();
+            assert.ok(bounds && bounds.y >= videoBounds.y + videoBounds.height,
+              'Lesson controls must be visible below the video');
+          }
+        };
+        await page.setViewportSize({width:320, height:844});
+        await checkDock();
         assert.ok((await floating.boundingBox()).height <= 844/4,'Compact player exceeds one quarter of the screen');
         assert.equal(await page.evaluate(() => window.__jitsiPinned),'their-video');
         await page.getByRole('button',{name:'Показать обоих участников'}).tap();
         assert.equal(await page.locator('.jaas-compact').count(),0,'Mobile should be able to expand without reconnecting');
         assert.ok(Math.abs((await floating.boundingBox()).height-844/2)<=3);
+        await checkDock();
+        await page.setViewportSize({width:390, height:844});
         await page.getByRole('button',{name:'Оставить в мини-окне: Вы'}).tap();
         assert.equal(await page.evaluate(() => window.__jitsiPinned),'my-video','Tapping self must select the local tile');
         assert.equal(await page.locator('.jaas-compact').count(),1,'Selecting a video must collapse the panel');

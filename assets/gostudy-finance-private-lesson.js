@@ -38,9 +38,7 @@ async function boot(){
    if(aside)aside.style.display='none';if(divider)divider.style.display='none';
    document.querySelector('.layout').style.display='block';
   }else{
-   const videoVersion = document.body.dataset.jaasScope === 'classroom' ? 'classroom-20261121-1'
-    : document.body.hasAttribute('data-jaas-mobile-panel') ? 'michael-controls-1' : 'two-tiles-20261119-1';
-   await loadScript('assets/gostudy-jaas-video.js?v='+videoVersion);
+   await loadScript('assets/gostudy-jaas-video.js?v=mobile-toolbar-1');
    await loadScript('assets/gostudy-michael-chat.js?v=1');
    if(document.body.dataset.extraLessonScript)await loadScript(document.body.dataset.extraLessonScript);
   }

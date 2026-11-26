@@ -1,5 +1,4 @@
-/* GoStudy shared video adapter. Opt-in pilot: the finance lesson only.
-   Existing vocabulary, chat, answers and homework remain untouched. */
+/* Shared GoStudy video adapter for JaaS-enabled lessons. */
 (() => {
   'use strict';
   if (!document.body.hasAttribute('data-jaas-video-pilot')) return;
@@ -134,6 +133,9 @@
     cameraButton.disabled = !api || !meeting;
   }
   const mobile = () => window.matchMedia?.('(max-width: 800px)').matches ?? false;
+  // Keep the iframe toolbar off on phones that start a call in landscape, too.
+  const useLessonControlsOnly = () => mobile() ||
+    (window.matchMedia?.('(pointer: coarse) and (max-height: 600px)').matches ?? false);
   const mobilePanel = document.body.hasAttribute('data-jaas-mobile-panel');
   const participants = new Map();
   let selfId = null;
@@ -406,6 +408,7 @@
       frame.setAttribute('aria-label', 'Видеозвонок GoStudy');
       placeholder.hidden = true;
       placeholder.after(frame);
+      const lessonControlsOnly = useLessonControlsOnly();
       api = new window.JitsiMeetExternalAPI('8x8.vc', {
         roomName: data.appId + '/' + data.room,
         parentNode: frame,
@@ -416,7 +419,7 @@
         configOverwrite: {
           startWithAudioMuted: true,
           prejoinPageEnabled: true,
-          toolbarButtons: ['microphone', 'camera', 'settings'],
+          toolbarButtons: lessonControlsOnly ? [] : ['microphone', 'camera', 'settings'],
           disableDeepLinking: true,
           ...(mobilePanel && mobile() ? {
             filmstrip: {disabled:true},
@@ -474,7 +477,9 @@
       });
       api.addEventListener('audioAvailabilityChanged', event => {
         audioAvailable = event?.available !== false;
-        if (!audioAvailable) status('Микрофон недоступен. Проверьте разрешение браузера и выбранный микрофон в настройках Jitsi.');
+        if (!audioAvailable) status(lessonControlsOnly
+          ? 'Микрофон недоступен. Проверьте разрешение браузера на доступ к микрофону.'
+          : 'Микрофон недоступен. Проверьте разрешение браузера и выбранный микрофон в настройках Jitsi.');
         void readActualAudio(api);
       });
       api.addEventListener('micError', () => {
@@ -519,7 +524,7 @@
       await new Promise(resolve => setTimeout(resolve, 1200));
       if (instance !== api) return;
       await readActualAudio(instance);
-      if (wasMuted && audioMuted) status('Микрофон остался выключен. Проверьте разрешение и попробуйте кнопку микрофона внутри видеозвонка.');
+      if (wasMuted && audioMuted) status('Микрофон остался выключен. Проверьте разрешение браузера на доступ к микрофону.');
       else if (!audioAvailable) status('Микрофон недоступен. Проверьте выбранное устройство.');
     } catch { status('Не получилось переключить микрофон. Проверьте разрешения браузера.'); }
     finally {

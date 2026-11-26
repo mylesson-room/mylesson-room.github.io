@@ -6,9 +6,14 @@ from functools import lru_cache
 
 ROOT = Path(__file__).resolve().parent.parent
 ASSET = re.compile(r'(assets/(?:gostudy-(?:[a-z-]+|v1-[a-z-]+)|business-ai-workbook)\.(?:js|css))(?:\?v=[\w-]+)?(?=["\'])')
+VIDEO_ASSET = re.compile(r'(assets/gostudy-(?:jaas-video|b1-stories-video|finance-private-lesson)\.js)(?:\?v=[\w-]+)?(?=["\'])')
 @lru_cache
 def digest(url):
     return hashlib.sha256((ROOT / url).read_bytes()).hexdigest()[:12]
+
+def version(match):
+    url = match[1]
+    return f'{url}?v={digest(url)}'
 
 def classroom_controls(html):
     dictionary = any(name in html for name in (
@@ -38,8 +43,9 @@ for path in sorted(ROOT.glob('*.html')):
     original = path.read_text()
     html = classroom_controls(original)
     if 'data-vocab-course=' not in html and 'data-finance-live' not in html and 'data-ielts-private-lesson' not in html and 'data-placement-' not in html and path.name not in {'login.html','gostudy-account.html','gostudy-teacher.html','gostudy-ui-kit.html'}:
-        if html != original:
-            path.write_text(ASSET.sub(lambda match: f'{match[1]}?v={digest(match[1])}', html))
+        updated = (ASSET if html != original else VIDEO_ASSET).sub(version, html)
+        if updated != original:
+            path.write_text(updated)
         continue
     # Course-restricted cabinets mount Michael's shared vocabulary dynamically
     # only after the existing Supabase enrollment/role check succeeds.
@@ -67,10 +73,6 @@ for path in sorted(ROOT.glob('*.html')):
         html = re.sub(r'(<script (?:defer )?src="assets/gostudy-sync\.js)', r'<script src="assets/gostudy-classroom-ui.js"></script>\1', html, count=1) if 'assets/gostudy-classroom-ui.js' not in html else html
     if 'id="student-home"' in html and 'assets/gostudy-lesson-header.css' not in html:
         html = html.replace('</head>', '<link rel="stylesheet" href="assets/gostudy-lesson-header.css"></head>', 1)
-    def version(match):
-        url = match[1]
-        stamp = digest(url)
-        return f'{url}?v={stamp}'
     updated = ASSET.sub(version, html)
     if updated != original:
         path.write_text(updated)
