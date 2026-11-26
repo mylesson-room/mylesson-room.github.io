@@ -84,7 +84,7 @@ async function checkThreeProgressMeLessons() {
     }
     if (spec.course === 'country-house') {
       assert.ok(cabinet.includes('"lesson":"country-house-travel-a2-05.html"'),'Irina now opens the new A2+ lesson');
-      assert.ok(cabinet.includes('"homework":"country-house-travel-a2-05-homework.html"'),'Irina has the assigned travel homework');
+      assert.ok(cabinet.includes('"homework":"country-house-travel-a2-05-homework-02.html"'),'Irina has the assigned travel homework');
       assert.ok(cabinet.includes('A Sunday Picnic Plan') && cabinethasOldHomeworkHistory(cabinet),
         'Previous lesson and historical homework URL must remain preserved');
     } else if (spec.course === 'art-b1') {
@@ -1909,7 +1909,7 @@ async function main() {
           try {
             await guest.goto(origin+'/student-finance-b1.html');
             await guest.getByRole('link',{name:'Открыть домашнее задание'}).click();
-            await guest.waitForURL('**/finance-b1-ai-20261118-homework.html');
+            await guest.waitForURL('**/finance-b1-ai-20261118-homework-02.html');
             await guest.locator('#gostudyAccessGate').waitFor();
             assert.equal(await guest.locator('#lessonPages').count(),0);
             await guest.goBack();
@@ -1919,7 +1919,7 @@ async function main() {
           } finally {
             await guest.close();
           }
-          assert.equal(await sp.locator('#assignment').getAttribute('href'),'finance-b1-ai-20261118-homework.html');
+          assert.equal(await sp.locator('#assignment').getAttribute('href'),'finance-b1-ai-20261118-homework-02.html');
           await sp.locator('.lesson-card-link').click();
           await tp.locator('#teacher-student-list .teacher-enter-class').click();
           for (const page of [sp,tp]) {
@@ -1993,8 +1993,8 @@ async function main() {
             // B1 Stories reuses Michael's actual cabinet JS/CSS after the
             // protected destination RPC, not its old standalone dashboard.
             assert.equal(await studentLink.getAttribute('href'),'general-english-b1-stories-01.html');
-            assert.equal(await sp.locator('.homework-link').getAttribute('href'),'general-english-b1-stories-01-homework.html');
-            await sp.getByText('Old Habits, New Habits',{exact:true}).waitFor();
+            assert.equal(await sp.locator('.homework-link').getAttribute('href'),'general-english-b1-stories-01-homework-02.html');
+            await sp.getByText('The Two-Week Neighbourhood Trial',{exact:true}).waitFor();
             await sp.locator('.vocab-feature--practice').waitFor({state:'visible'});
             await sp.getByRole('button',{name:/Словарь/}).first().click();
             await sp.locator('#words[open]').waitFor();
@@ -2224,11 +2224,11 @@ async function main() {
           assert.equal(studentConfig.key,current.lessonKey,'Existing progress key must remain stable');
           assert.equal(studentConfig.vocabulary.length,6,'B1 active vocabulary cap');
           assert.equal(await tp.locator('body').getAttribute('data-dud-b1-premium'),'','Premium styling must activate for both roles');
-          await sp.goto(origin + '/' + current.homework);
+          await sp.goto(origin + '/general-english-b1-stories-01-homework.html');
           await sp.getByRole('heading',{name:'01 · What does it really mean?',exact:true}).waitFor();
           assert.equal(await sp.locator('body').getAttribute('data-dud-b1-premium'),null,'Old homework design stays untouched');
           const homeworkConfig = await sp.locator('#lesson-data').evaluate(node=>JSON.parse(node.textContent));
-          assert.equal(homeworkConfig.key,current.homeworkKey,'The protected homework progress key must remain stable');
+          assert.equal(homeworkConfig.key,'gostudy-general-english-b1-stories-01-homework-v1','The previous homework progress key must remain stable');
           assert.equal(homeworkConfig.contentVersion,'old-habits-new-habits-20261124-v1');
           assert.equal(homeworkConfig.steps.length,6,'New homework must contain six activities');
           assert.equal(homeworkConfig.steps.reduce((n,step)=>n+step.minutes,0),35);
