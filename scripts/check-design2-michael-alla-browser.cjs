@@ -88,6 +88,8 @@ async function sample(browser,origin,{name,html,mobile,role='student'}){
     assert.equal(measure.translator,true,name+' must render the shared translation selection UI');
     if(mobile){
       assert.ok(measure.pager.top>=0&&measure.pager.top<=844,name+' mobile lesson pager must be visible');
+    }else if(name.includes('homework')){
+      assert.ok(measure.lesson.width>500,name+' desktop homework needs readable exercises');
     }else{
       assert.ok(measure.sidebar.width>250&&measure.lesson.width>500,name+' desktop needs left video / right exercises');
       assert.ok(measure.sidebar.right<=measure.lesson.left+20,name+' sidebar must precede the exercise sheet');
