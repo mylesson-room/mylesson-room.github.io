@@ -73,8 +73,8 @@
   const businessAIKeys = ['gostudy-vocabulary-business-ai-v1','gostudy-business-ai-b2c1-02-v1','gostudy-business-ai-b2c1-03-v1','gostudy-business-ai-b2c1-03-homework-v1','gostudy-business-ai-b2c1-03-v2','gostudy-business-ai-b2c1-03-homework-v2','gostudy-business-ai-b2c1-03-v3','gostudy-business-ai-b2c1-03-homework-v3'];
   const sportsB2Pages = ['student-sports-b2.html','barcelona-appeal-b2-04.html','barcelona-appeal-b2-04-homework.html'].includes(currentPage) || document.querySelector('meta[name=gostudy-course]')?.content === 'sports-b2';
   const sportsB2Keys = ['gostudy-vocabulary-sports-b2-v1','gostudy-sports-b2-football-academies-04-v1','gostudy-sports-b2-football-academies-04-homework-v1'];
-  const generalB2Pages = ['student-general-english-b2.html','general-english-b2-01.html'].includes(currentPage);
-  const generalB2Keys = ['gostudy-vocabulary-general-english-b2-v1','gostudy-general-english-b2-01-v1','gostudy-general-english-b2-01-v2'];
+  const generalB2Pages = ['student-general-english-b2.html','general-english-b2-01.html','general-english-b2-02.html','general-english-b2-02-homework.html'].includes(currentPage);
+  const generalB2Keys = ['gostudy-vocabulary-general-english-b2-v1','gostudy-general-english-b2-01-v1','gostudy-general-english-b2-01-v2','gostudy-general-english-b2-02-v1','gostudy-general-english-b2-02-homework-v1'];
   const generalB1Course = 'general-english-b1';
   const generalB1Cabinet = currentPage === 'student-general-english-b1.html';
   const generalB1 = generalB1Cabinet || document.querySelector('meta[name=gostudy-course]')?.content === generalB1Course;
@@ -1321,7 +1321,7 @@
       ielts_reading:{name:'IELTS Reading',lessons:[{title:'IELTS Reading · Lesson 1',lesson:'ielts-reading-01.html',homework:'ielts-reading-01-homework.html'},{number:4,title:'IELTS Academic Reading 04',lesson:'ielts-reading-04.html'}]},
       sweden_a2:{name:'Sweden · A2',lessons:[{number:2,title:'Your First Full Day in Stockholm',lesson:'sweden-a2-02-michael.html',lessonKey:'gostudy-sweden-a2-02-michael-v1',homework:'sweden-a2-02-michael-homework.html',homeworkKey:'gostudy-sweden-a2-02-michael-homework-v1'}]},
       [placement]:{name:'My Trip to Vietnam · A2',lessons:[{title:'English Placement Test',lesson:'english-placement.html'},{title:'My Trip to Vietnam',lesson:'my-trip-to-vietnam-a2.html',lessonKey:'gostudy-vietnam-a2-20261118-v1',homework:'my-trip-to-vietnam-a2-homework.html',homeworkKey:'gostudy-vietnam-a2-homework-20261118-v1'}]},
-      [generalB2]:{name:'General English B2',lessons:[{title:'The Hidden Cost of Convenience',lesson:'general-english-b2-01.html',lessonKey:'gostudy-general-english-b2-01-v2',homework:'general-english-b2-01.html#homework'}]},
+      [generalB2]:{name:'General English B2',lessons:[{title:'The Hidden Cost of Convenience',lesson:'general-english-b2-01.html',lessonKey:'gostudy-general-english-b2-01-v2',homework:'general-english-b2-01.html#homework'},{number:2,title:'Could a Favourite Holiday Destination Become Home?',lesson:'general-english-b2-02.html',lessonKey:'gostudy-general-english-b2-02-v1',homework:'general-english-b2-02-homework.html'}]},
       [financeCourse]:{
       name:'AI in Finance · B2',
       lessons:[{title:'AI in Finance · Lesson 2',lesson:financeLesson,homework:'business-ai-finance-b2-02-homework.html'}],

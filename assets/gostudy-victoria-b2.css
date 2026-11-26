@@ -1,0 +1,38 @@
+body[data-victoria-b2][data-homework-only] :is(#lessonVideo, #lessonDivider, #moveStudent) {
+  display: none !important;
+}
+body[data-victoria-b2][data-homework-only] .layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+body[data-victoria-b2][data-homework-only] :is(.lesson, .pager) {
+  width: min(100%, 1040px);
+  margin-inline: auto;
+}
+body[data-victoria-b2] .gostudy-real-photo {
+  margin: 0 0 1rem;
+}
+body[data-victoria-b2] .gostudy-real-photo img {
+  display: block;
+  width: 100%;
+  height: clamp(140px, 27vw, 270px);
+  object-fit: cover;
+  border-radius: 16px;
+}
+body[data-victoria-b2] .gostudy-real-photo figcaption {
+  font-size: .8rem;
+}
+body[data-victoria-b2] .unified-video iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+}
+body[data-victoria-b2] .unified-video {
+  aspect-ratio: auto;
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+}
+body[data-victoria-b2] .unified-video iframe {
+  height: auto;
+  border-radius: 16px;
+}
