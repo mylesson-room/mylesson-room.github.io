@@ -47,7 +47,7 @@ async function sample(browser,origin,{name,html,mobile,role='student'}){
       if(u.pathname.endsWith('/auth/v1/user'))return mockResponse(route,{id});
       if(u.pathname.includes('/gostudy_classroom_rooms'))return mockResponse(route,[{
         id:room,teacher_id:teacher,student_id:student,student_label:'Synthetic Student',
-        course:'vietnam-a2',lesson_path:'my-trip-to-vietnam-a2.html'
+        course:html.includes('homework')?'vietnam-a2-homework':'vietnam-a2',lesson_path:html
       }]);
       if(u.pathname.includes('/gostudy_finance_room'))return mockResponse(route,[{teacher_id:teacher,student_id:student}]);
       if(u.pathname.includes('/gostudy_classroom_events')||u.pathname.includes('/gostudy_finance_events')||u.pathname.includes('/gostudy_progress'))return mockResponse(route,[]);
@@ -122,13 +122,10 @@ async function sample(browser,origin,{name,html,mobile,role='student'}){
         assert.equal(await tiles.count(),2,name+' must visually match Michael two participant tiles');
         assert.deepEqual(await page.locator('#lessonVideo .jaas-person-label').allTextContents(),
           ['Преподаватель','Ученик'],name+' participant captions');
-        assert.equal(await page.locator('#lessonVideo .video-preview').getAttribute('role'),'group',
-          name+' placeholder must NOT pretend to start a call');
-        assert.equal(await page.locator('#lessonVideo .jaas-connect').count(),0,
-          name+' must not offer fake JaaS button without approved token service');
-        const existing=page.locator('#lessonVideo a.telemost-fallback-link[href*="telemost.yandex.ru"]');
-        assert.equal(await existing.isVisible(),true,name+' original real Telemost link must remain visible');
-        assert.equal(await existing.getAttribute('target'),'_blank',name+' opens externally');
+        assert.equal(await page.locator('#lessonVideo .jaas-connect').count(),1,
+          name+' approved scoped JaaS control must exist');
+        assert.equal(await page.locator('#lessonVideo a.telemost-fallback-link').count(),0,
+          name+' must not regress to legacy fallback');
       }
     }
     // A shared word notification must be visible for incoming classroom vocabulary events.
