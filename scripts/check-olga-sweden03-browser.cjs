@@ -117,7 +117,11 @@ async function pageFor(browser,base,{file,mobile=false,role='student',assigned='
       await page.locator('#page-2 .sweden-listening').waitFor({state:'visible',timeout:4000});
       assert.equal(await page.locator('#page-2 details summary').first().textContent(),'Transcript','listening transcript missing');
      } else {
-      assert.equal(await page.locator('#lessonVideo .video-workspace').isVisible(),false,'homework must not display fake video');
+      assert.equal(await page.locator('#lessonVideo').isVisible(),false,'homework must hide video, chat and lesson sections');
+      assert.equal(await page.locator('#lessonDivider').isVisible(),false,'homework must hide the sidebar divider');
+      assert.ok(await page.locator('.lesson').evaluate(lesson =>
+       lesson.getBoundingClientRect().width >= Math.min(lesson.parentElement.clientWidth, 1040) - 1
+      ),'homework exercises must use the available width');
      }
      assert.deepEqual(item.errors.filter(e=>/gostudy-v1-|gostudy-sweden/.test(e)),[],name+' runtime errors');
      await page.screenshot({path:path.join(shots,name+'.png'),fullPage:false,animations:'disabled'});

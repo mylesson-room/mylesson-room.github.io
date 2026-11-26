@@ -1,5 +1,13 @@
 (() => {
   const lesson = JSON.parse(document.querySelector('#lesson-data').textContent);
+  const standaloneHomework = document.body.hasAttribute('data-homework-only')
+    || /(?:^|[-/])homework(?:-[-\w]+)?\.html$/i.test(location.pathname);
+  function updateHomeworkLayout() {
+    document.body.toggleAttribute('data-homework-layout', standaloneHomework || location.hash === '#homework');
+  }
+  updateHomeworkLayout();
+  if (!standaloneHomework) window.addEventListener('hashchange', updateHomeworkLayout);
+
   const template = `
 <p class="classroom-access" role="status">Открываем урок… <a href="login.html">Войти в GoStudy</a></p>
 <header><a class="brand lesson-brand" href="%%CABINET%%" aria-label="My classroom"><img src="assets/gostudy-emblem.svg" alt=""></a><div class="header-right"><button type="button" class="lesson-dictionary-button" id="openLessonDictionary" aria-haspopup="dialog" aria-controls="lessonDictionary"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6c-3-2-6-2-9-1v13c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1v13"/></svg>Dictionary</button><a class="lesson-home-link" href="%%CABINET%%" aria-label="Student dashboard"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v11h14V9m-9 11v-6h4v6"/></svg></a></div></header>
