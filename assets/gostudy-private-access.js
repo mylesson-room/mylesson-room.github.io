@@ -84,10 +84,12 @@ async function verify(){
    });
    const result=await request('/rest/v1/gostudy_classroom_rooms?'+query);
    const candidate=Array.isArray(result.data)?result.data[0]:null;
-   if(!result.ok || !candidate || (selectedStudent ? candidate.teacher_id!==u.id : candidate.student_id!==u.id)){
+   const isTeacher = !!selectedStudent && candidate?.student_id === selectedStudent && u.id !== selectedStudent &&
+    (candidate.teacher_id === u.id || config.allowAssignedTeachers === true);
+   if(!result.ok || !candidate || (selectedStudent ? !isTeacher : candidate.student_id!==u.id)){
     user=null;room=null;show(false);text('У этого аккаунта нет доступа к данному кабинету.');return false;
    }
-   room={...config.room,student:candidate.student_id,teacher:candidate.teacher_id};
+   room={...config.room,student:candidate.student_id,teacher:isTeacher ? u.id : candidate.teacher_id};
   }
   user=u;show(true);text('');
   document.dispatchEvent(new CustomEvent('gostudy-private-authorized',{detail:{userId:u.id}}));

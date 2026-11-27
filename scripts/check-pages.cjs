@@ -1159,7 +1159,7 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     'my-trip-to-vietnam-a2-homework.html':'88888888-8888-4888-8888-888888888888',
     'english-placement.html':'99999999-9999-4999-8999-999999999999',
   };
-  const ids={student:studentId,teacher:teacherId,outsider:'00000000-0000-4000-8000-000000000001'};
+  const ids={student:studentId,teacher:teacherId,coTeacher:'00000000-0000-4000-8000-000000000002',outsider:'00000000-0000-4000-8000-000000000001'};
   const events=new Map(Object.values(rooms).map(id=>[id,[]]));
   const saved=new Map(),mastery=[];
   const courseData=await readFile('assets/gostudy-sync.js','utf8');
@@ -1179,6 +1179,7 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
   const student=await browser.newContext({viewport:{width:1360,height:900}});
   const teacher=await browser.newContext({viewport:{width:1360,height:900}});
   const outsider=await browser.newContext();
+  const coTeacher=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
   const route=async(r)=>{
     const request=r.request(),url=new URL(request.url()),method=request.method();
     const actor=(request.headers().authorization||'').replace('Bearer test-','');
@@ -1191,14 +1192,16 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
       return answer(200,{user:{id:ids[who],email},access_token:'test-'+who,refresh_token:'test',expires_in:3600});
     }
     if(!target)return answer(401,{});
-    if(url.pathname.endsWith('/gostudy_my_destinations'))return answer(200,actor==='teacher'?[{course:'teacher'}]:[{course:'english-placement'}]);
+    if(url.pathname.endsWith('/gostudy_my_destinations'))return answer(200,actor==='teacher'?[{course:'teacher'}]:actor==='coTeacher'?[{course:'teacher-assigned'}]:[{course:'english-placement'}]);
     if(url.pathname.endsWith('/gostudy_legacy_teacher_view')){
       if(actor==='teacher')return answer(200,[{id:studentId,label:'Vietnam A2 student',email:'student@example.invalid'}]);
       return answer(200,[]);
     }
     if(url.pathname.endsWith('/gostudy_classroom_rooms')){
-      const lesson=(url.searchParams.get('lesson_path')||'').slice(3);
-      const student=(url.searchParams.get('student_id')||'').slice(3);
+      const listing=url.searchParams.get('select')==='student_id,student_label' &&
+        url.searchParams.get('course')==='eq.english-placement' && ['teacher','coTeacher'].includes(actor);
+      const lesson=listing?'english-placement.html':(url.searchParams.get('lesson_path')||'').slice(3);
+      const student=listing?studentId:(url.searchParams.get('student_id')||'').slice(3);
       const found=rooms[lesson]&&student===studentId&&actor!=='outsider';
       return answer(200,found?[{id:rooms[lesson],student_id:studentId,teacher_id:teacherId,student_label:'Vietnam A2 student'}]:[]);
     }
@@ -1225,7 +1228,7 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     return answer(200,[]);
   };
   try{
-    for(const [context,role] of [[student,'student'],[teacher,'teacher'],[outsider,'outsider']]){
+    for(const [context,role] of [[student,'student'],[teacher,'teacher'],[outsider,'outsider'],[coTeacher,'coTeacher']]){
       await context.addInitScript(({id,role})=>{
         sessionStorage.setItem('gostudy-cloud-session-v1',JSON.stringify({
           user:{id,email:role+'@example.invalid'},access_token:'test-'+role,refresh_token:'test',expires_at:Date.now()+3600000
@@ -1233,6 +1236,25 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
       },{id:ids[role],role});
       await context.route('https://*.supabase.co/**',route);
     }
+    const delegated=await coTeacher.newPage();
+    await delegated.goto(origin+'/login.html');
+    await delegated.waitForURL(url=>url.pathname==='/gostudy-teacher.html');
+    const picker=delegated.locator('#teacher-mobile-picker');
+    const sheet=delegated.getByRole('dialog',{name:'Выбрать ученика'});
+    await picker.getByText('Vietnam A2 student').waitFor();
+    await picker.click();
+    await sheet.waitFor();
+    assert.equal(await sheet.locator('.teacher-student-row').count(),1);
+    assert.ok(!await sheet.locator('#teacher-add-student').isVisible());
+    await sheet.getByRole('button',{name:/Карточка ученика/}).click();
+    await sheet.waitFor({state:'hidden'});
+    await delegated.getByRole('tab',{name:'Домашняя работа'}).click();
+    assert.equal(await delegated.locator('#teacher-current-homework').getAttribute('href'),
+      'my-trip-to-vietnam-a2-homework.html?classStudent='+studentId);
+    await delegated.getByRole('tab',{name:'Уроки'}).click();
+    await delegated.locator('#teacher-current-lesson').getByRole('link',{name:'Войти в класс'}).click();
+    await delegated.locator('#lessonPages>.page.active').waitFor();
+    assert.equal(await delegated.evaluate(()=>window.FinanceLive.teacher()),true);
     const sp=await student.newPage();
     await sp.goto(origin+'/student-english-placement.html');
     await sp.locator('.lesson-card-link').waitFor();
@@ -1357,7 +1379,7 @@ async function checkVietnamA2PrivateClassroom(browser,origin){
     await mobile.close();
     console.log('VIETNAM A2: private cabinet, lesson & homework, auto-grading, answer restore, teacher sync, chat, dictionary, move student, outsider and mobile verified');
   }finally{
-    await Promise.all([student.close(),teacher.close(),outsider.close()]);
+    await Promise.all([student.close(),teacher.close(),outsider.close(),coTeacher.close()]);
   }
 }
 

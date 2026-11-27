@@ -65,7 +65,7 @@
         }
       } else {
         document.dispatchEvent(new CustomEvent("finance-event", {
-          detail:{...event,initial,own:event.actor === auth.userId(),teacher:event.actor === room.teacher_id}
+          detail:{...event,initial,own:event.actor === auth.userId(),teacher:privateRoom ? event.actor !== room.student_id : event.actor === room.teacher_id}
         }));
       }
     }
@@ -77,7 +77,7 @@
       if (!room) {
         const list = await request(classroomQuery ? "/rest/v1/gostudy_classroom_rooms?"+classroomQuery : roomPath);
         room = course ? list.find(row => {
-          if (privateRoom) return row.student_id === user || row.teacher_id === user;
+          if (privateRoom) return row.student_id === privateRoom.student && (row.student_id === user || privateRoom.teacher === user);
           return selectedStudent ? row.teacher_id === user : row.student_id === user;
         }) : list[0];
         if (!room) { show("Для этого аккаунта нет доступа к комнате."); return; }
@@ -124,7 +124,7 @@
   }
   window.FinanceLive = {
     connected: () => Boolean(room),
-    teacher: () => room?.teacher_id === auth.userId(),
+    teacher: () => !!room && (privateRoom?.teacher || room.teacher_id) === auth.userId(),
     words() {
       const combined = new Map();
       if (!room || room.student_id === auth.userId()) {
