@@ -175,9 +175,12 @@
   };
 
   async function request(path, options = {}, accessToken = '') {
-    const response = await fetch(project + path, {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+    try {
+      const response = await fetch(project + path, {
       method: options.method || 'GET',
-      signal: AbortSignal.timeout(12000),
+      signal: controller.signal,
       headers: {
         apikey: publicKey,
         ...(accessToken ? {Authorization: 'Bearer ' + accessToken} : {}),
@@ -187,7 +190,10 @@
       body: options.body ? JSON.stringify(options.body) : undefined,
     });
     const data = response.status === 204 ? null : await response.json().catch(() => null);
-    return {ok: response.ok, status: response.status, data};
+      return {ok: response.ok, status: response.status, data};
+    } finally {
+      clearTimeout(timeout);
+    }
   }
   function saveSession(data, persist = false) {
     session = {...data, expires_at: Date.now() + data.expires_in * 1000};
@@ -233,7 +239,7 @@
     if (!document.body.hasAttribute("data-preserve-workbook-progress")) return;
   }
   if (currentPage === 'student-travel-a2.html' && session && window.GoStudyWordActions) {
-    const lesson = classroomCatalog.travel_a2.lessons.at(-1).lesson;
+    const lesson = classroomCatalog.travel_a2.lessons.slice(-1)[0].lesson;
     window.GoStudyFinanceAuth = {token, request, userId: () => session?.user?.id, classroomStudent};
     GoStudyWordActions.connectCabinet('travel-a2',lesson);
   }
@@ -533,7 +539,7 @@
       vocabulary: 'travel-disruptions-b2.html#vocabulary', words: 'gostudy-travel-disruptions-b2-v1'
     } : null;
     const catalogCourse = storiesCabinet ? 'general_english_b1_stories' : generalB1 ? 'general_english_b1' : countryHouse ? 'country_house' : travelB2Cabinet ? 'travel_b2' : businessAI ? 'business_ai' : course;
-    const currentLesson = classroomCatalog[catalogCourse].lessons.at(-1);
+    const currentLesson = classroomCatalog[catalogCourse].lessons.slice(-1)[0];
     const lesson = {...courseHome,...currentLesson,homework:currentLesson.homework || courseHome?.homework};
     const started = json(GoStudyStorage.getItem(lesson.lessonKey),{});
     home.innerHTML = '<div class="home-duo"><article class="home-current home-homework"><p>Домашнее задание</p><h2></h2><div class="home-actions"><a class="home-primary home-homework-link">Сделать задание</a></div></article><article class="home-current home-lesson"><p>Текущий урок</p><h2></h2><div class="home-actions"><a class="home-primary home-open-lesson"></a></div></article></div><div class="home-tools"><a class="home-tile"><strong>Словарь</strong><small>Мои слова</small></a><button type="button" class="home-tile"><strong>Тренировки</strong><small>Повторить слова</small></button></div><dialog class="home-training"><h2>Тренировка слов</h2><p role="status"></p><strong class="home-prompt"></strong><p class="home-meaning" hidden></p><div class="home-actions"><button type="button" class="home-reveal">Показать перевод</button><button type="button" class="home-next">Следующее слово</button><button type="button" class="home-close">Закрыть</button></div></dialog>';
@@ -660,7 +666,7 @@
         mountLesson();
         await loadScript('assets/gostudy-v1-vocabulary.js?v=classroom-controls-1');
         if (window.GoStudyWordActions) {
-          const lesson = classroomCatalog[catalogCourse]?.lessons.at(-1)?.lesson?.split(/[?#]/)[0];
+          const lesson = classroomCatalog[catalogCourse]?.lessons.slice(-1)[0]?.lesson?.split(/[?#]/)[0];
           if (lesson) {
             window.GoStudyFinanceAuth = {token, request, userId:() => session?.user?.id, classroomStudent};
             GoStudyWordActions.connectCabinet(catalogCourse.replaceAll('_','-'),lesson);
@@ -1403,7 +1409,7 @@
         if (catalog) {
           const enter = document.createElement('a');
           enter.className = 'teacher-enter-class';
-          enter.href = classroomLink(catalog.lessons.at(-1).lesson,student.id);
+          enter.href = classroomLink(catalog.lessons.slice(-1)[0].lesson,student.id);
           enter.textContent = '→ Войти в класс';
           row.append(enter);
         }
@@ -1456,7 +1462,7 @@
       const current = document.getElementById('teacher-current-lesson');
       if (current) {
         current.replaceChildren();
-        const active = catalog?.lessons.at(-1);
+        const active = catalog?.lessons.slice(-1)[0];
         if (active) {
           const label = document.createElement('p');
           label.textContent = 'Текущий урок';
