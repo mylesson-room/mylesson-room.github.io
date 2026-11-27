@@ -1,0 +1,130 @@
+/* Only the new Michael lesson opts in. No selector applies to another student. */
+html[data-classroom-theme="light"]{--class-ink:#292c29;--class-muted:#4f514a;--class-panel:#fffaf0e8;--class-line:#655c493d;--class-veil:#f3ead2a8;--class-control:#fff8e8e8;--class-accent:#775e31;--class-green:#236044}
+html[data-classroom-theme="dark"]{--class-ink:#f4e9d5;--class-muted:#e0d7c8;--class-panel:#182222eb;--class-line:#e9dcc343;--class-veil:#141a22a8;--class-control:#182222eb;--class-accent:#e8c998;--class-green:#a7d7af}
+body[data-virtual-classroom="michael-1-1"]{--ink:var(--class-ink);--muted:var(--class-muted);--primary:var(--class-accent);--stroke:var(--class-line);color:var(--class-ink);background:#34342d;font-size:16px;line-height:1.5}
+body[data-virtual-classroom="michael-1-1"]::before{content:"";position:fixed;inset:-12px;z-index:-1;background:linear-gradient(var(--class-veil),var(--class-veil)),url('michael-classroom-london.jpg') center/cover;animation:classroom-environment 55s ease-in-out infinite alternate;pointer-events:none}
+body[data-virtual-classroom="michael-1-1"] header{height:66px;padding:12px 24px;gap:28px;border:0;background:transparent;box-shadow:none}
+body[data-virtual-classroom="michael-1-1"] .brand{color:var(--class-ink);font-size:25px;font-weight:650}
+body[data-virtual-classroom="michael-1-1"] .classroom-course{font-size:14px;white-space:nowrap;color:var(--class-ink)}
+body[data-virtual-classroom="michael-1-1"] .header-right{gap:8px;font-size:14px;color:var(--class-ink)}
+body[data-virtual-classroom="michael-1-1"] .header-right button,body[data-virtual-classroom="michael-1-1"] .header-right summary,body[data-virtual-classroom="michael-1-1"] .header-right a{border:1px solid var(--class-line);background:var(--class-control);color:var(--class-ink);border-radius:24px;padding:8px 16px;font:inherit;min-height:40px}
+body[data-virtual-classroom="michael-1-1"] .layout{display:grid;grid-template-columns:clamp(200px,20vw,300px) minmax(0,1fr);gap:30px;max-width:1800px;margin:0 auto;padding:12px 24px;height:calc(100dvh - 150px);background:transparent}
+body[data-virtual-classroom="michael-1-1"] .sidebar{position:relative;top:auto;height:100%;padding:0;background:transparent;border:0;overflow:visible}
+body[data-virtual-classroom="michael-1-1"] .lesson-divider,body[data-virtual-classroom="michael-1-1"] .hero,body[data-virtual-classroom="michael-1-1"] .footer,body[data-virtual-classroom="michael-1-1"] .lesson-section-menu{display:none}
+body[data-virtual-classroom="michael-1-1"] .lesson{padding:0;background:transparent;min-width:0;min-height:0}
+body[data-virtual-classroom="michael-1-1"] .lesson-content{height:100%;padding:0 12px 24px 0;background:transparent;border:0;box-shadow:none;border-radius:0;overflow:auto;scrollbar-gutter:stable;overscroll-behavior:contain}
+body[data-virtual-classroom="michael-1-1"] .page.active{animation:classroom-page .32s ease both}
+body[data-virtual-classroom="michael-1-1"] .panel{padding:0;margin:0;background:transparent;border:0;box-shadow:none}
+body[data-virtual-classroom="michael-1-1"] .classroom-section-label{margin:0 0 8px;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--class-accent)}
+body[data-virtual-classroom="michael-1-1"] .activity-head{background:transparent;border:0;padding:0;margin:0 0 12px}
+body[data-virtual-classroom="michael-1-1"] .activity-icon{display:none}
+body[data-virtual-classroom="michael-1-1"] .activity-titles h2{font-family:Georgia,'Times New Roman',serif;font-size:clamp(32px,3.5vw,54px);font-weight:400;line-height:1.1;letter-spacing:-.03em;color:var(--class-ink);margin:0}
+body[data-virtual-classroom="michael-1-1"] .lead{color:var(--class-ink);margin:0 0 22px;max-width:850px}
+body[data-virtual-classroom="michael-1-1"] .article,body[data-virtual-classroom="michael-1-1"] .tip,body[data-virtual-classroom="michael-1-1"] .term,body[data-virtual-classroom="michael-1-1"] .question-item,body[data-virtual-classroom="michael-1-1"] .gap-item,body[data-virtual-classroom="michael-1-1"] .role,body[data-virtual-classroom="michael-1-1"] .chart,body[data-virtual-classroom="michael-1-1"] .signal-card,body[data-virtual-classroom="michael-1-1"] .decision-metrics>div{background:var(--class-panel);border:1px solid var(--class-line);color:var(--class-ink);border-radius:16px;box-shadow:none}
+body[data-virtual-classroom="michael-1-1"] .article p,body[data-virtual-classroom="michael-1-1"] .role p,body[data-virtual-classroom="michael-1-1"] .signal-card span,body[data-virtual-classroom="michael-1-1"] .feedback,body[data-virtual-classroom="michael-1-1"] .case{color:var(--class-muted)}
+body[data-virtual-classroom="michael-1-1"] .tip{font-size:16px}
+body[data-virtual-classroom="michael-1-1"] .tip b{color:var(--class-accent)}
+body[data-virtual-classroom="michael-1-1"] input,body[data-virtual-classroom="michael-1-1"] textarea,body[data-virtual-classroom="michael-1-1"] select,body[data-virtual-classroom="michael-1-1"] .definition-picker,body[data-virtual-classroom="michael-1-1"] .definition-options,body[data-virtual-classroom="michael-1-1"] .definition-options button,body[data-virtual-classroom="michael-1-1"] .choices label{background:var(--class-control);color:var(--class-ink);border-color:var(--class-line)}
+body[data-virtual-classroom="michael-1-1"] textarea{font-size:16px;min-height:110px}
+body[data-virtual-classroom="michael-1-1"] .good,body[data-virtual-classroom="michael-1-1"] .finance-correct .feedback{color:var(--class-green)}
+body[data-virtual-classroom="michael-1-1"] .finance-correct{border-color:var(--class-green)}
+body[data-virtual-classroom="michael-1-1"] .warmup-scene{background:#172226ed;border:1px solid #ead8b847;color:#f4e9d5;padding:24px;border-radius:18px;box-shadow:none}
+body[data-virtual-classroom="michael-1-1"] .scene-live,body[data-virtual-classroom="michael-1-1"] .scene-footer b{display:none}
+body[data-virtual-classroom="michael-1-1"] .scene-chart{display:flex;flex-direction:column;gap:12px}
+body[data-virtual-classroom="michael-1-1"] .scene-copy strong{font:italic 600 52px Georgia,serif;color:#f4e9d5}
+body[data-virtual-classroom="michael-1-1"] .scene-copy span,body[data-virtual-classroom="michael-1-1"] .scene-footer{color:#e8c998}
+body[data-virtual-classroom="michael-1-1"] .scene-chart svg{max-height:110px;width:100%;filter:grayscale(1)}
+body[data-virtual-classroom="michael-1-1"] .scene-badge{background:transparent;color:#e8d9bd;font-size:14px;padding:0}
+body[data-virtual-classroom="michael-1-1"] .questions{list-style:decimal-leading-zero;padding-left:32px}
+body[data-virtual-classroom="michael-1-1"] .questions li{padding:12px 0 16px 8px;border-bottom:1px solid var(--class-line);margin:0}
+body[data-virtual-classroom="michael-1-1"] .questions li::marker{color:var(--class-accent);font-size:14px}
+body[data-virtual-classroom="michael-1-1"] .video-workspace{background:transparent;border:0;border-radius:18px;box-shadow:none}
+body[data-virtual-classroom="michael-1-1"] .video-top{background:var(--class-control);color:var(--class-ink);border:0;border-radius:18px 18px 0 0;font-size:12px}
+body[data-virtual-classroom="michael-1-1"] .video-preview{display:grid;gap:12px;background:transparent;min-height:0;padding:0;aspect-ratio:auto;border:0}
+body[data-virtual-classroom="michael-1-1"] .jaas-person-tile{border-radius:16px;background:#202b2cee;min-height:165px;color:#eadcc4;border:1px solid #e9dcc343}
+body[data-virtual-classroom="michael-1-1"] .jaas-person-student{margin-top:8px;transform:translateX(6px)}
+body[data-virtual-classroom="michael-1-1"] .video-actions{background:var(--class-control);border:0;border-radius:24px;margin-top:12px}
+body[data-virtual-classroom="michael-1-1"] .jaas-message{background:var(--class-panel);color:var(--class-muted);border:0;border-radius:12px;margin-top:12px;font-size:14px}
+body[data-virtual-classroom="michael-1-1"] .jaas-frame{border-radius:16px;overflow:hidden;height:clamp(320px,52vh,650px)}
+body[data-virtual-classroom="michael-1-1"] .pager{position:fixed;inset:auto 0 0;min-height:72px;padding:12px 24px max(12px,env(safe-area-inset-bottom));gap:16px;border:0;background:var(--class-control);box-shadow:none;display:flex;align-items:center}
+body[data-virtual-classroom="michael-1-1"] #lessonSections{display:flex;gap:8px;flex:1;justify-content:center;overflow:auto}
+body[data-virtual-classroom="michael-1-1"] #lessonSections button{font-size:14px;white-space:nowrap;padding:12px 8px;border:0;border-radius:0;background:transparent;color:var(--class-muted);border-top:3px solid var(--class-line)}
+body[data-virtual-classroom="michael-1-1"] #lessonSections [aria-current]{border-top-color:var(--class-accent);color:var(--class-ink)}
+body[data-virtual-classroom="michael-1-1"] .pager>.outline,body[data-virtual-classroom="michael-1-1"] .pager>.primary{background:transparent;color:var(--class-ink);border:0;font-size:14px;margin:0;white-space:nowrap}
+body[data-virtual-classroom="michael-1-1"] .pager>.primary{background:#e9d4ae;color:#292820;border-radius:24px;padding:10px 24px}
+body[data-virtual-classroom="michael-1-1"] .lesson-chat-dropdown,body[data-virtual-classroom="michael-1-1"] .classroom-translate{position:relative;margin:0}
+body[data-virtual-classroom="michael-1-1"] .lesson-chat-dropdown summary{width:auto;display:flex;gap:4px}
+body[data-virtual-classroom="michael-1-1"] .lesson-chat-toggle svg,body[data-virtual-classroom="michael-1-1"] .lesson-chat-spacer{display:none}
+body[data-virtual-classroom="michael-1-1"] .finance-chat,body[data-virtual-classroom="michael-1-1"] .classroom-translate>p{position:absolute;right:0;top:44px;width:min(370px,88vw);max-height:65dvh;overflow:auto;padding:20px;border:1px solid var(--class-line);border-radius:18px;background:var(--class-control);color:var(--class-ink);box-shadow:0 12px 35px #0003;font-size:16px;z-index:50}
+body[data-virtual-classroom="michael-1-1"] .lesson-dictionary{background:var(--class-control);color:var(--class-ink)}
+body[data-virtual-classroom="michael-1-1"] .homework-teacher-actions{margin-top:16px;background:var(--class-panel);padding:12px;border-radius:12px}
+@keyframes classroom-environment{to{transform:scale(1.025)}}
+@keyframes classroom-page{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media(min-width:1100px){
+body[data-virtual-classroom="michael-1-1"] #page-0 .panel{display:grid;grid-template-columns:minmax(260px,.85fr) minmax(300px,1.25fr);gap:0 28px}
+body[data-virtual-classroom="michael-1-1"] #page-0 .activity-head,body[data-virtual-classroom="michael-1-1"] #page-0 .lead,body[data-virtual-classroom="michael-1-1"] #page-0 .tip{grid-column:1/-1}
+body[data-virtual-classroom="michael-1-1"] #page-0 .questions{margin-top:0}
+body[data-virtual-classroom="michael-1-1"] #page-0 .tip p{columns:3}
+}
+@media(max-width:1050px){
+body[data-virtual-classroom="michael-1-1"] .classroom-course{display:none}
+body[data-virtual-classroom="michael-1-1"] .layout{gap:20px;grid-template-columns:210px minmax(0,1fr)}
+body[data-virtual-classroom="michael-1-1"] #lessonSections{justify-content:flex-start}
+}
+@media(max-width:800px){
+body[data-virtual-classroom="michael-1-1"] header{height:auto;min-height:64px;padding:10px 12px;flex-wrap:wrap;gap:8px;background:var(--class-control)}
+body[data-virtual-classroom="michael-1-1"] .header-right{flex-basis:100%;justify-content:flex-start;flex-wrap:wrap;gap:6px}
+body[data-virtual-classroom="michael-1-1"] .header-right button,body[data-virtual-classroom="michael-1-1"] .header-right summary,body[data-virtual-classroom="michael-1-1"] .header-right a{padding:6px 10px}
+body[data-virtual-classroom="michael-1-1"] .layout{display:block;height:auto;padding:16px 14px 145px}
+body[data-virtual-classroom="michael-1-1"] .sidebar{height:auto;position:relative;margin-bottom:24px}
+body[data-virtual-classroom="michael-1-1"] .video-preview{grid-template-columns:1fr 1fr}
+body[data-virtual-classroom="michael-1-1"] .jaas-person-tile{min-height:100px}
+body[data-virtual-classroom="michael-1-1"] .jaas-person-student{margin-top:0;transform:none}
+body[data-virtual-classroom="michael-1-1"] .lesson-content{height:auto;padding:0;overflow:visible}
+body[data-virtual-classroom="michael-1-1"] .reading-layout,body[data-virtual-classroom="michael-1-1"] .role-grid,body[data-virtual-classroom="michael-1-1"] .decision-metrics{grid-template-columns:1fr}
+body[data-virtual-classroom="michael-1-1"] .article{padding:20px}
+body[data-virtual-classroom="michael-1-1"] .pager{flex-wrap:wrap;gap:8px;padding:8px 12px;min-height:112px}
+body[data-virtual-classroom="michael-1-1"] #lessonSections{order:-1;flex-basis:100%}
+body[data-virtual-classroom="michael-1-1"] #next{margin-left:auto}
+body[data-virtual-classroom="michael-1-1"] .classroom-translate>p,body[data-virtual-classroom="michael-1-1"] .finance-chat{position:fixed;left:4vw;right:4vw;top:120px}
+}
+@media(prefers-reduced-motion:reduce){body[data-virtual-classroom="michael-1-1"]::before,body[data-virtual-classroom="michael-1-1"] .page.active{animation:none}body[data-virtual-classroom="michael-1-1"] *{scroll-behavior:auto!important;transition:none!important}}
+/* Clear the legacy card decoration inside the continuous classroom canvas. */
+body[data-virtual-classroom="michael-1-1"] .questions li{background:transparent;border-radius:0;box-shadow:none;font-weight:400;font-size:16px;padding:14px 0 18px 10px}
+body[data-virtual-classroom="michael-1-1"] .questions li::before{display:none}
+body[data-virtual-classroom="michael-1-1"] .video-preview{justify-items:stretch;align-items:stretch;grid-template-columns:minmax(0,1fr)}
+body[data-virtual-classroom="michael-1-1"] .jaas-person-tile{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;aspect-ratio:16/10}
+body[data-virtual-classroom="michael-1-1"] .jaas-person-icon{width:46px;height:46px;opacity:.7}
+body[data-virtual-classroom="michael-1-1"] .jaas-person-icon svg{width:100%;height:100%}
+body[data-virtual-classroom="michael-1-1"] .video-actions.jaas-control-bar{display:flex;flex-direction:row;justify-content:center;gap:8px;padding:10px}
+body[data-virtual-classroom="michael-1-1"] #lessonVideo .video-actions button{color:var(--class-ink);background:transparent;border:1px solid var(--class-line);padding:8px;min-height:40px}
+body[data-virtual-classroom="michael-1-1"] .video-actions .jaas-visually-hidden{display:none}
+body[data-virtual-classroom="michael-1-1"] .video-top{height:auto;min-height:32px;font-size:12px;padding:8px;display:flex;align-items:center;gap:8px}
+body[data-virtual-classroom="michael-1-1"] .scene-copy{width:100%;text-align:left}
+body[data-virtual-classroom="michael-1-1"] .scene-chart{padding:14px 0}
+body[data-virtual-classroom="michael-1-1"] .scene-top,body[data-virtual-classroom="michael-1-1"] .scene-footer{padding:0;border:0}
+body[data-virtual-classroom="michael-1-1"] .scene-copy small{color:#d6d5ce}
+body[data-virtual-classroom="michael-1-1"] .scene-copy strong{font-size:48px}
+body[data-virtual-classroom="michael-1-1"] .tip{margin:16px 0;padding:16px 20px}
+body[data-virtual-classroom="michael-1-1"] .lesson-chat-dropdown:not([open])>.finance-chat{display:none}
+body[data-virtual-classroom="michael-1-1"] #lessonPages .activity-titles h2{font-weight:400}
+body[data-virtual-classroom="michael-1-1"] .bad{color:#c35d4e}
+html[data-classroom-theme="dark"] body[data-virtual-classroom="michael-1-1"] .bad{color:#f3ac98}
+@media(max-width:800px){body[data-virtual-classroom="michael-1-1"] .video-preview{grid-template-columns:1fr 1fr}body[data-virtual-classroom="michael-1-1"] .video-workspace{display:block}}
+body[data-virtual-classroom="michael-1-1"] .questions li{color:var(--class-ink);border:0;border-bottom:1px solid var(--class-line);min-height:0;text-align:left;display:list-item}
+body[data-virtual-classroom="michael-1-1"] .video-actions button svg{display:block;width:22px;height:22px}
+body[data-virtual-classroom="michael-1-1"] .video-actions button:disabled{opacity:.4}
+body[data-virtual-classroom="michael-1-1"] #lessonVideo .jaas-message{background:var(--class-panel);color:var(--class-muted);font-size:14px}
+body[data-virtual-classroom="michael-1-1"] .definition-picker>summary{background:var(--class-control);color:var(--class-ink)}
+body[data-virtual-classroom="michael-1-1"] .definition-picker button:hover{background:var(--class-control);color:var(--class-ink);outline:1px solid var(--class-accent)}
+body[data-virtual-classroom="michael-1-1"] .scene-copy strong{letter-spacing:-.03em}
+body[data-virtual-classroom="michael-1-1"] .classroom-homework{position:relative}
+body[data-virtual-classroom="michael-1-1"] .classroom-homework-content{position:absolute;right:0;top:44px;width:min(370px,90vw);padding:18px;background:var(--class-control);color:var(--class-ink);border:1px solid var(--class-line);border-radius:18px;z-index:50}
+body[data-virtual-classroom="michael-1-1"] .classroom-homework:not([open])>.classroom-homework-content{display:none}
+body[data-virtual-classroom="michael-1-1"] .classroom-homework-content button{font-size:14px}
+body[data-virtual-classroom="michael-1-1"] .homework-exercise-menu{color:var(--class-muted)}
+body[data-virtual-classroom="michael-1-1"] .homework-exercise-menu summary{font-size:12px}
+body[data-virtual-classroom="michael-1-1"] .page:not(.active){display:none!important}
+@media(min-width:1100px){body[data-virtual-classroom="michael-1-1"] #page-0 .questions li{padding-top:10px;padding-bottom:14px}body[data-virtual-classroom="michael-1-1"] #page-0 .warmup-scene{padding:20px}body[data-virtual-classroom="michael-1-1"] #page-0 .scene-chart svg{height:80px}body[data-virtual-classroom="michael-1-1"] #page-0 .tip p{columns:auto;display:flex;justify-content:space-between;gap:20px;font-size:14px;line-height:1.5}body[data-virtual-classroom="michael-1-1"] #page-0 .tip p br{display:none}}
+body[data-virtual-classroom="michael-1-1"] #lessonSections button{flex:0 0 auto;width:auto;min-width:max-content}
+@media(max-width:800px){body[data-virtual-classroom="michael-1-1"] #classroomTheme{position:absolute;right:12px;top:10px}body[data-virtual-classroom="michael-1-1"] .classroom-homework-content{position:fixed;left:4vw;right:4vw;top:115px}}

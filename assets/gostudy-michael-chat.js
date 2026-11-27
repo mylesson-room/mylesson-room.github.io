@@ -1,7 +1,7 @@
 /* Collapsible chat, Michael pilot only. Existing chat DOM and event handlers are preserved. */
 (() => {
   'use strict';
-  if (document.body.dataset.premiumFeed !== 'michael-v1') return;
+  if (document.body.dataset.premiumFeed !== 'michael-v1' && document.body.dataset.virtualClassroom !== 'michael-1-1') return;
 
   const chat = document.querySelector('#lessonVideo .finance-chat');
   if (!chat || chat.closest('.lesson-chat-dropdown')) return;
