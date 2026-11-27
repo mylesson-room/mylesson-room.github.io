@@ -487,3 +487,57 @@ body[data-homework-layout] :is(.lesson, .pager) {
 /* Preserve historical lesson videos inside the approved shared lesson paper. */
 .unified-video{width:min(100%,850px);aspect-ratio:16/9;margin:18px 0 24px;overflow:hidden;border-radius:16px;background:#15243a;box-shadow:0 8px 24px rgba(22,44,72,.14)}
 .unified-video iframe{display:block;width:100%;height:100%;border:0}
+
+/* Lesson loading screen */
+.lesson-loading-active > :not(.classroom-access) {
+  visibility: hidden;
+}
+.classroom-access.lesson-loading-screen:not([hidden]) {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  max-width: none;
+  margin: 0;
+  padding: 0 20px 5vh;
+  background: #f8faff;
+  color: #18273f;
+}
+.lesson-loading-brand {
+  position: absolute;
+  top: 18px;
+  left: clamp(18px, 3vw, 32px);
+  font: 24px/1 'Instrument Serif', Georgia, serif;
+}
+.lesson-loading-title {
+  font: italic 40px/1.15 'Instrument Serif', Georgia, serif;
+}
+.lesson-loading-track {
+  width: 90px;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #d8e4fa;
+}
+.lesson-loading-track::before {
+  content: '';
+  display: block;
+  width: 30%;
+  height: 100%;
+  border-radius: inherit;
+  background: #377ff5;
+  animation: lesson-loading-sweep 1.25s ease-in-out infinite alternate;
+}
+@keyframes lesson-loading-sweep {
+  to { transform: translateX(233%); }
+}
+@media (max-width: 600px) {
+  .lesson-loading-title { font-size: 32px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lesson-loading-track::before { animation: none; }
+}
