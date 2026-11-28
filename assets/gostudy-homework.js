@@ -41,7 +41,7 @@ function definitions(config){
   ['decisionNotes',4,'write','Объясните финансовое решение',[],null,document.querySelector('#decisionNotes')],
   ['roleNotes',5,'write','Обсудите кейс: ваши заметки',[],null,document.querySelector('#roleNotes')],
   ['finalOpinion',6,'write','Сформулируйте аргументированное мнение',[],null,document.querySelector('[data-save="finalOpinion"]')],
-  ['writing',7,'write',config.homeworkPrompt||'Письменное задание',[],null,document.querySelector(newClassroom?'#classroomHomework .classroom-homework-content':'#lessonSections')]
+  ['writing',7,'write',config.homeworkPrompt||'Письменное задание',[],null,document.querySelector(newClassroom?'#lessonVideo':'#lessonSections')]
  ];
  for(const [name,page,kind,prompt,options,answer,element] of extra)push(ids[name],page,kind,prompt,options,answer,element);
  return result;
@@ -68,7 +68,7 @@ function renderLesson(config){
   record=await getAssignment(room.student_id)||{exercise_ids:[],published_at:null};
   const query=new URLSearchParams({classStudent:room.student_id});link.href=homeworkPath+'?'+query;
   update();
-  const allowExerciseMenus=document.body.dataset.premiumFeed!=='michael-v1';
+  const allowExerciseMenus=document.body.dataset.premiumFeed!=='michael-v1' && !newClassroom;
   for(const d of defs){
    if(!d.element)continue;
    d.element.dataset.exerciseId=d.id;
@@ -92,7 +92,7 @@ function renderLesson(config){
    const target=d.element.closest('.term,.question-item,.gap-item')||d.element;
    target.insertAdjacentElement('afterbegin',control);
   }
-  if(newClassroom)document.querySelector('#classroomHomework .classroom-homework-content')?.append(container);
+  if(newClassroom)document.querySelector('#lessonVideo .video-workspace')?.after(container);
   else (nav?.closest('details')||nav)?.after(container); // visible only to the authenticated teacher
   publish.addEventListener('click',async()=>{
    if(busy)return;busy=true;update();

@@ -32,6 +32,10 @@ assert.ok(!read('scripts/michael-classroom-config.cjs').includes('localStorage')
 console.log('PASS: exact 7-page content, isolated IDs, bidirectional answer replay isolation, shared dictionary, private shells, unchanged default lesson.');
 // Theme changes only attributes and account-scoped preferences; no video or event API.
 const controller=read('assets/gostudy-michael-classroom.js');
+assert.ok(!controller.includes('classroom-translate'),'Do not invent a Translate help button');
+assert.ok(!controller.includes('classroomHomework'),'Do not invent a lesson tools overflow');
+assert.ok(!controller.includes('Lesson tools'));
+assert.ok(read('assets/gostudy-homework.js').includes("dataset.premiumFeed!=='michael-v1' && !newClassroom"),'Keep Michael exercise menus hidden');
 const themeFunction=controller.slice(controller.indexOf('  function mountTheme()'),controller.indexOf('  function compose()'));
 const preferences=new Map();
 function themeFor(user){

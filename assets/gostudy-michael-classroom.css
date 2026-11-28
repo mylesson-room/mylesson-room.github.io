@@ -52,10 +52,10 @@ body[data-virtual-classroom="michael-1-1"] #lessonSections button{font-size:14px
 body[data-virtual-classroom="michael-1-1"] #lessonSections [aria-current]{border-top-color:var(--class-accent);color:var(--class-ink)}
 body[data-virtual-classroom="michael-1-1"] .pager>.outline,body[data-virtual-classroom="michael-1-1"] .pager>.primary{background:transparent;color:var(--class-ink);border:0;font-size:14px;margin:0;white-space:nowrap}
 body[data-virtual-classroom="michael-1-1"] .pager>.primary{background:#e9d4ae;color:#292820;border-radius:24px;padding:10px 24px}
-body[data-virtual-classroom="michael-1-1"] .lesson-chat-dropdown,body[data-virtual-classroom="michael-1-1"] .classroom-translate{position:relative;margin:0}
+body[data-virtual-classroom="michael-1-1"] .lesson-chat-dropdown{position:relative;margin:0}
 body[data-virtual-classroom="michael-1-1"] .lesson-chat-dropdown summary{width:auto;display:flex;gap:4px}
 body[data-virtual-classroom="michael-1-1"] .lesson-chat-toggle svg,body[data-virtual-classroom="michael-1-1"] .lesson-chat-spacer{display:none}
-body[data-virtual-classroom="michael-1-1"] .finance-chat,body[data-virtual-classroom="michael-1-1"] .classroom-translate>p{position:absolute;right:0;top:44px;width:min(370px,88vw);max-height:65dvh;overflow:auto;padding:20px;border:1px solid var(--class-line);border-radius:18px;background:var(--class-control);color:var(--class-ink);box-shadow:0 12px 35px #0003;font-size:16px;z-index:50}
+body[data-virtual-classroom="michael-1-1"] .finance-chat{position:absolute;right:0;top:44px;width:min(370px,88vw);max-height:65dvh;overflow:auto;padding:20px;border:1px solid var(--class-line);border-radius:18px;background:var(--class-control);color:var(--class-ink);box-shadow:0 12px 35px #0003;font-size:16px;z-index:50}
 body[data-virtual-classroom="michael-1-1"] .lesson-dictionary{background:var(--class-control);color:var(--class-ink)}
 body[data-virtual-classroom="michael-1-1"] .homework-teacher-actions{margin-top:16px;background:var(--class-panel);padding:12px;border-radius:12px}
 @keyframes classroom-environment{to{transform:scale(1.025)}}
@@ -86,7 +86,7 @@ body[data-virtual-classroom="michael-1-1"] .article{padding:20px}
 body[data-virtual-classroom="michael-1-1"] .pager{flex-wrap:wrap;gap:8px;padding:8px 12px;min-height:112px}
 body[data-virtual-classroom="michael-1-1"] #lessonSections{order:-1;flex-basis:100%}
 body[data-virtual-classroom="michael-1-1"] #next{margin-left:auto}
-body[data-virtual-classroom="michael-1-1"] .classroom-translate>p,body[data-virtual-classroom="michael-1-1"] .finance-chat{position:fixed;left:4vw;right:4vw;top:120px}
+body[data-virtual-classroom="michael-1-1"] .finance-chat{position:fixed;left:4vw;right:4vw;top:120px}
 }
 @media(prefers-reduced-motion:reduce){body[data-virtual-classroom="michael-1-1"]::before,body[data-virtual-classroom="michael-1-1"] .page.active{animation:none}body[data-virtual-classroom="michael-1-1"] *{scroll-behavior:auto!important;transition:none!important}}
 /* Clear the legacy card decoration inside the continuous classroom canvas. */
@@ -118,13 +118,9 @@ body[data-virtual-classroom="michael-1-1"] #lessonVideo .jaas-message{background
 body[data-virtual-classroom="michael-1-1"] .definition-picker>summary{background:var(--class-control);color:var(--class-ink)}
 body[data-virtual-classroom="michael-1-1"] .definition-picker button:hover{background:var(--class-control);color:var(--class-ink);outline:1px solid var(--class-accent)}
 body[data-virtual-classroom="michael-1-1"] .scene-copy strong{letter-spacing:-.03em}
-body[data-virtual-classroom="michael-1-1"] .classroom-homework{position:relative}
-body[data-virtual-classroom="michael-1-1"] .classroom-homework-content{position:absolute;right:0;top:44px;width:min(370px,90vw);padding:18px;background:var(--class-control);color:var(--class-ink);border:1px solid var(--class-line);border-radius:18px;z-index:50}
-body[data-virtual-classroom="michael-1-1"] .classroom-homework:not([open])>.classroom-homework-content{display:none}
-body[data-virtual-classroom="michael-1-1"] .classroom-homework-content button{font-size:14px}
 body[data-virtual-classroom="michael-1-1"] .homework-exercise-menu{color:var(--class-muted)}
 body[data-virtual-classroom="michael-1-1"] .homework-exercise-menu summary{font-size:12px}
 body[data-virtual-classroom="michael-1-1"] .page:not(.active){display:none!important}
 @media(min-width:1100px){body[data-virtual-classroom="michael-1-1"] #page-0 .questions li{padding-top:10px;padding-bottom:14px}body[data-virtual-classroom="michael-1-1"] #page-0 .warmup-scene{padding:20px}body[data-virtual-classroom="michael-1-1"] #page-0 .scene-chart svg{height:80px}body[data-virtual-classroom="michael-1-1"] #page-0 .tip p{columns:auto;display:flex;justify-content:space-between;gap:20px;font-size:14px;line-height:1.5}body[data-virtual-classroom="michael-1-1"] #page-0 .tip p br{display:none}}
 body[data-virtual-classroom="michael-1-1"] #lessonSections button{flex:0 0 auto;width:auto;min-width:max-content}
-@media(max-width:800px){body[data-virtual-classroom="michael-1-1"] #classroomTheme{position:absolute;right:12px;top:10px}body[data-virtual-classroom="michael-1-1"] .classroom-homework-content{position:fixed;left:4vw;right:4vw;top:115px}}
+@media(max-width:800px){body[data-virtual-classroom="michael-1-1"] #classroomTheme{position:absolute;right:12px;top:10px}}

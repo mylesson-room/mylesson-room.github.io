@@ -46,18 +46,11 @@
       header.querySelector('.header-right').prepend(chat);
       chat.querySelector('summary > span:nth-child(2)').textContent = 'Chat';
     }
-    const help = document.createElement('details'); help.className = 'classroom-translate';
-    help.innerHTML = '<summary>Translate</summary><p>Выделите слово или фразу в задании, чтобы открыть перевод и сохранить в Dictionary.</p>';
-    header.querySelector('.header-right').prepend(help);
     document.querySelectorAll('.page').forEach((page,index) => {
       const label = document.createElement('p'); label.className = 'classroom-section-label';
       label.textContent = String(index+1).padStart(2,'0')+' / '+window.GoStudyLesson.labels[index].label;
       page.prepend(label);
     });
-    const homework = document.createElement('details');
-    homework.id = 'classroomHomework'; homework.className = 'classroom-homework';
-    homework.innerHTML = '<summary aria-label="Lesson tools">…</summary><div class="classroom-homework-content"></div>';
-    header.querySelector('.header-right').append(homework);
     const useful = document.querySelector('#page-0 .tip p');
     if (useful) {
       const lines = [...useful.childNodes].filter(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());

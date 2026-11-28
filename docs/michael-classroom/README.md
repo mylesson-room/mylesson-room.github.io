@@ -7,7 +7,7 @@
 
 ## Реализовано в ветке
 
-- Публичная оболочка без материалов/ответов; загрузка из `gostudy_private_lessons` через существующий JWT/RLS-клиент. Slug `michael-ai-finance-lesson-2-new`. Production-запись ещё НЕ создана.
+- Публичная оболочка без материалов/ответов; загрузка из `gostudy_private_lessons` через существующий JWT/RLS-клиент. Slug `michael-ai-finance-lesson-2-new`. Production-запись создана 27 ноября после разрешения пользователя; повторно проверена 28 ноября, published=true. Это не означает публикацию HTML на сайте.
 - Семь исходных страниц, включая полный Reading и Decision lab без разделения на дополнительные страницы. Материал не переписан: config builder читает исходный Lesson 2, меняет только идентификаторы и метаданные.
 - Стабильный key `gostudy-michael-finance2-new-v1`; namespace ответов и exercise ID `michael-finance2-new-v1:`; page scope `michael-finance2-new-v1`. Старые ответы и сбросы отбрасываются по namespace. Словарь `gostudy-business-ai-shared-v1` и существующая комната сохраняются.
 - Общие lesson/workbook/JaaS/live модули; отдельный opt-in CSS. Темы привязаны к ID вошедшего пользователя, default Light. Обработчик темы не обращается к Jitsi и не отправляет событий.
@@ -30,13 +30,13 @@
 ## Блокеры выпуска и точные следующие действия
 
 1. Из прошлого чата получен только основной JPG `telegram-cloud-photo-size-2-5208469611542685034-y.jpg`. 18 файлов `FluenVia_NEW_*` / `FluenVia_LIGHT_*` доступны в истории лишь как sandbox-ссылки. Нужны сами файлы для проверки всех 9 состояний в двух темах; текущий вариант основан на основном референсе и словесном ТЗ.
-2. Проверено SELECT в production: constraint `gostudy_finance_lesson_selection_lesson_path_check` допускает только старый `business-ai-finance-b2-02.html` и `business-ai-finance-b2-03.html`. Для назначения NEW необходимо отдельное разрешение пользователя на расширение этого CHECK (см. ниже). Никаких DDL/RLS/UPDATE/DELETE в production не выполнялось.
-3. После разрешения: создать миграцию штатным CLI, повторно проверить актуальное ограничение, добавить только один разрешённый путь; создать новую private lesson запись с текущей парой student/teacher из finance room и payload из builder. Не менять existing rows и текущий lesson_path; не импортировать прогресс/ответы/слова.
+2. 27 ноября пользователь разрешил расширение CHECK и подготовку нового защищённого материала. Миграция `20261127145642_michael_new_lesson_choice.sql` уже применена предыдущим запуском. 28 ноября read-only проверка подтвердила три разрешённых пути, одну опубликованную private запись NEW и текущее назначение OLD. Повторять миграцию/INSERT не нужно. RLS не менялся.
+3. 28 ноября `scripts/check-michael-classroom-rls.sql` повторно выполнился в production с обязательным ROLLBACK: PASS. Проверены чтение teacher/student, выбор NEW/OLD преподавателем, запрет смены учеником, видимость домашки/ответов и отсутствие доступа outsider/anon. Тестовые назначения и ответы не сохранились; после отката NEW drafts/published homework/answers = 0. Это проверка SQL с ролью authenticated и локальными claims, не вход через браузер с настоящим JWT.
 4. Провести реальные JWT/RLS проверки student/teacher/постороннего аккаунта, выбор OLD/NEW, изоляцию ответов/reset/page, домашку, чат/перевод/словарь и активный звонок с переключением темы. Проверить живую компоновку Jitsi: две карточки до соединения уже есть; расположение двух реальных участников внутри неизменённого Jitsi ещё не подтверждено.
 5. Проверить Safari/iPhone и desktop Chrome, регрессии других учеников. Материал других учеников и исходный Lesson 2 не менялись; полного браузерного регресса пока нет.
 6. Только после успешных проверок — merge PR / штатный Pages release, затем live URL и NEW в teacher UI. До этого НЕ публиковать. Проверять отсутствие переназначения Михаила и потери данных отдельно; сейчас отсутствие записей в production подтверждено характером выполненных операций, а не полным сравнением всех таблиц.
 
-Предлагаемое изменение схемы (НЕ применено; не меняет RLS и не назначает урок):
+Изменение схемы, уже применённое 27 ноября после разрешения пользователя (не меняет RLS и не назначает урок):
 
 ```sql
 begin;
@@ -57,3 +57,15 @@ commit;
 `assets/michael-classroom-london.jpg` — отдельный сгенерированный фон, без людей и UI; оптимизирован JPEG. Генерация встроенным image_gen, исходник сохранён в `/Users/danil/.codex/generated_images/01a21d67-a695-7fe2-b1b9-f1f31f0265ea/exec-4850360f-a783-4819-84e2-579eed46dc0c.png`.
 
 Prompt: “Create a clean photorealistic cinematic background asset for the FluenVia English classroom, landscape 16:9. London Westminster Big Ben prominent on the RIGHT third, seen through a panoramic window from an elegant quiet business office at golden sunset, warm amber sunlight, smoky charcoal shadows, subtle dark desk silhouette along bottom edge, distant Thames and London skyline, atmospheric soft focus and low detail in left and center to allow UI overlay. Premium restrained editorial photography, natural warm ivory and brown palette. Absolutely NO interface, no UI panels, no typography, no words, no screens, no video cards, no people, no neon. This is only a clean environment photograph, not a screenshot. Save generated output locally for website asset.”
+
+## Повторная проверка 28 ноября 2026
+
+- Найден и открыт прежний чат `Design 3.0 Work` (01a21d67-a695-7fe2-b1b9-f1f31f0265ea); новый дубль ветки/PR не создавался. Предыдущий запуск остановился из-за лимита использования после серверной проверки.
+- PR #75 остаётся черновиком. Все три GitHub Actions для f1c277d завершились success; это проверки коммита, не доказательство публикации.
+- Обычный Chrome-переход на https://fluenvia.ru/business-ai-finance-b2-02-new.html показал GitHub Pages 404. Новый HTML на сайте пока отсутствует.
+- Повторно PASS: `check-michael-classroom.cjs`, `check-architecture.cjs`, `check-jaas-video.cjs`, синтаксис обоих изменённых JS, `git diff --check`. Исходный Lesson 2, кабинет Михаила и общий lesson/workbook код не отличаются от локального origin/main.
+- Chrome, локальные имитированные роли: student gap0 → Enter → teacher; teacher gap1 → blur → student после reload, оба ответа и проверка 2/6 восстановлены. Student Light и teacher Dark одновременно; student Light сохраняется после reload.
+- Встроенный браузер 390×844: innerWidth=scrollWidth=390, навигация видна. Chrome viewport override не применился (остался 1440), поэтому он не считается мобильным тестом. Настройки viewport после проверки сброшены.
+- Из предыдущего запуска сохранено исправление шапки: убраны придуманные Translate и overflow; штатный перевод по выделению остаётся, домашка размещена у видео, меню упражнений скрыты как в исходном уроке.
+- 18 утверждённых PNG не найдены в доступных локальных файлах; история содержит sandbox-ссылки без самих вложений. Для точной визуальной сверки нужны файлы `FluenVia_NEW_*.png` и `FluenVia_LIGHT_*.png` (можно одним архивом).
+- Настоящий звонок двух участников, browser JWT E2E, Safari/iPhone, полный регресс остальных учеников и полное сравнение всех исторических данных остаются НЕ проверены. Выпуск заблокирован до закрытия критических проверок; в этом продолжении production-схема и постоянные данные не менялись.
