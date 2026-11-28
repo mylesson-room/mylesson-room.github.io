@@ -52,6 +52,11 @@ async function run(browser,base,mobile,role){
  for(const field of fields){await field.selectOption(await field.getAttribute('data-expected'));}
  assert.equal(await page.locator('#page-5 [data-grade]').allTextContents().then(x=>x.filter(s=>s==='✓ Correct').length),12);
  assert.match(await page.locator('#page-5 iframe').getAttribute('src'),/start=144&end=210/);
+ const fallback=page.locator('#page-5 a[href*="youtube.com/watch"]');
+ assert.equal(await fallback.evaluate(a=>a.closest('figure')),null,'Fallback must sit outside the clipped video figure');
+ await fallback.scrollIntoViewIfNeeded();
+ assert.equal(await fallback.isVisible(),true);
+ await page.locator('#page-5 h3').first().scrollIntoViewIfNeeded();
  assert.equal(await page.locator('#page-5 iframe').getAttribute('title'),'Feel Good Foodie: TikTok pasta, fragment 2:24–3:30');
  const width=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,viewport:innerWidth}));
  assert.ok(width.scroll<=width.viewport+2,'horizontal overflow: '+JSON.stringify(width));
