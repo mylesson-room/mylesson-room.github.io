@@ -51,6 +51,22 @@ function reflect(){
  }
  const picker=document.querySelector('#teacher-student');
  if(picker?.value===spec.profileCourse+':'+room.student_id){
+  // Keep the finance course list and the existing assignment selector together in Michael's card.
+  if(spec.id==='michael'){
+   const classroom=document.querySelector('#teacher-classroom');
+   const courseList=document.querySelector('#teacher-classroom-lessons');
+   const assignment=document.getElementById('michael-lesson-assignment');
+   if(classroom&&assignment&&assignment.parentNode!==classroom)classroom.append(assignment);
+   if(courseList){
+    for(const [path,entry] of Object.entries(catalog)){
+     if([...courseList.querySelectorAll('a')].some(a=>a.getAttribute('href')===link(path)))continue;
+     const row=document.createElement('li');
+     const preview=document.createElement('a');preview.href=link(path);preview.textContent=entry.title;row.append(preview);
+     if(entry.homework){const hw=document.createElement('a');hw.href=link(entry.homework);hw.textContent='Домашнее задание';row.append(hw);}
+     courseList.append(row);
+    }
+   }
+  }
   const panel=document.querySelector('#teacher-current-lesson');
   if(panel && panel.querySelector('h3')?.textContent!==item.title){
    const title=panel.querySelector('h3');if(title)title.textContent=item.title;
@@ -65,6 +81,9 @@ function reflect(){
    homework.hidden=!href;
    document.querySelector('#teacher-homework-empty').hidden=!!href;
   }
+ }else if(spec.id==='michael'){
+  const assignment=document.getElementById('michael-lesson-assignment'),dashboard=document.querySelector('#teacher-dashboard');
+  if(assignment&&dashboard&&assignment.parentNode!==dashboard)dashboard.prepend(assignment);
  }
 }
 function mount(){
@@ -118,7 +137,7 @@ const start=()=>{
  if(teacherPage){
   const list=document.querySelector('#teacher-student-list'),panel=document.querySelector('#teacher-current-lesson');
   const observer=new MutationObserver(()=>{if(ready)reflect();});
-  for(const node of [list,panel])if(node)observer.observe(node,{childList:true,subtree:true});
+  for(const node of [list,panel,document.querySelector('#teacher-classroom-lessons')])if(node)observer.observe(node,{childList:true,subtree:true});
  }
  window.addEventListener('pagehide',e=>{if(!e.persisted)clearInterval(timer);});
 };
