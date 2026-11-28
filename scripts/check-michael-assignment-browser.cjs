@@ -3,7 +3,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('node:http'),path=require('node:path');
 const {chromium}=require('playwright');
 const STUDENT='e4f31916-6d4c-49c8-9b80-0e2a233fc6c6',TEACHER='acf2f6a1-f38b-45ef-836d-6cc9a9a5a832',OUTSIDER='3bc8903b-29c0-474d-9d09-c89f896510bc';
-const OLD='business-ai-finance-b2-02.html',NEXT='business-ai-finance-b2-03.html';
+const OLD='business-ai-finance-b2-02.html',NEXT='business-ai-finance-b2-03.html',LIGHT='business-ai-finance-b2-02-new.html';
 const fixture={title:'Payment review fixture',hero:'Payment review fixture',cabinet:'student-business-ai-finance.html',key:'finance3-fixture',wordsKey:'gostudy-business-ai-shared-v1',course:null,answerNamespace:'finance3:',lessonWords:[{en:'verification',ru:'проверка'}],steps:[
  {id:'review',title:'Review evidence',minutes:25,html:'<svg role="img" aria-label="Payment evidence" viewBox="0 0 300 80"><rect width="300" height="80" fill="#234"/></svg><label>Recommendation<textarea data-exercise-field="f3-note"></textarea></label><button type="button" data-lesson-word="0">Save verification</button>'},
  {id:'check',title:'Check the facts',minutes:25,type:'choice',items:[['Does an alert prove fraud?',['Yes','No'],1]]}
@@ -43,7 +43,7 @@ const waitFor=async(fn,label,timeout=15000)=>{const end=Date.now()+timeout;while
     if(![TEACHER,STUDENT].includes(actor))return json([]);
     if(req.method()==='PATCH'){
      if(actor!==TEACHER)return json([],403);
-     const body=req.postDataJSON();assert.ok([OLD,NEXT].includes(body.lesson_path));selected=body.lesson_path;
+     const body=req.postDataJSON();assert.ok([OLD,NEXT,LIGHT].includes(body.lesson_path));selected=body.lesson_path;
     }
     return json([{student_id:STUDENT,teacher_id:TEACHER,lesson_path:selected}]);
    }
@@ -132,6 +132,42 @@ const waitFor=async(fn,label,timeout=15000)=>{const end=Date.now()+timeout;while
   const anon=await context(null);
   await anon.page.goto(base+'/'+NEXT);await anon.page.locator('#gostudyAccessGate').waitFor();
   assert.equal(await anon.page.locator('#lessonPages').count(),0,'anonymous receives no lesson UI');
+  // NEW must be a view of the canonical workbook, not a second set of data or controls.
+  const lightTeacher=await context(TEACHER),lightStudent=await context(STUDENT);
+  await lightTeacher.page.goto(base+'/gostudy-teacher.html');
+  const lightForm=lightTeacher.page.locator('#michael-lesson-assignment form');
+  await lightForm.waitFor();
+  await lightForm.locator('select').selectOption(LIGHT);
+  await lightForm.getByRole('button',{name:'Назначить Михаилу'}).click();
+  await lightForm.getByRole('status').getByText(/Назначено/).waitFor();
+  assert.equal(selected,LIGHT);
+  await lightStudent.page.goto(base+'/student-business-ai-finance.html');
+  await waitFor(()=>lightStudent.page.locator('.lesson-card-link').getAttribute('href').then(v=>v===LIGHT),'NEW student assignment');
+  assert.equal(await lightStudent.page.locator('.homework-link').getAttribute('href'),'business-ai-finance-b2-02-homework.html');
+  await lightTeacher.page.goto(base+'/'+LIGHT+'?classStudent='+STUDENT);
+  await lightStudent.page.goto(base+'/'+LIGHT);
+  for(const page of [lightTeacher.page,lightStudent.page]){
+    await waitFor(()=>page.locator('#finance-live-status').textContent().then(t=>t.includes('Онлайн')).catch(()=>false),'NEW room connected');
+    await page.locator('.pager #lessonSections button').first().waitFor();
+    assert.equal(await page.locator('#lessonPages .page').count(),7);
+    assert.equal(await page.locator('#lessonSections button').count(),7);
+    assert.equal(await page.locator('.jaas-connect').count(),1);
+    assert.equal(await page.evaluate(()=>GoStudyLesson.key),'gostudy-business-ai-finance-b2-02-v1');
+    assert.equal(await page.evaluate(()=>GoStudyLesson.wordsKey),'gostudy-business-ai-shared-v1');
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true);
+    await page.locator('#lessonSections button').nth(2).click();
+    await page.locator('#page-2').waitFor();
+  }
+  await lightStudent.page.locator('#page-2 input[name="read0"][value="0"]').check();
+  await waitFor(()=>lightTeacher.page.locator('#page-2 input[name="read0"][value="0"]').isChecked(),'NEW answer sync');
+  await lightTeacher.page.locator('#openLessonDictionary').click();
+  await lightTeacher.page.locator('#lessonDictionary').waitFor();
+  await lightTeacher.page.locator('#lessonDictionary form[method=dialog] button').click();
+  const lightMobile=await context(STUDENT,true);
+  await lightMobile.page.goto(base+'/'+LIGHT);
+  await waitFor(()=>lightMobile.page.locator('#finance-live-status').textContent().then(t=>t.includes('Онлайн')).catch(()=>false),'NEW mobile connected');
+  assert.ok(await lightMobile.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'NEW mobile viewport has no horizontal overflow');
+  console.log('Michael Light Edition: assigned NEW, canonical seven sections, preserved keys, desktop navigation, two-role answer sync, dictionary, video control and mobile width PASS.');
   assert.deepEqual(errors,[],'no page exceptions');
   console.log('Michael: assignment, uncommitted choice, preview, auto update, reload, two-role answers, explicit page movement, vocabulary, chat, scope isolation, mobile, homework, outsider and anonymous gates passed.');
  }finally{await browser.close();await new Promise(r=>server.close(r));}
