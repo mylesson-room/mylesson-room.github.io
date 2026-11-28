@@ -47,3 +47,17 @@ body[data-fluenvia-light] .footer{color:#53666c}
 @media(min-width:801px){body[data-fluenvia-light] .layout{--video-width:24%;}body[data-fluenvia-light] #page-0.active .panel{display:grid;grid-template-columns:minmax(0, .8fr) minmax(0, 1.2fr);gap:12px;align-items:stretch}body[data-fluenvia-light] #page-0 .activity-head,body[data-fluenvia-light] #page-0 .lead,body[data-fluenvia-light] #page-0 .tip{grid-column:1/-1}body[data-fluenvia-light] #page-0 .questions{margin:0}body[data-fluenvia-light] #page-0 .tip{margin:0}}
 @media(max-width:800px){body[data-fluenvia-light] .light-breadcrumb{display:none}body[data-fluenvia-light] .lesson{padding:10px 12px 70px}body[data-fluenvia-light] .lesson-content{padding:0;min-height:0}body[data-fluenvia-light] .sidebar{padding:0}body[data-fluenvia-light] #lessonPages .activity-titles h2{font-size:38px}body[data-fluenvia-light] #lessonPages .warmup-scene{margin-bottom:12px}}
 @media print{body[data-fluenvia-light] .layout{background:#fff}}
+
+@media(min-width:1050px){
+ body[data-fluenvia-light]{--lesson-toolbar-height:52px}
+ body[data-fluenvia-light] .pager{gap:12px;padding-inline:16px}
+ body[data-fluenvia-light] .pager>.lesson-section-menu{flex:1 1 auto;min-width:0;margin:0;padding:0;border:0;background:transparent}
+ body[data-fluenvia-light] .pager>.lesson-section-menu summary{display:none}
+ body[data-fluenvia-light] .pager #lessonSections{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:clamp(4px,1vw,14px);margin:0}
+ body[data-fluenvia-light] .pager #lessonSections button{font-size:11px;padding:0 2px;height:40px;min-width:0;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:transparent;border:0;border-radius:0;color:#53666c;box-shadow:none}
+ body[data-fluenvia-light] .pager #lessonSections button::before{content:"";display:block;height:3px;background:#aab7b8;border-radius:3px;margin:0 0 7px}
+ body[data-fluenvia-light] .pager #lessonSections [aria-current="step"]{color:#20343e;font-weight:750}
+ body[data-fluenvia-light] .pager #lessonSections [aria-current="step"]::before{background:#805631}
+ body[data-fluenvia-light] .pager #next,body[data-fluenvia-light] .pager #back{min-width:88px}
+ body[data-fluenvia-light] .pager #moveStudent{font-size:12px;white-space:nowrap}
+}
