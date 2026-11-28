@@ -69,6 +69,14 @@ const waitFor=async(fn,label,timeout=15000)=>{const end=Date.now()+timeout;while
   await teacher.page.goto(base+'/gostudy-teacher.html');
   const form=teacher.page.locator('#michael-lesson-assignment form');
   await form.waitFor();
+  const michaelRow=teacher.page.locator('#teacher-student-list .teacher-student-row').filter({hasText:'Михаил'});
+  await michaelRow.locator('.teacher-student-profile').click();
+  await teacher.page.locator('#teacher-classroom #michael-lesson-assignment').waitFor();
+  const courseList=teacher.page.locator('#teacher-classroom-lessons');
+  assert.equal(await courseList.locator('a[href^="'+OLD+'?"]').count(),1);
+  assert.equal(await courseList.locator('a[href^="'+LIGHT+'?"]').count(),1);
+  assert.equal(await courseList.locator('a[href^="'+NEXT+'?"]').count(),1);
+  assert.equal(selected,OLD,'Opening Michael card must not change current lesson');
   await form.locator('select').selectOption(NEXT);
   assert.equal(selected,OLD,'Selecting without clicking must not assign');
   assert.ok((await form.locator('[data-preview]').getAttribute('href')).startsWith(NEXT+'?classStudent='));
