@@ -18,8 +18,13 @@ async function boot(){
   if(selected && (auth.userId()!==row.teacher_id||selected!==row.student_id))throw Error('Неверно выбран ученик.');
   if(auth.userId()===row.teacher_id && !selected){const url=new URL(location.href);url.searchParams.set('classStudent',row.student_id);location.replace(url.href);return;}
   const config=row.lesson_payload;
-  // Room-authorized private shells use the verified room, not a client-supplied identifier.
-  if(auth.room()) config.privateRoom=auth.room();
+  // Only the opt-in private-room shell bypasses the legacy classroom auth/CSS gate.
+  // Existing lessons keep their original sync and classroom-authorized lifecycle.
+  if(document.body.hasAttribute('data-room-auth-only')) {
+   const room=auth.room();
+   if(!room || room.student!==row.student_id || room.teacher!==row.teacher_id) throw Error('Нет доступа к комнате урока.');
+   config.privateRoom=room;
+  }
   if(document.body.hasAttribute('data-room-auth-only') && auth.userId()===row.teacher_id) config.cabinet='gostudy-teacher.html';
   const node=document.createElement('script');node.type='application/json';node.id='lesson-data';node.textContent=JSON.stringify(config);document.body.append(node);
   await loadScript(document.body.dataset.lessonScript);
