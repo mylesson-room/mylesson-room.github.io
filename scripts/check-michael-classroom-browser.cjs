@@ -6,6 +6,13 @@ const {chromium}=require('playwright');
 const {server,events}=require('./preview-michael-classroom.cjs');
 const student='e4f31916-6d4c-49c8-9b80-0e2a233fc6c6';
 const labels=['Warm-up','Vocabulary','Reading','Language practice','Decision lab','Role-play','Final discussion'];
+function contrast(foreground,background){
+ const luminance=color=>{
+  const channels=color.match(/[\d.]+/g).slice(0,3).map(Number).map(x=>x/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);
+  return channels[0]*.2126+channels[1]*.7152+channels[2]*.0722;
+ };
+ const a=luminance(foreground),b=luminance(background);return (Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+}
 async function exercise(browser,origin,mobile){
  events.length=0;
  const size=mobile?{width:390,height:844}:{width:1440,height:900};
@@ -38,6 +45,10 @@ async function exercise(browser,origin,mobile){
     assert.equal(await sp.locator('body').getAttribute('data-fixture-jitsi-starts'),'1');
     assert.equal(await sp.locator('body').getAttribute('data-fixture-jitsi-disposals'),null);
     assert.ok(await sp.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Horizontal overflow');
+    if(i===2){
+     const colors=await sp.locator('.article').evaluate(article=>({foreground:getComputedStyle(article.querySelector('h3')).color,background:getComputedStyle(article).backgroundColor}));
+     assert.ok(contrast(colors.foreground,colors.background)>=4.5,'Reading heading contrast below 4.5:1');
+    }
     await sp.screenshot({path:`artifacts/michael-classroom/${mobile?'mobile':'desktop'}-${theme}-${i+1}.jpg`});
     if(i===2||i===4){
      await sp.locator(i===2?'#reading':'#decision').scrollIntoViewIfNeeded();

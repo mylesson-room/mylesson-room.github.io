@@ -124,3 +124,20 @@ body[data-virtual-classroom="michael-1-1"] .page:not(.active){display:none!impor
 @media(min-width:1100px){body[data-virtual-classroom="michael-1-1"] #page-0 .questions li{padding-top:10px;padding-bottom:14px}body[data-virtual-classroom="michael-1-1"] #page-0 .warmup-scene{padding:20px}body[data-virtual-classroom="michael-1-1"] #page-0 .scene-chart svg{height:80px}body[data-virtual-classroom="michael-1-1"] #page-0 .tip p{columns:auto;display:flex;justify-content:space-between;gap:20px;font-size:14px;line-height:1.5}body[data-virtual-classroom="michael-1-1"] #page-0 .tip p br{display:none}}
 body[data-virtual-classroom="michael-1-1"] #lessonSections button{flex:0 0 auto;width:auto;min-width:max-content}
 @media(max-width:800px){body[data-virtual-classroom="michael-1-1"] #classroomTheme{position:absolute;right:12px;top:10px}}
+/* Shared workbook accents need the opt-in classroom palette in both themes. */
+body[data-virtual-classroom="michael-1-1"] .panel h3,
+body[data-virtual-classroom="michael-1-1"] .article h3,
+body[data-virtual-classroom="michael-1-1"] .decision-metrics b,
+body[data-virtual-classroom="michael-1-1"] .chart-row b{color:var(--class-ink)}
+body[data-virtual-classroom="michael-1-1"] .signal-card strong{color:var(--class-accent)}
+body[data-virtual-classroom="michael-1-1"] .signal-card small,
+body[data-virtual-classroom="michael-1-1"] .decision-metrics small,
+body[data-virtual-classroom="michael-1-1"] .decision-metrics span{color:var(--class-muted)}
+body[data-virtual-classroom="michael-1-1"] .signal-emoji,
+body[data-virtual-classroom="michael-1-1"] .role-icon{background:var(--class-control);color:var(--class-accent)}
+body[data-virtual-classroom="michael-1-1"] .question-item label,
+body[data-virtual-classroom="michael-1-1"] .term .definition-picker summary,
+body[data-virtual-classroom="michael-1-1"] .definition-options button{color:var(--class-ink);background:var(--class-control);border-color:var(--class-line)}
+body[data-virtual-classroom="michael-1-1"] #lessonVideo .jaas-size,
+body[data-virtual-classroom="michael-1-1"] #lessonVideo .jaas-expand{color:var(--class-ink);background:var(--class-control);border:1px solid var(--class-line);border-radius:10px;padding:8px 12px;font-size:14px;margin:4px 3px 4px 0}
+body[data-virtual-classroom="michael-1-1"] #finance-messages{background:var(--class-panel);color:var(--class-ink);border-color:var(--class-line)}
