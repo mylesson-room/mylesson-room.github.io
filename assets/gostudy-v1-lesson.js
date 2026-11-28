@@ -47,6 +47,31 @@
 
 `;
   document.body.insertAdjacentHTML('afterbegin',template.replaceAll('%%CABINET%%',lesson.cabinet));
+  if (document.body.hasAttribute('data-lesson-loading-preview')) {
+    const accessStatus = document.querySelector('.classroom-access');
+    accessStatus.innerHTML = `
+      <span class="lesson-loading-brand" aria-hidden="true">Fluenvia</span>
+      <span class="lesson-loading-title" lang="en">Getting ready…</span>
+      <span class="lesson-loading-track" aria-hidden="true"></span>`;
+    accessStatus.classList.add('lesson-loading-screen');
+    document.body.classList.add('lesson-loading-active');
+
+    const finishLoading = () => {
+      clearTimeout(timeout);
+      observer.disconnect();
+      accessStatus.classList.remove('lesson-loading-screen');
+      document.body.classList.remove('lesson-loading-active');
+    };
+    const observer = new MutationObserver(finishLoading);
+    observer.observe(accessStatus, {childList:true, attributes:true, attributeFilter:['hidden']});
+    const timeout = setTimeout(() => {
+      const retry = document.createElement('a');
+      retry.href = location.href;
+      retry.textContent = 'Попробовать снова';
+      accessStatus.replaceChildren('Не удалось завершить загрузку урока. ', retry);
+      finishLoading();
+    }, 12000);
+  }
   document.querySelector('.hero h1').textContent = lesson.hero || lesson.title;
   document.querySelector('.footer').textContent = lesson.footer || '';
   const pages = document.querySelector('#lessonPages');
