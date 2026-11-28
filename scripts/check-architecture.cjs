@@ -14,7 +14,8 @@ const pages=[
  {cabinet:'student-pharma.html',lesson:'pharma-ai-evidence-c1-20261118.html'},
  {cabinet:'student-first-sales.html',lesson:'first-sales-c1-03.html'},
  {cabinet:'student-english-placement.html',lesson:'english-placement.html',private:true,client:'assets/gostudy-placement.js',workbook:true},
- {cabinet:'student-ielts-reading.html',lesson:'ielts-reading-04.html',private:true,client:'assets/gostudy-ielts-reading.js'}
+ {cabinet:'student-ielts-reading.html',lesson:'ielts-reading-04.html',private:true,client:'assets/gostudy-ielts-reading.js'},
+ {cabinet:'student-engineering-c1.html',lesson:'engineering-c1-01.html',private:true,client:'assets/gostudy-finance-private-lesson.js',privateWorkbook:true}
 ];
 for(const p of pages){
  const cabinet=read(p.cabinet),lesson=read(p.lesson);
@@ -32,6 +33,11 @@ for(const p of pages){
    must(lesson,'data-exercises-script="assets/gostudy-v1-exercises.js',p.lesson);
    must(client,'await loadScript(body.dataset.lessonScript)',p.client);
    must(client,'await loadScript(body.dataset.workbookScript)',p.client);
+  }else if(p.privateWorkbook){
+   must(lesson,'data-workbook-script="assets/gostudy-v1-workbook.js',p.lesson);
+   must(lesson,'data-exercises-script="assets/gostudy-v1-exercises.js',p.lesson);
+   must(client,'await loadScript(document.body.dataset.lessonScript)',p.client);
+   must(client,'await loadScript(document.body.dataset.workbookScript)',p.client);
   }else{
    must(client,'loadScript(document.body.dataset.lessonScript)',p.client);
    must(client,'loadScript(document.body.dataset.liveScript)',p.client);
