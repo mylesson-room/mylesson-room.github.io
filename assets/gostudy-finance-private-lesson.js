@@ -18,6 +18,8 @@ async function boot(){
   if(selected && (auth.userId()!==row.teacher_id||selected!==row.student_id))throw Error('Неверно выбран ученик.');
   if(auth.userId()===row.teacher_id && !selected){const url=new URL(location.href);url.searchParams.set('classStudent',row.student_id);location.replace(url.href);return;}
   const config=row.lesson_payload;
+  // Room-authorized private shells use the verified room, not a client-supplied identifier.
+  if(auth.room()) config.privateRoom=auth.room();
   const node=document.createElement('script');node.type='application/json';node.id='lesson-data';node.textContent=JSON.stringify(config);document.body.append(node);
   await loadScript(document.body.dataset.lessonScript);
   await loadScript(document.body.dataset.syncScript || 'assets/gostudy-sync.js?v=michael-assignment-20261121');
