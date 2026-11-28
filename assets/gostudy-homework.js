@@ -1,6 +1,8 @@
 (() => {
 'use strict';
-const path='business-ai-finance-b2-02.html', homeworkPath='business-ai-finance-b2-02-homework.html';
+const newClassroom=document.body.dataset.virtualClassroom==='michael-1-1';
+const path=newClassroom?'business-ai-finance-b2-02-new.html':'business-ai-finance-b2-02.html';
+const homeworkPath=newClassroom?'business-ai-finance-b2-02-new-homework.html':'business-ai-finance-b2-02-homework.html';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const text=html=>{const el=document.createElement('div');el.innerHTML=html;return el.textContent.trim().replace(/\s+/g,' ').slice(0,450)};
 const api=async (url,options={})=>{
@@ -39,7 +41,7 @@ function definitions(config){
   ['decisionNotes',4,'write','Объясните финансовое решение',[],null,document.querySelector('#decisionNotes')],
   ['roleNotes',5,'write','Обсудите кейс: ваши заметки',[],null,document.querySelector('#roleNotes')],
   ['finalOpinion',6,'write','Сформулируйте аргументированное мнение',[],null,document.querySelector('[data-save="finalOpinion"]')],
-  ['writing',7,'write',config.homeworkPrompt||'Письменное задание',[],null,document.querySelector('#lessonSections')]
+  ['writing',7,'write',config.homeworkPrompt||'Письменное задание',[],null,document.querySelector(newClassroom?'#lessonVideo':'#lessonSections')]
  ];
  for(const [name,page,kind,prompt,options,answer,element] of extra)push(ids[name],page,kind,prompt,options,answer,element);
  return result;
@@ -66,7 +68,7 @@ function renderLesson(config){
   record=await getAssignment(room.student_id)||{exercise_ids:[],published_at:null};
   const query=new URLSearchParams({classStudent:room.student_id});link.href=homeworkPath+'?'+query;
   update();
-  const allowExerciseMenus=document.body.dataset.premiumFeed!=='michael-v1';
+  const allowExerciseMenus=document.body.dataset.premiumFeed!=='michael-v1' && !newClassroom;
   for(const d of defs){
    if(!d.element)continue;
    d.element.dataset.exerciseId=d.id;
@@ -90,7 +92,8 @@ function renderLesson(config){
    const target=d.element.closest('.term,.question-item,.gap-item')||d.element;
    target.insertAdjacentElement('afterbegin',control);
   }
-  (nav?.closest('details')||nav)?.after(container); // visible only to the authenticated teacher
+  if(newClassroom)document.querySelector('#lessonVideo .video-workspace')?.after(container);
+  else (nav?.closest('details')||nav)?.after(container); // visible only to the authenticated teacher
   publish.addEventListener('click',async()=>{
    if(busy)return;busy=true;update();
    try{
@@ -106,7 +109,9 @@ function renderLesson(config){
    }catch(e){status.textContent=e.message;}finally{busy=false;update();}
   });
  }
- document.addEventListener('finance-ready',()=>{refresh().catch(e=>{status.textContent=e.message;});},{once:true});
+ const start=()=>{refresh().catch(e=>{status.textContent=e.message;});};
+ if(newClassroom && window.FinanceLive?.connected())start();
+ else document.addEventListener('finance-ready',start,{once:true});
 }
 async function renderHomework(){
  const root=document.querySelector('#homework-root'),status=document.querySelector('#homework-status');
@@ -117,10 +122,16 @@ async function renderHomework(){
    if(!room.teacher){status.textContent='Домашнее задание пока не опубликовано. Доступ появится после публикации преподавателем.';return;}
    status.textContent='Черновик пуст. Назначьте упражнения из урока.';return;
   }
-  const source=await fetch(path,{cache:'no-store'});
-  if(!source.ok)throw Error('Не удалось загрузить задания урока.');
-  const html=await source.text(),dom=new DOMParser().parseFromString(html,'text/html');
-  const config=JSON.parse(dom.querySelector('#lesson-data').textContent);
+  let config;
+  if(newClassroom){
+   config=window.GoStudyLesson;
+   if(config?.answerNamespace!=='michael-finance2-new-v1:')throw Error('Новый урок ещё не загружен.');
+  }else{
+   const source=await fetch(path,{cache:'no-store'});
+   if(!source.ok)throw Error('Не удалось загрузить задания урока.');
+   const html=await source.text(),dom=new DOMParser().parseFromString(html,'text/html');
+   config=JSON.parse(dom.querySelector('#lesson-data').textContent);
+  }
   const defs=definitions(config),byId=new Map(defs.map(d=>[d.id,d]));
   const stored=await api(answersUrl(room.student_id)),answers=new Map(stored.map(x=>[x.exercise_id,x.answer?.value||'']));
   status.textContent=room.teacher?(assignment.published_at?'Опубликовано · просмотр преподавателя':'Черновик · виден только преподавателю'):'Опубликовано · ваши ответы сохраняются автоматически';

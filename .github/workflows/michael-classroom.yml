@@ -1,0 +1,39 @@
+name: Michael classroom 1.1 isolated contract
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '*finance*b2-02*'
+      - 'assets/gostudy-michael-classroom.*'
+      - 'assets/gostudy-homework.js'
+      - 'assets/gostudy-finance-assignment.js'
+      - 'assets/gostudy-michael-chat.js'
+      - 'scripts/*michael-classroom*'
+      - '.github/workflows/michael-classroom.yml'
+permissions:
+  contents: read
+jobs:
+  isolated-lesson:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/check-michael-classroom.cjs
+      - run: node scripts/check-architecture.cjs
+      - run: node scripts/check-jaas-video.cjs
+      - run: node --check assets/gostudy-michael-classroom.js
+      - run: node --check assets/gostudy-homework.js
+      - run: npm install --no-save --no-package-lock playwright@1.58.2
+      - name: NEW lesson two-role browser checks with synthetic Jitsi
+        run: |
+          GOSTUDY_CHROME="$(command -v google-chrome)"
+          export GOSTUDY_CHROME
+          node scripts/check-michael-classroom-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: michael-classroom-synthetic-browser-screenshots
+          path: artifacts/michael-classroom/
+          if-no-files-found: ignore
