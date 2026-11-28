@@ -8,6 +8,7 @@ const student='e4f31916-6d4c-49c8-9b80-0e2a233fc6c6',teacher='acf2f6a1-f38b-45ef
 const room={student_id:student,teacher_id:teacher};
 const server=http.createServer(async(req,res)=>{
  const url=new URL(req.url,'http://127.0.0.1:8765');
+ if(url.pathname==='/__qa/jitsi.js'){res.setHeader('Content-Type','text/javascript');res.end(fs.readFileSync('scripts/michael-classroom-video-fixture.js','utf8'));return;}
  if(url.pathname==='/__qa/student'||url.pathname==='/__qa/teacher'){
   const role=url.pathname.split('/').pop(),uid=role==='teacher'?teacher:student;
   const setup=`<script>window.GoStudyPrivateAccess={ready:Promise.resolve(),userId:()=>${JSON.stringify(uid)},token:async()=>'local-fixture',request:async(path,options={})=>{const response=await fetch('/__qa/api?role=${role}&path='+encodeURIComponent(path),{method:options.method||'GET',headers:{'Content-Type':'application/json'},body:options.body?JSON.stringify(options.body):undefined});return {ok:response.ok,status:response.status,data:await response.json()}}};</script>`;
@@ -15,6 +16,7 @@ const server=http.createServer(async(req,res)=>{
   html=html.replace('<script src="assets/gostudy-private-access.js"></script>',setup).replace('<script src="/assets/gostudy-private-access.js"></script>',setup);
   // The component URLs are relative to the page, as they are in production.
   html=html.replace('<head>','<head><base href="/">');
+  if(url.searchParams.get('video')==='fixture')html=html.replace('</head>','<script src="/__qa/jitsi.js"></script></head>');
   html=html.replace('<body ','<body class="gostudy-authorized" ').replace('<section id="gostudyAccessGate"','<section hidden id="gostudyAccessGate"');
   res.setHeader('Content-Type','text/html');res.end(html);return;
  }
@@ -38,4 +40,5 @@ const server=http.createServer(async(req,res)=>{
   res.end(fs.readFileSync(file));
  }catch{res.writeHead(404);res.end('Not found');}
 });
-server.listen(8765,'127.0.0.1',()=>console.log('Fixture preview: http://127.0.0.1:8765/__qa/student (simulated accounts, no real call)'));
+module.exports={server,events};
+if(require.main===module){const port=Number(process.env.FLUENVIA_PREVIEW_PORT)||8765;server.listen(port,'127.0.0.1',()=>console.log('Fixture preview: http://127.0.0.1:'+port+'/__qa/student (simulated accounts, no real call)'));}

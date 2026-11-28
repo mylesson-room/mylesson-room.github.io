@@ -25,3 +25,15 @@ jobs:
       - run: node scripts/check-jaas-video.cjs
       - run: node --check assets/gostudy-michael-classroom.js
       - run: node --check assets/gostudy-homework.js
+      - run: npm install --no-save --no-package-lock playwright@1.58.2
+      - name: NEW lesson two-role browser checks with synthetic Jitsi
+        run: |
+          GOSTUDY_CHROME="$(command -v google-chrome)"
+          export GOSTUDY_CHROME
+          node scripts/check-michael-classroom-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: michael-classroom-synthetic-browser-screenshots
+          path: artifacts/michael-classroom/
+          if-no-files-found: ignore
