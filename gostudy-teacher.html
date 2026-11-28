@@ -3,18 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GoStudy · Кабинет преподавателя</title>
+<title>Fluenvia · Кабинет преподавателя</title>
 <link rel="stylesheet" href="assets/gostudy-sync.css?v=d9356e89a210">
-<script src="assets/gostudy-sync.js?v=emilia-holiday-b2"></script>
+<script src="assets/gostudy-sync.js?v=teacher-workspace-3"></script>
 <style>.teacher-course-links{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px}.teacher-course-links .pharma-lesson-shortcut{display:inline-flex;align-items:center;min-height:40px;padding:0 12px;border-radius:10px;background:#2368b0;color:#fff;text-decoration:none;font-weight:650}.teacher-course-links .pharma-lesson-shortcut:hover{background:#164f8d}</style>
 <link rel="stylesheet" href="assets/gostudy-classroom.css?v=b9085c1b0b36">
 <style>#teacher-add-student{margin-top:16px}#teacher-add-student summary{font-weight:700}#teacher-add-student form{max-width:420px;margin-top:12px}#teacher-add-student select{font:inherit;padding:9px}</style>
 <link rel="stylesheet" href="assets/gostudy-cabinet.css?v=3729477e56d0">
+<link rel="stylesheet" href="assets/fluenvia-teacher-workspace.css?v=3">
 </head>
 <body class="cloud-account teacher-page">
 <main>
-  <header class="teacher-top"><strong>GoStudy</strong><a href="login.html">Общий вход GoStudy</a></header>
-  <h1>Обучение</h1>
+  <header class="teacher-top"><strong>Fluenvia</strong><a href="login.html">Общий вход</a></header>
+  <h1>Кабинет преподавателя</h1>
   <form id="teacher-login" method="post" hidden>
     <label for="teacher-email">Электронная почта</label>
     <input id="teacher-email" type="email" name="email" autocomplete="username" required>
@@ -24,7 +25,8 @@
   </form>
   <p id="teacher-status" role="status"></p>
   <section id="teacher-dashboard" hidden>
-    <div class="teacher-roster-flat">
+    <div class="teacher-workspace-layout">
+    <div id="teacher-roster" class="teacher-roster-flat">
       <div class="teacher-section-tab">Ученики</div>
       <input id="teacher-student-search" type="search" placeholder="Поиск учеников" aria-label="Поиск учеников">
       <p id="teacher-student-count" class="teacher-count"></p>
@@ -43,80 +45,68 @@
       <a href="login.html">Общая ссылка на вход</a>
     </details>
       <div id="teacher-student-list"></div>
-      <!-- Пока учётная запись Саввы не создана, преподаватель может открыть урок для просмотра. -->
-      <div id="teacher-savva-pending" class="teacher-student-row" aria-label="Савва, урок B2" style="margin-top:12px">
-        <span class="teacher-avatar" aria-hidden="true">С</span>
-        <div style="flex:1;min-width:0"><strong>Савва</strong><small style="display:block">Sport & Travel · B2 · Football Academies</small><small style="display:block;color:#8a6870">Просмотр урока · аккаунт ученика ещё не подключён</small></div>
-        <a class="teacher-enter-class" href="https://daniilkhlynov1-sys.github.io/gostudy/barcelona-appeal-b2-04.html" aria-label="Открыть урок Саввы на старом сайте">→ Открыть урок</a>
-      </div>
       <select id="teacher-student" hidden aria-label="Ученик"></select>
     </div>
-    <details id="teacher-profile"><summary>Карточка ученика</summary>
-    <section id="teacher-classroom" class="teacher-panel" hidden>
-      <h2 id="teacher-classroom-title">Класс</h2>
-      <article class="home-current" id="teacher-current-lesson"></article><details><summary>Все уроки</summary><ul id="teacher-classroom-lessons"></ul></details>
-    </section>
-    <div class="teacher-grid">
-      <section class="teacher-panel">
-        <h2>Ответы ученика</h2>
-        <div id="teacher-answers">Загружаем ответы…</div>
-      </section>
-      <section class="teacher-panel">
-        <h2>Словарь</h2>
-        <form id="teacher-word" method="post" hidden>
-          <label for="teacher-en">Слово или фраза</label>
-          <input id="teacher-en" name="en" maxlength="150" required>
-          <label for="teacher-ru">Перевод</label>
-          <input id="teacher-ru" name="ru" maxlength="300" required>
-          <button type="submit">Добавить ученику</button>
-          <p id="teacher-word-status" role="status"></p>
-        </form>
-        <h3>Добавил ученик</h3><ul id="teacher-student-words"></ul>
-        <h3>Задал преподаватель</h3><ul id="teacher-assigned-words"></ul>
+      <section id="teacher-profile" aria-labelledby="teacher-profile-name">
+        <h2 id="teacher-profile-name">Карточка ученика</h2>
+        <button type="button" id="teacher-mobile-picker" aria-haspopup="dialog" aria-controls="teacher-roster-sheet">
+          <span>Выбрать ученика</span><span aria-hidden="true">⌄</span>
+        </button>
+        <p id="teacher-profile-empty">Выберите ученика, чтобы открыть его карточку.</p>
+        <div id="teacher-profile-content" hidden>
+          <div class="teacher-profile-tabs" role="tablist" aria-label="Карточка ученика">
+            <button type="button" role="tab" id="teacher-lessons-tab" aria-controls="teacher-lessons-panel" aria-selected="true">Уроки</button>
+            <button type="button" role="tab" id="teacher-homework-tab" aria-controls="teacher-homework-panel" aria-selected="false" tabindex="-1">Домашняя работа</button>
+            <button type="button" role="tab" id="teacher-words-tab" aria-controls="teacher-words-panel" aria-selected="false" tabindex="-1">Словарь</button>
+          </div>
+          <div id="teacher-lessons-panel" role="tabpanel" aria-labelledby="teacher-lessons-tab" tabindex="0">
+            <section id="teacher-classroom" class="teacher-panel" hidden>
+              <h3 id="teacher-classroom-title">Класс</h3>
+              <article class="home-current" id="teacher-current-lesson"></article>
+              <details><summary>Уроки курса</summary><ul id="teacher-classroom-lessons"></ul></details>
+            </section>
+            <section class="teacher-panel">
+              <h3>Ответы на уроках</h3>
+              <div id="teacher-answers"></div>
+            </section>
+          </div>
+          <div id="teacher-homework-panel" role="tabpanel" aria-labelledby="teacher-homework-tab" tabindex="0" hidden>
+            <section class="teacher-panel">
+              <h3>Домашняя работа</h3>
+              <p id="teacher-homework-empty">У текущего урока нет ссылки на домашнюю работу.</p>
+              <div class="home-actions"><a id="teacher-current-homework" hidden>Открыть домашнюю работу</a></div>
+              <h3>Ответы на домашнюю работу</h3>
+              <div id="teacher-homework-answers"></div>
+            </section>
+          </div>
+          <div id="teacher-words-panel" role="tabpanel" aria-labelledby="teacher-words-tab" tabindex="0" hidden>
+            <section class="teacher-panel">
+              <form id="teacher-word" method="post" hidden>
+                <label for="teacher-en">Слово или фраза</label>
+                <input id="teacher-en" name="en" maxlength="150" required>
+                <label for="teacher-ru">Перевод</label>
+                <input id="teacher-ru" name="ru" maxlength="300" required>
+                <button type="submit">Добавить ученику</button>
+                <p id="teacher-word-status" role="status"></p>
+              </form>
+              <h3>Добавил ученик</h3><ul id="teacher-student-words"></ul>
+              <h3>Задал преподаватель</h3><ul id="teacher-assigned-words"></ul>
+            </section>
+          </div>
+        </div>
       </section>
     </div>
-    </details>
+    <dialog id="teacher-roster-sheet" aria-labelledby="teacher-roster-sheet-title">
+      <div class="teacher-sheet-header">
+        <h2 id="teacher-roster-sheet-title">Выбрать ученика</h2>
+        <form method="dialog"><button type="submit" aria-label="Закрыть список учеников">×</button></form>
+      </div>
+    </dialog>
     <button type="button" id="teacher-signout">Выйти</button>
   </section>
 </main>
 <script src="assets/gostudy-sweden-teacher-shortcut.js?v=20261121-3"></script>
 <script type="application/json" id="lesson-assignment-settings">[{"id":"anastasia","name":"Анастасия","toName":"Анастасии","ofName":"Анастасии","profileCourse":"art_b1","cabinet":"student-art-b1.html","studentId":"d4f4980a-e17b-4bf6-9541-425c48fc2c0e","roomQuery":"/rest/v1/gostudy_classroom_rooms?select=student_id,teacher_id&course=eq.art-b1&lesson_path=eq.art-b1-03.html","table":"gostudy_art_lesson_selection","initial":"art-b1-05.html","lessons":{"art-b1-03.html":{"title":"The Gallery Makeover","homework":"art-b1-03-homework.html","label":"Текущий урок · Art & Mosaics · B1"},"art-b1-04.html":{"title":"The Story Behind the Mosaic","homework":"art-b1-04-homework.html","label":"Урок 4 · история мозаики и подписи к работам"},"art-b1-05.html":{"title":"Can We Save the Past?","homework":"art-b1-05-homework.html","label":"Урок 5 · Art conservation · B1"}}}]</script>
-<script src="assets/gostudy-finance-assignment.js?v=art05-route-20261124"></script>
-<script>
-/* Не дублируем Савву после появления настоящего аккаунта и класса в списке. */
-(() => {
-  const pending = document.getElementById('teacher-savva-pending');
-  const enrollment = document.createElement('button');
-  enrollment.type='button';
-  enrollment.className='teacher-student-profile';
-  enrollment.textContent='Подключить';
-  enrollment.title='Создать аккаунт Саввы через защищённый вход преподавателя';
-  enrollment.addEventListener('click', () => {
-    const details=document.getElementById('teacher-add-student');
-    details.hidden=false; details.open=true;
-    const form=details.querySelector('form');
-    form.elements.email.value='savva.50.ryabkov@yandex.ru';
-    form.elements.course.value='sports_b2';
-    form.elements.course.dispatchEvent(new Event('change'));
-    form.elements.password.focus();
-    details.scrollIntoView({behavior:'smooth',block:'center'});
-  });
-  pending?.append(enrollment);
-  const list = document.getElementById('teacher-student-list');
-  const preview = document.getElementById('teacher-savva-pending');
-  const search = document.getElementById('teacher-student-search');
-  function refresh() {
-    const enrolled = [...list.querySelectorAll('.teacher-student-row')].some(
-      row => /савва|savva\.50\.ryabkov@yandex\.ru/i.test(row.textContent)
-    );
-    const query = (search?.value || '').trim().toLowerCase();
-    const match = !query || 'савва savva.50.ryabkov@yandex.ru sport travel b2 football academies'.includes(query);
-    preview.hidden = enrolled || !match;
-  }
-  new MutationObserver(refresh).observe(list,{childList:true,subtree:true});
-  search?.addEventListener('input',refresh);
-  refresh();
-})();
-</script>
+<script src="assets/gostudy-finance-assignment.js?v=teacher-workspace-3"></script>
 </body>
 </html>

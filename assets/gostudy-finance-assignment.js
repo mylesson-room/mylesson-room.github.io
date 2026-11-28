@@ -56,6 +56,14 @@ function reflect(){
    const actions=panel.querySelectorAll('a');
    for(const action of actions)action.href=link(action.textContent.includes('Домашнее')?item.homework:current);
   }
+  const homework=document.querySelector('#teacher-current-homework');
+  if(homework){
+   const href=item.homework ? link(item.homework) : null;
+   if(href && homework.getAttribute('href')!==href)homework.href=href;
+   if(!href)homework.removeAttribute('href');
+   homework.hidden=!href;
+   document.querySelector('#teacher-homework-empty').hidden=!!href;
+  }
  }
 }
 function mount(){

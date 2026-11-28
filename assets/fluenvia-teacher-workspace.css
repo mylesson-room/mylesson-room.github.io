@@ -1,0 +1,190 @@
+.teacher-page {
+  background: #f5f5fb;
+  color: #242440;
+}
+
+.teacher-page main {
+  width: min(1180px, 100%);
+}
+
+.teacher-workspace-layout {
+  display: grid;
+  grid-template-columns: minmax(250px, 31%) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  margin-bottom: 16px;
+}
+
+.teacher-workspace-layout .teacher-roster-flat,
+.teacher-workspace-layout #teacher-profile {
+  min-width: 0;
+  margin: 0;
+  padding: 18px;
+  border: 1px solid #e4e3ef;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.teacher-workspace-layout #teacher-profile-name {
+  margin-bottom: 12px;
+  font-size: 1.4rem;
+}
+
+.teacher-workspace-layout .teacher-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.teacher-workspace-layout .teacher-student-row {
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 6px 8px;
+  min-height: 0;
+  padding: 10px 5px;
+}
+
+.teacher-workspace-layout .teacher-student-row:has([aria-pressed="true"]) {
+  border-radius: 9px;
+  background: #f2efff;
+}
+
+.teacher-workspace-layout .teacher-avatar {
+  width: 34px;
+  height: 34px;
+  font-size: 1rem;
+}
+
+.teacher-workspace-layout .teacher-student-profile {
+  grid-column: 3;
+  grid-row: 1;
+  width: auto;
+  padding-inline: 7px;
+  color: #493ca1;
+}
+
+.teacher-workspace-layout .teacher-enter-class {
+  grid-column: 2 / -1;
+  justify-self: start;
+}
+
+.teacher-workspace-layout .home-current {
+  border-color: #e0dbff;
+  background: #f4f1ff;
+  color: #242440;
+}
+
+.teacher-workspace-layout .home-primary,
+.teacher-workspace-layout .teacher-enter-class {
+  border-color: #5043c3;
+  background: #5043c3;
+}
+
+@media (max-width: 760px) {
+  .teacher-workspace-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.teacher-profile-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 16px;
+  background: #f5f4fb;
+  border-radius: 12px;
+}
+
+.teacher-page .teacher-profile-tabs button {
+  flex: 1 1 auto;
+  min-height: 42px;
+  margin: 0;
+  padding: 7px 12px;
+  border: 0;
+  background: transparent;
+  color: #383550;
+}
+
+.teacher-page .teacher-profile-tabs button[aria-selected="true"] {
+  background: #e8e1ff;
+  color: #3d2f97;
+}
+
+.teacher-profile-tabs button:focus-visible {
+  outline: 2px solid #5043c3;
+  outline-offset: -2px;
+}
+
+#teacher-lessons-panel > section + section {
+  margin-top: 12px;
+}
+
+#teacher-mobile-picker {
+  display: none;
+}
+
+#teacher-roster-sheet {
+  box-sizing: border-box;
+  position: fixed;
+  inset: auto 0 0;
+  width: min(100%, 760px);
+  max-width: 100%;
+  max-height: 82vh;
+  max-height: 82dvh;
+  margin: 0 auto;
+  padding: 18px 16px max(16px, env(safe-area-inset-bottom));
+  border: 0;
+  border-radius: 22px 22px 0 0;
+  background: #fff;
+  color: #242440;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+#teacher-roster-sheet::backdrop {
+  background: #26213d73;
+}
+
+.teacher-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.teacher-sheet-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.teacher-sheet-header button {
+  min-width: 44px;
+  min-height: 44px;
+  background: #f4f2fb;
+  color: #312b4f;
+}
+
+#teacher-roster-sheet .teacher-section-tab {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .teacher-workspace-layout > #teacher-roster,
+  #teacher-profile-name {
+    display: none;
+  }
+
+  #teacher-mobile-picker {
+    display: flex;
+    width: 100%;
+    min-height: 48px;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 14px;
+    background: #f0ebff;
+    color: #3d2f97;
+    text-align: left;
+  }
+
+  #teacher-roster-sheet .teacher-student-row {
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+  }
+}

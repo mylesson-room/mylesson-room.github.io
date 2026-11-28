@@ -1,14 +1,13 @@
 // GoStudy JaaS: shared RLS-authorized video token for one existing classroom course/lesson.
 // No database mutations. Never return a JWT without matching the user's exact room.
-const ORIGIN = 'https://mylesson-room.github.io';
-const headers = {
-  'Access-Control-Allow-Origin': ORIGIN,
+const ALLOWED_ORIGINS = new Set(['https://mylesson-room.github.io', 'https://daniilkhlynov1-sys.github.io', 'https://fluenvia.ru', 'https://www.fluenvia.ru']);
+const BASE_HEADERS = {
+  'Access-Control-Allow-Origin': 'https://mylesson-room.github.io',
   'Access-Control-Allow-Headers': 'authorization, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Cache-Control': 'no-store',
   'Vary': 'Origin',
 };
-const respond = (status, data) => Response.json(data, { status, headers });
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const APP_ID = /^vpaas-magic-cookie-[A-Za-z0-9-]+$/;
 const concat = (...parts) => {
@@ -51,7 +50,10 @@ async function signJwt(claims, keyId, privatePem) {
   return unsigned + '.' + toBase64Url(signature);
 }
 Deno.serve(async (request) => {
-  if (request.headers.get('origin') && request.headers.get('origin') !== ORIGIN)
+  const requestOrigin = request.headers.get('origin');
+  const headers = {...BASE_HEADERS, 'Access-Control-Allow-Origin': requestOrigin && ALLOWED_ORIGINS.has(requestOrigin) ? requestOrigin : 'https://mylesson-room.github.io'};
+  const respond = (status, data) => Response.json(data, { status, headers });
+  if (requestOrigin && !ALLOWED_ORIGINS.has(requestOrigin))
     return respond(403, { error: 'Недопустимый сайт.' });
   if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers });
   if (request.method !== 'POST') return respond(405, { error: 'Недопустимый запрос.' });
@@ -91,7 +93,7 @@ Deno.serve(async (request) => {
       lesson_path: 'eq.' + lessonPath,
     });
     // User JWT + enabled RLS limits rooms to real enrolled teacher/student pairs.
-    // Match all three dimensions, not a client-supplied student ID alone.
+    // Match the exact room. Vietnam A2 also grants scoped visibility to its assigned co-teacher.
     const roomsResponse = await lookup('/rest/v1/gostudy_classroom_rooms?' + params);
     if (!roomsResponse.ok) return respond(403, { error: 'Нет доступа к видеокомнате.' });
     const rooms = await roomsResponse.json();
@@ -99,10 +101,12 @@ Deno.serve(async (request) => {
       row.student_id === target &&
       row.course === course &&
       row.lesson_path === lessonPath &&
-      (studentId ? row.teacher_id === me : row.student_id === me)
+      (studentId
+        ? row.student_id !== me && (row.teacher_id === me || row.course === 'vietnam-a2')
+        : row.student_id === me)
     ) : null;
     if (!room) return respond(403, { error: 'Нет доступа к видеокомнате.' });
-    const role = room.teacher_id === me ? 'teacher' : 'student';
+    const role = room.teacher_id === me || studentId ? 'teacher' : 'student';
     const name = role === 'teacher' ? 'Преподаватель' : 'Ученик';
     // Exact room claim prevents joining other students' sessions with this JWT.
     const roomName = 'gostudy-classroom-' + course + '-' + target.replace(/-/g, '').toLowerCase();

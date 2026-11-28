@@ -427,7 +427,7 @@
       const response = await request('/rest/v1/rpc/gostudy_my_destinations', {method: 'POST', body: {}}, await token());
       if (response.status === 401) throw new Error('Срок входа истёк. Войдите снова.');
       if (!response.ok || !Array.isArray(response.data)) throw new Error('Не удалось загрузить назначенные курсы. Попробуйте ещё раз.');
-      const options = [...new Set(response.data.map(row => row.course))]
+      const options = [...new Set(response.data.map(row => row.course === 'teacher-assigned' ? 'teacher' : row.course))]
         .map(course => destinations.get(course)).filter(Boolean);
       if (!options.length && session.user.app_metadata?.gostudy_without_course === true) {
         localStorage.setItem(studentSessionKey,JSON.stringify(session));
@@ -1374,6 +1374,61 @@
     let pollTimer;
     const studentSearch = document.getElementById('teacher-student-search');
     const studentList = document.getElementById('teacher-student-list');
+    const profile = document.getElementById('teacher-profile');
+    const profileContent = document.getElementById('teacher-profile-content');
+    const profileEmpty = document.getElementById('teacher-profile-empty');
+    const homeworkLink = document.getElementById('teacher-current-homework');
+    const homeworkEmpty = document.getElementById('teacher-homework-empty');
+    const homeworkAnswers = document.getElementById('teacher-homework-answers');
+    const tabs = [...profile.querySelectorAll('[role="tab"]')];
+    const roster = document.getElementById('teacher-roster');
+    const mobilePicker = document.getElementById('teacher-mobile-picker');
+    const rosterSheet = document.getElementById('teacher-roster-sheet');
+    const narrow = matchMedia('(max-width: 760px)');
+    const rosterAnchor = document.createComment('teacher roster');
+    roster.before(rosterAnchor);
+
+    mobilePicker.addEventListener('click', () => {
+      rosterSheet.append(roster);
+      rosterSheet.showModal();
+      studentSearch.focus();
+    });
+    rosterSheet.addEventListener('close', () => {
+      rosterAnchor.after(roster);
+      if (narrow.matches) mobilePicker.focus();
+    });
+    rosterSheet.addEventListener('click', event => {
+      if (event.target === rosterSheet) rosterSheet.close();
+    });
+    narrow.addEventListener('change', event => {
+      if (!event.matches && rosterSheet.open) rosterSheet.close();
+    });
+
+    function selectTab(selected) {
+      for (const tab of tabs) {
+        const active = tab === selected;
+        tab.setAttribute('aria-selected', String(active));
+        tab.tabIndex = active ? 0 : -1;
+        document.getElementById(tab.getAttribute('aria-controls')).hidden = !active;
+      }
+    }
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => selectTab(tab));
+      tab.addEventListener('keydown', event => {
+        const nextIndex = {
+          ArrowLeft: (index + tabs.length - 1) % tabs.length,
+          ArrowRight: (index + 1) % tabs.length,
+          Home: 0,
+          End: tabs.length - 1,
+        }[event.key];
+        if (nextIndex === undefined) return;
+        event.preventDefault();
+        selectTab(tabs[nextIndex]);
+        tabs[nextIndex].focus();
+      });
+    });
+
     function renderStudentList() {
       if (!studentList) return;
       const query = studentSearch.value.trim().toLowerCase();
@@ -1411,13 +1466,20 @@
         button.type = 'button';
         button.className = 'teacher-student-profile';
         button.setAttribute('aria-label','Карточка ученика · '+label);
-        button.textContent = '👤';
+        button.textContent = 'Открыть';
+        button.dataset.selection = student.selection;
+        button.setAttribute('aria-pressed', String(studentPicker.value === student.selection));
         button.onclick = () => {
           studentPicker.value = student.selection;
-          const panel = document.getElementById('teacher-profile');
-          panel.open = true;
+          selectTab(tabs[0]);
           renderStudent();
-          panel.scrollIntoView({block:'start'});
+          if (rosterSheet.open) {
+            rosterSheet.close();
+          } else {
+            const selected = [...studentList.querySelectorAll('button[data-selection]')]
+              .find(item => item.dataset.selection === student.selection);
+            selected?.focus({preventScroll:true});
+          }
         };
         row.append(button);
         studentList.append(row);
@@ -1425,11 +1487,14 @@
       if (!studentList.childElementCount) studentList.textContent = query ? 'Никого не нашли.' : 'Список пока пуст.';
     }
     if (studentSearch) studentSearch.oninput = renderStudentList;
-    if (new URLSearchParams(location.search).has('selected')) document.getElementById('teacher-profile')?.setAttribute('open','');
 
     function renderStudent() {
       renderStudentList();
       const student = students.find(row => row.selection === studentPicker.value);
+      document.getElementById('teacher-profile-name').textContent = student?.label || 'Карточка ученика';
+      mobilePicker.firstElementChild.textContent = student?.label || 'Выбрать ученика';
+      profileContent.hidden = !student;
+      profileEmpty.hidden = !!student;
       wordForm.hidden = !student || student.course === withoutCourse || student.course === financeCourse || student.course === generalB2 || student.course === placement || ['travel_b2','art_b1','ielts_reading','sweden_a2','country_house','business_ai','general_english_b1','general_english_b1_stories','sports_b2'].includes(student.course);
       wordItems(studentWords, student?.words);
       wordItems(assignedWords, student?.assigned);
@@ -1453,10 +1518,14 @@
         }
         return row;
       }));
+      const active = catalog?.lessons.at(-1);
+      homeworkLink.hidden = !active?.homework;
+      homeworkEmpty.hidden = !homeworkLink.hidden;
+      if (active?.homework) homeworkLink.href = classroomLink(active.homework, student.id);
+      else homeworkLink.removeAttribute('href');
       const current = document.getElementById('teacher-current-lesson');
       if (current) {
         current.replaceChildren();
-        const active = catalog?.lessons.at(-1);
         if (active) {
           const label = document.createElement('p');
           label.textContent = 'Текущий урок';
@@ -1464,18 +1533,16 @@
           title.textContent = active.title;
           const actions = document.createElement('div');
           actions.className = 'home-actions';
-          for (const [path,name] of [[active.lesson,'Войти в урок'],[active.homework,'Домашнее задание']]) {
-            if (!path) continue;
-            const link = document.createElement('a');
-            link.href = classroomLink(path,student.id);
-            link.textContent = name;
-            if (path === active.lesson) link.className = 'home-primary';
-            actions.append(link);
-          }
+          const link = document.createElement('a');
+          link.href = classroomLink(active.lesson, student.id);
+          link.textContent = 'Войти в класс';
+          link.className = 'home-primary';
+          actions.append(link);
           current.append(label,title,actions);
         }
       }
       answerList.replaceChildren();
+      homeworkAnswers.replaceChildren();
       for (const [key,label] of lessonLabels) {
         const progress = student?.progress?.find(row => row.key === key);
         if (!progress) continue;
@@ -1494,8 +1561,12 @@
           list.append(question,answer);
         }
         group.append(title,list);
-        answerList.append(group);
+        const target = key.includes('homework') ? homeworkAnswers : answerList;
+        target.append(group);
       }
+      if (!homeworkAnswers.childElementCount) homeworkAnswers.textContent = student?.course === placement && active?.homework
+        ? 'Ответы доступны на странице домашней работы.'
+        : 'Пока нет сохранённых ответов.';
       if (!answerList.childElementCount) answerList.textContent = student?.course === placement
         ? 'Ответы доступны в общей комнате урока.'
         : student?.course === withoutCourse ? 'Курс пока не назначен.'
@@ -1510,6 +1581,11 @@
       busy = true;
       try {
         const access = await token();
+        const roles = await request('/rest/v1/rpc/gostudy_my_destinations',{method:'POST',body:{}},access);
+        const destinations = roles.ok && Array.isArray(roles.data) ? roles.data : [];
+        const canProvision = destinations.some(row => row.course === 'teacher');
+        const assignedOnly = !canProvision && destinations.some(row => row.course === 'teacher-assigned');
+        if (addStudent) addStudent.hidden = !canProvision;
         const lookup = async () => {
           if (studentEmails.size && students.every(student => student.course === financeCourse || student.course === placement || studentEmails.has(student.id))) return;
           const response = await request('/rest/v1/rpc/gostudy_teacher_student_emails',{method:'POST',body:{}},access);
@@ -1523,7 +1599,9 @@
             id:row.id,label:row.email,email:row.email,course:withoutCourse,selection:withoutCourse+':'+row.id,
           })));
         };
-        const results = await Promise.allSettled([lookup(),lookupWithoutCourse(),...Array.from(courses, async ([course,label]) => {
+        const availableCourses = assignedOnly ? [[placement,courses.get(placement)]] : courses;
+        const lookups = assignedOnly ? [] : [lookup(),lookupWithoutCourse()];
+        const results = await Promise.allSettled([...lookups,...Array.from(availableCourses, async ([course,label]) => {
           if (course === financeCourse) {
             const response = await request('/rest/v1/gostudy_finance_room?select=student_id&teacher_id=eq.' + encodeURIComponent(session.user.id), {}, access);
             if (!response.ok || !Array.isArray(response.data)) throw new Error(label);
@@ -1533,11 +1611,13 @@
             return;
           }
           if (course === generalB2 || course === placement || course === 'sports_b2') {
-            const query = new URLSearchParams({select:'student_id,student_label',course:'eq.'+course.replaceAll('_','-'),teacher_id:'eq.'+session.user.id});
+            const query = new URLSearchParams({select:'student_id,student_label',course:'eq.'+course.replaceAll('_','-')});
+            if (course === placement) query.set('student_id','neq.'+session.user.id);
+            else query.set('teacher_id','eq.'+session.user.id);
             const response = await request('/rest/v1/gostudy_classroom_rooms?'+query, {}, access);
             if (!response.ok || !Array.isArray(response.data)) throw new Error(label);
             rosterByCourse.set(course,response.data.map(row=>({
-              id:row.student_id,label:row.student_label,email:course === placement ? row.student_label : undefined,course,selection:course+':'+row.student_id,
+              id:row.student_id,label:row.student_label,course,selection:course+':'+row.student_id,
             })));
             return;
           }
@@ -1555,7 +1635,6 @@
           const selected = studentPicker.value || new URLSearchParams(location.search).get('selected');
           signature = next;
           students = roster;
-          if (addStudent) addStudent.hidden = !students.length;
           studentPicker.replaceChildren(...students.map(student => {
             const option = document.createElement('option');
             option.value = student.selection;
@@ -1585,7 +1664,7 @@
         const result = await request('/auth/v1/token?grant_type=password',{method:'POST',body:{email:login.elements.email.value.trim(),password}});
         if (!result.ok) throw new Error('Не удалось войти. Проверьте почту и пароль.');
         const roles = await request('/rest/v1/rpc/gostudy_my_destinations',{method:'POST',body:{}},result.data.access_token);
-        if (!roles.ok || !roles.data?.some(row=>row.course==='teacher')) throw Error('У аккаунта нет доступа к кабинету преподавателя.');
+        if (!roles.ok || !roles.data?.some(row=>row.course==='teacher' || row.course==='teacher-assigned')) throw Error('У аккаунта нет доступа к кабинету преподавателя.');
         saveSession(result.data,true);
         setSignedIn();
         startPolling();

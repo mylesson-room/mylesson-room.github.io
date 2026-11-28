@@ -145,7 +145,7 @@
       };
       document.addEventListener('finance-ready', refresh);
       document.addEventListener('finance-word', refresh);
-      await loadScript('assets/gostudy-finance-live.js');
+      await loadScript('assets/gostudy-finance-live.js?v=shared-teachers');
       return;
     }
 

@@ -14,7 +14,7 @@
   data-workbook-script="assets/gostudy-v1-workbook.js"
   data-live-script="assets/gostudy-finance-live.js">
 <script type="application/json" id="private-access-config">
-{"room":{"course":"english-placement","lesson":"english-placement.html"}}
+{"allowAssignedTeachers":true,"room":{"course":"english-placement","lesson":"english-placement.html"}}
 </script>
 <div id="gostudyAccessGate" role="region" aria-label="Вход в урок">
   <h1>Вход в урок</h1>
@@ -29,7 +29,7 @@
 </div>
 <p id="placement-loading" role="status" hidden></p>
 <button id="gostudyAccessSignout" hidden type="button">Выйти</button>
-<script src="assets/gostudy-private-access.js"></script>
-<script src="assets/gostudy-placement.js"></script>
+<script src="assets/gostudy-private-access.js?v=shared-teachers"></script>
+<script src="assets/gostudy-placement.js?v=shared-teachers"></script>
 </body>
 </html>
