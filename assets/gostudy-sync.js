@@ -350,6 +350,7 @@
   function mountUnifiedAccount() {
     const destinations = new Map([
       ['business-ai-finance', {name:'AI in Finance · B2',path:'student-business-ai-finance.html'}],
+      ['engineering-c1', {name:'Engineering English · C1',path:'student-engineering-c1.html'}],
       ['general-english-b2', {name:'General English B2',path:'student-general-english-b2.html',keys:generalB2Keys}],
       ['sports-b2', {name:'World Football Academies · B2',path:'student-sports-b2.html',keys:sportsB2Keys}],
       [storiesCourse, {name:'General English B1',path:'student-general-english-b1-stories.html',keys:storiesKeys}],
@@ -1317,6 +1318,7 @@
     const financeLesson = 'business-ai-finance-b2-02.html';
     const legacyTeacherCourses = new Set(['art_b1','ielts_reading','sweden_a2']);
     const teacherCatalog = {...classroomCatalog,
+      engineering_c1:{name:'Engineering English · C1',lessons:[{number:1,title:'AI in wind turbines and satellites',lesson:'engineering-c1-01.html',lessonKey:'gostudy-engineering-c1-01-v1'}]},
       art_b1:{name:'Art & Mosaics · B1',lessons:[{title:'Small pieces, big ideas',lesson:'art-mosaics-b1.html',homework:'art-b1-homework.html'},{title:'Every picture has a story',lesson:'art-b1-02.html',homework:'art-b1-02-homework.html'},{title:'The Gallery Makeover',lesson:'art-b1-03.html',lessonKey:'gostudy-art-b1-03-v1',homework:'art-b1-03-homework.html',homeworkKey:'gostudy-art-b1-03-homework-v1'},{number:4,title:'The Story Behind the Mosaic',lesson:'art-b1-04.html',lessonKey:'gostudy-art-b1-04-v1',homework:'art-b1-04-homework.html',homeworkKey:'gostudy-art-b1-04-homework-v1'},{number:5,title:'Can We Save the Past?',lesson:'art-b1-05.html',lessonKey:'gostudy-art-b1-05-v1',homework:'art-b1-05-homework.html',homeworkKey:'gostudy-art-b1-05-homework-v1'}]},
       ielts_reading:{name:'IELTS Reading',lessons:[{title:'IELTS Reading · Lesson 1',lesson:'ielts-reading-01.html',homework:'ielts-reading-01-homework.html'},{number:4,title:'IELTS Academic Reading 04',lesson:'ielts-reading-04.html'}]},
       sweden_a2:{name:'Sweden · A2',lessons:[{number:2,title:'Your First Full Day in Stockholm',lesson:'sweden-a2-02-michael.html',lessonKey:'gostudy-sweden-a2-02-michael-v1',homework:'sweden-a2-02-michael-homework.html',homeworkKey:'gostudy-sweden-a2-02-michael-homework-v1'}]},
@@ -1333,7 +1335,7 @@
     const addStudentStatus = document.getElementById('teacher-add-student-status');
     if (addStudentForm) {
       for (const [id,name] of courses) {
-        if (id === financeCourse || id === generalB2 || id === placement || ['country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(id)) continue;
+        if (id === 'engineering_c1' || id === financeCourse || id === generalB2 || id === placement || ['country_house','business_ai','general_english_b1','general_english_b1_stories'].includes(id)) continue;
         const option = document.createElement('option');
         option.value = id;
         option.textContent = name;
@@ -1495,7 +1497,7 @@
       mobilePicker.firstElementChild.textContent = student?.label || 'Выбрать ученика';
       profileContent.hidden = !student;
       profileEmpty.hidden = !!student;
-      wordForm.hidden = !student || student.course === withoutCourse || student.course === financeCourse || student.course === generalB2 || student.course === placement || ['travel_b2','art_b1','ielts_reading','sweden_a2','country_house','business_ai','general_english_b1','general_english_b1_stories','sports_b2'].includes(student.course);
+      wordForm.hidden = !student || student.course === withoutCourse || student.course === financeCourse || student.course === generalB2 || student.course === placement || ['travel_b2','art_b1','ielts_reading','sweden_a2','country_house','business_ai','general_english_b1','general_english_b1_stories','sports_b2','engineering_c1'].includes(student.course);
       wordItems(studentWords, student?.words);
       wordItems(assignedWords, student?.assigned);
       const classroom = document.getElementById('teacher-classroom');
@@ -1610,7 +1612,7 @@
             })));
             return;
           }
-          if (course === generalB2 || course === placement || course === 'sports_b2') {
+          if (course === generalB2 || course === placement || course === 'sports_b2' || course === 'engineering_c1') {
             const query = new URLSearchParams({select:'student_id,student_label',course:'eq.'+course.replaceAll('_','-')});
             if (course === placement) query.set('student_id','neq.'+session.user.id);
             else query.set('teacher_id','eq.'+session.user.id);
