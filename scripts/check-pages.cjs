@@ -160,6 +160,7 @@ async function checkGeneralB2Room(browser, origin) {
             return route.fulfill({json:[]});
           if (url.searchParams.get('course') === 'eq.english-placement') return route.fulfill({json:[]});
           if (url.searchParams.get('course') === 'eq.sports-b2') return route.fulfill({json:[]});
+          if (url.searchParams.get('course') === 'eq.engineering-c1' && !url.searchParams.has('lesson_path')) return route.fulfill({json:[]});
           assert.equal(url.searchParams.get('course'),'eq.general-english-b2');
           return route.fulfill({json:[{id:roomId,teacher_id:teacherId,student_id:studentId,student_label:'Виктория'}]});
         }
