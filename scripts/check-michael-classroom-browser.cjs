@@ -48,6 +48,7 @@ async function exercise(browser,origin,mobile){
     if(i===2){
      const colors=await sp.locator('.article').evaluate(article=>({foreground:getComputedStyle(article.querySelector('h3')).color,background:getComputedStyle(article).backgroundColor}));
      assert.ok(contrast(colors.foreground,colors.background)>=4.5,'Reading heading contrast below 4.5:1');
+     assert.ok(await sp.locator('.article p').first().evaluate(node=>parseFloat(getComputedStyle(node).fontSize)>=16),'Reading body text below 16px');
     }
     await sp.screenshot({path:`artifacts/michael-classroom/${mobile?'mobile':'desktop'}-${theme}-${i+1}.jpg`});
     if(i===2||i===4){

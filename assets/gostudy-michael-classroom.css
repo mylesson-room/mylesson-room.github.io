@@ -141,3 +141,6 @@ body[data-virtual-classroom="michael-1-1"] .definition-options button{color:var(
 body[data-virtual-classroom="michael-1-1"] #lessonVideo .jaas-size,
 body[data-virtual-classroom="michael-1-1"] #lessonVideo .jaas-expand{color:var(--class-ink);background:var(--class-control);border:1px solid var(--class-line);border-radius:10px;padding:8px 12px;font-size:14px;margin:4px 3px 4px 0}
 body[data-virtual-classroom="michael-1-1"] #finance-messages{background:var(--class-panel);color:var(--class-ink);border-color:var(--class-line)}
+body[data-virtual-classroom="michael-1-1"] .article p,
+body[data-virtual-classroom="michael-1-1"] .role p,
+body[data-virtual-classroom="michael-1-1"] .question-item label{font-size:1rem}
