@@ -8,6 +8,7 @@ const defaults={
  table:'gostudy_finance_lesson_selection',initial:'business-ai-finance-b2-02.html',
  lessons:{
   'business-ai-finance-b2-02.html':{title:'Can AI predict a financial crisis before it happens?',homework:'business-ai-finance-b2-02-homework.html',label:'Текущий урок · прогнозирование финансовых рисков'},
+  'business-ai-finance-b2-02-new.html':{title:'AI in Finance — Lesson 2 (NEW)',homework:'business-ai-finance-b2-02-homework.html',label:'Light Edition · новый дизайн'},
   'business-ai-finance-b2-03.html':{title:'AI has flagged the payment. What would you do?',homework:'business-ai-finance-b2-03-homework.html',label:'Следующий урок · When AI Flags a Payment'}
  }
 };

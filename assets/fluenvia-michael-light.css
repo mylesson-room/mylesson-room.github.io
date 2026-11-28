@@ -1,0 +1,63 @@
+/* Michael-only Light Edition. Preserve shared DOM, event handlers and data. */
+body[data-fluenvia-light] {--ink:#20343e;--muted:#53666c;--primary:#24565a;--stroke:#d9ded9;color:var(--ink);background:#e8e0d6;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body[data-fluenvia-light] .layout{background:linear-gradient(120deg,rgba(250,246,240,.73),rgba(247,235,218,.65)),url("fluenvia-london-light.svg") center/cover no-repeat;gap:0}
+body[data-fluenvia-light] header,body[data-fluenvia-light] .pager{background:rgba(253,250,245,.96);border-color:#e5e0d8;box-shadow:none;color:#20343e}
+body[data-fluenvia-light] .lesson-brand img{display:none}
+body[data-fluenvia-light] .lesson-brand::after{content:"FluenVia";font-size:23px;font-weight:750;color:#20343e;white-space:nowrap}
+body[data-fluenvia-light] .light-breadcrumb{color:#53666c;font-size:13px;white-space:nowrap;margin-right:auto}
+body[data-fluenvia-light] .header-right button,body[data-fluenvia-light] .header-right a{border-radius:22px;background:#fffdf9;border-color:transparent;color:#20343e}
+body[data-fluenvia-light] .sidebar,body[data-fluenvia-light] .lesson,body[data-fluenvia-light] .lesson-divider{background:transparent;border:0}
+body[data-fluenvia-light] .sidebar{padding:16px 10px 12px}
+body[data-fluenvia-light] .lesson{padding:14px clamp(12px,2vw,26px) 0}
+body[data-fluenvia-light] .lesson-content{background:transparent;border:0;box-shadow:none;padding:0 0 18px;scrollbar-gutter:stable}
+body[data-fluenvia-light] .hero{display:none}
+body[data-fluenvia-light] #lessonPages .panel{background:transparent;display:flow-root;border:0;padding:0 0 12px}
+body[data-fluenvia-light] #lessonPages .activity-head{display:block;background:transparent;border:0;padding:0;margin:0 0 6px;border-radius:0}
+body[data-fluenvia-light] #lessonPages .activity-icon{display:none}
+body[data-fluenvia-light] #lessonPages .activity-head::before{content:attr(data-light-section);display:block;color:#805631;font-size:12px;font-weight:700;letter-spacing:.055em;margin-bottom:4px}
+body[data-fluenvia-light] #lessonPages .activity-titles h2{font-family:"Instrument Serif",Georgia,serif;font-size:clamp(32px,4vw,55px);line-height:1.08;font-weight:400;letter-spacing:-.025em;color:#20343e}
+body[data-fluenvia-light] #lessonPages .lead{font-size:15px;line-height:1.55;margin:0 0 16px;color:#304953}
+body[data-fluenvia-light] #lessonPages :is(.warmup-scene,.article,.signal-card,.chart,.term,.role,.tip,.question-item,.gap-item,.decision-metrics>div,.choices label,.questions){background:rgba(255,253,249,.94);border:1px solid rgba(255,255,255,.7);border-radius:16px;box-shadow:0 3px 16px #392f2110;color:#20343e}
+body[data-fluenvia-light] #lessonPages :is(.tip,.case,.scene-badge,.field-label){color:#805631}
+body[data-fluenvia-light] #lessonPages .tip p{color:#20343e}
+body[data-fluenvia-light] #lessonPages .questions{padding:12px 18px 12px 42px;margin:0 0 12px}
+body[data-fluenvia-light] #lessonPages .questions li{padding:10px 0;border-bottom:1px solid #d7dbd8;margin:0}
+body[data-fluenvia-light] #lessonPages .questions li:last-child{border:0}
+body[data-fluenvia-light] #lessonPages .questions li::marker{color:#805631;font-weight:700}
+body[data-fluenvia-light] #lessonPages .warmup-scene{padding:16px;margin:0;color:#20343e;min-width:0}
+body[data-fluenvia-light] #lessonPages .scene-top,body[data-fluenvia-light] #lessonPages .scene-footer{color:#805631;background:transparent;border-color:#e1e2de}
+body[data-fluenvia-light] #lessonPages .scene-badge{background:none;padding:0}
+body[data-fluenvia-light] #lessonPages .scene-copy strong{color:#20343e;font-size:clamp(30px,4.2vw,52px)}
+body[data-fluenvia-light] #lessonPages .scene-chart{display:flex;flex-direction:column;align-items:stretch;gap:8px}
+body[data-fluenvia-light] #lessonPages .scene-chart svg{width:100%;height:auto;max-height:110px}
+body[data-fluenvia-light] #lessonPages .scene-chart svg path[stroke]{stroke:#24565a}
+body[data-fluenvia-light] #lessonPages .scene-chart svg circle{fill:#805631}
+body[data-fluenvia-light] #lessonPages .scene-copy span{color:#ad433a}
+body[data-fluenvia-light] #lessonPages .scene-copy small{color:#24565a}
+body[data-fluenvia-light] #lessonPages .question-item{padding:14px;margin:10px 0}
+body[data-fluenvia-light] #lessonPages .gap-item{padding:12px;margin:8px 0}
+body[data-fluenvia-light] #lessonPages .article p{color:#30434c}
+body[data-fluenvia-light] #lessonPages input:not([type=radio]),body[data-fluenvia-light] #lessonPages textarea,body[data-fluenvia-light] #lessonPages select{background:#fffdf9;color:#20343e;border-color:#cbd2cc}
+body[data-fluenvia-light] #lessonPages .good{color:#167352}
+body[data-fluenvia-light] #lessonPages .bad{color:#a43c32}
+body[data-fluenvia-light] .video-workspace{border:0;border-radius:16px;background:rgba(255,253,249,.92);box-shadow:0 5px 18px #392f211c}
+body[data-fluenvia-light] .pager .primary{background:#24565a;color:white;border-radius:24px;box-shadow:none}
+body[data-fluenvia-light] .pager .outline{background:#fffdf9;color:#20343e;border-color:#d9ded9;border-radius:22px}
+body[data-fluenvia-light] .footer{color:#53666c}
+@media(min-width:801px){body[data-fluenvia-light] .layout{--video-width:24%;}body[data-fluenvia-light] #page-0.active .panel{display:grid;grid-template-columns:minmax(0, .8fr) minmax(0, 1.2fr);gap:12px;align-items:stretch}body[data-fluenvia-light] #page-0 .activity-head,body[data-fluenvia-light] #page-0 .lead,body[data-fluenvia-light] #page-0 .tip{grid-column:1/-1}body[data-fluenvia-light] #page-0 .questions{margin:0}body[data-fluenvia-light] #page-0 .tip{margin:0}}
+@media(max-width:800px){body[data-fluenvia-light] .light-breadcrumb{display:none}body[data-fluenvia-light] .lesson{padding:10px 12px 70px}body[data-fluenvia-light] .lesson-content{padding:0;min-height:0}body[data-fluenvia-light] .sidebar{padding:0}body[data-fluenvia-light] #lessonPages .activity-titles h2{font-size:38px}body[data-fluenvia-light] #lessonPages .warmup-scene{margin-bottom:12px}}
+@media print{body[data-fluenvia-light] .layout{background:#fff}}
+
+@media(min-width:1050px){
+ body[data-fluenvia-light]{--lesson-toolbar-height:52px}
+ body[data-fluenvia-light] .pager{gap:12px;padding-inline:16px}
+ body[data-fluenvia-light] .pager>.lesson-section-menu{flex:1 1 auto;min-width:0;margin:0;padding:0;border:0;background:transparent}
+ body[data-fluenvia-light] .pager>.lesson-section-menu summary{display:none}
+ body[data-fluenvia-light] .pager #lessonSections{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:clamp(4px,1vw,14px);margin:0}
+ body[data-fluenvia-light] .pager #lessonSections button{font-size:11px;padding:0 2px;height:40px;min-width:0;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:transparent;border:0;border-radius:0;color:#53666c;box-shadow:none}
+ body[data-fluenvia-light] .pager #lessonSections button::before{content:"";display:block;height:3px;background:#aab7b8;border-radius:3px;margin:0 0 7px}
+ body[data-fluenvia-light] .pager #lessonSections [aria-current="step"]{color:#20343e;font-weight:750}
+ body[data-fluenvia-light] .pager #lessonSections [aria-current="step"]::before{background:#805631}
+ body[data-fluenvia-light] .pager #next,body[data-fluenvia-light] .pager #back{min-width:88px}
+ body[data-fluenvia-light] .pager #moveStudent{font-size:12px;white-space:nowrap}
+}
