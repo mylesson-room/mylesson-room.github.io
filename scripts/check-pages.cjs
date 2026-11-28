@@ -1548,7 +1548,7 @@ async function main() {
             general_english_b1:{pages:4,key:'gostudy-general-english-b1-01-v1',section:3,answer:'weekend-decision',value:'I can meet on Saturday at ten.'},
             general_english_b1_stories:{pages:8,key:'gostudy-general-english-b1-stories-01-v1',section:6,answer:'newhome-relocation',value:'I recommend Porto because she can make friends.'},
             travel_a2:{pages:7,key:'gostudy-positive-thinking-a2-v1',section:6,answer:'pt-speaking',value:'I will call back tomorrow.'},
-            tiktok_a2:{pages:5,key:'gostudy-tiktok-a2-v1',section:4,answer:'video-pitch',value:'My funny dog is sleeping.'}
+            tiktok_a2:{pages:7,key:'gostudy-tiktok-a2-v1',section:4,answer:'video-pitch',value:'My funny dog is sleeping.'}
           };
           const e=expectations[course];
           await sp.locator('.lesson-card-link').waitFor();
